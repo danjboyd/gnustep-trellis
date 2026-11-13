@@ -1,0 +1,65 @@
+{
+ "id": "wpt/css/css-flexbox/flex-minimum-height-flex-items-012",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/flex-minimum-height-flex-items-012.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "height": 100,
+   "width": 100
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "height": 10,
+     "flexGrow": "0.1",
+     "flexShrink": "1",
+     "flexBasis": "0%"
+    }
+   },
+   {
+    "style": {
+     "display": "flex",
+     "height": "100%",
+     "flexGrow": "0.9",
+     "flexShrink": "1",
+     "flexBasis": "0%"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "height": "100%"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "height": 10
+   },
+   {
+    "children": [
+     {}
+    ],
+    "height": 90
+   }
+  ]
+ }
+}

@@ -1,0 +1,37 @@
+{
+ "id": "wpt/css/css-flexbox/flex-one-sets-flex-basis-to-zero-px/12",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/flex-one-sets-flex-basis-to-zero-px.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "flexGrow": "0.5",
+   "flexShrink": "1",
+   "flexBasis": "0%",
+   "minWidth": 0,
+   "minHeight": 0
+  },
+  "measure": {
+   "text": "Flex item with flex: 0.5",
+   "charWidth": 14,
+   "lineHeight": 14
+  }
+ },
+ "expected": {
+  "width": 14
+ },
+ "requires": [
+  "measure"
+ ]
+}

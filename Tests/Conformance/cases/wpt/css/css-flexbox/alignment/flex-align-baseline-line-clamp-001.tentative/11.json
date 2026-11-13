@@ -1,0 +1,142 @@
+{
+ "id": "wpt/css/css-flexbox/alignment/flex-align-baseline-line-clamp-001.tentative/11",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/alignment/flex-align-baseline-line-clamp-001.tentative.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "inlineSize": 100,
+   "position": "relative",
+   "paddingTop": 10,
+   "paddingRight": 10,
+   "paddingBottom": 10,
+   "paddingLeft": 10,
+   "alignItems": "last baseline"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "inline-block",
+       "width": 30,
+       "height": 30
+      }
+     }
+    ]
+   },
+   {
+    "style": {
+     "display": "-webkit-box",
+     "lineClamp": "3 no-ellipsis",
+     "overflow": "hidden",
+     "borderTopWidth": 10,
+     "borderRightWidth": 10,
+     "borderBottomWidth": 10,
+     "borderLeftWidth": 10
+    },
+    "children": [
+     {
+      "style": {
+       "display": "inline-block",
+       "width": 40,
+       "height": 40
+      }
+     },
+     {
+      "style": {
+       "display": "inline"
+      },
+      "children": [
+       {
+        "style": {
+         "display": "inline-block",
+         "width": 40,
+         "height": 40
+        }
+       },
+       {
+        "style": {
+         "display": "block"
+        },
+        "children": [
+         {
+          "style": {
+           "display": "inline-block",
+           "width": 40,
+           "height": 40
+          }
+         },
+         {
+          "style": {
+           "display": "inline-block",
+           "width": 40,
+           "height": 40
+          }
+         },
+         {
+          "style": {
+           "display": "inline-block",
+           "width": 40,
+           "height": 40
+          }
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {}
+    ],
+    "y": 110
+   },
+   {
+    "children": [
+     {},
+     {
+      "children": [
+       {},
+       {
+        "children": [
+         {},
+         {},
+         {}
+        ]
+       }
+      ]
+     }
+    ],
+    "y": 10
+   }
+  ]
+ },
+ "requires": [
+  "block-layout",
+  "display--webkit-box",
+  "display-inline",
+  "display-inline-block",
+  "logical-properties",
+  "overflow"
+ ]
+}

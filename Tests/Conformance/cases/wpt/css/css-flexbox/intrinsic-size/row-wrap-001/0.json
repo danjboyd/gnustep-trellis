@@ -1,0 +1,66 @@
+{
+ "id": "wpt/css/css-flexbox/intrinsic-size/row-wrap-001/0",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/intrinsic-size/row-wrap-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "available": {
+  "width": 0,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexWrap": "wrap",
+   "height": 100
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "flexGrow": "1",
+     "flexShrink": "1",
+     "flexBasis": 200,
+     "width": 50
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "width": 100
+      }
+     }
+    ]
+   },
+   {
+    "style": {
+     "display": "block",
+     "flexGrow": "1",
+     "flexShrink": "1",
+     "flexBasis": 400,
+     "width": 50
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {}
+    ]
+   },
+   {}
+  ],
+  "width": 100
+ },
+ "rootSizing": "fit-content",
+ "requires": [
+  "block-layout"
+ ]
+}

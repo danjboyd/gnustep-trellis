@@ -1,0 +1,52 @@
+{
+ "id": "wpt/css/css-flexbox/flexbox-lines-must-be-stretched-by-default",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/flexbox-lines-must-be-stretched-by-default.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "height": 100,
+   "width": 200,
+   "flexWrap": "wrap"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "width": "100%",
+     "borderTopWidth": 1,
+     "borderRightWidth": 1,
+     "borderBottomWidth": 1,
+     "borderLeftWidth": 1
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "width": "100%"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "height": 51
+   },
+   {
+    "height": 49
+   }
+  ]
+ }
+}

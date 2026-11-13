@@ -1,0 +1,97 @@
+{
+ "id": "wpt/css/css-flexbox/percentage-size/2",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/percentage-size.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "height": 50,
+   "marginBottom": 100
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "height": "auto"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "flexGrow": 0,
+       "flexShrink": 0,
+       "flexBasis": "auto",
+       "height": 10,
+       "minHeight": "50%"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "flexGrow": 0,
+       "flexShrink": 0,
+       "flexBasis": "auto",
+       "height": "50%"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "flexGrow": 0,
+       "flexShrink": 0,
+       "flexBasis": "auto",
+       "height": 10,
+       "maxHeight": "50%"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "flexGrow": 0,
+       "flexShrink": 0,
+       "flexBasis": "auto",
+       "minHeight": 10,
+       "height": 100,
+       "maxHeight": "50%"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "height": 10
+     },
+     {
+      "height": 0
+     },
+     {
+      "height": 10
+     },
+     {
+      "height": 100
+     }
+    ]
+   }
+  ]
+ },
+ "requires": [
+  "block-layout"
+ ]
+}

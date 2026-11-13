@@ -1,0 +1,28 @@
+{
+ "id": "wpt/css/css-flexbox/flex-shorthand-flex-basis-middle/2",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/flex-shorthand-flex-basis-middle.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "available": {
+  "width": 500,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "width": 50,
+   "flexGrow": "1",
+   "flexShrink": "0%",
+   "flexBasis": "1"
+  }
+ },
+ "expected": {
+  "width": 50
+ }
+}

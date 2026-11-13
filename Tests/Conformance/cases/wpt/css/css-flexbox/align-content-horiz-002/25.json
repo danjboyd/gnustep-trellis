@@ -1,0 +1,80 @@
+{
+ "id": "wpt/css/css-flexbox/align-content-horiz-002/25",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/align-content-horiz-002.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "width": 20,
+   "height": 200,
+   "flexWrap": "wrap-reverse",
+   "marginRight": 2,
+   "alignContent": "end"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "width": 20,
+     "height": 10,
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": "auto"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "width": 20,
+     "height": "auto",
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": "auto"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "width": 10,
+       "height": 30
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 20,
+    "height": 10
+   },
+   {
+    "children": [
+     {
+      "width": 10,
+      "height": 30
+     }
+    ],
+    "width": 20,
+    "height": 30
+   }
+  ]
+ },
+ "rootSizing": "fit-content",
+ "requires": [
+  "block-layout"
+ ],
+ "droppedChecks": 6
+}

@@ -1,0 +1,53 @@
+{
+ "id": "wpt/css/css-flexbox/flex-basis-014/2",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/flex-basis-014.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "height": 50
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "minWidth": 0
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "height": "100%",
+       "aspectRatio": "2 / 1"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {}
+    ],
+    "width": 100
+   }
+  ]
+ },
+ "requires": [
+  "aspect-ratio",
+  "block-layout"
+ ]
+}

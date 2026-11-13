@@ -1,0 +1,62 @@
+{
+ "id": "wpt/css/css-flexbox/justify-content-006",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/justify-content-006.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "width": 100,
+   "position": "relative",
+   "borderTopWidth": 2,
+   "borderRightWidth": 2,
+   "borderBottomWidth": 2,
+   "borderLeftWidth": 2
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": 50,
+     "minHeight": 50,
+     "flexDirection": "column",
+     "justifyContent": "flex-end"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "width": 30,
+       "height": 30
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "y": 22,
+      "relativeTo": 2
+     }
+    ]
+   }
+  ]
+ }
+}

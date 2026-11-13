@@ -1,0 +1,57 @@
+{
+ "id": "wpt/css/css-flexbox/abspos/flex-abspos-staticpos-align-self-008/22",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/abspos/flex-abspos-staticpos-align-self-008.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "position": "relative",
+   "flexDirection": "column-reverse",
+   "flexWrap": "wrap-reverse",
+   "paddingTop": 1,
+   "paddingRight": 2,
+   "paddingBottom": 1,
+   "paddingLeft": 2,
+   "marginBottom": 5,
+   "marginRight": 5,
+   "alignItems": "center",
+   "height": 2,
+   "width": 4,
+   "borderTopWidth": 1,
+   "borderRightWidth": 1,
+   "borderBottomWidth": 1,
+   "borderLeftWidth": 1
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "position": "absolute",
+     "height": 6,
+     "width": 8,
+     "alignSelf": "flex-start"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "x": -1,
+    "y": -2
+   }
+  ]
+ },
+ "rootSizing": "fit-content"
+}

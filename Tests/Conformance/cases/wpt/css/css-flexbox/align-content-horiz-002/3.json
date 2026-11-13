@@ -1,0 +1,48 @@
+{
+ "id": "wpt/css/css-flexbox/align-content-horiz-002/3",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/align-content-horiz-002.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "width": 20,
+   "height": 200,
+   "flexWrap": "wrap-reverse",
+   "marginRight": 2,
+   "alignContent": "flex-start"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "width": 20,
+     "height": 10,
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": "auto"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 20,
+    "height": 10
+   }
+  ]
+ },
+ "rootSizing": "fit-content",
+ "droppedChecks": 2
+}

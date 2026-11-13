@@ -1,0 +1,80 @@
+{
+ "id": "wpt/css/css-flexbox/flexbox_justifycontent-center-overflow",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/flexbox_justifycontent-center-overflow.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "marginLeft": 50,
+   "height": 150,
+   "width": 50,
+   "justifyContent": "center",
+   "position": "relative"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "marginTop": 10,
+     "marginRight": 10,
+     "marginBottom": 10,
+     "marginLeft": 10,
+     "flexGrow": "1",
+     "flexShrink": 0,
+     "flexBasis": 40
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "marginTop": 10,
+     "marginRight": 10,
+     "marginBottom": 10,
+     "marginLeft": 10,
+     "flexGrow": "1",
+     "flexShrink": 0,
+     "flexBasis": 40
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "marginTop": 10,
+     "marginRight": 10,
+     "marginBottom": 10,
+     "marginLeft": 10,
+     "flexGrow": "1",
+     "flexShrink": 0,
+     "flexBasis": 40
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 40,
+    "x": -55
+   },
+   {
+    "width": 40,
+    "x": 5
+   },
+   {
+    "width": 40,
+    "x": 65
+   }
+  ]
+ }
+}

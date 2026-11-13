@@ -1,0 +1,94 @@
+{
+ "id": "wpt/css/css-flexbox/align-content-vert-002/20",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/align-content-vert-002.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "width": 200,
+   "height": 20,
+   "flexDirection": "column",
+   "flexWrap": "wrap-reverse",
+   "marginBottom": 2,
+   "alignContent": "space-evenly"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "width": 10,
+     "height": 20,
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": "auto"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "width": "auto",
+     "height": 20,
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": "auto"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "width": 30,
+       "height": 10
+      }
+     }
+    ]
+   },
+   {
+    "style": {
+     "display": "block",
+     "width": 40,
+     "height": 20,
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": "auto"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 10,
+    "height": 20
+   },
+   {
+    "children": [
+     {
+      "width": 30,
+      "height": 10
+     }
+    ],
+    "width": 30,
+    "height": 20
+   },
+   {
+    "width": 40,
+    "height": 20
+   }
+  ]
+ },
+ "requires": [
+  "block-layout"
+ ],
+ "droppedChecks": 8
+}

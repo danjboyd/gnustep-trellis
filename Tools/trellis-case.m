@@ -78,6 +78,15 @@ static TRNode *TRBuildNode(NSDictionary *d, NSString **err)
           n.baselineBlock = ^TRFloat(TRSize size) { return b; };
         }
     }
+  for (NSDictionary *cq in d[@"conditions"])
+    {
+      NSError *ce = nil;
+      if (![n addConditionalStyle: cq[@"style"] when: cq[@"when"] error: &ce])
+        {
+          *err = [ce localizedDescription];
+          return nil;
+        }
+    }
   for (NSDictionary *c in d[@"children"])
     {
       TRNode *cn = TRBuildNode(c, err);

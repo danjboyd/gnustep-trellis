@@ -239,6 +239,23 @@ TRBoxView *bar = [TRBoxView boxWithStyle: @"flex-direction: row; align-items: ce
 [share.trellisStyle setValue: @"none" forProperty: @"display" error: NULL]; // hidden below 500px via @container
 ```
 
+## 4a. Not CSS: where Trellis departs from the browser
+
+Agents must not assume browser behaviour in these cases:
+
+| Topic | Browser CSS | Trellis |
+|---|---|---|
+| Default `display` | `inline` / `block` by element | `flex` for every box |
+| `display: block` | block flow | a **column** flex container (`align-items: stretch`) |
+| `box-sizing` | `content-box` | **`border-box`** |
+| Block and inline flow, floats, tables | yes | no; boxes are flex (v1) or grid (v1.1) containers |
+| `position: absolute` | relative to the nearest *positioned* ancestor | relative to the **parent's** padding box |
+| Default `position` | `static` | `relative` (insets offset the box) |
+| Unitless lengths | invalid, except 0 | accepted as px; `trellis-lint` warns |
+| Unknown property names | ignored | **an error** |
+| Selectors and cascade | yes | inline styles have none; `.trellis` files have file-scoped type, class and id selectors only |
+| Units | many | `px`, `%` and `auto` (plus `fr` in v1.1) |
+
 ## 5. The agent loop: trellis-render and trellis-lint
 
 ```
@@ -248,11 +265,23 @@ trellis-render [--width W] [--height H] [--widths 360,560,900]
                (Screen.trellis | --class TRDemoAskView --bundle Demo.bundle)
 ```
 
-- It runs offscreen under Xvfb, with `HOME` set to a throwaway directory,
-  so the maintainer's defaults are never read or written. It fails closed if no
-  private display or private HOME is available. On macOS it uses
-  `-[NSView cacheDisplayInRect:toBitmapImageRep:]` with no window on
-  screen.
+- **Isolation (fail closed).** It runs offscreen under a private Xvfb display
+  and never touches the user's GNUstep defaults:
+  - On GNUstep, `NSHomeDirectory()` comes from `$GNUSTEP_HOME`, falling
+    back to the passwd entry, and **ignores `$HOME`**. `GNUstep.sh` also
+    ends by unsetting `GNUSTEP_HOME`.
+  - So `scripts/run-headless.sh` exports `GNUSTEP_HOME` (and `HOME`) to a
+    throwaway directory *after* sourcing GNUstep.sh, and starts Xvfb on a
+    free display number.
+  - Before `NSApplication` starts, the tool checks that `NSHomeDirectory()`
+    and the user Library path (where NSUserDefaults lives) both resolve
+    inside that directory. If not, it exits with status 3 before any GUI
+    code runs.
+  - It refuses to run against `:0` or the user's own display.
+
+  This closes the gap that wrote into the maintainer's real defaults on 2026-11-11.
+  On macOS it uses `-[NSView cacheDisplayInRect:toBitmapImageRep:]` with
+  no window on screen.
 - With `--widths`, it writes one PNG and one JSON per width
   (`out-360.png` and so on).
 - `--outlines` draws box outlines, padding and gaps over the controls: the
@@ -360,14 +389,12 @@ for `.trellis` files. Its rules:
 | **Departures from browser CSS.** | `display` defaults to flex, with no block or inline flow. Absolute children are placed against their parent box. Documented, and checked by conformance. |
 | **Maintainer load of a second layout system.** | Separate library, Foundation-only core, conformance suite. |
 
-## 8. Open questions
+## 8. Decided questions (lead, 2026-11-13; the maintainer may override)
 
-1. Should `display: block` behave as `flex-direction: column` with
-   `align-items: stretch`? That would be closer to what people expect.
-   Today it's an alias for flex row.
-2. Default `box-sizing`: CSS's content-box (current), or border-box like
-   most modern CSS resets? This matters for agents writing
-   `width: 200px; padding: 8px`.
-3. Should Grid (v1.1) also include `subgrid`, which form label columns
-   want?
-4. Windows/MSYS2: build there in v1, or after?
+1. `display: block` is a column flex container with `align-items: stretch`.
+   **Implemented.**
+2. `box-sizing` defaults to `border-box`, as a deliberate departure from
+   CSS. WPT imports set `content-box` explicitly. **Implemented.**
+3. No subgrid in v1.1. Grid comes first; subgrid in v1.2 if form label
+   columns need it (`max-content` tracks cover most of that).
+4. Windows/MSYS2 comes after v1.

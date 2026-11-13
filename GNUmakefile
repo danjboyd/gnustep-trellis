@@ -23,7 +23,8 @@ LIBRARY_NAME = libTrellisEngine
 libTrellisEngine_OBJC_FILES = \
 	Source/Engine/TRStyle.m \
 	Source/Engine/TRNode.m \
-	Source/Engine/TRLayout.m
+	Source/Engine/TRLayout.m \
+	Source/Engine/TRContainerQuery.m
 libTrellisEngine_HEADER_FILES_DIR = Source/Engine
 libTrellisEngine_HEADER_FILES_INSTALL_DIR = Trellis
 libTrellisEngine_HEADER_FILES = TRTypes.h TRStyle.h TRNode.h TrellisEngine.h

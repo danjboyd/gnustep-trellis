@@ -23,7 +23,7 @@ TRStyleStorage TRStyleStorageInitial(void)
   s.alignSelf = TRAlignAuto;
   s.alignContent = TRAlignNormal;
   s.overflow = TROverflowVisible;
-  s.boxSizing = TRBoxSizingContentBox;
+  s.boxSizing = TRBoxSizingBorderBox;   /* deliberate departure from CSS */
   s.flexGrow = 0;
   s.flexShrink = 1;
   s.flexBasis = TRAuto;
@@ -154,8 +154,8 @@ static BOOL TRLookup(NSString *tok, const TRKeyword *table, int *out)
 
 static const TRKeyword kDisplay[] = {
   {"flex", TRDisplayFlex}, {"none", TRDisplayNone},
-  /* No block/inline layout in v1: these behave as flex containers. */
-  {"block", TRDisplayFlex}, {"inline-flex", TRDisplayFlex}, {NULL, 0}};
+  /* No CSS block/inline flow: block is a column flex container. */
+  {"block", TRDisplayBlock}, {"inline-flex", TRDisplayFlex}, {NULL, 0}};
 static const TRKeyword kPosition[] = {
   {"relative", TRPositionRelative}, {"static", TRPositionStatic},
   {"absolute", TRPositionAbsolute}, {NULL, 0}};
@@ -202,7 +202,7 @@ static NSSet *TRVisualProperties(void)
       @"border-color", @"border-style", @"border-radius",
       @"border-top-color", @"border-right-color", @"border-bottom-color",
       @"border-left-color", @"box-shadow", @"visibility", @"z-index",
-      @"cursor", @"content", nil];
+      @"cursor", @"content", @"container-type", @"container-name", nil];
   });
   return set;
 }

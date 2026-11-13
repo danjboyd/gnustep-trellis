@@ -91,4 +91,21 @@ typedef TRFloat (^TRBaselineBlock)(TRSize size);
 
 @end
 
+@interface TRNode (ContainerQueries)
+
+/* Container queries. `condition` is evaluated against the inner width of
+   the nearest ancestor whose style has `container-type: inline-size` (or
+   the root, if there is none), after each layout pass; when it matches,
+   `declarations` are applied on top of the node's style. Accepted forms:
+   "(min-width: 560px)", "(max-width: 400px)", "width >= 560px",
+   "width < 400px", joined with "and". Set the node's base style before
+   adding conditions. */
+- (BOOL)addConditionalStyle:(NSString *)declarations
+                       when:(NSString *)condition
+                      error:(NSError **)error;
+/* The conditions that matched in the last layout. */
+@property (nonatomic, readonly) NSArray<NSString *> *matchedConditions;
+
+@end
+
 #endif

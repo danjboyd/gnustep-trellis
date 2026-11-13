@@ -51,13 +51,24 @@ runner (`trellis-case`) reads both.
 - Numbers are px. Strings are CSS values: `"50%"`, `"auto"`, `"10px 20px"`,
   `"1 1 0"`. Shorthands (`flex`, `margin`, `padding`, `inset`, `gap`,
   `border-width`, `flex-flow`, `place-*`) are accepted.
-- CSS initial values apply: `display:flex` is the default display for every
-  node (Trellis has no block layout in v1), `flex-direction:row`,
-  `flex-shrink:1`, `box-sizing:content-box`, `min-width/height:auto`.
+- CSS initial values apply, with two deliberate departures:
+  `box-sizing` defaults to **border-box**, and `display` defaults to
+  `flex` (`display: block` means a column flex container). Otherwise
+  `flex-direction:row`, `flex-shrink:1`, `min-width/height:auto`.
+  **WPT imports must set `"boxSizing": "content-box"` on every node.**
+  Yoga imports need nothing (Yoga is border-box too).
 - **Positioning:** an absolutely positioned child is placed against its
   parent's padding box (Yoga semantics), whatever the parent's `position`.
   WPT imports should give the container `position:relative`, which makes
   this match the browser.
+
+## `conditions` (container queries)
+
+Any node may carry
+`"conditions": [{"when": "width < 300px", "style": "flex-direction: column"}]`.
+Each condition is tested against the inner width of the nearest ancestor
+with `containerType: "inline-size"` (or the root), and the style is applied
+on top when it matches. See `TRNode -addConditionalStyle:when:error:`.
 
 ## `measure` (leaves only)
 

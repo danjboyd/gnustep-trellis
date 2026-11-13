@@ -39,6 +39,11 @@ typedef struct {
   int _cacheCount, _cacheNext;
   BOOL _hasPerformEntry;
   TRCacheEntry _performEntry;
+
+  /* Container queries (TRContainerQuery.m). */
+  TRStyle *_baseStyle;            /* the style without conditional overlays */
+  NSMutableArray *_conditions;    /* TRCondition objects, in order */
+  uint64_t _matchedMask;
 }
 @end
 
@@ -50,6 +55,10 @@ TRSize TRLayoutNode(TRNode *node, TRFloat aw, TRFloat ah,
                     TRMeasureMode wm, TRMeasureMode hm,
                     TRFloat ow, TRFloat oh, BOOL perform,
                     TRDirection parentDirection);
+
+/* Re-evaluates container queries after a layout pass; YES if any node's
+   effective style changed (and so another pass is needed). */
+BOOL TRApplyContainerQueries(TRNode *root);
 
 void TRRoundTree(TRNode *node, TRFloat parentAbsX, TRFloat parentAbsY, TRFloat scale);
 TRFloat TRComputeBaseline(TRNode *node);

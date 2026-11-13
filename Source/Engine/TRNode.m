@@ -69,6 +69,11 @@
 {
   _style = [style copy];
   _style.owner = self;
+  if (_conditions != nil)
+    {
+      _baseStyle = [style copy];
+      _matchedMask = 0;
+    }
   [self markDirty];
 }
 
@@ -146,6 +151,19 @@ static void TRClearDirty(TRNode *n)
 
 - (void)layoutWithAvailableSize:(TRSize)available direction:(TRDirection)direction
 {
+  /* Container queries can change styles, which changes sizes: iterate
+     until stable (in practice one or two passes). */
+  for (int pass = 0; pass < 4; pass++)
+    {
+      [self _layoutOnceWithAvailableSize: available direction: direction];
+      if (!TRApplyContainerQueries(self)) break;
+    }
+  TRRoundTree(self, 0, 0, _pixelScale);
+  TRClearDirty(self);
+}
+
+- (void)_layoutOnceWithAvailableSize:(TRSize)available direction:(TRDirection)direction
+{
   const TRStyleStorage *s = &_style->_s;
   TRFloat aw = available.width, ah = available.height;
   TRMeasureMode wm = isnan(aw) ? TRMeasureModeUndefined : TRMeasureModeExactly;
@@ -203,8 +221,6 @@ static void TRClearDirty(TRNode *n)
   TRFloat y = s->margin[TREdgeTop].unit == TRUnitPoint ? s->margin[TREdgeTop].value : 0;
   _rawFrame.x = x;
   _rawFrame.y = y;
-  TRRoundTree(self, 0, 0, _pixelScale);
-  TRClearDirty(self);
 }
 
 - (TRRect)layoutFrame { return _frame; }

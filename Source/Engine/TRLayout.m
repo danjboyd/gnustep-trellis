@@ -252,10 +252,9 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
                            TRFloat ow, TRFloat oh, BOOL perform, TRDirection dir)
 {
   const BOOL rtl = (dir == TRDirectionRTL);
-  const BOOL isRow = (s->flexDirection == TRFlexDirectionRow
-                      || s->flexDirection == TRFlexDirectionRowReverse);
-  const BOOL dirReverse = (s->flexDirection == TRFlexDirectionRowReverse
-                           || s->flexDirection == TRFlexDirectionColumnReverse);
+  const TRFlexDirection fd = (s->display == TRDisplayBlock) ? TRFlexDirectionColumn : s->flexDirection;
+  const BOOL isRow = (fd == TRFlexDirectionRow || fd == TRFlexDirectionRowReverse);
+  const BOOL dirReverse = (fd == TRFlexDirectionRowReverse || fd == TRFlexDirectionColumnReverse);
   const BOOL wrapReverse = (s->flexWrap == TRFlexWrapWrapReverse);
   const BOOL mainRev = isRow ? (dirReverse != rtl) : dirReverse;
   const BOOL crossRev = isRow ? wrapReverse : (rtl != wrapReverse);
@@ -978,8 +977,8 @@ TRFloat TRComputeBaseline(TRNode *node)
   if (node->_baselineFn != nil)
     return node->_baselineFn(TRSizeMake(node->_rawFrame.width, node->_rawFrame.height));
   const TRStyleStorage *s = &node->_style->_s;
-  BOOL isRow = (s->flexDirection == TRFlexDirectionRow
-                || s->flexDirection == TRFlexDirectionRowReverse);
+  BOOL isRow = s->display != TRDisplayBlock
+    && (s->flexDirection == TRFlexDirectionRow || s->flexDirection == TRFlexDirectionRowReverse);
   TRNode *best = nil;
   NSInteger bestOrder = NSIntegerMax;
   for (TRNode *c in node->_children)

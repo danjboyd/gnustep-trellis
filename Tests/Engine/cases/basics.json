@@ -272,7 +272,8 @@
    "style": {
     "width": 100,
     "height": 100,
-    "padding": 10
+    "padding": 10,
+    "boxSizing": "content-box"
    },
    "children": [
     {
@@ -298,13 +299,12 @@
   }
  },
  {
-  "id": "engine/border_box_padding",
+  "id": "engine/border_box_is_default",
   "root": {
    "style": {
     "width": 100,
     "height": 100,
-    "padding": 10,
-    "boxSizing": "border-box"
+    "padding": 10
    },
    "children": [
     {
@@ -335,8 +335,7 @@
    "style": {
     "width": 100,
     "height": 100,
-    "borderWidth": 5,
-    "boxSizing": "border-box"
+    "borderWidth": 5
    },
    "children": [
     {
@@ -563,6 +562,81 @@
      "y": 5,
      "width": 10,
      "height": 10
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/display_block_is_column",
+  "root": {
+   "style": {
+    "display": "block",
+    "width": 100,
+    "height": 100
+   },
+   "children": [
+    {
+     "style": {
+      "height": 10
+     }
+    },
+    {
+     "style": {
+      "height": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 100,
+     "height": 10
+    },
+    {
+     "x": 0,
+     "y": 10,
+     "width": 100,
+     "height": 10
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/border_box_child_padding",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "alignItems": "flex-start"
+   },
+   "children": [
+    {
+     "style": {
+      "width": 50,
+      "height": 20,
+      "padding": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 50,
+     "height": 20
     }
    ]
   }

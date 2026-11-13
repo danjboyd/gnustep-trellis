@@ -1,0 +1,624 @@
+[
+ {
+  "id": "engine/justify_center",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "justifyContent": "center"
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10
+     }
+    },
+    {
+     "style": {
+      "width": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 40,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    },
+    {
+     "x": 50,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/justify_flex_end",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "justifyContent": "flex-end"
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10
+     }
+    },
+    {
+     "style": {
+      "width": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 80,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    },
+    {
+     "x": 90,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/justify_space_between",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "justifyContent": "space-between"
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10
+     }
+    },
+    {
+     "style": {
+      "width": 10
+     }
+    },
+    {
+     "style": {
+      "width": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    },
+    {
+     "x": 45,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    },
+    {
+     "x": 90,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/justify_space_around",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "justifyContent": "space-around"
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10
+     }
+    },
+    {
+     "style": {
+      "width": 10
+     }
+    },
+    {
+     "style": {
+      "width": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 12,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    },
+    {
+     "x": 45,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    },
+    {
+     "x": 78,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/justify_space_evenly",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "justifyContent": "space-evenly"
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10
+     }
+    },
+    {
+     "style": {
+      "width": 10
+     }
+    },
+    {
+     "style": {
+      "width": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 18,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    },
+    {
+     "x": 45,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    },
+    {
+     "x": 73,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/justify_flex_end_row_reverse",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "flexDirection": "row-reverse",
+    "justifyContent": "flex-end"
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10
+     }
+    },
+    {
+     "style": {
+      "width": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 10,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    },
+    {
+     "x": 0,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/justify_start_row_reverse",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "flexDirection": "row-reverse",
+    "justifyContent": "start"
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10
+     }
+    },
+    {
+     "style": {
+      "width": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 10,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    },
+    {
+     "x": 0,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/align_items_center",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "alignItems": "center"
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10,
+      "height": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 0,
+     "y": 45,
+     "width": 10,
+     "height": 10
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/align_items_flex_end",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "alignItems": "flex-end"
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10,
+      "height": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 0,
+     "y": 90,
+     "width": 10,
+     "height": 10
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/align_self_override",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "alignItems": "flex-start"
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10,
+      "height": 10,
+      "alignSelf": "flex-end"
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 0,
+     "y": 90,
+     "width": 10,
+     "height": 10
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/align_baseline",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "alignItems": "baseline"
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10,
+      "height": 20
+     }
+    },
+    {
+     "style": {
+      "width": 10,
+      "height": 10
+     },
+     "measure": {
+      "width": 10,
+      "height": 10,
+      "baseline": 5
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 10,
+     "height": 20
+    },
+    {
+     "x": 10,
+     "y": 15,
+     "width": 10,
+     "height": 10
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/margin_stretch",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10,
+      "margin": 5
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 5,
+     "y": 5,
+     "width": 10,
+     "height": 90
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/margin_left_auto",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10,
+      "marginLeft": "auto"
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 90,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/margin_auto_centers",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10,
+      "height": 10,
+      "margin": "auto"
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 45,
+     "y": 45,
+     "width": 10,
+     "height": 10
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/gap_row",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "gap": "10px"
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10
+     }
+    },
+    {
+     "style": {
+      "width": 10
+     }
+    },
+    {
+     "style": {
+      "width": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    },
+    {
+     "x": 20,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    },
+    {
+     "x": 40,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    }
+   ]
+  }
+ }
+]

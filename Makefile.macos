@@ -1,0 +1,29 @@
+# Plain-clang build for macOS (Apple Foundation; no GNUstep make needed).
+#   make -f Makefile.macos && make -f Makefile.macos check
+CC      ?= clang
+CFLAGS  ?= -O2 -g
+CFLAGS  += -fobjc-arc -fblocks -Wall -Wno-unused-function -ISource/Engine
+B       := build
+
+ENGINE_SRC := Source/Engine/TRStyle.m Source/Engine/TRNode.m Source/Engine/TRLayout.m
+
+all: $(B)/libTrellisEngine.dylib $(B)/trellis-case
+
+$(B):
+	mkdir -p $(B)
+
+$(B)/libTrellisEngine.dylib: $(ENGINE_SRC) Source/Engine/*.h | $(B)
+	$(CC) $(CFLAGS) -dynamiclib -install_name @rpath/libTrellisEngine.dylib \
+	  -framework Foundation $(ENGINE_SRC) -o $@
+
+$(B)/trellis-case: Tools/trellis-case.m $(B)/libTrellisEngine.dylib
+	$(CC) $(CFLAGS) -framework Foundation -L$(B) -lTrellisEngine \
+	  -Wl,-rpath,@executable_path Tools/trellis-case.m -o $@
+
+check: all
+	$(B)/trellis-case Tests/Engine/cases
+	@if [ -d Tests/Conformance/cases ]; then $(B)/trellis-case Tests/Conformance/cases | tail -20 || true; fi
+
+clean:
+	rm -rf $(B)
+.PHONY: all check clean

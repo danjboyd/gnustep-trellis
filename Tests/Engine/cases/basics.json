@@ -1,0 +1,570 @@
+[
+ {
+  "id": "engine/row_basic",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10
+     }
+    },
+    {
+     "style": {
+      "width": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    },
+    {
+     "x": 10,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/column_basic",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "flexDirection": "column"
+   },
+   "children": [
+    {
+     "style": {
+      "height": 10
+     }
+    },
+    {
+     "style": {
+      "height": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 100,
+     "height": 10
+    },
+    {
+     "x": 0,
+     "y": 10,
+     "width": 100,
+     "height": 10
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/row_reverse",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "flexDirection": "row-reverse"
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10
+     }
+    },
+    {
+     "style": {
+      "width": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 90,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    },
+    {
+     "x": 80,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/column_reverse",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "flexDirection": "column-reverse"
+   },
+   "children": [
+    {
+     "style": {
+      "height": 10
+     }
+    },
+    {
+     "style": {
+      "height": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 0,
+     "y": 90,
+     "width": 100,
+     "height": 10
+    },
+    {
+     "x": 0,
+     "y": 80,
+     "width": 100,
+     "height": 10
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/rtl_row",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10
+     }
+    },
+    {
+     "style": {
+      "width": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 90,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    },
+    {
+     "x": 80,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    }
+   ]
+  },
+  "direction": "rtl"
+ },
+ {
+  "id": "engine/auto_root_size",
+  "root": {
+   "style": {},
+   "children": [
+    {
+     "style": {
+      "width": 10,
+      "height": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 10,
+   "height": 10,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 10,
+     "height": 10
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/auto_root_padding",
+  "root": {
+   "style": {
+    "padding": 5
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10,
+      "height": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 20,
+   "height": 20,
+   "children": [
+    {
+     "x": 5,
+     "y": 5,
+     "width": 10,
+     "height": 10
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/content_box_padding",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "padding": 10
+   },
+   "children": [
+    {
+     "style": {
+      "flexGrow": 1
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 120,
+   "height": 120,
+   "children": [
+    {
+     "x": 10,
+     "y": 10,
+     "width": 100,
+     "height": 100
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/border_box_padding",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "padding": 10,
+    "boxSizing": "border-box"
+   },
+   "children": [
+    {
+     "style": {
+      "flexGrow": 1
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 10,
+     "y": 10,
+     "width": 80,
+     "height": 80
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/border_width",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "borderWidth": 5,
+    "boxSizing": "border-box"
+   },
+   "children": [
+    {
+     "style": {
+      "flexGrow": 1
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 5,
+     "y": 5,
+     "width": 90,
+     "height": 90
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/percent_width",
+  "root": {
+   "style": {
+    "width": 200,
+    "height": 100
+   },
+   "children": [
+    {
+     "style": {
+      "width": "50%"
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 200,
+   "height": 100,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 100,
+     "height": 100
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/display_none",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10,
+      "display": "none"
+     }
+    },
+    {
+     "style": {
+      "width": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 0,
+     "height": 0
+    },
+    {
+     "x": 0,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/order",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10,
+      "order": 2
+     }
+    },
+    {
+     "style": {
+      "width": 20,
+      "order": 1
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 20,
+     "y": 0,
+     "width": 10,
+     "height": 100
+    },
+    {
+     "x": 0,
+     "y": 0,
+     "width": 20,
+     "height": 100
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/nested_flex",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "flexDirection": "column"
+   },
+   "children": [
+    {
+     "style": {
+      "flexGrow": 1
+     },
+     "children": [
+      {
+       "style": {
+        "flex": 1
+       }
+      },
+      {
+       "style": {
+        "flex": 1
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 100,
+     "height": 100,
+     "children": [
+      {
+       "x": 0,
+       "y": 0,
+       "width": 50,
+       "height": 100
+      },
+      {
+       "x": 50,
+       "y": 0,
+       "width": 50,
+       "height": 100
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/relative_offset",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 100,
+    "alignItems": "flex-start"
+   },
+   "children": [
+    {
+     "style": {
+      "width": 10,
+      "height": 10,
+      "left": 5,
+      "top": 5
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 5,
+     "y": 5,
+     "width": 10,
+     "height": 10
+    }
+   ]
+  }
+ }
+]

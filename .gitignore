@@ -1,0 +1,6 @@
+obj/
+*.d
+build/
+derived_src/
+*.o
+.DS_Store

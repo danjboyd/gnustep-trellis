@@ -24,6 +24,20 @@ TRNode *row = [TRNode nodeWithStyle: @"flex-direction: row; gap: 8px; padding: 1
 [row layoutWithAvailableSize: TRSizeMake(400, NAN)];
 ```
 
+## Seeing it
+
+```sh
+scripts/run-headless.sh obj/trellis-render --screen ask --widths 420,760 \
+    --png /tmp/ask.png --json /tmp/ask.json --lint
+obj/trellis-lint /tmp/ask-420.json
+```
+
+`run-headless.sh` starts a private Xvfb display and points `GNUSTEP_HOME` at
+a throwaway directory. trellis-render refuses to run otherwise, so it never
+touches real user defaults.
+
+![Sample screens at 420 and 760 px](docs/images/samples-gnustep-default-theme.png)
+
 ## Building
 
 GNUstep (clang, libobjc2, ARC, libdispatch; GCC is not supported):

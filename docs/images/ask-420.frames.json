@@ -1,0 +1,152 @@
+{
+  "root": {
+    "x": 0,
+    "children": [
+      {
+        "x": 16,
+        "children": [
+          {
+            "x": 0,
+            "text": "approve",
+            "needed": {
+              "height": 15,
+              "width": 56
+            },
+            "intrinsic": {
+              "height": 15,
+              "width": 56
+            },
+            "width": 68,
+            "height": 19,
+            "style": "flex-shrink: 0; padding-left: 6px; padding-top: 2px; padding-right: 6px; padding-bottom: 2px; color: #1c71d8; font-weight: bold",
+            "class": "NSTextField",
+            "y": 2,
+            "id": "kind"
+          },
+          {
+            "x": 76,
+            "text": "Tag example-cli v0.1.8 as rc2 and publish the release notes?",
+            "needed": {
+              "height": 36,
+              "width": 234
+            },
+            "intrinsic": {
+              "height": 18,
+              "width": 461
+            },
+            "width": 235,
+            "height": 36,
+            "style": "flex-grow: 1; flex-basis: 0%; font-size: 15px",
+            "class": "NSTextField",
+            "y": 0,
+            "id": "title"
+          },
+          {
+            "x": 319,
+            "text": "12 min ago",
+            "needed": {
+              "height": 15,
+              "width": 69
+            },
+            "intrinsic": {
+              "height": 15,
+              "width": 69
+            },
+            "width": 69,
+            "height": 15,
+            "style": "flex-shrink: 0; color: #777",
+            "class": "NSTextField",
+            "y": 2,
+            "id": "age"
+          }
+        ],
+        "width": 388,
+        "height": 36,
+        "style": "align-items: baseline; row-gap: 8px; column-gap: 8px",
+        "class": "TRBoxView",
+        "y": 16,
+        "id": "header"
+      },
+      {
+        "x": 16,
+        "text": "All tests pass on Linux and Windows. The macOS job is still flaky on the notarization step; I re-ran it twice and it passed the second time. This blocks the rc2 tag and the packager update that depends on it.",
+        "needed": {
+          "height": 60,
+          "width": 388
+        },
+        "intrinsic": {
+          "height": 15,
+          "width": 1247
+        },
+        "width": 388,
+        "height": 60,
+        "style": "flex-grow: 1; min-height: 60px",
+        "class": "NSTextField",
+        "y": 64,
+        "id": "body"
+      },
+      {
+        "x": 16,
+        "children": [
+          {
+            "intrinsic": {
+              "height": 25,
+              "width": 124
+            },
+            "class": "NSButton",
+            "x": 0,
+            "height": 25,
+            "width": 388,
+            "title": "Approve: tag rc2",
+            "y": 0
+          },
+          {
+            "intrinsic": {
+              "height": 25,
+              "width": 183
+            },
+            "class": "NSButton",
+            "x": 0,
+            "height": 25,
+            "width": 388,
+            "title": "Re-run the macOS job first",
+            "y": 31
+          },
+          {
+            "intrinsic": {
+              "height": 25,
+              "width": 121
+            },
+            "class": "NSButton",
+            "x": 0,
+            "height": 25,
+            "width": 388,
+            "title": "Defer to Monday",
+            "y": 62
+          }
+        ],
+        "width": 388,
+        "height": 87,
+        "style": "flex-direction: column; row-gap: 6px; column-gap: 6px",
+        "class": "TRBoxView",
+        "y": 136,
+        "id": "options"
+      }
+    ],
+    "width": 420,
+    "height": 239,
+    "style": "flex-direction: column; padding-left: 16px; padding-top: 16px; padding-right: 16px; padding-bottom: 16px; row-gap: 12px; column-gap: 12px; background-color: #fafafa; container-type: inline-size",
+    "class": "TRBoxView",
+    "y": 0,
+    "id": "ask"
+  },
+  "trellis": "0.1",
+  "lint": [
+  ],
+  "source": "sample:ask",
+  "viewport": {
+    "scale": 1,
+    "height": 239,
+    "width": 420
+  }
+}

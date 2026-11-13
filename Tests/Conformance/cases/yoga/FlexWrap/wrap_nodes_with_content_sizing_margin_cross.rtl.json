@@ -1,0 +1,135 @@
+{
+ "id": "yoga/FlexWrap/wrap_nodes_with_content_sizing_margin_cross/rtl",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGFlexWrapTest.html",
+  "generated": "tests/generated/YGFlexWrapTest.cpp",
+  "test": "wrap_nodes_with_content_sizing_margin_cross",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "rtl",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "boxSizing": "border-box",
+   "position": "absolute",
+   "width": 500,
+   "height": 500
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "row",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative",
+     "flexWrap": "wrap",
+     "width": 70
+    },
+    "children": [
+     {
+      "style": {
+       "display": "flex",
+       "flexDirection": "column",
+       "alignContent": "flex-start",
+       "flexShrink": 0,
+       "boxSizing": "border-box",
+       "position": "relative"
+      },
+      "children": [
+       {
+        "style": {
+         "display": "flex",
+         "flexDirection": "column",
+         "alignContent": "flex-start",
+         "flexShrink": 0,
+         "boxSizing": "border-box",
+         "position": "relative",
+         "height": 40,
+         "width": 40
+        }
+       }
+      ]
+     },
+     {
+      "style": {
+       "display": "flex",
+       "flexDirection": "column",
+       "alignContent": "flex-start",
+       "flexShrink": 0,
+       "boxSizing": "border-box",
+       "position": "relative",
+       "marginTop": 10
+      },
+      "children": [
+       {
+        "style": {
+         "display": "flex",
+         "flexDirection": "column",
+         "alignContent": "flex-start",
+         "flexShrink": 0,
+         "boxSizing": "border-box",
+         "position": "relative",
+         "height": 40,
+         "width": 40
+        }
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 500,
+  "height": 500,
+  "children": [
+   {
+    "x": 430,
+    "y": 0,
+    "width": 70,
+    "height": 90,
+    "children": [
+     {
+      "x": 30,
+      "y": 0,
+      "width": 40,
+      "height": 40,
+      "children": [
+       {
+        "x": 0,
+        "y": 0,
+        "width": 40,
+        "height": 40
+       }
+      ]
+     },
+     {
+      "x": 30,
+      "y": 50,
+      "width": 40,
+      "height": 40,
+      "children": [
+       {
+        "x": 0,
+        "y": 0,
+        "width": 40,
+        "height": 40
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

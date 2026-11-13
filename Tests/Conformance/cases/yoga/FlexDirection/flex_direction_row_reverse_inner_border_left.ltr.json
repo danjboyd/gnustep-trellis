@@ -1,0 +1,111 @@
+{
+ "id": "yoga/FlexDirection/flex_direction_row_reverse_inner_border_left/ltr",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGFlexDirectionTest.html",
+  "generated": "tests/generated/YGFlexDirectionTest.cpp",
+  "test": "flex_direction_row_reverse_inner_border_left",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "ltr",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "boxSizing": "border-box",
+   "position": "absolute",
+   "height": 100,
+   "width": 100
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "row-reverse",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative",
+     "height": 100,
+     "width": 100
+    },
+    "children": [
+     {
+      "style": {
+       "display": "flex",
+       "flexDirection": "column",
+       "alignContent": "flex-start",
+       "flexShrink": 0,
+       "boxSizing": "border-box",
+       "position": "absolute",
+       "width": 10,
+       "height": 10,
+       "borderLeftWidth": 10
+      }
+     },
+     {
+      "style": {
+       "display": "flex",
+       "flexDirection": "column",
+       "alignContent": "flex-start",
+       "flexShrink": 0,
+       "boxSizing": "border-box",
+       "position": "relative",
+       "width": 10
+      }
+     },
+     {
+      "style": {
+       "display": "flex",
+       "flexDirection": "column",
+       "alignContent": "flex-start",
+       "flexShrink": 0,
+       "boxSizing": "border-box",
+       "position": "relative",
+       "width": 10
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 100,
+  "height": 100,
+  "children": [
+   {
+    "x": 0,
+    "y": 0,
+    "width": 100,
+    "height": 100,
+    "children": [
+     {
+      "x": 90,
+      "y": 0,
+      "width": 10,
+      "height": 10
+     },
+     {
+      "x": 90,
+      "y": 0,
+      "width": 10,
+      "height": 100
+     },
+     {
+      "x": 80,
+      "y": 0,
+      "width": 10,
+      "height": 100
+     }
+    ]
+   }
+  ]
+ }
+}

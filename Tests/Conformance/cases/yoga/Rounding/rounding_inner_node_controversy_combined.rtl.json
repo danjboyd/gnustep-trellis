@@ -1,0 +1,170 @@
+{
+ "id": "yoga/Rounding/rounding_inner_node_controversy_combined/rtl",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGRoundingTest.html",
+  "generated": "tests/generated/YGRoundingTest.cpp",
+  "test": "rounding_inner_node_controversy_combined",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "rtl",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "row",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "boxSizing": "border-box",
+   "position": "absolute",
+   "width": 640,
+   "height": 320
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative",
+     "height": "100%",
+     "flexGrow": 1
+    }
+   },
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative",
+     "height": "100%",
+     "flexGrow": 1
+    },
+    "children": [
+     {
+      "style": {
+       "display": "flex",
+       "flexDirection": "column",
+       "alignContent": "flex-start",
+       "flexShrink": 0,
+       "boxSizing": "border-box",
+       "position": "relative",
+       "width": "100%",
+       "flexGrow": 1
+      }
+     },
+     {
+      "style": {
+       "display": "flex",
+       "flexDirection": "column",
+       "alignContent": "flex-start",
+       "flexShrink": 0,
+       "boxSizing": "border-box",
+       "position": "relative",
+       "width": "100%",
+       "flexGrow": 1
+      },
+      "children": [
+       {
+        "style": {
+         "display": "flex",
+         "flexDirection": "column",
+         "alignContent": "flex-start",
+         "flexShrink": 0,
+         "boxSizing": "border-box",
+         "position": "relative",
+         "flexGrow": 1,
+         "width": "100%"
+        }
+       }
+      ]
+     },
+     {
+      "style": {
+       "display": "flex",
+       "flexDirection": "column",
+       "alignContent": "flex-start",
+       "flexShrink": 0,
+       "boxSizing": "border-box",
+       "position": "relative",
+       "width": "100%",
+       "flexGrow": 1
+      }
+     }
+    ]
+   },
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative",
+     "height": "100%",
+     "flexGrow": 1
+    }
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 640,
+  "height": 320,
+  "children": [
+   {
+    "x": 427,
+    "y": 0,
+    "width": 213,
+    "height": 320
+   },
+   {
+    "x": 213,
+    "y": 0,
+    "width": 214,
+    "height": 320,
+    "children": [
+     {
+      "x": 0,
+      "y": 0,
+      "width": 214,
+      "height": 107
+     },
+     {
+      "x": 0,
+      "y": 107,
+      "width": 214,
+      "height": 106,
+      "children": [
+       {
+        "x": 0,
+        "y": 0,
+        "width": 214,
+        "height": 106
+       }
+      ]
+     },
+     {
+      "x": 0,
+      "y": 213,
+      "width": 214,
+      "height": 107
+     }
+    ]
+   },
+   {
+    "x": 0,
+    "y": 0,
+    "width": 213,
+    "height": 320
+   }
+  ]
+ }
+}

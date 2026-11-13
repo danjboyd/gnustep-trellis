@@ -1,0 +1,56 @@
+{
+ "id": "yoga/MinMaxDimension/align_items_min_max/ltr",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGMinMaxDimensionTest.html",
+  "generated": "tests/generated/YGMinMaxDimensionTest.cpp",
+  "test": "align_items_min_max",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "ltr",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "boxSizing": "border-box",
+   "position": "absolute",
+   "maxWidth": 200,
+   "minWidth": 100,
+   "height": 100,
+   "alignItems": "center"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative",
+     "width": 60,
+     "height": 60
+    }
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 100,
+  "height": 100,
+  "children": [
+   {
+    "x": 20,
+    "y": 0,
+    "width": 60,
+    "height": 60
+   }
+  ]
+ }
+}

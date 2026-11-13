@@ -1,0 +1,55 @@
+{
+ "id": "yoga/Percentage/percent_of_minmax_cross_stretched/rtl",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGPercentageTest.html",
+  "generated": "tests/generated/YGPercentageTest.cpp",
+  "test": "percent_of_minmax_cross_stretched",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "rtl",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "boxSizing": "border-box",
+   "position": "absolute",
+   "minWidth": 60,
+   "maxWidth": 60,
+   "height": 50
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative",
+     "width": "50%",
+     "height": 20
+    }
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 60,
+  "height": 50,
+  "children": [
+   {
+    "x": 30,
+    "y": 0,
+    "width": 30,
+    "height": 20
+   }
+  ]
+ }
+}

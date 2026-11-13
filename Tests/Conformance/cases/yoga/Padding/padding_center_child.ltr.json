@@ -1,0 +1,59 @@
+{
+ "id": "yoga/Padding/padding_center_child/ltr",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGPaddingTest.html",
+  "generated": "tests/generated/YGPaddingTest.cpp",
+  "test": "padding_center_child",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "ltr",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "boxSizing": "border-box",
+   "position": "absolute",
+   "width": 100,
+   "height": 100,
+   "alignItems": "center",
+   "justifyContent": "center",
+   "paddingLeft": 10,
+   "paddingRight": 20,
+   "paddingBottom": 20
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative",
+     "height": 10,
+     "width": 10
+    }
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 100,
+  "height": 100,
+  "children": [
+   {
+    "x": 40,
+    "y": 35,
+    "width": 10,
+    "height": 10
+   }
+  ]
+ }
+}

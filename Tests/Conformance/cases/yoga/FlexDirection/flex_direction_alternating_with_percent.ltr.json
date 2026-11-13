@@ -1,0 +1,56 @@
+{
+ "id": "yoga/FlexDirection/flex_direction_alternating_with_percent/ltr",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGFlexDirectionTest.html",
+  "generated": "tests/generated/YGFlexDirectionTest.cpp",
+  "test": "flex_direction_alternating_with_percent",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "ltr",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "boxSizing": "border-box",
+   "position": "absolute",
+   "height": 300,
+   "width": 200
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "row",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative",
+     "height": "50%",
+     "width": "50%",
+     "left": "10%",
+     "top": "10%"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 200,
+  "height": 300,
+  "children": [
+   {
+    "x": 20,
+    "y": 30,
+    "width": 100,
+    "height": 150
+   }
+  ]
+ }
+}

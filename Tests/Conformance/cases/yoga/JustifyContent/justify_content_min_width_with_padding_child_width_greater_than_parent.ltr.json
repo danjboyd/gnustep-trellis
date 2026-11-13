@@ -1,0 +1,98 @@
+{
+ "id": "yoga/JustifyContent/justify_content_min_width_with_padding_child_width_greater_than_parent/ltr",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGJustifyContentTest.html",
+  "generated": "tests/generated/YGJustifyContentTest.cpp",
+  "test": "justify_content_min_width_with_padding_child_width_greater_than_parent",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "ltr",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "alignContent": "stretch",
+   "flexShrink": 0,
+   "boxSizing": "border-box",
+   "position": "absolute",
+   "width": 1000,
+   "height": 1584
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "row",
+     "alignContent": "stretch",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "flex",
+       "flexDirection": "row",
+       "alignContent": "stretch",
+       "flexShrink": 0,
+       "boxSizing": "border-box",
+       "position": "relative",
+       "justifyContent": "center",
+       "minWidth": 400,
+       "paddingLeft": 100,
+       "paddingRight": 100
+      },
+      "children": [
+       {
+        "style": {
+         "display": "flex",
+         "flexDirection": "row",
+         "alignContent": "stretch",
+         "flexShrink": 0,
+         "boxSizing": "border-box",
+         "position": "relative",
+         "height": 100,
+         "width": 300
+        }
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 1000,
+  "height": 1584,
+  "children": [
+   {
+    "x": 0,
+    "y": 0,
+    "width": 1000,
+    "height": 100,
+    "children": [
+     {
+      "x": 0,
+      "y": 0,
+      "width": 500,
+      "height": 100,
+      "children": [
+       {
+        "x": 100,
+        "y": 0,
+        "width": 300,
+        "height": 100
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

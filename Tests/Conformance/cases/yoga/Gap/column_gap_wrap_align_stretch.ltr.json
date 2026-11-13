@@ -1,0 +1,131 @@
+{
+ "id": "yoga/Gap/column_gap_wrap_align_stretch/ltr",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGGapTest.html",
+  "generated": "tests/generated/YGGapTest.cpp",
+  "test": "column_gap_wrap_align_stretch",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "ltr",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "row",
+   "alignContent": "stretch",
+   "flexShrink": 0,
+   "boxSizing": "border-box",
+   "position": "absolute",
+   "flexWrap": "wrap",
+   "width": 300,
+   "height": 300,
+   "columnGap": 5
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative",
+     "minWidth": 60,
+     "flexGrow": 1
+    }
+   },
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative",
+     "minWidth": 60,
+     "flexGrow": 1
+    }
+   },
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative",
+     "minWidth": 60,
+     "flexGrow": 1
+    }
+   },
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative",
+     "minWidth": 60,
+     "flexGrow": 1
+    }
+   },
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative",
+     "minWidth": 60,
+     "flexGrow": 1
+    }
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 300,
+  "height": 300,
+  "children": [
+   {
+    "x": 0,
+    "y": 0,
+    "width": 71,
+    "height": 150
+   },
+   {
+    "x": 76,
+    "y": 0,
+    "width": 72,
+    "height": 150
+   },
+   {
+    "x": 153,
+    "y": 0,
+    "width": 71,
+    "height": 150
+   },
+   {
+    "x": 229,
+    "y": 0,
+    "width": 71,
+    "height": 150
+   },
+   {
+    "x": 0,
+    "y": 150,
+    "width": 300,
+    "height": 150
+   }
+  ]
+ },
+ "requires": [
+  "gap"
+ ]
+}

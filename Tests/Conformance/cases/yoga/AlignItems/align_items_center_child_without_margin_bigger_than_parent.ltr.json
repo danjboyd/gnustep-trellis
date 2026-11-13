@@ -1,0 +1,77 @@
+{
+ "id": "yoga/AlignItems/align_items_center_child_without_margin_bigger_than_parent/ltr",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGAlignItemsTest.html",
+  "generated": "tests/generated/YGAlignItemsTest.cpp",
+  "test": "align_items_center_child_without_margin_bigger_than_parent",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "ltr",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "boxSizing": "border-box",
+   "position": "absolute",
+   "height": 52,
+   "width": 52,
+   "alignItems": "center",
+   "justifyContent": "center"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative",
+     "alignItems": "center"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "flex",
+       "flexDirection": "column",
+       "alignContent": "flex-start",
+       "flexShrink": 0,
+       "boxSizing": "border-box",
+       "position": "relative",
+       "width": 72,
+       "height": 72
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 52,
+  "height": 52,
+  "children": [
+   {
+    "x": -10,
+    "y": -10,
+    "width": 72,
+    "height": 72,
+    "children": [
+     {
+      "x": 0,
+      "y": 0,
+      "width": 72,
+      "height": 72
+     }
+    ]
+   }
+  ]
+ }
+}

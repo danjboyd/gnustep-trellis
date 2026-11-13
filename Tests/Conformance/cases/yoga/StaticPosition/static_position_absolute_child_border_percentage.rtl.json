@@ -1,0 +1,99 @@
+{
+ "id": "yoga/StaticPosition/static_position_absolute_child_border_percentage/rtl",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGStaticPositionTest.html",
+  "generated": "tests/generated/YGStaticPositionTest.cpp",
+  "test": "static_position_absolute_child_border_percentage",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "rtl",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "boxSizing": "border-box",
+   "position": "absolute"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative",
+     "width": 200,
+     "height": 200
+    },
+    "children": [
+     {
+      "style": {
+       "display": "flex",
+       "flexDirection": "column",
+       "alignContent": "flex-start",
+       "flexShrink": 0,
+       "boxSizing": "border-box",
+       "position": "static",
+       "height": 100,
+       "width": 100
+      },
+      "children": [
+       {
+        "style": {
+         "display": "flex",
+         "flexDirection": "column",
+         "alignContent": "flex-start",
+         "flexShrink": 0,
+         "boxSizing": "border-box",
+         "position": "absolute",
+         "height": 50,
+         "width": 50
+        }
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 200,
+  "height": 200,
+  "children": [
+   {
+    "x": 0,
+    "y": 0,
+    "width": 200,
+    "height": 200,
+    "children": [
+     {
+      "x": 100,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "children": [
+       {
+        "x": 50,
+        "y": 0,
+        "width": 50,
+        "height": 50
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "requires": [
+  "position-static"
+ ]
+}

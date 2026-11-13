@@ -1,0 +1,351 @@
+{
+ "id": "yoga/AndroidNewsFeed/android_news_feed/ltr",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGAndroidNewsFeed.html",
+  "generated": "tests/generated/YGAndroidNewsFeed.cpp",
+  "test": "android_news_feed",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "ltr",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "alignContent": "stretch",
+   "flexShrink": 0,
+   "boxSizing": "border-box",
+   "position": "absolute",
+   "width": 1080
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "flex",
+       "flexDirection": "column",
+       "alignContent": "stretch",
+       "flexShrink": 0,
+       "boxSizing": "border-box",
+       "position": "relative"
+      },
+      "children": [
+       {
+        "style": {
+         "display": "flex",
+         "flexDirection": "column",
+         "alignContent": "stretch",
+         "flexShrink": 0,
+         "boxSizing": "border-box",
+         "position": "relative"
+        },
+        "children": [
+         {
+          "style": {
+           "display": "flex",
+           "flexDirection": "row",
+           "alignContent": "stretch",
+           "flexShrink": 0,
+           "boxSizing": "border-box",
+           "position": "relative",
+           "alignItems": "flex-start",
+           "marginLeft": 36,
+           "marginTop": 24
+          },
+          "children": [
+           {
+            "style": {
+             "display": "flex",
+             "flexDirection": "row",
+             "alignContent": "stretch",
+             "flexShrink": 0,
+             "boxSizing": "border-box",
+             "position": "relative"
+            },
+            "children": [
+             {
+              "style": {
+               "display": "flex",
+               "flexDirection": "column",
+               "alignContent": "stretch",
+               "flexShrink": 0,
+               "boxSizing": "border-box",
+               "position": "relative",
+               "width": 120,
+               "height": 120
+              }
+             }
+            ]
+           },
+           {
+            "style": {
+             "display": "flex",
+             "flexDirection": "column",
+             "alignContent": "stretch",
+             "flexShrink": 1,
+             "boxSizing": "border-box",
+             "position": "relative",
+             "marginRight": 36,
+             "paddingLeft": 36,
+             "paddingTop": 21,
+             "paddingRight": 36,
+             "paddingBottom": 18
+            },
+            "children": [
+             {
+              "style": {
+               "display": "flex",
+               "flexDirection": "row",
+               "alignContent": "stretch",
+               "flexShrink": 1,
+               "boxSizing": "border-box",
+               "position": "relative"
+              }
+             },
+             {
+              "style": {
+               "display": "flex",
+               "flexDirection": "column",
+               "alignContent": "stretch",
+               "flexShrink": 1,
+               "boxSizing": "border-box",
+               "position": "relative"
+              }
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "style": {
+         "display": "flex",
+         "flexDirection": "column",
+         "alignContent": "stretch",
+         "flexShrink": 0,
+         "boxSizing": "border-box",
+         "position": "relative"
+        },
+        "children": [
+         {
+          "style": {
+           "display": "flex",
+           "flexDirection": "row",
+           "alignContent": "stretch",
+           "flexShrink": 0,
+           "boxSizing": "border-box",
+           "position": "relative",
+           "alignItems": "flex-start",
+           "marginLeft": 174,
+           "marginTop": 24
+          },
+          "children": [
+           {
+            "style": {
+             "display": "flex",
+             "flexDirection": "row",
+             "alignContent": "stretch",
+             "flexShrink": 0,
+             "boxSizing": "border-box",
+             "position": "relative"
+            },
+            "children": [
+             {
+              "style": {
+               "display": "flex",
+               "flexDirection": "column",
+               "alignContent": "stretch",
+               "flexShrink": 0,
+               "boxSizing": "border-box",
+               "position": "relative",
+               "width": 72,
+               "height": 72
+              }
+             }
+            ]
+           },
+           {
+            "style": {
+             "display": "flex",
+             "flexDirection": "column",
+             "alignContent": "stretch",
+             "flexShrink": 1,
+             "boxSizing": "border-box",
+             "position": "relative",
+             "marginRight": 36,
+             "paddingLeft": 36,
+             "paddingTop": 21,
+             "paddingRight": 36,
+             "paddingBottom": 18
+            },
+            "children": [
+             {
+              "style": {
+               "display": "flex",
+               "flexDirection": "row",
+               "alignContent": "stretch",
+               "flexShrink": 1,
+               "boxSizing": "border-box",
+               "position": "relative"
+              }
+             },
+             {
+              "style": {
+               "display": "flex",
+               "flexDirection": "column",
+               "alignContent": "stretch",
+               "flexShrink": 1,
+               "boxSizing": "border-box",
+               "position": "relative"
+              }
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 1080,
+  "height": 240,
+  "children": [
+   {
+    "x": 0,
+    "y": 0,
+    "width": 1080,
+    "height": 240,
+    "children": [
+     {
+      "x": 0,
+      "y": 0,
+      "width": 1080,
+      "height": 240,
+      "children": [
+       {
+        "x": 0,
+        "y": 0,
+        "width": 1080,
+        "height": 144,
+        "children": [
+         {
+          "x": 36,
+          "y": 24,
+          "width": 1044,
+          "height": 120,
+          "children": [
+           {
+            "x": 0,
+            "y": 0,
+            "width": 120,
+            "height": 120,
+            "children": [
+             {
+              "x": 0,
+              "y": 0,
+              "width": 120,
+              "height": 120
+             }
+            ]
+           },
+           {
+            "x": 120,
+            "y": 0,
+            "width": 72,
+            "height": 39,
+            "children": [
+             {
+              "x": 36,
+              "y": 21,
+              "width": 0,
+              "height": 0
+             },
+             {
+              "x": 36,
+              "y": 21,
+              "width": 0,
+              "height": 0
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "x": 0,
+        "y": 144,
+        "width": 1080,
+        "height": 96,
+        "children": [
+         {
+          "x": 174,
+          "y": 24,
+          "width": 906,
+          "height": 72,
+          "children": [
+           {
+            "x": 0,
+            "y": 0,
+            "width": 72,
+            "height": 72,
+            "children": [
+             {
+              "x": 0,
+              "y": 0,
+              "width": 72,
+              "height": 72
+             }
+            ]
+           },
+           {
+            "x": 72,
+            "y": 0,
+            "width": 72,
+            "height": 39,
+            "children": [
+             {
+              "x": 36,
+              "y": 21,
+              "width": 0,
+              "height": 0
+             },
+             {
+              "x": 36,
+              "y": 21,
+              "width": 0,
+              "height": 0
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

@@ -1,0 +1,56 @@
+{
+ "id": "yoga/Percentage/percentage_absolute_position/ltr",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGPercentageTest.html",
+  "generated": "tests/generated/YGPercentageTest.cpp",
+  "test": "percentage_absolute_position",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "ltr",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "boxSizing": "border-box",
+   "position": "absolute",
+   "width": 200,
+   "height": 100
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "absolute",
+     "width": 10,
+     "height": 10,
+     "left": "30%",
+     "top": "10%"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 200,
+  "height": 100,
+  "children": [
+   {
+    "x": 60,
+    "y": 10,
+    "width": 10,
+    "height": 10
+   }
+  ]
+ }
+}

@@ -1,0 +1,56 @@
+{
+ "id": "yoga/Border/border_container_match_child/rtl",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGBorderTest.html",
+  "generated": "tests/generated/YGBorderTest.cpp",
+  "test": "border_container_match_child",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "rtl",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "boxSizing": "border-box",
+   "position": "absolute",
+   "borderLeftWidth": 10,
+   "borderTopWidth": 10,
+   "borderRightWidth": 10,
+   "borderBottomWidth": 10
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative",
+     "width": 10,
+     "height": 10
+    }
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 30,
+  "height": 30,
+  "children": [
+   {
+    "x": 10,
+    "y": 10,
+    "width": 10,
+    "height": 10
+   }
+  ]
+ }
+}

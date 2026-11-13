@@ -1,0 +1,74 @@
+{
+ "id": "yoga/SizeOverflow/nested_overflowing_child/rtl",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGSizeOverflowTest.html",
+  "generated": "tests/generated/YGSizeOverflowTest.cpp",
+  "test": "nested_overflowing_child",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "rtl",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "boxSizing": "border-box",
+   "position": "absolute",
+   "height": 100,
+   "width": 100
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "boxSizing": "border-box",
+     "position": "relative"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "flex",
+       "flexDirection": "column",
+       "alignContent": "flex-start",
+       "flexShrink": 0,
+       "boxSizing": "border-box",
+       "position": "relative",
+       "height": 200,
+       "width": 200
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 100,
+  "height": 100,
+  "children": [
+   {
+    "x": 0,
+    "y": 0,
+    "width": 100,
+    "height": 200,
+    "children": [
+     {
+      "x": -100,
+      "y": 0,
+      "width": 200,
+      "height": 200
+     }
+    ]
+   }
+  ]
+ }
+}

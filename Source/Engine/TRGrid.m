@@ -595,7 +595,7 @@ static double TRPlaceTracks(TRTrack *tr, NSInteger n, double gap, double avail, 
   double lead = 0, between = 0;
   switch (align)
     {
-      case TRAlignEnd: case TRAlignFlexEnd: lead = free; break;
+      case TRAlignEnd: case TRAlignFlexEnd: case TRAlignRight: lead = free; break;
       case TRAlignCenter: lead = free / 2; break;
       case TRAlignSpaceBetween: if (free > 0 && visible > 1) between = free / (visible - 1); break;
       case TRAlignSpaceAround: if (free > 0 && visible > 0) { between = free / visible; lead = between / 2; } break;
@@ -940,7 +940,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           else if (!autoR)
             {
               if (js == TRAlignCenter) offX += freeW / 2;
-              else if (js == TRAlignEnd || js == TRAlignFlexEnd) offX += freeW;
+              else if (js == TRAlignEnd || js == TRAlignFlexEnd || js == TRAlignRight) offX += freeW;
             }
           if (autoT && autoB) offY += MAX(0, freeH) / 2;
           else if (autoT) offY += MAX(0, freeH);

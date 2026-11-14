@@ -95,7 +95,9 @@ typedef NS_ENUM(unsigned char, TRAlign) {
   TRAlignBaseline,
   TRAlignSpaceBetween,
   TRAlignSpaceAround,
-  TRAlignSpaceEvenly
+  TRAlignSpaceEvenly,
+  TRAlignLeft,          /* justify-* only: physical */
+  TRAlignRight
 };
 typedef NS_ENUM(unsigned char, TROverflow) {
   TROverflowVisible = 0, TROverflowHidden, TROverflowScroll, TROverflowAuto

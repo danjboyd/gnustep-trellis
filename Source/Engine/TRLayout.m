@@ -307,8 +307,11 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
   const TRFloat minInnerCross = TRMax(0, TRDefault(isRow ? minH : minW, 0) - pbCrossC);
   const TRFloat maxInnerCross = isnan(isRow ? maxH : maxW) ? TRUndefined : TRMax(0, (isRow ? maxH : maxW) - pbCrossC);
 
-  /* Children resolve percentages against these. */
-  const TRFloat refW = innerW, refH = innerH;
+  /* Children resolve percentages against these. A size that is only an
+     upper bound (fit-content) is indefinite, so percentages act as auto
+     until the final, exact layout. */
+  const TRFloat refW = wm == TRMeasureModeExactly ? innerW : TRUndefined;
+  const TRFloat refH = hm == TRMeasureModeExactly ? innerH : TRUndefined;
   const TRFloat refMain = isRow ? refW : refH, refCross = isRow ? refH : refW;
 
   const TRFloat mainGap = TRMax(0, TRDefault(TRResolve(isRow ? s->columnGap : s->rowGap, refMain), 0));
@@ -589,8 +592,13 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
     innerMain = availMain;
   else
     {
-      innerMain = TRClamp(maxLineMain, minInnerMain, maxInnerMain);
-      if (mainMode == TRMeasureModeAtMost) innerMain = TRMin(innerMain, availMain);
+      /* fit-content: min(max-content, max(min-content, available)). Items
+         were already shrunk towards availMain, so a line longer than that is
+         at its min-content and the container grows to hold it; a container
+         that wrapped has max-content > available, so it takes availMain. */
+      TRFloat content = maxLineMain;
+      if (mainMode == TRMeasureModeAtMost && nLines > 1) content = TRMax(content, availMain);
+      innerMain = TRClamp(content, minInnerMain, maxInnerMain);
       innerMain = TRMax(innerMain, 0);
     }
 
@@ -668,8 +676,9 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
     innerCross = availCross;
   else
     {
+      /* Items were measured at most availCross; one that is larger cannot
+         be narrower (its min-content), so the container holds it. */
       innerCross = TRClamp(totalCross, minInnerCross, maxInnerCross);
-      if (crossMode == TRMeasureModeAtMost) innerCross = TRMin(innerCross, availCross);
       innerCross = TRMax(innerCross, 0);
     }
 
@@ -698,13 +707,14 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
           case TRAlignSpaceBetween:
             if (free > 0 && nLines > 1) acBetween = free / (nLines - 1);
             break;
+          /* Negative space: these fall back to 'safe center', i.e. 'start'. */
           case TRAlignSpaceAround:
             if (free > 0) { acBetween = free / nLines; acLead = acBetween / 2; }
-            else acLead = free / 2;
+            else acLead = wrapReverse ? free : 0;
             break;
           case TRAlignSpaceEvenly:
             if (free > 0) { acBetween = free / (nLines + 1); acLead = acBetween; }
-            else acLead = free / 2;
+            else acLead = wrapReverse ? free : 0;
             break;
           default: break;
         }
@@ -727,10 +737,17 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
   /* ---- Main-axis alignment (9.5) ---- */
   TRAlign jc = s->justifyContent;
   if (jc == TRAlignNormal || jc == TRAlignStretch) jc = TRAlignFlexStart;
+  if (jc == TRAlignLeft || jc == TRAlignRight)
+    {
+      /* Physical: in a column (main axis not the inline axis) they act as
+         'start'; in a row, left is the start only in ltr. */
+      if (!isRow) jc = TRAlignStart;
+      else jc = ((jc == TRAlignLeft) == !rtl) ? TRAlignStart : TRAlignEnd;
+    }
+  /* start/end follow the writing mode, not the flex direction. */
+  BOOL startIsFlexStart = isRow ? (rtl == mainRev) : !mainRev;
   if (jc == TRAlignStart || jc == TRAlignEnd)
     {
-      /* start/end follow the writing mode, not the flex direction. */
-      BOOL startIsFlexStart = isRow ? (rtl == mainRev) : !mainRev;
       BOOL wantStart = (jc == TRAlignStart);
       jc = (wantStart == startIsFlexStart) ? TRAlignFlexStart : TRAlignFlexEnd;
     }
@@ -758,13 +775,14 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
             case TRAlignSpaceBetween:
               if (free > 0 && cnt > 1) between = free / (cnt - 1);
               break;
+            /* Negative space: these fall back to 'safe center', i.e. 'start'. */
             case TRAlignSpaceAround:
               if (free > 0 && cnt > 0) { between = free / cnt; lead = between / 2; }
-              else lead = free / 2;
+              else lead = startIsFlexStart ? 0 : free;
               break;
             case TRAlignSpaceEvenly:
               if (free > 0) { between = free / (cnt + 1); lead = between; }
-              else lead = free / 2;
+              else lead = startIsFlexStart ? 0 : free;
               break;
             default: break;
           }
@@ -920,6 +938,9 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
                 default: break;
               }
             TRAlign a = TRResolveAlignSelf(cs, s);
+            /* An abspos box has no baseline set to join: CSS Align falls
+               back to 'start' (not 'flex-start'), which ignores wrap-reverse. */
+            if (a == TRAlignBaseline) a = TRAlignStart;
             if (a == TRAlignStart) a = wrapReverse ? TRAlignFlexEnd : TRAlignFlexStart;
             else if (a == TRAlignEnd) a = wrapReverse ? TRAlignFlexStart : TRAlignFlexEnd;
             if (a == TRAlignFlexEnd) offCross = freeCross;

@@ -179,9 +179,20 @@ static const TRKeyword kAlign[] = {
   {"flex-start", TRAlignFlexStart}, {"flex-end", TRAlignFlexEnd},
   {"start", TRAlignStart}, {"end", TRAlignEnd},
   {"self-start", TRAlignStart}, {"self-end", TRAlignEnd},
-  {"left", TRAlignStart}, {"right", TRAlignEnd},
   {"center", TRAlignCenter}, {"stretch", TRAlignStretch},
-  {"baseline", TRAlignBaseline}, {"first", TRAlignBaseline},
+  {"baseline", TRAlignBaseline}, {"first baseline", TRAlignBaseline},
+  {"space-between", TRAlignSpaceBetween},
+  {"space-around", TRAlignSpaceAround},
+  {"space-evenly", TRAlignSpaceEvenly}, {NULL, 0}};
+/* justify-* also accept the physical left/right. */
+static const TRKeyword kJustify[] = {
+  {"auto", TRAlignAuto}, {"normal", TRAlignNormal},
+  {"flex-start", TRAlignFlexStart}, {"flex-end", TRAlignFlexEnd},
+  {"start", TRAlignStart}, {"end", TRAlignEnd},
+  {"self-start", TRAlignStart}, {"self-end", TRAlignEnd},
+  {"left", TRAlignLeft}, {"right", TRAlignRight},
+  {"center", TRAlignCenter}, {"stretch", TRAlignStretch},
+  {"baseline", TRAlignBaseline}, {"first baseline", TRAlignBaseline},
   {"space-between", TRAlignSpaceBetween},
   {"space-around", TRAlignSpaceAround},
   {"space-evenly", TRAlignSpaceEvenly}, {NULL, 0}};
@@ -413,7 +424,7 @@ static int TREdgeFromSuffix(NSString *suffix)
   KEYWORD(@"direction", kDirection, direction, TRDirection)
   KEYWORD(@"flex-direction", kFlexDirection, flexDirection, TRFlexDirection)
   KEYWORD(@"flex-wrap", kFlexWrap, flexWrap, TRFlexWrap)
-  KEYWORD(@"justify-content", kAlign, justifyContent, TRAlign)
+  KEYWORD(@"justify-content", kJustify, justifyContent, TRAlign)
   KEYWORD(@"align-items", kAlign, alignItems, TRAlign)
   KEYWORD(@"align-self", kAlign, alignSelf, TRAlign)
   KEYWORD(@"align-content", kAlign, alignContent, TRAlign)
@@ -492,7 +503,7 @@ static int TREdgeFromSuffix(NSString *suffix)
       if ([t count] < 1 || [t count] > 2) return NO;
       if (!TRLookup(t[0], kAlign, &a)) return NO;
       b = a;
-      if ([t count] == 2 && !TRLookup(t[1], kAlign, &b)) return NO;
+      if ([t count] == 2 && !TRLookup(t[1], kJustify, &b)) return NO;
       if ([p isEqualToString: @"place-content"])
         { _s.alignContent = (TRAlign)a; _s.justifyContent = (TRAlign)b; return YES; }
       if ([p isEqualToString: @"place-items"])
@@ -578,7 +589,7 @@ static int TREdgeFromSuffix(NSString *suffix)
   int k;
   if ([p isEqualToString: @"justify-items"] || [p isEqualToString: @"justify-self"])
     {
-      if (!TRLookup(v, kAlign, &k)) return 0;
+      if (!TRLookup(v, kJustify, &k)) return 0;
       if ([p isEqualToString: @"justify-items"]) _s.justifyItems = (TRAlign)k; else _s.justifySelf = (TRAlign)k;
       return 1;
     }
@@ -769,7 +780,7 @@ static NSString *TRKeywordString(const TRKeyword *table, int value)
   KW(@"direction", kDirection, direction)
   KW(@"flex-direction", kFlexDirection, flexDirection)
   KW(@"flex-wrap", kFlexWrap, flexWrap)
-  KW(@"justify-content", kAlign, justifyContent)
+  KW(@"justify-content", kJustify, justifyContent)
   KW(@"align-items", kAlign, alignItems)
   KW(@"align-self", kAlign, alignSelf)
   KW(@"align-content", kAlign, alignContent)
@@ -796,8 +807,8 @@ static NSString *TRKeywordString(const TRKeyword *table, int value)
   LEN(@"row-gap", rowGap)
   LEN(@"column-gap", columnGap)
   if (_s.order != 0) [out addObject: [NSString stringWithFormat: @"order: %ld", (long)_s.order]];
-  KW(@"justify-items", kAlign, justifyItems)
-  KW(@"justify-self", kAlign, justifySelf)
+  KW(@"justify-items", kJustify, justifyItems)
+  KW(@"justify-self", kJustify, justifySelf)
   if (_s.gridAutoFlowColumn) [out addObject: @"grid-auto-flow: column"];
   if (_gridTemplateColumns) [out addObject: [@"grid-template-columns: " stringByAppendingString: _gridTemplateColumns]];
   if (_gridTemplateRows) [out addObject: [@"grid-template-rows: " stringByAppendingString: _gridTemplateRows]];

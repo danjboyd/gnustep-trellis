@@ -209,12 +209,45 @@ static void TRClearDirty(TRNode *n)
       TRFloat mb = s->margin[TREdgeBottom].unit == TRUnitPoint ? s->margin[TREdgeBottom].value : 0;
       ah = MAX(0, ah - mt - mb);
     }
+  /* min/max win over the root's own width/height (definite sizes only). */
+  {
+    TRFloat pbs[2] = {0, 0};
+    for (int k = 0; k < 4; k++)
+      {
+        TRFloat v = 0;
+        if (s->padding[k].unit == TRUnitPoint) v += s->padding[k].value;
+        else if (s->padding[k].unit == TRUnitPercent && !isnan(available.width)) v += s->padding[k].value * available.width / 100;
+        if (s->border[k].unit == TRUnitPoint) v += s->border[k].value;
+        pbs[k % 2] += v;
+      }
+    TRFloat extra[2];
+    for (int a = 0; a < 2; a++) extra[a] = s->boxSizing == TRBoxSizingContentBox ? pbs[a] : 0;
+    if (wm == TRMeasureModeExactly && !isnan(aw))
+      {
+        if (s->maxWidth.unit == TRUnitPoint) aw = MIN(aw, s->maxWidth.value + extra[TREdgeLeft % 2]);
+        if (s->minWidth.unit == TRUnitPoint) aw = MAX(aw, s->minWidth.value + extra[TREdgeLeft % 2]);
+      }
+    if (hm == TRMeasureModeExactly && !isnan(ah))
+      {
+        if (s->maxHeight.unit == TRUnitPoint) ah = MIN(ah, s->maxHeight.value + extra[TREdgeTop % 2]);
+        if (s->minHeight.unit == TRUnitPoint) ah = MAX(ah, s->minHeight.value + extra[TREdgeTop % 2]);
+      }
+  }
   /* A root with max-width/height and no available size: fit-content. */
   if (wm == TRMeasureModeUndefined && s->maxWidth.unit == TRUnitPoint)
     { aw = s->maxWidth.value; wm = TRMeasureModeAtMost; }
   if (hm == TRMeasureModeUndefined && s->maxHeight.unit == TRUnitPoint)
     { ah = s->maxHeight.value; hm = TRMeasureModeAtMost; }
 
+  /* Size a fit-content root's width first, then lay it out at that exact
+     width so its children's percentages resolve against it. (As in CSS,
+     a shrink-to-fit width becomes definite; an auto height does not.) */
+  if (wm != TRMeasureModeExactly)
+    {
+      TRSize sz = TRLayoutNode(self, aw, ah, wm, hm, available.width, available.height, NO, direction);
+      aw = sz.width;
+      wm = TRMeasureModeExactly;
+    }
   TRLayoutNode(self, aw, ah, wm, hm, available.width, available.height, YES, direction);
 
   TRFloat x = s->margin[TREdgeLeft].unit == TRUnitPoint ? s->margin[TREdgeLeft].value : 0;

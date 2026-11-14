@@ -26,7 +26,7 @@ static void TRAdd(NSMutableArray *out, NSString *rule, NSString *sev, NSDictiona
 }
 
 static void TRLintNode(NSDictionary *n, NSString *path, double absX, double absY,
-                       double vw, double vh, NSMutableArray *out)
+                       double vw, double vh, BOOL insideScroller, NSMutableArray *out)
 {
   if ([n[@"hidden"] boolValue]) return;
   double x = [n[@"x"] doubleValue], y = [n[@"y"] doubleValue];
@@ -74,7 +74,7 @@ static void TRLintNode(NSDictionary *n, NSString *path, double absX, double absY
     TRAdd(out, @"collapsed", @"warning", n, path,
           [NSString stringWithFormat: @"%@ (%@) is %gx%g: give it a width/height or flex", name, cls, w, h]);
 
-  if (ax < -kTol || ay < -kTol || (vw > 0 && ax + w > vw + kTol) || (vh > 0 && ay + h > vh + kTol))
+  if (!insideScroller && (ax < -kTol || ay < -kTol || (vw > 0 && ax + w > vw + kTol) || (vh > 0 && ay + h > vh + kTol)))
     TRAdd(out, @"offscreen", @"warning", n, path,
           [NSString stringWithFormat: @"%@ (%g,%g %gx%g) extends outside the %gx%g viewport",
                     name, ax, ay, w, h, vw, vh]);
@@ -97,7 +97,8 @@ static void TRLintNode(NSDictionary *n, NSString *path, double absX, double absY
                         TRNodeName(c, cp), cx, cy, cw, ch, name, w, h]);
       if (![c[@"position"] isEqualToString: @"absolute"] && cw > 0 && ch > 0)
         [flow addObject: @[c, cp]];
-      TRLintNode(c, cp, ax, ay, vw, vh, out);
+      /* Content of a scrolling/clipping box may extend past the viewport. */
+      TRLintNode(c, cp, ax, ay, vw, vh, insideScroller || clips, out);
     }
   for (NSUInteger i = 0; i < [flow count]; i++)
     for (NSUInteger j = i + 1; j < [flow count]; j++)
@@ -119,6 +120,6 @@ static void TRLintNode(NSDictionary *n, NSString *path, double absX, double absY
 NSArray<NSDictionary *> *TRLintFrameTree(NSDictionary *root, double vw, double vh)
 {
   NSMutableArray *out = [NSMutableArray array];
-  TRLintNode(root, @"root", 0, 0, vw, vh, out);
+  TRLintNode(root, @"root", 0, 0, vw, vh, NO, out);
   return out;
 }

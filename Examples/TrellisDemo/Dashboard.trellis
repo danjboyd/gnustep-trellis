@@ -19,7 +19,9 @@
     <column class="card"><label class="k" no-outlet="yes">Week used</label><label id="week" class="v">9%</label></column>
     <column class="card"><label class="k" no-outlet="yes">Builds</label><progress id="builds" value="70" max="100"/></column>
   </box>
-  <text id="log" class="log">Log output appears here.</text>
+  <scroll class="log">
+    <text id="log">Log output appears here.</text>
+  </scroll>
 </box>
 
 <style>
@@ -40,7 +42,7 @@
   .card   { padding: 10px; gap: 4px; background-color: #ffffff; border: 1px solid #deddda; border-radius: 6px; }
   .k      { color: #77767b; }
   .v      { font-size: 22px; font-weight: bold; }
-  .log    { grid-area: log; min-height: 60px; }
+  .log    { grid-area: log; min-height: 60px; background-color: #ffffff; }
 
   /* Narrow: one column, the side list becomes a row under the header. */
   @container (max-width: 599px) {

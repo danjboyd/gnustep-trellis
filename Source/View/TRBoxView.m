@@ -67,6 +67,17 @@ NSColor *TRColorFromCSS(NSString *css)
 
 static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
 {
+  if ([view isKindOfClass: [NSScrollView class]])
+    {
+      NSString *bg = decls[@"background-color"] ?: decls[@"background"];
+      NSColor *c = bg ? TRColorFromCSS(bg) : nil;
+      if (c)
+        {
+          [(NSScrollView *)view setBackgroundColor: c];
+          [(NSScrollView *)view setDrawsBackground: YES];
+        }
+      return;
+    }
   if (![view isKindOfClass: [NSControl class]] || [decls count] == 0) return;
   NSControl *ctl = (NSControl *)view;
   NSString *v;
@@ -374,6 +385,15 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
   NSSize old = [self frame].size;
   [super setFrameSize: size];
   if (![self isNestedBox] && !NSEqualSizes(old, size))
+    [self layoutTrellis];
+}
+
+/* GNUstep's -setFrame: does not call -setFrameSize:. */
+- (void)setFrame:(NSRect)frame
+{
+  NSSize old = [self frame].size;
+  [super setFrame: frame];
+  if (![self isNestedBox] && !NSEqualSizes(old, frame.size))
     [self layoutTrellis];
 }
 

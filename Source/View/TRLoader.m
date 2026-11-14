@@ -61,9 +61,16 @@ static BOOL TRYes(NSString *v)
   [_box layoutTrellis];
 }
 
+/* GNUstep's -setFrame: does not go through -setFrameSize:, so both. */
 - (void)setFrameSize:(NSSize)size
 {
   [super setFrameSize: size];
+  [self layoutContent];
+}
+
+- (void)setFrame:(NSRect)frame
+{
+  [super setFrame: frame];
   [self layoutContent];
 }
 

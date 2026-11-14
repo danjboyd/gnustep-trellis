@@ -464,8 +464,9 @@ static int TREdgeFromSuffix(NSString *suffix)
       TRFloat a, b = 1;
       if (!TRParseNumber(parts[0], &a)) return NO;
       if ([parts count] == 2 && !TRParseNumber(parts[1], &b)) return NO;
-      if ([parts count] > 2 || a <= 0 || b <= 0) return NO;
-      _s.aspectRatio = a / b;
+      if ([parts count] > 2 || a < 0 || b < 0) return NO;
+      /* A degenerate ratio (0, or x/0) behaves as auto (CSS Values 4). */
+      _s.aspectRatio = (a == 0 || b == 0) ? TRUndefined : a / b;
       return YES;
     }
   if ([p isEqualToString: @"gap"])

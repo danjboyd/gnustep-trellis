@@ -252,6 +252,16 @@ static void TRClearDirty(TRNode *n)
 
   TRFloat x = s->margin[TREdgeLeft].unit == TRUnitPoint ? s->margin[TREdgeLeft].value : 0;
   TRFloat y = s->margin[TREdgeTop].unit == TRUnitPoint ? s->margin[TREdgeTop].value : 0;
+  /* A positioned root is offset by its own left/top insets. */
+  if (s->position != TRPositionStatic)
+    {
+      if (s->inset[TREdgeLeft].unit == TRUnitPoint) x += s->inset[TREdgeLeft].value;
+      else if (s->inset[TREdgeLeft].unit == TRUnitPercent && !isnan(available.width))
+        x += s->inset[TREdgeLeft].value * available.width / 100;
+      if (s->inset[TREdgeTop].unit == TRUnitPoint) y += s->inset[TREdgeTop].value;
+      else if (s->inset[TREdgeTop].unit == TRUnitPercent && !isnan(available.height))
+        y += s->inset[TREdgeTop].value * available.height / 100;
+    }
   _rawFrame.x = x;
   _rawFrame.y = y;
 }

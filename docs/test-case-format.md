@@ -41,7 +41,7 @@ runner (`trellis-case`) reads both.
 | `direction` | no | `ltr` (default) or `rtl` for the root. |
 | `tolerance` | no | Maximum absolute difference per number, default 0.5. |
 | `pixelScale` | no | Pixel-grid rounding. Default 1 (Yoga-style rounding to whole points). 0 disables rounding (use this for WPT cases compared at sub-pixel precision). |
-| `requires` | no | Features the case depends on, for example `["aspect-ratio","position:absolute"]`. A runner can report unsupported ones as *skipped*, not failed. |
+| `requires` | no | Features the case depends on, for example `["position-static","block-layout"]`. `trellis-case` skips a case that requires a feature Trellis doesn't implement, or does differently on purpose: `position-static`, `display-inline`, `display-inline-block`, `display-contents`, `display--webkit-box`, `logical-properties` and `intrinsic-size-keyword`. It counts the skips by feature. `--all` runs every case, and `--unsupported a,b` replaces the list. |
 | `skip` | no | A string: the reason this case is known bad and skipped. |
 
 ## Styles
@@ -89,7 +89,7 @@ on top when it matches. See `TRNode -addConditionalStyle:when:error:`.
 
 ## Runner output
 
-`trellis-case [--verbose] <dir-or-file>...` prints one line per failure and then:
+`trellis-case [--verbose] [--all | --unsupported a,b] <dir-or-file>...` prints one line per failure and then:
 
 ```
 PASS 812/1000 (81.2%)  fail 150  skip 38

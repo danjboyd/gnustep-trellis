@@ -204,14 +204,32 @@ static int TRCompareOrder(const void *a, const void *b)
 /* The cross-axis constraint an item is measured under: exactly the line
    when it will be stretched in a single-line container of definite cross
    size, otherwise fit-content within the available cross size. */
+/* The item's own min/max cross size bound the space it is measured in:
+   text in a max-width: 100px column item wraps at 100px, not at the
+   container's width. */
+static TRFloat TRBoundCrossAvail(const TRItem *it, TRFloat c, TRMeasureMode *mode)
+{
+  if (!isnan(it->maxCross))
+    {
+      if (*mode == TRMeasureModeUndefined) { *mode = TRMeasureModeAtMost; c = it->maxCross; }
+      else c = TRMin(c, it->maxCross);
+    }
+  if (*mode != TRMeasureModeUndefined) c = TRMax(c, it->minCross);
+  return c;
+}
+
 static TRFloat TRItemCrossAvail(TRItem *it, TRFloat availCross, TRMeasureMode crossMode,
                                 BOOL multiLine, TRMeasureMode *mode)
 {
-  if (isnan(availCross)) { *mode = TRMeasureModeUndefined; return TRUndefined; }
+  if (isnan(availCross))
+    {
+      *mode = TRMeasureModeUndefined;
+      return TRBoundCrossAvail(it, TRUndefined, mode);
+    }
   BOOL stretch = (it->align == TRAlignStretch && !it->crossLeadAuto && !it->crossTrailAuto);
   *mode = (stretch && crossMode == TRMeasureModeExactly && !multiLine)
     ? TRMeasureModeExactly : TRMeasureModeAtMost;
-  return TRMax(0, availCross - it->crossLead - it->crossTrail);
+  return TRBoundCrossAvail(it, TRMax(0, availCross - it->crossLead - it->crossTrail), mode);
 }
 
 /* The automatic minimum size of a flex item in the main axis
@@ -281,6 +299,16 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
                            TRFloat aw, TRFloat ah, TRMeasureMode wm, TRMeasureMode hm,
                            TRFloat ow, TRFloat oh, BOOL perform, TRDirection dir)
 {
+  /* As in CSS, an auto block size is never limited by the space on offer:
+     a container whose height is only bounded takes its content height
+     (its own min/max-height still apply), so its items don't shrink. */
+  if (hm == TRMeasureModeAtMost) { hm = TRMeasureModeUndefined; ah = TRUndefined; }
+  if (hm == TRMeasureModeUndefined)
+    {
+      /* ...but its own max-height does bound it (line breaking, shrinking). */
+      TRFloat mh = TRBoxSize(s, s->maxHeight, oh, TRPBVertical(e));
+      if (!isnan(mh)) { hm = TRMeasureModeAtMost; ah = mh; }
+    }
   const BOOL rtl = (dir == TRDirectionRTL);
   const TRFlexDirection fd = (s->display == TRDisplayBlock) ? TRFlexDirectionColumn : s->flexDirection;
   const BOOL isRow = (fd == TRFlexDirectionRow || fd == TRFlexDirectionRowReverse);
@@ -401,13 +429,10 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
           TRFloat cw = sw, ch = sh;
           TRMeasureMode cwm = isnan(cw) ? TRMeasureModeUndefined : TRMeasureModeExactly;
           TRMeasureMode chm = isnan(ch) ? TRMeasureModeUndefined : TRMeasureModeExactly;
-          TRFloat crossMargins = it->crossLead + it->crossTrail;
-          if (isnan(it->styleCross) && !isnan(availCross))
+          if (isnan(it->styleCross))
             {
-              BOOL stretch = (it->align == TRAlignStretch && !it->crossLeadAuto && !it->crossTrailAuto);
-              TRFloat c = TRMax(0, availCross - crossMargins);
-              TRMeasureMode cm = (stretch && crossMode == TRMeasureModeExactly && !multiLine)
-                ? TRMeasureModeExactly : TRMeasureModeAtMost;
+              TRMeasureMode cm;
+              TRFloat c = TRItemCrossAvail(it, availCross, crossMode, multiLine, &cm);
               if (isRow) { ch = c; chm = cm; } else { cw = c; cwm = cm; }
             }
           if (!isnan(ar) && (isRow ? chm : cwm) == TRMeasureModeExactly)
@@ -618,12 +643,8 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
         }
       else
         {
-          TRFloat crossMargins = it->crossLead + it->crossTrail;
-          TRFloat c = isnan(availCross) ? TRUndefined : TRMax(0, availCross - crossMargins);
-          TRMeasureMode cm = isnan(c) ? TRMeasureModeUndefined : TRMeasureModeAtMost;
-          BOOL stretch = (it->align == TRAlignStretch && !it->crossLeadAuto && !it->crossTrailAuto);
-          if (stretch && crossMode == TRMeasureModeExactly && !multiLine)
-            cm = TRMeasureModeExactly;
+          TRMeasureMode cm;
+          TRFloat c = TRItemCrossAvail(it, availCross, crossMode, multiLine, &cm);
           TRSize sz = isRow
             ? TRLayoutNode(it->node, it->target, c, TRMeasureModeExactly, cm, refW, refH, NO, dir)
             : TRLayoutNode(it->node, c, it->target, cm, TRMeasureModeExactly, refW, refH, NO, dir);
@@ -952,7 +973,8 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
             staticY = e->pad[TREdgeTop] + e->border[TREdgeTop] + (isRow ? crossPhys : mainPhys) + m[TREdgeTop];
           }
           TRFloat x, y;
-          if (!isnan(L)) x = e->border[TREdgeLeft] + L + m[TREdgeLeft];
+          /* Over-constrained (left, right and width): rtl honours right. */
+          if (!isnan(L) && !(rtl && !isnan(R))) x = e->border[TREdgeLeft] + L + m[TREdgeLeft];
           else if (!isnan(R)) x = W - e->border[TREdgeRight] - R - m[TREdgeRight] - w;
           else x = staticX;
           if (!isnan(T)) y = e->border[TREdgeTop] + T + m[TREdgeTop];

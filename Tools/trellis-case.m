@@ -125,6 +125,23 @@ static void TRCompare(TRNode *n, NSDictionary *exp, NSString *path, TRFloat tol,
 
 typedef enum { TRPass, TRFail, TRSkip } TROutcome;
 
+/* Features a case may list in "requires" that Trellis does not implement,
+   or deliberately does differently (docs/agents.md section 4). Such cases are
+   skipped and counted by reason. --all runs them; --unsupported a,b replaces
+   the list. */
+static NSSet *gUnsupported;
+static NSCountedSet *gSkipReasons;
+static NSSet *TRDefaultUnsupported(void)
+{
+  return [NSSet setWithObjects:
+    @"position-static",          /* abspos is relative to the parent */
+    @"display-inline", @"display-inline-block", @"display-contents",
+    @"display--webkit-box",
+    @"logical-properties",       /* inline-size, margin-inline-start, ... */
+    @"intrinsic-size-keyword",   /* width: min-content / max-content / fit-content */
+    nil];
+}
+
 static TROutcome TRRunCase(NSString *file, NSDictionary *c, NSString **suiteOut)
 {
   NSString *cid = c[@"id"] ?: [file lastPathComponent];
@@ -140,6 +157,13 @@ static TROutcome TRRunCase(NSString *file, NSDictionary *c, NSString **suiteOut)
       if (gVerbose) printf("SKIP %s: %s\n", [cid UTF8String], [[c[@"skip"] description] UTF8String]);
       return TRSkip;
     }
+  for (NSString *req in c[@"requires"])
+    if ([gUnsupported containsObject: req])
+      {
+        [gSkipReasons addObject: req];
+        if (gVerbose) printf("SKIP %s: requires %s\n", [cid UTF8String], [req UTF8String]);
+        return TRSkip;
+      }
   NSString *err = nil;
   TRNode *root = TRBuildNode(c[@"root"], &err);
   if (root == nil)
@@ -195,10 +219,18 @@ int main(int argc, const char **argv)
   @autoreleasepool
     {
       NSMutableArray *files = [NSMutableArray array];
+      gUnsupported = TRDefaultUnsupported();
+      gSkipReasons = [NSCountedSet set];
       for (int i = 1; i < argc; i++)
         {
           NSString *a = [NSString stringWithUTF8String: argv[i]];
           if ([a isEqualToString: @"--verbose"] || [a isEqualToString: @"-v"]) gVerbose = YES;
+          else if ([a isEqualToString: @"--all"]) gUnsupported = [NSSet set];
+          else if ([a isEqualToString: @"--unsupported"] && i + 1 < argc)
+            {
+              NSString *list = [NSString stringWithUTF8String: argv[++i]];
+              gUnsupported = [NSSet setWithArray: [list length] ? [list componentsSeparatedByString: @","] : @[]];
+            }
           else TRCollect(a, files);
         }
       [files sortUsingSelector: @selector(compare:)];
@@ -235,6 +267,13 @@ int main(int argc, const char **argv)
       printf("PASS %lu/%lu (%.1f%%)  fail %lu  skip %lu\n", (unsigned long)pass,
              (unsigned long)run, run ? 100.0 * pass / run : 100.0,
              (unsigned long)fail, (unsigned long)skip);
+      if ([gSkipReasons count])
+        {
+          printf("  skipped, unsupported:");
+          for (NSString *r in [[gSkipReasons allObjects] sortedArrayUsingSelector: @selector(compare:)])
+            printf(" %s %lu", [r UTF8String], (unsigned long)[gSkipReasons countForObject: r]);
+          printf("\n");
+        }
       for (NSString *s in [[perSuite allKeys] sortedArrayUsingSelector: @selector(compare:)])
         {
           NSArray *t = perSuite[s];

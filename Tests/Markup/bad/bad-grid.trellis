@@ -1,0 +1,2 @@
+<!-- expect: invalid value "flex" for grid-template-columns -->
+<box style="display: grid; grid-template-columns: flex"/>

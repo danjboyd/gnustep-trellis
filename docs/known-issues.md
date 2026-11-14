@@ -20,11 +20,7 @@
 
 ## Trellis
 
-- **Baselines of pop-up buttons** are a few px off under Adwaita: labels
-  aligned with `align-items: baseline` sit about 3 px above the pop-up
-  text. `TRBaselineOfView` centres the font's line box in the cell's
-  title rect, and themed pop-up cells draw their title differently.
-  Needs a per-cell-class baseline, or a theme hook.
+- **Baselines of buttons and pop-ups** are computed by centring the font line box in the bezel (fixed 2026-11-13; it was about 3 px off under Adwaita).
 - `display: block` is a column flex container, not CSS block flow (see
   design.md section 4a).
 - Absolute positioning is relative to the parent box, not the nearest

@@ -65,6 +65,13 @@ TRFloat TRBaselineOfView(NSView *view, TRSize size)
   NSFont *font = [cell font];
   if (cell == nil || font == nil) return size.height;
   NSRect bounds = NSMakeRect(0, 0, size.width, size.height);
+  CGFloat lineH0 = [font ascender] - [font descender];
+  /* Push buttons and pop-ups draw their single-line title centred in the
+     whole bezel (GNUstep themes and Aqua alike); their title rects are not
+     reliable for this. */
+  if ([view isKindOfClass: [NSPopUpButton class]]
+      || ([view isKindOfClass: [NSButton class]] && [cell isBezeled]))
+    return floor((size.height - lineH0) / 2) + [font ascender];
   NSRect title = [cell titleRectForBounds: bounds];
   /* Text inside the title rect is vertically centred on GNUstep and Apple
      for single-line cells. */

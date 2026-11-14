@@ -1,0 +1,2 @@
+<!-- expect: duplicate attribute id -->
+<column id="a" id="b"/>

@@ -82,6 +82,7 @@ check:: all
 	@$(LINT) Examples/TrellisDemo/AskDetail.trellis --owner Examples/TrellisDemo/AskDetailController.h
 	@$(LINT) Examples/TrellisDemo/Settings.trellis --owner Examples/TrellisDemo/SettingsController.h
 	@$(LINT) Examples/TrellisDemo/Dashboard.trellis --owner Examples/TrellisDemo/DashboardController.h
+	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH Tests/Markup/run.sh
 	@if [ -d Tests/Conformance/cases ] && [ -n "$$(ls -A Tests/Conformance/cases 2>/dev/null)" ]; then \
 	  echo "== conformance (report only; does not fail the build)"; \
 	  $(CASE_RUNNER) Tests/Conformance/cases | tail -20 || true; \

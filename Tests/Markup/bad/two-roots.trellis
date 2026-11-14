@@ -1,0 +1,3 @@
+<!-- expect: one root element -->
+<column/>
+<row/>

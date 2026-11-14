@@ -1,0 +1,4 @@
+<!-- expect: 3:12: </lable> does not match <label> -->
+<column>
+  <label>hi</lable>
+</column>

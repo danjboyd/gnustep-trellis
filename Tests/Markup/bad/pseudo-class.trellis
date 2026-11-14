@@ -1,0 +1,5 @@
+<!-- expect: unsupported selector '.a:hover' -->
+<column/>
+<style>
+ .a:hover { color: red }
+</style>

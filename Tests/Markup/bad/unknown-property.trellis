@@ -1,0 +1,2 @@
+<!-- expect: unknown property "flex-directon" -->
+<column style="flex-directon: row"/>

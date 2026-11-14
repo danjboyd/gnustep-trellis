@@ -1,0 +1,4 @@
+<!-- expect: </column> does not match <row> opened at line 3 -->
+<column>
+  <row>
+</column>

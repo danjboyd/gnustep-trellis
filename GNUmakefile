@@ -27,7 +27,8 @@ libTrellisEngine_OBJC_FILES = \
 	Source/Engine/TRLayout.m \
 	Source/Engine/TRContainerQuery.m \
 	Source/Engine/TRLint.m \
-	Source/Engine/TRMarkup.m
+	Source/Engine/TRMarkup.m \
+	Source/Engine/TRGrid.m
 libTrellisEngine_HEADER_FILES_DIR = Source/Engine
 libTrellisEngine_HEADER_FILES_INSTALL_DIR = Trellis
 libTrellisEngine_HEADER_FILES = TRTypes.h TRStyle.h TRNode.h TRLint.h TRMarkup.h TrellisEngine.h
@@ -71,6 +72,7 @@ check:: all
 	@echo "== .trellis files (syntax, styles, bindings)"
 	@$(LINT) Examples/TrellisDemo/AskDetail.trellis --owner Examples/TrellisDemo/AskDetailController.h
 	@$(LINT) Examples/TrellisDemo/Settings.trellis --owner Examples/TrellisDemo/SettingsController.h
+	@$(LINT) Examples/TrellisDemo/Dashboard.trellis --owner Examples/TrellisDemo/DashboardController.h
 	@if [ -d Tests/Conformance/cases ] && [ -n "$$(ls -A Tests/Conformance/cases 2>/dev/null)" ]; then \
 	  echo "== conformance (report only; does not fail the build)"; \
 	  $(CASE_RUNNER) Tests/Conformance/cases | tail -20 || true; \

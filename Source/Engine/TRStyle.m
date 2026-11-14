@@ -6,6 +6,7 @@
 
 #import "TRStyle.h"
 #import "TRNode.h"
+#import "TRGrid.h"
 
 NSString *const TRStyleErrorDomain = @"TRStyleErrorDomain";
 
@@ -40,6 +41,9 @@ TRStyleStorage TRStyleStorageInitial(void)
     }
   s.rowGap = s.columnGap = TRPx(0);
   s.order = 0;
+  s.justifyItems = TRAlignNormal;
+  s.justifySelf = TRAlignAuto;
+  s.gridAutoFlowColumn = NO;
   return s;
 }
 
@@ -155,7 +159,8 @@ static BOOL TRLookup(NSString *tok, const TRKeyword *table, int *out)
 static const TRKeyword kDisplay[] = {
   {"flex", TRDisplayFlex}, {"none", TRDisplayNone},
   /* No CSS block/inline flow: block is a column flex container. */
-  {"block", TRDisplayBlock}, {"inline-flex", TRDisplayFlex}, {NULL, 0}};
+  {"block", TRDisplayBlock}, {"inline-flex", TRDisplayFlex},
+  {"grid", TRDisplayGrid}, {"inline-grid", TRDisplayGrid}, {NULL, 0}};
 static const TRKeyword kPosition[] = {
   {"relative", TRPositionRelative}, {"static", TRPositionStatic},
   {"absolute", TRPositionAbsolute}, {NULL, 0}};
@@ -287,6 +292,15 @@ static int TREdgeFromSuffix(NSString *suffix)
   TRStyle *c = [[[self class] allocWithZone: zone] init];
   c->_s = _s;
   c->_other = [_other mutableCopy];
+  c->_gridTemplateColumns = _gridTemplateColumns;
+  c->_gridTemplateRows = _gridTemplateRows;
+  c->_gridAutoColumns = _gridAutoColumns;
+  c->_gridAutoRows = _gridAutoRows;
+  c->_gridTemplateAreas = _gridTemplateAreas;
+  c->_gridRowStart = _gridRowStart;
+  c->_gridRowEnd = _gridRowEnd;
+  c->_gridColumnStart = _gridColumnStart;
+  c->_gridColumnEnd = _gridColumnEnd;
   return c;
 }
 
@@ -368,7 +382,11 @@ static int TREdgeFromSuffix(NSString *suffix)
       @"min-width", @"min-height", @"max-width", @"max-height",
       @"aspect-ratio", @"margin", @"padding", @"border", @"border-width",
       @"inset", @"gap", @"row-gap", @"column-gap", @"order", @"left",
-      @"top", @"right", @"bottom", nil];
+      @"top", @"right", @"bottom", @"grid-template-columns", @"grid-template-rows",
+      @"grid-template-areas", @"grid-auto-columns", @"grid-auto-rows", @"grid-auto-flow",
+      @"grid-row", @"grid-column", @"grid-area", @"grid-row-start", @"grid-row-end",
+      @"grid-column-start", @"grid-column-end", @"justify-items", @"justify-self",
+      @"place-items", @"place-self", nil];
   });
   return [layout containsObject: p];
 }
@@ -452,6 +470,11 @@ static int TREdgeFromSuffix(NSString *suffix)
     }
   if ([p isEqualToString: @"flex"])
     return [self _setFlexShorthand: v];
+  if ([p hasPrefix: @"grid"] || [p isEqualToString: @"justify-items"] || [p isEqualToString: @"justify-self"])
+    {
+      int r = [self _setGrid: p value: v];
+      if (r >= 0) return r == 1;
+    }
   if ([p isEqualToString: @"flex-flow"])
     {
       for (NSString *t in TRTokens(v))
@@ -473,9 +496,9 @@ static int TREdgeFromSuffix(NSString *suffix)
       if ([p isEqualToString: @"place-content"])
         { _s.alignContent = (TRAlign)a; _s.justifyContent = (TRAlign)b; return YES; }
       if ([p isEqualToString: @"place-items"])
-        { _s.alignItems = (TRAlign)a; return YES; }   /* justify-items: n/a in flex */
+        { _s.alignItems = (TRAlign)a; _s.justifyItems = (TRAlign)b; return YES; }
       if ([p isEqualToString: @"place-self"])
-        { _s.alignSelf = (TRAlign)a; return YES; }
+        { _s.alignSelf = (TRAlign)a; _s.justifySelf = (TRAlign)b; return YES; }
       return NO;
     }
   if ([p isEqualToString: @"margin"])
@@ -547,6 +570,85 @@ static int TREdgeFromSuffix(NSString *suffix)
       return YES;
     }
   return NO;
+}
+
+/* Grid properties. Returns 1 = set, 0 = invalid value, -1 = not a grid property. */
+- (int)_setGrid:(NSString *)p value:(NSString *)v
+{
+  int k;
+  if ([p isEqualToString: @"justify-items"] || [p isEqualToString: @"justify-self"])
+    {
+      if (!TRLookup(v, kAlign, &k)) return 0;
+      if ([p isEqualToString: @"justify-items"]) _s.justifyItems = (TRAlign)k; else _s.justifySelf = (TRAlign)k;
+      return 1;
+    }
+  if ([p isEqualToString: @"grid-template-columns"] || [p isEqualToString: @"grid-template-rows"]
+      || [p isEqualToString: @"grid-auto-columns"] || [p isEqualToString: @"grid-auto-rows"])
+    {
+      BOOL isAuto = [p hasPrefix: @"grid-auto"];
+      NSString *val = [[v lowercaseString] isEqualToString: @"none"] ? nil : v;
+      if (val && !TRGridValidateTrackList(val, isAuto)) return 0;
+      if ([p isEqualToString: @"grid-template-columns"]) _gridTemplateColumns = val;
+      else if ([p isEqualToString: @"grid-template-rows"]) _gridTemplateRows = val;
+      else if ([p isEqualToString: @"grid-auto-columns"]) _gridAutoColumns = val;
+      else _gridAutoRows = val;
+      return 1;
+    }
+  if ([p isEqualToString: @"grid-template-areas"])
+    {
+      if ([[v lowercaseString] isEqualToString: @"none"]) { _gridTemplateAreas = nil; return 1; }
+      NSArray *areas = TRGridParseAreas(v);
+      if (areas == nil) return 0;
+      _gridTemplateAreas = areas;
+      return 1;
+    }
+  if ([p isEqualToString: @"grid-auto-flow"])
+    {
+      NSString *lv = [v lowercaseString];
+      if ([lv hasPrefix: @"column"]) _s.gridAutoFlowColumn = YES;
+      else if ([lv hasPrefix: @"row"] || [lv isEqualToString: @"dense"]) _s.gridAutoFlowColumn = NO;
+      else return 0;
+      return 1;
+    }
+  if ([p isEqualToString: @"grid-row-start"] || [p isEqualToString: @"grid-row-end"]
+      || [p isEqualToString: @"grid-column-start"] || [p isEqualToString: @"grid-column-end"])
+    {
+      if (!TRGridValidateLine(v)) return 0;
+      if ([p isEqualToString: @"grid-row-start"]) _gridRowStart = v;
+      else if ([p isEqualToString: @"grid-row-end"]) _gridRowEnd = v;
+      else if ([p isEqualToString: @"grid-column-start"]) _gridColumnStart = v;
+      else _gridColumnEnd = v;
+      return 1;
+    }
+  if ([p isEqualToString: @"grid-row"] || [p isEqualToString: @"grid-column"])
+    {
+      NSArray *parts = [v componentsSeparatedByString: @"/"];
+      if ([parts count] > 2) return 0;
+      NSString *a = [parts[0] stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
+      NSString *b = [parts count] == 2
+        ? [parts[1] stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]] : nil;
+      if (!TRGridValidateLine(a) || (b && !TRGridValidateLine(b))) return 0;
+      /* A lone area/line name means name / name (CSS); otherwise auto. */
+      if (b == nil) b = TRGridIsName(a) ? a : @"auto";
+      if ([p isEqualToString: @"grid-row"]) { _gridRowStart = a; _gridRowEnd = b; }
+      else { _gridColumnStart = a; _gridColumnEnd = b; }
+      return 1;
+    }
+  if ([p isEqualToString: @"grid-area"])
+    {
+      NSMutableArray *parts = [NSMutableArray array];
+      for (NSString *x in [v componentsSeparatedByString: @"/"])
+        [parts addObject: [x stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]]];
+      if ([parts count] < 1 || [parts count] > 4) return 0;
+      for (NSString *x in parts) if (!TRGridValidateLine(x)) return 0;
+      NSString *rs = parts[0];
+      NSString *cs = [parts count] > 1 ? parts[1] : (TRGridIsName(rs) ? rs : @"auto");
+      NSString *re = [parts count] > 2 ? parts[2] : (TRGridIsName(rs) ? rs : @"auto");
+      NSString *ce = [parts count] > 3 ? parts[3] : (TRGridIsName(cs) ? cs : @"auto");
+      _gridRowStart = rs; _gridColumnStart = cs; _gridRowEnd = re; _gridColumnEnd = ce;
+      return 1;
+    }
+  return -1;
 }
 
 - (BOOL)_setFlexShorthand:(NSString *)v
@@ -694,6 +796,24 @@ static NSString *TRKeywordString(const TRKeyword *table, int value)
   LEN(@"row-gap", rowGap)
   LEN(@"column-gap", columnGap)
   if (_s.order != 0) [out addObject: [NSString stringWithFormat: @"order: %ld", (long)_s.order]];
+  KW(@"justify-items", kAlign, justifyItems)
+  KW(@"justify-self", kAlign, justifySelf)
+  if (_s.gridAutoFlowColumn) [out addObject: @"grid-auto-flow: column"];
+  if (_gridTemplateColumns) [out addObject: [@"grid-template-columns: " stringByAppendingString: _gridTemplateColumns]];
+  if (_gridTemplateRows) [out addObject: [@"grid-template-rows: " stringByAppendingString: _gridTemplateRows]];
+  if (_gridAutoColumns) [out addObject: [@"grid-auto-columns: " stringByAppendingString: _gridAutoColumns]];
+  if (_gridAutoRows) [out addObject: [@"grid-auto-rows: " stringByAppendingString: _gridAutoRows]];
+  if (_gridTemplateAreas)
+    {
+      NSMutableArray *rows = [NSMutableArray array];
+      for (NSArray *r in _gridTemplateAreas)
+        [rows addObject: [NSString stringWithFormat: @"\"%@\"", [r componentsJoinedByString: @" "]]];
+      [out addObject: [@"grid-template-areas: " stringByAppendingString: [rows componentsJoinedByString: @" "]]];
+    }
+  if (_gridRowStart || _gridRowEnd)
+    [out addObject: [NSString stringWithFormat: @"grid-row: %@ / %@", _gridRowStart ?: @"auto", _gridRowEnd ?: @"auto"]];
+  if (_gridColumnStart || _gridColumnEnd)
+    [out addObject: [NSString stringWithFormat: @"grid-column: %@ / %@", _gridColumnStart ?: @"auto", _gridColumnEnd ?: @"auto"]];
 #undef KW
 #undef LEN
   for (NSString *k in [[_other allKeys] sortedArrayUsingSelector: @selector(compare:)])

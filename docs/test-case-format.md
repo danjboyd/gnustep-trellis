@@ -57,6 +57,10 @@ runner (`trellis-case`) reads both.
   `flex-direction:row`, `flex-shrink:1`, `min-width/height:auto`.
   **WPT imports must set `"boxSizing": "content-box"` on every node.**
   Yoga imports need nothing (Yoga is border-box too).
+- **Grid** properties (`display: "grid"`, `gridTemplateColumns`,
+  `gridTemplateAreas`, `gridColumn`, …) use the same CSS value syntax.
+  Named lines and subgrid are not supported: mark such cases with
+  `"requires": ["grid-named-lines"]` or `["subgrid"]`.
 - **Positioning:** an absolutely positioned child is placed against its
   parent's padding box (Yoga semantics), whatever the parent's `position`.
   WPT imports should give the container `position:relative`, which makes

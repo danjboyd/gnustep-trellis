@@ -67,6 +67,13 @@ static void TRLintNode(NSDictionary *n, NSString *path, double absX, double absY
                         @"(check flex-basis/align-items for the cross axis)", name, cls, h, ih]);
     }
 
+  /* A control laid out with no width or height is invisible: usually a
+     view with no intrinsic size and no width/height/flex. */
+  if (![cls isEqualToString: @"NSView"] && ![cls isEqualToString: @"TRBoxView"]
+      && [n[@"children"] count] == 0 && (w < 1 || h < 1))
+    TRAdd(out, @"collapsed", @"warning", n, path,
+          [NSString stringWithFormat: @"%@ (%@) is %gx%g: give it a width/height or flex", name, cls, w, h]);
+
   if (ax < -kTol || ay < -kTol || (vw > 0 && ax + w > vw + kTol) || (vh > 0 && ay + h > vh + kTol))
     TRAdd(out, @"offscreen", @"warning", n, path,
           [NSString stringWithFormat: @"%@ (%g,%g %gx%g) extends outside the %gx%g viewport",

@@ -1,0 +1,52 @@
+<!-- owner: DashboardController -->
+<box id="dashboard" class="page">
+  <row class="head">
+    <label class="title" no-outlet="yes">Fleet</label>
+    <spacer/>
+    <field id="filter" placeholder="Filter agents"/>
+    <button action="refresh:">Refresh</button>
+  </row>
+  <column class="side">
+    <label class="section" no-outlet="yes">Projects</label>
+    <button class="nav" action="showProject:">Project Alpha</button>
+    <button class="nav" action="showProject:">AIManager</button>
+    <button class="nav" action="showProject:">agent-b</button>
+  </column>
+  <box id="cards" class="cards">
+    <column class="card"><label class="k" no-outlet="yes">Agents online</label><label id="online" class="v">11</label></column>
+    <column class="card"><label class="k" no-outlet="yes">Open asks</label><label id="asks" class="v">4</label></column>
+    <column class="card"><label class="k" no-outlet="yes">Items done today</label><label id="done" class="v">37</label></column>
+    <column class="card"><label class="k" no-outlet="yes">Week used</label><label id="week" class="v">9%</label></column>
+    <column class="card"><label class="k" no-outlet="yes">Builds</label><progress id="builds" value="70" max="100"/></column>
+  </box>
+  <text id="log" class="log">Log output appears here.</text>
+</box>
+
+<style>
+  .page {
+    display: grid; container-type: inline-size;
+    grid-template-columns: 180px 1fr;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas: "head head" "side cards" "side log";
+    gap: 12px; padding: 16px; background-color: #f6f5f4;
+  }
+  .head   { grid-area: head; gap: 8px; }
+  .title  { font-size: 18px; font-weight: bold; }
+  #filter { width: 200px; }
+  .side   { grid-area: side; gap: 6px; }
+  .section { color: #77767b; }
+  .cards  { grid-area: cards; display: grid; gap: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .card   { padding: 10px; gap: 4px; background-color: #ffffff; border: 1px solid #deddda; border-radius: 6px; }
+  .k      { color: #77767b; }
+  .v      { font-size: 22px; font-weight: bold; }
+  .log    { grid-area: log; min-height: 60px; }
+
+  /* Narrow: one column, the side list becomes a row under the header. */
+  @container (max-width: 599px) {
+    .page { grid-template-columns: 1fr; grid-template-rows: auto auto auto 1fr;
+            grid-template-areas: "head" "side" "cards" "log"; }
+    .side { flex-direction: row; flex-wrap: wrap; }
+    #filter { width: auto; flex: 1; min-width: 80px; }
+  }
+</style>

@@ -37,6 +37,10 @@ typedef struct {
   TRValue inset[4];             /* left/top/right/bottom */
   TRValue rowGap, columnGap;
   NSInteger order;
+  /* Grid */
+  TRAlign justifyItems;         /* normal = stretch */
+  TRAlign justifySelf;          /* auto = justify-items */
+  BOOL gridAutoFlowColumn;      /* grid-auto-flow: column */
 } TRStyleStorage;
 
 extern TRStyleStorage TRStyleStorageInitial(void);
@@ -55,6 +59,11 @@ extern TRStyleStorage TRStyleStorageInitial(void);
 {
 @public
   TRStyleStorage _s;
+  /* Grid properties are kept as validated CSS text; TRGrid.m parses them. */
+  NSString *_gridTemplateColumns, *_gridTemplateRows;
+  NSString *_gridAutoColumns, *_gridAutoRows;
+  NSArray<NSArray<NSString *> *> *_gridTemplateAreas;   /* rows of cell names; "." = empty */
+  NSString *_gridRowStart, *_gridRowEnd, *_gridColumnStart, *_gridColumnEnd;
 }
 
 + (instancetype)style;

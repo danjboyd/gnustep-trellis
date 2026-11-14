@@ -11,6 +11,10 @@
 #import "TRNode+Internal.h"
 #include <stdlib.h>
 
+TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFloat border[4],
+                    TRFloat aw, TRFloat ah, TRMeasureMode wm, TRMeasureMode hm,
+                    TRFloat ow, TRFloat oh, BOOL perform, TRDirection dir);
+
 /* ------------------------------------------------------------------ */
 #pragma mark Small helpers
 
@@ -931,7 +935,12 @@ TRSize TRLayoutNode(TRNode *node, TRFloat aw, TRFloat ah,
     if (c->_style->_s.display != TRDisplayNone) { hasInFlowOrAbs = YES; break; }
 
   TRSize size;
-  if (!hasInFlowOrAbs)
+  if (s->display == TRDisplayGrid)
+    {
+      size = TRLayoutGrid(node, s, e.pad, e.border, aw, ah, wm, hm, ow, oh, perform, dir);
+      hasInFlowOrAbs = YES;   /* the grid set _contentSize */
+    }
+  else if (!hasInFlowOrAbs)
     {
       if (perform)
         for (TRNode *c in node->_children) TRZeroLayout(c);

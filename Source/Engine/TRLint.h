@@ -11,6 +11,6 @@
    needed, overflow, position, hidden, children). Returns findings:
    {rule, severity ("error"|"warning"), id, path, message}.
 
-   Rules: clipped-text, undersized, stretched, overlap, overflow, offscreen. */
+   Rules: clipped-text, undersized, stretched, collapsed, overlap, overflow, offscreen. */
 NSArray<NSDictionary *> *TRLintFrameTree(NSDictionary *root, double viewportWidth,
                                          double viewportHeight);

@@ -20,7 +20,7 @@ that code is going.
 | Toolchain | Modern clang, libobjc2, ARC, blocks, libdispatch. GCC is not supported. |
 | Platforms | GNUstep (Linux first, then Windows/MSYS2) and native macOS AppKit, from the same source. |
 | v1 scope | Flexbox, inline style strings, a typed ObjC API, container queries, `trellis-render` (PNG + JSON), `trellis-lint`. |
-| v1.1 | CSS Grid on the same box tree and the same measuring. |
+| v1.1 | CSS Grid on the same box tree and the same measuring. **An early implementation landed on 2026-11-13** (TRGrid.m; see agents.md for the supported subset). |
 | Authoring | Typed ObjC API plus inline CSS declaration strings; `.trellis` layout files (markup plus scoped CSS) approved on 2026-11-13, built on the typed API. |
 | Apple testing | Macs project Macs; trellis-conformance owns the macOS build. |
 

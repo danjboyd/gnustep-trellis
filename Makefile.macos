@@ -5,7 +5,7 @@ CFLAGS  ?= -O2 -g
 CFLAGS  += -fobjc-arc -fblocks -Wall -Wno-unused-function -ISource/Engine
 B       := build
 
-ENGINE_SRC := Source/Engine/TRStyle.m Source/Engine/TRNode.m Source/Engine/TRLayout.m Source/Engine/TRContainerQuery.m Source/Engine/TRLint.m Source/Engine/TRMarkup.m
+ENGINE_SRC := Source/Engine/TRStyle.m Source/Engine/TRNode.m Source/Engine/TRLayout.m Source/Engine/TRContainerQuery.m Source/Engine/TRLint.m Source/Engine/TRMarkup.m Source/Engine/TRGrid.m
 
 all: $(B)/libTrellisEngine.dylib $(B)/trellis-case
 

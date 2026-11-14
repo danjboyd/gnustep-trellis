@@ -533,6 +533,8 @@ static NSString *TRElementDefaults(NSString *name)
       @"spacer": @"flex: 1",
       @"separator": @"align-self: stretch; flex: none; min-height: 1px; min-width: 1px",
       @"scroll": @"flex: 1; min-height: 0; min-width: 0",
+      @"progress": @"min-height: 16px; min-width: 60px",
+      @"image": @"min-width: 16px; min-height: 16px",
     };
   });
   return d[name];

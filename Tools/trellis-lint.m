@@ -33,7 +33,9 @@ static BOOL TRScanHeader(NSString *path, NSString *cls, NSMutableSet *outlets, N
   NSRegularExpression *iface = [NSRegularExpression regularExpressionWithPattern:
     @"@interface\\s+(\\w+)[^\\n]*\\n([\\s\\S]*?)@end" options: 0 error: NULL];
   NSRegularExpression *prop = [NSRegularExpression regularExpressionWithPattern:
-    @"@property[^;]*?\\b(\\w+)\\s*;" options: 0 error: NULL];
+    @"@property\\s*(?:\\([^)]*\\))?([^;]*);" options: 0 error: NULL];
+  NSRegularExpression *lastWord = [NSRegularExpression regularExpressionWithPattern:
+    @"(\\w+)\\s*$" options: 0 error: NULL];
   NSRegularExpression *ivar = [NSRegularExpression regularExpressionWithPattern:
     @"IBOutlet\\s+\\w+\\s*\\*?\\s*(\\w+)\\s*;" options: 0 error: NULL];
   NSRegularExpression *meth = [NSRegularExpression regularExpressionWithPattern:
@@ -46,7 +48,16 @@ static BOOL TRScanHeader(NSString *path, NSString *cls, NSMutableSet *outlets, N
       NSString *body = [src substringWithRange: [m rangeAtIndex: 2]];
       NSRange all = NSMakeRange(0, [body length]);
       for (NSTextCheckingResult *p in [prop matchesInString: body options: 0 range: all])
-        [outlets addObject: [body substringWithRange: [p rangeAtIndex: 1]]];
+        {
+          /* "NSTextField *a, *b" declares a and b. */
+          NSString *decl = [body substringWithRange: [p rangeAtIndex: 1]];
+          for (NSString *piece in [decl componentsSeparatedByString: @","])
+            {
+              NSTextCheckingResult *w = [lastWord firstMatchInString: piece options: 0
+                                                               range: NSMakeRange(0, [piece length])];
+              if (w) [outlets addObject: [piece substringWithRange: [w rangeAtIndex: 1]]];
+            }
+        }
       for (NSTextCheckingResult *p in [ivar matchesInString: body options: 0 range: all])
         [outlets addObject: [body substringWithRange: [p rangeAtIndex: 1]]];
       for (NSTextCheckingResult *p in [meth matchesInString: body options: 0 range: all])

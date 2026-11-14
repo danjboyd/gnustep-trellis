@@ -85,6 +85,16 @@ the user's settings. trellis-render refuses to run without it.
   `auto`), `padding`, `border` (width only for layout), `position`
   (`relative`, `absolute`), `top`, `right`, `bottom`, `left`, `inset`,
   `overflow`, `box-sizing`, `direction`.
+- **Grid** (`display: grid`): `grid-template-columns` and
+  `grid-template-rows` take `px`, `%`, `fr`, `auto`, `min-content`,
+  `max-content`, `minmax()` and `repeat(N | auto-fill | auto-fit, …)`.
+  Also `grid-template-areas`, `grid-auto-rows`, `grid-auto-columns`,
+  `grid-auto-flow: row | column`, `grid-row`, `grid-column` (`2 / 4`,
+  `span 2`, `1 / -1`), `grid-area` (an area name or four lines),
+  `justify-items`, `justify-self`, `align-items`, `align-self`,
+  `justify-content` and `align-content`.
+  **Not supported:** named lines (`[name]`), `subgrid`, `dense`, and
+  `fit-content()`.
 - **Drawing:** `background-color` and `border-color`/`border-radius` on
   boxes; `color`, `font-size`, `font-weight` and `text-align` on text
   controls; `white-space: nowrap`.
@@ -128,6 +138,12 @@ it a row. Lint reports this as `stretched`.
   `#options > button { flex: 1 1 160px }` (in a row).
 - **Truncating vs wrapping:** labels don't wrap by default. Use `<text>` or
   `wraps="yes"` for paragraphs.
+- **Page layout:** use a grid with `grid-template-areas` on the root,
+  and swap the areas in a container query for narrow widths (see
+  `Examples/TrellisDemo/Dashboard.trellis`).
+- **Responsive cards:**
+  `grid-template-columns: repeat(auto-fill, minmax(150px, 1fr))`. The
+  number of columns follows the width, and you don't need a query.
 - **Hide on narrow screens:** `@container (max-width: 499px) { #share { display: none } }`.
 - **Scrolling content:** wrap it in `<scroll>`. The scroll view takes the
   remaining space (`flex: 1`), and its content is a column.

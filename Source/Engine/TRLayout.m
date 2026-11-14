@@ -297,6 +297,19 @@ static TRSize TRLayoutLeaf(TRNode *node, const TRStyleStorage *s, const TREdges 
 /* ------------------------------------------------------------------ */
 #pragma mark The flex algorithm
 
+/* A flex base size ignores the item's own min/max main size (CSS Flexbox
+   9.2.3); they apply later, when flexible lengths are resolved. While an
+   item's content basis is measured, this names that item and the axis whose
+   min/max to ignore. It names one node only, so it never reaches the item's
+   descendants, and such a measure bypasses the cache. */
+static __thread const void *gUnclampedNode;
+static __thread BOOL gUnclampedIsWidth;
+
+static inline BOOL TRIgnoresOwnMinMax(TRNode *node, BOOL width)
+{
+  return gUnclampedNode == (__bridge const void *)node && gUnclampedIsWidth == width;
+}
+
 static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges *e,
                            TRFloat aw, TRFloat ah, TRMeasureMode wm, TRMeasureMode hm,
                            TRFloat ow, TRFloat oh, BOOL perform, TRDirection dir)
@@ -305,7 +318,7 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
      a container whose height is only bounded takes its content height
      (its own min/max-height still apply), so its items don't shrink. */
   if (hm == TRMeasureModeAtMost) { hm = TRMeasureModeUndefined; ah = TRUndefined; }
-  if (hm == TRMeasureModeUndefined)
+  if (hm == TRMeasureModeUndefined && !TRIgnoresOwnMinMax(node, NO))
     {
       /* ...but its own max-height does bound it (line breaking, shrinking). */
       TRFloat mh = TRBoxSize(s, s->maxHeight, oh, TRPBVertical(e));
@@ -332,6 +345,8 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
   /* The container's own min/max, as inner sizes. */
   TRFloat minW = TRBoxSize(s, s->minWidth, ow, pbW), maxW = TRBoxSize(s, s->maxWidth, ow, pbW);
   TRFloat minH = TRBoxSize(s, s->minHeight, oh, pbH), maxH = TRBoxSize(s, s->maxHeight, oh, pbH);
+  if (TRIgnoresOwnMinMax(node, YES)) minW = maxW = TRUndefined;
+  if (TRIgnoresOwnMinMax(node, NO)) minH = maxH = TRUndefined;
   const TRFloat minInnerMain = TRMax(0, TRDefault(isRow ? minW : minH, 0) - pbMainC);
   const TRFloat maxInnerMain = isnan(isRow ? maxW : maxH) ? TRUndefined : TRMax(0, (isRow ? maxW : maxH) - pbMainC);
   const TRFloat minInnerCross = TRMax(0, TRDefault(isRow ? minH : minW, 0) - pbCrossC);
@@ -446,7 +461,20 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
             }
           else
             {
+              TRValue mnV = isRow ? cs->minWidth : cs->minHeight;
+              TRValue mxV = isRow ? cs->maxWidth : cs->maxHeight;
+              BOOL unclamped = (mnV.unit != TRUnitAuto && mnV.unit != TRUnitUndefined)
+                            || mxV.unit != TRUnitUndefined;
+              const void *savedNode = gUnclampedNode;
+              BOOL savedIsWidth = gUnclampedIsWidth;
+              if (unclamped)
+                {
+                  gUnclampedNode = (__bridge const void *)it->node;
+                  gUnclampedIsWidth = isRow;
+                }
               TRSize sz = TRLayoutNode(it->node, cw, ch, cwm, chm, refW, refH, NO, dir);
+              gUnclampedNode = savedNode;
+              gUnclampedIsWidth = savedIsWidth;
               basis = isRow ? sz.width : sz.height;
             }
         }
@@ -1015,7 +1043,10 @@ TRSize TRLayoutNode(TRNode *node, TRFloat aw, TRFloat ah,
      children's percentages depend on ow/oh only via its own inner size,
      which is covered by aw/ah. */
   BOOL ownerMatters = TRUsesOwnerSize(s);
-  if (perform)
+  const BOOL unclampW = TRIgnoresOwnMinMax(node, YES), unclampH = TRIgnoresOwnMinMax(node, NO);
+  if (unclampW || unclampH)
+    ;   /* an unclamped basis measure: neither read nor stored in the cache */
+  else if (perform)
     {
       if (node->_hasPerformEntry
           && TRCacheMatch(&node->_performEntry, aw, ah, wm, hm, ow, oh, dir, ownerMatters))
@@ -1054,10 +1085,10 @@ TRSize TRLayoutNode(TRNode *node, TRFloat aw, TRFloat ah,
     size = TRLayoutFlex(node, s, &e, aw, ah, wm, hm, ow, oh, perform, dir);
 
   /* The node's own min/max apply to dimensions it chose itself. */
-  if (wm != TRMeasureModeExactly)
+  if (wm != TRMeasureModeExactly && !unclampW)
     size.width = TRMax(TRClamp(size.width, TRBoxSize(s, s->minWidth, ow, pbW),
                                TRBoxSize(s, s->maxWidth, ow, pbW)), pbW);
-  if (hm != TRMeasureModeExactly)
+  if (hm != TRMeasureModeExactly && !unclampH)
     size.height = TRMax(TRClamp(size.height, TRBoxSize(s, s->minHeight, oh, pbH),
                                 TRBoxSize(s, s->maxHeight, oh, pbH)), pbH);
 
@@ -1077,7 +1108,7 @@ TRSize TRLayoutNode(TRNode *node, TRFloat aw, TRFloat ah,
       pe->aw = aw; pe->ah = ah; pe->wm = wm; pe->hm = hm;
       pe->ow = ow; pe->oh = oh; pe->dir = dir; pe->result = size;
     }
-  else
+  else if (!unclampW && !unclampH)
     TRCacheStore(node, aw, ah, wm, hm, ow, oh, dir, size);
   return size;
 }

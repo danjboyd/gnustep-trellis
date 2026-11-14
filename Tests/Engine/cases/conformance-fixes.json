@@ -563,5 +563,95 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/flex_basis_ignores_own_max_width",
+  "note": "WPT flex-base-size-ignores-min-max-width-001: the content basis is 300, not 100; max-width applies when flexing",
+  "root": {
+   "style": {
+    "flexDirection": "row",
+    "width": 300,
+    "height": 10
+   },
+   "children": [
+    {
+     "style": {
+      "minWidth": 0,
+      "maxWidth": 100
+     },
+     "children": [
+      {
+       "style": {
+        "width": 300,
+        "height": 10
+       }
+      }
+     ]
+    },
+    {
+     "style": {
+      "minWidth": 0
+     },
+     "children": [
+      {
+       "style": {
+        "width": 300,
+        "height": 10
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "width": 100
+    },
+    {
+     "width": 200
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/relative_to_ancestor",
+  "note": "runner: relativeTo k measures x/y from the ancestor k levels up",
+  "root": {
+   "style": {
+    "width": 100,
+    "padding": 2
+   },
+   "children": [
+    {
+     "style": {
+      "height": 50,
+      "justifyContent": "flex-end",
+      "flexDirection": "column"
+     },
+     "children": [
+      {
+       "style": {
+        "width": 30,
+        "height": 30
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "children": [
+      {
+       "y": 22,
+       "x": 2,
+       "relativeTo": 2
+      }
+     ]
+    }
+   ]
+  }
  }
 ]

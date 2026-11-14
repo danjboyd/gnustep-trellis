@@ -36,7 +36,7 @@ runner (`trellis-case`) reads both.
 | `id` | yes | Unique, path-like. |
 | `source` | imported cases | Suite, upstream file, licence. Keep upstream attribution. |
 | `root` | yes | The node tree. Each node has `style` (object), optional `children` (array), optional `measure`. |
-| `expected` | yes | The same tree shape, with `x`, `y`, `width`, `height` per node. Frames are the node's border box, relative to the parent's border box (like Yoga). |
+| `expected` | yes | The same tree shape, with `x`, `y`, `width`, `height` per node. Frames are the node's border box, relative to the parent's border box (like Yoga). A node may add `relativeTo: k` to make its `x`/`y` relative to the border box of the ancestor `k` levels up (1 is the parent). |
 | `available` | no | The space the root is laid out into. A given width or height lays the root out *exactly* at that size, unless the root's own style sets the size. `null` or absent means unconstrained (the root takes its content size). |
 | `direction` | no | `ltr` (default) or `rtl` for the root. |
 | `tolerance` | no | Maximum absolute difference per number, default 0.5. |

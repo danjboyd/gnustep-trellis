@@ -100,6 +100,16 @@ static void TRCompare(TRNode *n, NSDictionary *exp, NSString *path, TRFloat tol,
                       NSMutableArray *diffs)
 {
   TRRect f = [n layoutFrame];
+  /* "relativeTo": k makes x/y relative to the ancestor k levels up
+     (k = 1 is the parent, the default). */
+  NSInteger k = [exp[@"relativeTo"] integerValue];
+  TRNode *up = [n parent];
+  for (NSInteger i = 1; i < k && up != nil && [up parent] != nil; i++)
+    {
+      TRRect pf = [up layoutFrame];
+      f.x += pf.x; f.y += pf.y;
+      up = [up parent];
+    }
   TRFloat got[4] = { f.x, f.y, f.width, f.height };
   NSString *keys[4] = { @"x", @"y", @"width", @"height" };
   for (int i = 0; i < 4; i++)

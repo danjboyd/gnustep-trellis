@@ -38,6 +38,16 @@ touches real user defaults.
 
 ![TrellisDemo .trellis screens at 340, 520 and 800 px under Adwaita](docs/images/demo-adwaita-3-widths.png)
 
+### Trellis Preview
+
+`TrellisPreview.app` opens a `.trellis` file and reloads it whenever the
+file (or its `.sample.json`) changes. Resize the window to watch the
+layout respond, or use View > Width presets. View > Inspector draws box
+outlines and lint findings in place, and the Theme menu switches the
+GSTheme (light or dark on macOS).
+
+![Preview inspector: lint findings drawn in place](docs/images/preview-inspector.png)
+
 ## Building
 
 GNUstep (clang, libobjc2, ARC, libdispatch; GCC is not supported):

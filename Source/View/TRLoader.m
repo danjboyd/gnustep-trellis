@@ -87,11 +87,10 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
   [f setBezeled: NO];
   [f setBordered: NO];
   [f setDrawsBackground: NO];
-  if (wraps)
-    {
-      [[f cell] setWraps: YES];
-      [[f cell] setLineBreakMode: NSLineBreakByWordWrapping];
-    }
+  /* Explicit either way: GNUstep text-field cells wrap by default, Apple's
+     do not. Labels are single-line unless asked; lint flags clipping. */
+  [[f cell] setWraps: wraps];
+  [[f cell] setLineBreakMode: wraps ? NSLineBreakByWordWrapping : NSLineBreakByTruncatingTail];
   return f;
 }
 
@@ -121,6 +120,8 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
       NSTextField *f = TRYes(a[@"secure"]) ? [[NSSecureTextField alloc] initWithFrame: NSMakeRect(0, 0, 10, 10)]
                                           : [[NSTextField alloc] initWithFrame: NSMakeRect(0, 0, 10, 10)];
       [f setStringValue: a[@"value"] ?: text ?: @""];
+      [[f cell] setWraps: NO];
+      [[f cell] setScrollable: YES];
       if (a[@"placeholder"]) [[f cell] setPlaceholderString: a[@"placeholder"]];
       if (a[@"editable"] && !TRYes(a[@"editable"])) [f setEditable: NO];
       v = f;

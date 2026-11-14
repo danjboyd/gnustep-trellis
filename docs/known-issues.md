@@ -11,6 +11,13 @@
 - `_NET_WORKAREA` warnings on stderr under bare Xvfb (no window manager)
   are harmless.
 
+- **Text-field cells wrap by default on GNUstep** (Apple's labels don't).
+  The loader sets `wraps` explicitly on every label and field, so layout
+  and lint behave the same on both platforms.
+- **NSScanner** on GNUstep doesn't skip leading whitespace when a scan
+  fails; Apple's does. Trellis parsers avoid NSScanner for multi-token
+  input.
+
 ## Trellis
 
 - **Baselines of pop-up buttons** are a few px off under Adwaita: labels

@@ -189,11 +189,24 @@ static int TRCompareOrder(const void *a, const void *b)
   return x->line < y->line ? -1 : (x->line > y->line ? 1 : 0);
 }
 
+/* The cross-axis constraint an item is measured under: exactly the line
+   when it will be stretched in a single-line container of definite cross
+   size, otherwise fit-content within the available cross size. */
+static TRFloat TRItemCrossAvail(TRItem *it, TRFloat availCross, TRMeasureMode crossMode,
+                                BOOL multiLine, TRMeasureMode *mode)
+{
+  if (isnan(availCross)) { *mode = TRMeasureModeUndefined; return TRUndefined; }
+  BOOL stretch = (it->align == TRAlignStretch && !it->crossLeadAuto && !it->crossTrailAuto);
+  *mode = (stretch && crossMode == TRMeasureModeExactly && !multiLine)
+    ? TRMeasureModeExactly : TRMeasureModeAtMost;
+  return TRMax(0, availCross - it->crossLead - it->crossTrail);
+}
+
 /* The automatic minimum size of a flex item in the main axis
    (CSS Flexbox 4.5): the content-based minimum, capped by the specified
    size, for items whose overflow is visible. */
 static TRFloat TRAutoMinMain(TRItem *it, BOOL isRow, TRFloat refW, TRFloat refH,
-                             TRDirection dir)
+                             TRDirection dir, TRFloat crossAvail, TRMeasureMode crossAvailMode)
 {
   if (it->s->overflow != TROverflowVisible) return it->pbMain;
   TRNode *child = it->node;
@@ -210,11 +223,12 @@ static TRFloat TRAutoMinMain(TRItem *it, BOOL isRow, TRFloat refW, TRFloat refH,
     }
   else
     {
-      /* min-content height is the content height at the item's width. */
+      /* min-content height is the content height at the width the item
+         will actually get (stretched, or fit-content). */
       TRFloat w = it->styleCross;
-      TRSize sz = TRLayoutNode(child, TRDefault(w, refW), TRUndefined,
-                               isnan(w) ? (isnan(refW) ? TRMeasureModeUndefined : TRMeasureModeAtMost)
-                                        : TRMeasureModeExactly,
+      TRMeasureMode m = TRMeasureModeExactly;
+      if (isnan(w)) { w = crossAvail; m = crossAvailMode; }
+      TRSize sz = TRLayoutNode(child, w, TRUndefined, isnan(w) ? TRMeasureModeUndefined : m,
                                TRMeasureModeUndefined, refW, refH, NO, dir);
       content = sz.height;
     }
@@ -399,7 +413,11 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
       /* With an explicit basis, the automatic minimum can exceed it
          (e.g. flex: 1 on text never shrinks below its longest word). */
       if (it->minMainIsAuto && !it->basisFromContent)
-        it->minMain = TRAutoMinMain(it, isRow, refW, refH, dir);
+        {
+          TRMeasureMode cm;
+          TRFloat ca = TRItemCrossAvail(it, availCross, crossMode, multiLine, &cm);
+          it->minMain = TRAutoMinMain(it, isRow, refW, refH, dir, ca, cm);
+        }
       it->hypo = TRClamp(it->base, it->minMain, it->maxMain);
     }
 
@@ -446,12 +464,33 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
         space = availMain;
       else
         {
+          /* Intrinsic (fit-content / max-content) sizing: the line's
+             content size is the sum of the items' max-content
+             contributions (CSS Flexbox 9.9.1), not their flex-basis sizes,
+             so `flex: 1` text does not collapse to its min-content. */
+          TRFloat content = gaps;
+          for (NSInteger j = 0; j < cnt; j++)
+            {
+              TRItem *it = &li[j];
+              TRFloat contrib = it->hypo;
+              if (!it->basisFromContent && it->s->flexGrow > 0)
+                {
+                  TRMeasureMode cm;
+                  TRFloat ca = TRItemCrossAvail(it, availCross, crossMode, multiLine, &cm);
+                  TRSize mc = isRow
+                    ? TRLayoutNode(it->node, TRUndefined, ca, TRMeasureModeUndefined, cm, refW, refH, NO, dir)
+                    : TRLayoutNode(it->node, ca, TRUndefined, cm, TRMeasureModeUndefined, refW, refH, NO, dir);
+                  TRFloat m = TRClamp(isRow ? mc.width : mc.height, it->minMain, it->maxMain);
+                  if (!isnan(it->styleMain)) m = it->styleMain;
+                  contrib = TRMax(contrib, m);
+                }
+              content += contrib + it->mainLead + it->mainTrail;
+            }
           TRFloat hi = maxInnerMain;
           if (mainMode == TRMeasureModeAtMost)
             hi = isnan(hi) ? availMain : TRMin(hi, availMain);
-          space = TRClamp(sumHypo, minInnerMain, hi);
+          space = TRClamp(TRMax(content, sumHypo), minInnerMain, hi);
         }
-
       BOOL growing = sumHypo < space;
       for (NSInteger j = 0; j < cnt; j++)
         {
@@ -463,7 +502,11 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
             || (!growing && it->base < it->hypo)
             || TRFloatsEqual(sumHypo, space);
           if (!growing && !it->frozen && it->minMainIsAuto && it->basisFromContent)
-            it->minMain = TRAutoMinMain(it, isRow, refW, refH, dir);
+            {
+              TRMeasureMode cm;
+              TRFloat ca = TRItemCrossAvail(it, availCross, crossMode, multiLine, &cm);
+              it->minMain = TRAutoMinMain(it, isRow, refW, refH, dir, ca, cm);
+            }
         }
 
       TRFloat initialFree = space - gaps;

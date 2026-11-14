@@ -54,12 +54,19 @@ trellis-render_OBJC_FILES = Tools/trellis-render.m Tools/TRSamples.m
 trellis-render_TOOL_LIBS = -lTrellis -lTrellisEngine
 trellis-render_NEEDS_GUI = yes
 
+# --- Trellis Preview app -----------------------------------------------------
+APP_NAME = TrellisPreview
+TrellisPreview_OBJC_FILES = Tools/TrellisPreview/TPController.m
+TrellisPreview_GUI_LIBS = -lTrellis -lTrellisEngine
+TrellisPreview_MAIN_MODEL_FILE =
+
 ADDITIONAL_OBJCFLAGS += -fobjc-arc -fblocks -Wall -Wno-unused-function
 ADDITIONAL_INCLUDE_DIRS += -ISource/Engine -ISource/View
 ADDITIONAL_LIB_DIRS += -L./obj -L./$(GNUSTEP_OBJ_DIR)
 
 include $(GNUSTEP_MAKEFILES)/library.make
 include $(GNUSTEP_MAKEFILES)/tool.make
+include $(GNUSTEP_MAKEFILES)/application.make
 
 # --- Tests -------------------------------------------------------------------
 CASE_RUNNER = LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH ./obj/trellis-case

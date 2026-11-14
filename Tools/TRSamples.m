@@ -15,6 +15,7 @@ static NSTextField *TRLabel(NSString *text, NSString *ident)
   [f setSelectable: NO];
   [f setBezeled: NO];
   [f setDrawsBackground: NO];
+  [[f cell] setWraps: NO];
   [f setIdentifier: ident];
   return f;
 }

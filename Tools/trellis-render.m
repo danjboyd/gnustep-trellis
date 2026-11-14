@@ -13,6 +13,7 @@
 #import "TRBoxView.h"
 #import "TRViewMeasure.h"
 #import "TRLint.h"
+#import "TRLoader.h"
 
 extern TRBoxView *TRSampleScreen(NSString *name);
 extern NSArray<NSString *> *TRSampleScreenNames(void);
@@ -95,6 +96,12 @@ static NSDictionary *TRDumpView(NSView *v, TRNode *node)
       else if ([v isKindOfClass: [NSButton class]])
         d[@"title"] = [(NSButton *)v title];
     }
+  if ([v isKindOfClass: [TRScrollBox class]])
+    {
+      TRBoxView *cb = [(TRScrollBox *)v contentBox];
+      d[@"overflow"] = @"scroll";
+      d[@"children"] = @[TRDumpView(cb, cb.node)];
+    }
   if ([v isKindOfClass: [TRBoxView class]])
     {
       TRBoxView *box = (TRBoxView *)v;
@@ -160,8 +167,9 @@ static NSString *TRWithSuffix(NSString *path, NSString *suffix)
 static void TRUsage(void)
 {
   fprintf(stderr,
-    "usage: trellis-render --screen NAME [--width W | --widths W1,W2,...] [--height H]\n"
-    "                      [--png out.png] [--json out.json] [--outlines] [--lint]\n"
+    "usage: trellis-render (Screen.trellis [--sample S.json] | --screen NAME)\n"
+    "                      [--width W | --widths W1,W2,...] [--height H]\n"
+    "                      [--png out.png] [--json out.json] [--outlines] [--lint] [--theme NAME]\n"
     "screens: %s\n", [[TRSampleScreenNames() componentsJoinedByString: @", "] UTF8String]);
   exit(2);
 }
@@ -170,10 +178,11 @@ int main(int argc, const char **argv)
 {
   @autoreleasepool
     {
-      NSString *screen = nil, *png = nil, *json = nil;
+      NSString *screen = nil, *png = nil, *json = nil, *file = nil, *samplePath = nil;
       NSMutableArray *widths = [NSMutableArray array];
       double height = NAN;
       BOOL outlines = NO, printLint = NO;
+      NSString *theme = nil;
       for (int i = 1; i < argc; i++)
         {
           NSString *a = [NSString stringWithUTF8String: argv[i]];
@@ -191,12 +200,46 @@ int main(int argc, const char **argv)
           else if ([a isEqualToString: @"--json"] && next) { json = next; i++; }
           else if ([a isEqualToString: @"--outlines"]) outlines = YES;
           else if ([a isEqualToString: @"--lint"]) printLint = YES;
+          else if ([a isEqualToString: @"--theme"] && next) { theme = next; i++; }
+          else if ([a isEqualToString: @"--sample"] && next) { samplePath = next; i++; }
+          else if ([[a pathExtension] isEqualToString: @"trellis"] && file == nil) file = a;
           else TRUsage();
         }
-      if (screen == nil) TRUsage();
+      if (screen == nil && file == nil) TRUsage();
+      TRMarkupDocument *doc = nil;
+      NSDictionary *sample = nil;
+      if (file)
+        {
+          NSError *err = nil;
+          doc = [TRMarkupDocument documentWithContentsOfFile: file error: &err];
+          if (doc == nil) TRDie(1, @"%@", [err localizedDescription]);
+          if (samplePath == nil)
+            {
+              NSString *guess = [[file stringByDeletingPathExtension] stringByAppendingPathExtension: @"sample.json"];
+              if ([[NSFileManager defaultManager] fileExistsAtPath: guess]) samplePath = guess;
+            }
+          if (samplePath)
+            {
+              NSData *sd = [NSData dataWithContentsOfFile: samplePath];
+              sample = sd ? [NSJSONSerialization JSONObjectWithData: sd options: 0 error: &err] : nil;
+              if (![sample isKindOfClass: [NSDictionary class]])
+                TRDie(1, @"%@: not a JSON object (%@)", samplePath, err ? [err localizedDescription] : @"unreadable");
+            }
+          screen = [[file lastPathComponent] stringByDeletingPathExtension];
+        }
       if ([widths count] == 0) [widths addObject: @480];
 
       TRCheckIsolation();
+      if (theme)
+        {
+          /* Volatile (argument-domain) setting: nothing is written to disk. */
+          NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+          NSMutableDictionary *args = [[defs volatileDomainForName: NSArgumentDomain] mutableCopy]
+            ?: [NSMutableDictionary dictionary];
+          args[@"GSTheme"] = theme;
+          [defs removeVolatileDomainForName: NSArgumentDomain];
+          [defs setVolatileDomain: args forName: NSArgumentDomain];
+        }
       [NSApplication sharedApplication];
 
       int lintErrors = 0;
@@ -204,7 +247,19 @@ int main(int argc, const char **argv)
         {
           double W = [wn doubleValue];
           NSString *suffix = [widths count] > 1 ? [NSString stringWithFormat: @"%g", W] : nil;
-          TRBoxView *box = TRSampleScreen(screen);
+          TRBoxView *box;
+          if (doc)
+            {
+              NSError *err = nil;
+              /* No owner: outlets and actions are not bound when rendering
+                 (trellis-lint --owner checks them). */
+              box = [TRLoader loadDocument: doc owner: nil error: &err];
+              if (box == nil) TRDie(1, @"%@", [err localizedDescription]);
+              if (sample && ![TRLoader applySample: sample toView: box error: &err])
+                TRDie(1, @"%@", [err localizedDescription]);
+            }
+          else
+            box = TRSampleScreen(screen);
           if (box == nil) TRDie(2, @"unknown screen '%@'", screen);
 
           double H = height;
@@ -235,7 +290,8 @@ int main(int argc, const char **argv)
           if (json)
             {
               NSDictionary *doc = @{
-                @"trellis": @"0.1", @"source": [NSString stringWithFormat: @"sample:%@", screen],
+                @"trellis": @"0.1", @"source": file ?: [NSString stringWithFormat: @"sample:%@", screen],
+                @"theme": theme ?: @"default",
                 @"viewport": @{@"width": @(W), @"height": @(H), @"scale": @1},
                 @"root": tree, @"lint": lint };
               NSData *data = [NSJSONSerialization dataWithJSONObject: doc

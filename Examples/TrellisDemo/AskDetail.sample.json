@@ -1,0 +1,12 @@
+{
+  "_comment": "Sample content for trellis-render; keys are element ids.",
+  "kind": "approve",
+  "title": "Tag example-cli v0.1.8 as rc2 and publish the release notes?",
+  "age": "12 min ago",
+  "agent": "agent-a",
+  "blocks": "blocks the rc2 tag and the packager update",
+  "body": "All tests pass on Linux and Windows. The macOS job is still flaky on the notarization step; I re-ran it twice and it passed the second time. If you approve, I'll tag rc2 now and post the release notes draft for review.",
+  "approve": "Approve: tag rc2 now",
+  "alternative": "Re-run the macOS job first",
+  "defer": "Defer to Monday"
+}

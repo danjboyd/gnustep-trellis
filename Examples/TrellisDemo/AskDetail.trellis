@@ -1,0 +1,48 @@
+<!-- owner: AskDetailController -->
+<column id="ask" class="card">
+  <row class="header">
+    <label id="kind" class="badge">approve</label>
+    <label id="title" class="title" wraps="yes">Question title</label>
+    <label id="age" class="muted">now</label>
+  </row>
+  <row class="meta">
+    <label id="agent" class="muted">agent</label>
+    <label class="muted" no-outlet="yes">·</label>
+    <label id="blocks" class="muted" wraps="yes">blocks nothing</label>
+  </row>
+  <text id="body" class="body">Body text.</text>
+  <column id="options">
+    <button id="approve" action="approve:" default="yes">Approve</button>
+    <button id="alternative" action="chooseAlternative:">Alternative</button>
+    <button id="defer" action="deferAsk:">Defer</button>
+  </column>
+  <row class="reply">
+    <field id="reply" placeholder="Reply to the agent…"/>
+    <button id="send" action="sendReply:">Send</button>
+  </row>
+</column>
+
+<style>
+  .card    { container-type: inline-size; padding: 16px; gap: 10px; background-color: #ffffff; }
+  .header  { gap: 8px; align-items: baseline; }
+  .badge   { flex: none; color: #1c71d8; font-weight: bold; }
+  .title   { flex: 1; font-size: 15px; }
+  .muted   { flex: none; color: #77767b; }
+  .meta    { gap: 6px; align-items: baseline; }
+  .meta #blocks { flex: 1; }
+  .body    { min-height: 48px; }
+  #options { gap: 6px; }
+  .reply   { gap: 8px; margin-top: 4px; }
+  #reply   { flex: 1; }
+
+  /* Wide: options side by side; each takes a share of the row. */
+  @container (min-width: 560px) {
+    #options { flex-direction: row; flex-wrap: wrap; }
+    #options > button { flex: 1 1 160px; }
+  }
+  /* Very narrow: the age moves under the title. */
+  @container (max-width: 359px) {
+    .header { flex-wrap: wrap; }
+    .title  { flex: 1 1 100%; order: 3; }
+  }
+</style>

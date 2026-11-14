@@ -27,16 +27,16 @@ TRNode *row = [TRNode nodeWithStyle: @"flex-direction: row; gap: 8px; padding: 1
 ## Seeing it
 
 ```sh
-scripts/run-headless.sh obj/trellis-render --screen ask --widths 420,760 \
-    --png /tmp/ask.png --json /tmp/ask.json --lint
-obj/trellis-lint /tmp/ask-420.json
+scripts/run-headless.sh obj/trellis-render Examples/TrellisDemo/AskDetail.trellis \
+    --widths 340,520,800 --theme Adwaita --png /tmp/ask.png --json /tmp/ask.json --lint
+obj/trellis-lint Examples/TrellisDemo/AskDetail.trellis --owner Examples/TrellisDemo/AskDetailController.h
 ```
 
 `run-headless.sh` starts a private Xvfb display and points `GNUSTEP_HOME` at
 a throwaway directory. trellis-render refuses to run otherwise, so it never
 touches real user defaults.
 
-![Sample screens at 420 and 760 px](docs/images/samples-gnustep-default-theme.png)
+![TrellisDemo .trellis screens at 340, 520 and 800 px under Adwaita](docs/images/demo-adwaita-3-widths.png)
 
 ## Building
 
@@ -53,4 +53,6 @@ macOS: `make -f Makefile.macos check`.
 ## Documents
 
 - [docs/design.md](docs/design.md): architecture, API, tools, risks
+- [docs/agents.md](docs/agents.md): writing Trellis UI (for coding agents)
 - [docs/test-case-format.md](docs/test-case-format.md): JSON layout test cases
+- [docs/known-issues.md](docs/known-issues.md)

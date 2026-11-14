@@ -1,0 +1,44 @@
+<!-- owner: SettingsController -->
+<column id="settings" class="form">
+  <label class="heading" no-outlet="yes">Preferences</label>
+  <row class="field-row">
+    <label class="field-label" no-outlet="yes">Display name</label>
+    <field id="displayName" class="control" placeholder="Your name"/>
+  </row>
+  <row class="field-row">
+    <label class="field-label" no-outlet="yes">Theme</label>
+    <popup id="theme" class="control" items="Adwaita, Gumdrop, GNUstep"/>
+  </row>
+  <row class="field-row">
+    <label class="field-label" no-outlet="yes">Density</label>
+    <popup id="density" class="control" items="Comfortable, Compact"/>
+  </row>
+  <row class="field-row">
+    <label class="field-label" no-outlet="yes">Updates</label>
+    <checkbox id="autoUpdate" class="control" state="on">Check for updates automatically</checkbox>
+  </row>
+  <row class="field-row">
+    <label class="field-label" no-outlet="yes">Font size</label>
+    <slider id="fontSize" class="control" min="9" max="24" value="13"/>
+  </row>
+  <separator/>
+  <row class="buttons">
+    <spacer/>
+    <button action="cancel:">Cancel</button>
+    <button action="save:" default="yes">Save</button>
+  </row>
+</column>
+
+<style>
+  .form        { container-type: inline-size; padding: 20px; gap: 12px; }
+  .heading     { font-size: 17px; font-weight: bold; margin-bottom: 4px; }
+  .field-row   { flex-direction: column; align-items: stretch; gap: 4px; }
+  .control     { max-width: 360px; }
+  .buttons     { gap: 8px; }
+
+  @container (min-width: 480px) {
+    .field-row   { flex-direction: row; align-items: baseline; gap: 12px; }
+    .field-label { flex: 0 0 120px; text-align: right; }
+    .control     { flex: 1; }
+  }
+</style>

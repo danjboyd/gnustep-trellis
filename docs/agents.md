@@ -118,6 +118,7 @@ the user's settings. trellis-render refuses to run without it.
 | `display: block` | block flow | a column |
 | `box-sizing` | `content-box` | **`border-box`**: `width` includes padding and border |
 | `position: absolute` | relative to the nearest positioned ancestor | relative to the **parent** |
+| `last baseline` | aligns last baselines | aligns as `end` (its fallback) |
 | No block or inline flow, floats or tables | | use rows and columns |
 
 **The most common mistake:** `flex-basis` (and the third value of

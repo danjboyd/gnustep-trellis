@@ -181,6 +181,7 @@ static const TRKeyword kAlign[] = {
   {"self-start", TRAlignStart}, {"self-end", TRAlignEnd},
   {"center", TRAlignCenter}, {"stretch", TRAlignStretch},
   {"baseline", TRAlignBaseline}, {"first baseline", TRAlignBaseline},
+  {"last baseline", TRAlignLastBaseline},
   {"space-between", TRAlignSpaceBetween},
   {"space-around", TRAlignSpaceAround},
   {"space-evenly", TRAlignSpaceEvenly}, {NULL, 0}};

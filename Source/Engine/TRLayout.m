@@ -100,6 +100,8 @@ static inline TRAlign TRResolveAlignSelf(const TRStyleStorage *item, const TRSty
   TRAlign a = item->alignSelf;
   if (a == TRAlignAuto) a = container->alignItems;
   if (a == TRAlignNormal) a = TRAlignStretch;
+  /* Last-baseline sharing is not implemented: use its fallback, 'end'. */
+  if (a == TRAlignLastBaseline) a = TRAlignEnd;
   return a;
 }
 
@@ -716,7 +718,8 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
       if (ac == TRAlignNormal) ac = TRAlignStretch;
       if (ac == TRAlignStart) ac = TRAlignFlexStart;   /* refined below */
       if (s->alignContent == TRAlignStart) ac = wrapReverse ? TRAlignFlexEnd : TRAlignFlexStart;
-      if (s->alignContent == TRAlignEnd) ac = wrapReverse ? TRAlignFlexStart : TRAlignFlexEnd;
+      if (s->alignContent == TRAlignEnd || s->alignContent == TRAlignLastBaseline)
+        ac = wrapReverse ? TRAlignFlexStart : TRAlignFlexEnd;
       switch (ac)
         {
           case TRAlignStretch:

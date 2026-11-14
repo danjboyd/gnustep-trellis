@@ -204,8 +204,22 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
       n = [TRNode node];
       n.context = view;
       __weak NSView *wv = view;
+      /* Non-wrapping controls measure the same at any width: memoize on
+         the content signature, so live resize does no text measuring. */
+      __block NSString *memoSig = nil;
+      __block TRSize memoSize;
       n.measureBlock = ^TRSize(TRSize avail, TRMeasureMode wm, TRMeasureMode hm) {
-        return TRMeasureView(wv, avail, wm, hm);
+        NSView *v = wv;
+        BOOL wraps = [v isKindOfClass: [NSControl class]] && [[(NSControl *)v cell] wraps];
+        if (!wraps)
+          {
+            NSString *sig = TRContentSignature(v);
+            if (memoSig != nil && [sig isEqualToString: memoSig]) return memoSize;
+            memoSize = TRMeasureView(v, avail, wm, hm);
+            memoSig = sig;
+            return memoSize;
+          }
+        return TRMeasureView(v, avail, wm, hm);
       };
       n.baselineBlock = ^TRFloat(TRSize size) {
         return TRBaselineOfView(wv, size);

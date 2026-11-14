@@ -112,14 +112,26 @@ static inline BOOL TRIsInFlow(TRNode *child)
 /* ------------------------------------------------------------------ */
 #pragma mark Cache
 
+/* The containing block size (ow/oh) only affects a node's own layout
+   through percentages in its padding or min/max sizes; when it has none,
+   it is left out of the cache key, so e.g. max-content measurements stay
+   cached while a window is resized. */
+static BOOL TRUsesOwnerSize(const TRStyleStorage *s)
+{
+  for (int i = 0; i < 4; i++)
+    if (s->padding[i].unit == TRUnitPercent) return YES;
+  return s->minWidth.unit == TRUnitPercent || s->maxWidth.unit == TRUnitPercent
+      || s->minHeight.unit == TRUnitPercent || s->maxHeight.unit == TRUnitPercent;
+}
+
 static BOOL TRCacheMatch(const TRCacheEntry *e, TRFloat aw, TRFloat ah,
                          TRMeasureMode wm, TRMeasureMode hm,
-                         TRFloat ow, TRFloat oh, TRDirection dir)
+                         TRFloat ow, TRFloat oh, TRDirection dir, BOOL ownerMatters)
 {
   if (e->wm != wm || e->hm != hm || e->dir != dir) return NO;
   if (wm != TRMeasureModeUndefined && !TRFloatsEqual(e->aw, aw)) return NO;
   if (hm != TRMeasureModeUndefined && !TRFloatsEqual(e->ah, ah)) return NO;
-  if (!TRFloatsEqual(e->ow, ow) || !TRFloatsEqual(e->oh, oh)) return NO;
+  if (ownerMatters && (!TRFloatsEqual(e->ow, ow) || !TRFloatsEqual(e->oh, oh))) return NO;
   return YES;
 }
 
@@ -953,20 +965,23 @@ TRSize TRLayoutNode(TRNode *node, TRFloat aw, TRFloat ah,
   if (wm == TRMeasureModeUndefined) aw = TRUndefined;
   if (hm == TRMeasureModeUndefined) ah = TRUndefined;
 
-  /* Cache lookup. */
+  /* Cache lookup. A perform must also redo a grid/flex container whose
+     children's percentages depend on ow/oh only via its own inner size,
+     which is covered by aw/ah. */
+  BOOL ownerMatters = TRUsesOwnerSize(s);
   if (perform)
     {
       if (node->_hasPerformEntry
-          && TRCacheMatch(&node->_performEntry, aw, ah, wm, hm, ow, oh, dir))
+          && TRCacheMatch(&node->_performEntry, aw, ah, wm, hm, ow, oh, dir, ownerMatters))
         return node->_performEntry.result;
     }
   else
     {
       if (node->_hasPerformEntry
-          && TRCacheMatch(&node->_performEntry, aw, ah, wm, hm, ow, oh, dir))
+          && TRCacheMatch(&node->_performEntry, aw, ah, wm, hm, ow, oh, dir, ownerMatters))
         return node->_performEntry.result;
       for (int i = 0; i < node->_cacheCount; i++)
-        if (TRCacheMatch(&node->_cache[i], aw, ah, wm, hm, ow, oh, dir))
+        if (TRCacheMatch(&node->_cache[i], aw, ah, wm, hm, ow, oh, dir, ownerMatters))
           return node->_cache[i].result;
     }
 

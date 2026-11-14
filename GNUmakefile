@@ -45,9 +45,11 @@ libTrellis_NEEDS_GUI = yes
 libTrellis_LIBRARIES_DEPEND_UPON = -lTrellisEngine $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS)
 
 # --- Tools ------------------------------------------------------------------
-TOOL_NAME = trellis-case trellis-lint trellis-render
+TOOL_NAME = trellis-case trellis-lint trellis-render trellis-bench
 trellis-case_OBJC_FILES = Tools/trellis-case.m
 trellis-case_TOOL_LIBS = -lTrellisEngine
+trellis-bench_OBJC_FILES = Tools/trellis-bench.m
+trellis-bench_TOOL_LIBS = -lTrellisEngine
 trellis-lint_OBJC_FILES = Tools/trellis-lint.m
 trellis-lint_TOOL_LIBS = -lTrellisEngine
 trellis-render_OBJC_FILES = Tools/trellis-render.m Tools/TRSamples.m

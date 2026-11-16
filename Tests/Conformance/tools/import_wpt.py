@@ -372,8 +372,10 @@ def fmt(n):
 def norm_value(v, font_size, requires):
     """Turn a declared value into a number (px) or a cleaned CSS string."""
     v = re.sub(r"\s+", " ", v.strip())
-    if "calc(" in v or "min(" in v or "max(" in v or "clamp(" in v:
-        requires.add("calc")
+    # CSS math functions; the lookbehind keeps minmax() (a grid track
+    # function, supported) from matching max(.
+    if re.search(r"(?<![\w-])(calc|min|max|clamp)\(", v):
+        requires.add("css-calc")
     if re.search(r"\d(vw|vh|vmin|vmax|ch|ex|rem|lh|cqw|cqh|in|cm|mm|pt|pc|q)\b", v):
         raise Skip("unit in " + v)
     p = to_px(v, font_size)

@@ -53,7 +53,7 @@
   "height": 200
  },
  "requires": [
-  "calc",
-  "containing-block-height"
+  "containing-block-height",
+  "css-calc"
  ]
 }

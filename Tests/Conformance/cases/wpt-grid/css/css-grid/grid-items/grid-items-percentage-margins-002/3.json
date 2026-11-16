@@ -62,7 +62,6 @@
   ]
  },
  "requires": [
-  "calc",
   "measure"
  ],
  "droppedChecks": 1

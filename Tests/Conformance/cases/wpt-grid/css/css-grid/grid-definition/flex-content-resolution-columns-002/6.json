@@ -84,7 +84,6 @@
  },
  "requires": [
   "block-layout",
-  "calc",
   "display-inline-block"
  ]
 }

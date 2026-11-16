@@ -65,6 +65,6 @@
   ]
  },
  "requires": [
-  "calc"
+  "css-calc"
  ]
 }

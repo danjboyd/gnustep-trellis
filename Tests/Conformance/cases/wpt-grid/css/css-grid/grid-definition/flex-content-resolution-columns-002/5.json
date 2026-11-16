@@ -82,7 +82,6 @@
  },
  "requires": [
   "block-layout",
-  "calc",
   "measure"
  ]
 }

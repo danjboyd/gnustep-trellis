@@ -66,7 +66,6 @@
  },
  "requires": [
   "block-layout",
-  "calc",
   "grid-lanes"
  ]
 }

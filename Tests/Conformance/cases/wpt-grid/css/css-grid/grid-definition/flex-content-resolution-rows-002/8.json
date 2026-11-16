@@ -68,7 +68,6 @@
   ]
  },
  "requires": [
-  "calc",
   "measure"
  ]
 }

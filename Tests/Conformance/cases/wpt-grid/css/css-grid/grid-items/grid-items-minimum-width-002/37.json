@@ -61,7 +61,6 @@
   "width": 72
  },
  "requires": [
-  "calc",
   "display-inline-grid"
  ]
 }

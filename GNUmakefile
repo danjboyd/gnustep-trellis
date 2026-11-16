@@ -71,6 +71,9 @@ include $(GNUSTEP_MAKEFILES)/tool.make
 include $(GNUSTEP_MAKEFILES)/application.make
 
 # --- Tests -------------------------------------------------------------------
+# The conformance report: each failing case id, then the totals, per-suite
+# rates and skip reasons.
+CONF_SUMMARY = sed -n -e 's/^FAIL \([^ :]*\).*/  fail: \1/p' -e '/^PASS /,$$p'
 CASE_RUNNER = LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH ./obj/trellis-case
 
 LINT = LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH ./obj/trellis-lint
@@ -85,5 +88,5 @@ check:: all
 	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH Tests/Markup/run.sh
 	@if [ -d Tests/Conformance/cases ] && [ -n "$$(ls -A Tests/Conformance/cases 2>/dev/null)" ]; then \
 	  echo "== conformance (report only; does not fail the build)"; \
-	  $(CASE_RUNNER) Tests/Conformance/cases | tail -20 || true; \
+	  $(CASE_RUNNER) Tests/Conformance/cases | $(CONF_SUMMARY) || true; \
 	fi

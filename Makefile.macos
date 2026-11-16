@@ -20,9 +20,13 @@ $(B)/trellis-case: Tools/trellis-case.m $(B)/libTrellisEngine.dylib
 	$(CC) $(CFLAGS) -framework Foundation -L$(B) -lTrellisEngine \
 	  -Wl,-rpath,@executable_path Tools/trellis-case.m -o $@
 
+# The conformance report: each failing case id, then the totals, per-suite
+# rates and skip reasons.
+CONF_SUMMARY = sed -n -e 's/^FAIL \([^ :]*\).*/  fail: \1/p' -e '/^PASS /,$$p'
+
 check: all
 	$(B)/trellis-case Tests/Engine/cases
-	@if [ -d Tests/Conformance/cases ]; then $(B)/trellis-case Tests/Conformance/cases | tail -20 || true; fi
+	@if [ -d Tests/Conformance/cases ]; then $(B)/trellis-case Tests/Conformance/cases | $(CONF_SUMMARY) || true; fi
 
 clean:
 	rm -rf $(B)

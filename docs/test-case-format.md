@@ -41,7 +41,7 @@ runner (`trellis-case`) reads both.
 | `direction` | no | `ltr` (default) or `rtl` for the root. |
 | `tolerance` | no | Maximum absolute difference per number, default 0.5. |
 | `pixelScale` | no | Pixel-grid rounding. Default 1 (Yoga-style rounding to whole points). 0 disables rounding (use this for WPT cases compared at sub-pixel precision). |
-| `requires` | no | Features the case depends on, for example `["position-static","block-layout"]`. `trellis-case` skips a case that requires a feature Trellis doesn't implement, or does differently on purpose: `position-static`, `display-inline`, `display-inline-block`, `display-contents`, `display--webkit-box`, `logical-properties` and `intrinsic-size-keyword`. It counts the skips by feature. `--all` runs every case, and `--unsupported a,b` replaces the list. |
+| `requires` | no | Features the case depends on, for example `["position-static","block-layout"]`. `trellis-case` skips a case that requires a feature Trellis doesn't implement, or does differently on purpose: `position-static`, `display-inline`, `display-inline-block`, `display-contents`, `display--webkit-box`, `logical-properties`, `intrinsic-size-keyword`, `overflow-axis` (overflow-x differs from overflow-y) and `flex-wrap-balance`. It counts the skips by feature. `--all` runs every case, and `--unsupported a,b` replaces the list. |
 | `skip` | no | A string: the reason this case is known bad and skipped. |
 
 ## Styles
@@ -98,3 +98,20 @@ PASS 812/1000 (81.2%)  fail 150  skip 38
 ```
 
 It exits non-zero if any non-skipped case fails.
+
+`make check` runs the conformance cases as a report that never fails the
+build. It prints each failing case id, then the totals, the per-suite rates
+and the skip reasons.
+
+## Current results
+
+On main, the same on Linux (GNUstep, clang) and macOS (Apple clang), as of
+2026-11-16:
+
+| Suite | Pass | Skipped |
+|---|---|---|
+| Yoga gentest | 906/906 | 24 `contains_inner_text_*` cases, marked `skip` (they depend on Yoga's own text measure) |
+| WPT css-flexbox | 813/824 | 289, by `requires` tag; most are `position-static` (128) and `intrinsic-size-keyword` (80) |
+
+All 11 WPT failures (`percentage-heights-001`, `percentage-size/2`) come from
+`display: block` being a column. See docs/agents.md section 4.

@@ -194,6 +194,7 @@ static NSSet *TRDefaultUnsupported(void)
     @"display-inline-grid",
     @"position-sticky",
     @"grid-template-shorthand",  /* grid / grid-template with area strings */
+    @"abspos-ancestor-cb",       /* abspos whose containing block is an ancestor beyond the parent */
     nil];
 }
 

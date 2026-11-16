@@ -18,6 +18,7 @@
   "style": {
    "display": "flex",
    "boxSizing": "content-box",
+   "flexWrap": "balance",
    "marginTop": 100,
    "marginRight": 100,
    "marginBottom": 100,
@@ -82,5 +83,8 @@
     "width": 50
    }
   ]
- }
+ },
+ "requires": [
+  "flex-wrap-balance"
+ ]
 }

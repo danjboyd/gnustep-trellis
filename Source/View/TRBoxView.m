@@ -216,6 +216,31 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
 
 /* ------------------------------------------------------------------ */
 
+/* The target of a box's deferred layout. It holds the box weakly, so a
+   box freed with a layout pending is never messaged: GNUstep's delayed
+   performer doesn't keep a deallocating target alive. */
+@interface TRLayoutTrigger : NSObject
+{
+@public
+  __weak TRBoxView *box;
+}
+- (void)fire;
+@end
+
+@interface TRBoxView ()
+- (void)runScheduledLayout;
+@end
+
+@implementation TRLayoutTrigger
+- (void)fire
+{
+  TRBoxView *b = box;
+  [b runScheduledLayout];
+}
+@end
+
+/* ------------------------------------------------------------------ */
+
 @implementation TRBoxView
 {
   TRNode *_node;
@@ -224,6 +249,8 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
   NSMapTable *_appliedStyles;     /* view -> style last pushed to the control */
   BOOL _applyingFrames;
   BOOL _layoutScheduled;
+  BOOL _tearingDown;
+  TRLayoutTrigger *_trigger;
   BOOL _managesKeyViewLoop;
   __weak NSView *_firstKeyView;
 }
@@ -254,6 +281,18 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
       [self setAutoresizesSubviews: NO];
     }
   return self;
+}
+
+- (void)dealloc
+{
+  /* NSView's teardown removes the subviews, which would schedule a layout
+     on this (deallocating) box. */
+  _tearingDown = YES;
+  if (_trigger != nil)
+    {
+      [NSObject cancelPreviousPerformRequestsWithTarget: _trigger];
+      _trigger->box = nil;
+    }
 }
 
 - (BOOL)isFlipped
@@ -431,11 +470,17 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
 
 - (void)scheduleLayout
 {
+  if (_tearingDown) return;
   TRBoxView *root = [self rootBox];
   if (root != self) { [root scheduleLayout]; return; }
   if (_layoutScheduled) return;
   _layoutScheduled = YES;
-  [self performSelector: @selector(runScheduledLayout) withObject: nil afterDelay: 0];
+  if (_trigger == nil)
+    {
+      _trigger = [TRLayoutTrigger new];
+      _trigger->box = self;
+    }
+  [_trigger performSelector: @selector(fire) withObject: nil afterDelay: 0];
 }
 
 - (void)runScheduledLayout

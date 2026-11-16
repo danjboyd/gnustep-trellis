@@ -3,8 +3,17 @@
 Trellis follows semantic versioning once 1.0 ships; before that, a minor
 version may change the API listed in docs/api.md, and says so here.
 
-## Unreleased
+## 0.2.1 (2026-11-16)
 
+No API changes.
+
+- **Fixed:** a crash (use-after-free) when a box tree was freed with a
+  layout still queued. The deferred layout now goes through a helper
+  that holds the box weakly, and a box being freed schedules nothing.
+  This affects v0.1.0 through v0.2.0 on GNUstep, where the delayed
+  performer doesn't keep a deallocating box alive.
+  Tests/View/dealloc-pending-layout.m (DEALLOC in `make check-gui`, run
+  with NSZombieEnabled) covers it.
 - **Fixed:** `MarkText` is black: `Mark` is a light highlight in both
   appearances, and MarkText used to follow the text colour, so it turned
   near-white on yellow in dark. Tests/View/mark.trellis covers it in

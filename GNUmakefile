@@ -23,7 +23,7 @@ ifeq ($(shared),no)
 endif
 
 PACKAGE_NAME = Trellis
-VERSION = 0.2.0
+VERSION = 0.2.1
 
 LIBRARY_NAME = libTrellisEngine libTrellis
 
@@ -125,6 +125,7 @@ check-gui:: all
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/key-view-loop.m -o obj/gui-tests/key-view-loop $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/accessibility.m -o obj/gui-tests/accessibility $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/hot-reload.m -o obj/gui-tests/hot-reload $(GUI_TEST_LIBS)
+	@$(CC) $(GUI_TEST_FLAGS) Tests/View/dealloc-pending-layout.m -o obj/gui-tests/dealloc-pending-layout $(GUI_TEST_LIBS)
 	@echo "== view checks (headless)"
 	@export LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH; status=0; \
 	  timeout 60 scripts/run-headless.sh obj/gui-tests/size-for-width > obj/gui-tests/hook.log 2>&1 || status=1; \
@@ -137,6 +138,9 @@ check-gui:: all
 	  grep -v _NET_WORKAREA obj/gui-tests/a11y.log | tail -1; \
 	  timeout 60 scripts/run-headless.sh obj/gui-tests/hot-reload > obj/gui-tests/hotreload.log 2>&1 || status=1; \
 	  grep -v _NET_WORKAREA obj/gui-tests/hotreload.log | tail -1; \
+	  NSZombieEnabled=YES timeout 60 scripts/run-headless.sh obj/gui-tests/dealloc-pending-layout > obj/gui-tests/dealloc.log 2>&1 || status=1; \
+	  if grep -q "deallocated instance" obj/gui-tests/dealloc.log; then echo "DEALLOC FAIL: message sent to a freed object"; status=1; fi; \
+	  grep -v _NET_WORKAREA obj/gui-tests/dealloc.log | tail -1; \
 	  Tests/View/appearance.sh || status=1; \
 	  Tests/View/scroll-container-query.sh || status=1; \
 	  exit $$status

@@ -1649,5 +1649,74 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_spanning_auto_minimum_clamped",
+  "note": "CSS Grid 6.6: a spanning item's automatic minimum is clamped when all its tracks have fixed maximums; a percentage min-width acts as 0 while tracks are sized",
+  "root": {
+   "style": {
+    "width": 200,
+    "flexDirection": "column",
+    "alignItems": "flex-start"
+   },
+   "children": [
+    {
+     "style": {
+      "display": "grid",
+      "gridTemplateColumns": "minmax(auto, 0px) minmax(auto, 0px)",
+      "gridTemplateRows": "10px"
+     },
+     "children": [
+      {
+       "style": {
+        "gridColumn": "span 2"
+       },
+       "measure": {
+        "text": "XXXXXXXXXX",
+        "charWidth": 10,
+        "lineHeight": 10
+       }
+      }
+     ]
+    },
+    {
+     "style": {
+      "display": "grid",
+      "gridTemplateColumns": "minmax(auto, 0px)",
+      "gridTemplateRows": "10px"
+     },
+     "children": [
+      {
+       "style": {
+        "minWidth": "50%"
+       },
+       "measure": {
+        "text": "XXXX",
+        "charWidth": 10,
+        "lineHeight": 10
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "children": [
+      {
+       "width": 0
+      }
+     ]
+    },
+    {
+     "children": [
+      {
+       "width": 0
+      }
+     ]
+    }
+   ]
+  }
  }
 ]

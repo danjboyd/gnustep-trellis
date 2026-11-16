@@ -531,7 +531,10 @@ static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
               {
                 /* An explicit min-width/height replaces the automatic minimum:
                    the contribution is that size (a border box) plus margins. */
-                double mn = TRGBox(it->s, columns ? it->s->minWidth : it->s->minHeight, NAN, columns, NAN);
+                TRValue mv = columns ? it->s->minWidth : it->s->minHeight;
+                double mn = TRGBox(it->s, mv, NAN, columns, NAN);
+                /* A percentage can't resolve while the tracks are sized: 0. */
+                if (isnan(mn) && mv.unit == TRUnitPercent) mn = TRGBox(it->s, TRZeroValue(), NAN, columns, NAN);
                 if (!isnan(mn)) minA = mn + mg;
               }
             if (mk == TRBreadthAuto) t->base = MAX(t->base, minA);
@@ -549,6 +552,25 @@ static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
           {
             /* A spanning item, in the phases of CSS Grid 12.5.1. */
             const double gapsS = gap * (span - 1);
+            /* Its automatic minimum is clamped to the stretch fit when every
+               spanned track has a fixed maximum (CSS Grid 6.6). */
+            if (columns ? it->autoMinW : it->autoMinH)
+              {
+                double fixedSum = gapsS;
+                BOOL allFixed = YES;
+                for (NSInteger i = a; i < b && allFixed; i++)
+                  {
+                    double fx = TRBreadthFixedValue(tr[i].size.max, avail);
+                    if (isnan(fx)) allFixed = NO; else fixedSum += fx;
+                  }
+                if (allFixed)
+                  {
+                    double mg = columns ? it->margin[TREdgeLeft] + it->margin[TREdgeRight]
+                                        : it->margin[TREdgeTop] + it->margin[TREdgeBottom];
+                    double pb = TRGBox(it->s, TRZeroValue(), NAN, columns, NAN);
+                    minC = MIN(minC - mg - pb, MAX(0, fixedSum - mg - pb)) + mg + pb;
+                  }
+              }
             /* 1. Intrinsic minimums take its min-content contribution. */
             double have = gapsS;
             int intrinsic = 0;

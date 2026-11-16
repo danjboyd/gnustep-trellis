@@ -823,7 +823,42 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
         NSInteger ms = colFlow ? pl[k].cspan : pl[k].rspan, ns = colFlow ? pl[k].rspan : pl[k].cspan;
         mark(maj, min, ms, ns);
       }
-  /* 2. the rest, in order, with a sparse cursor */
+  /* Widens the minor axis (adds implicit tracks), keeping the marks. */
+  void (^widen)(NSInteger) = ^(NSInteger minorEnd) {
+    if (minorEnd <= occMinor) return;
+    NSInteger rowsHave = [occ length] / (occMinor ? occMinor : 1);
+    NSMutableData *n2 = [NSMutableData dataWithLength: rowsHave * minorEnd];
+    for (NSInteger r = 0; r < rowsHave; r++)
+      memcpy((char *)[n2 mutableBytes] + r * minorEnd, (char *)[occ bytes] + r * occMinor, occMinor);
+    occ = n2;
+    occMinor = minorEnd;
+  };
+
+  /* 2. items locked to a major line (CSS Grid 8.5 step 2), in order: each
+     goes past the previous one placed in its line, adding minor tracks
+     when it runs out. */
+  NSMutableDictionary *lineCursor = [NSMutableDictionary dictionary];
+  for (NSInteger k = 0; k < n; k++)
+    {
+      if (pl[k].rDef && pl[k].cDef) continue;
+      BOOL majDef = colFlow ? pl[k].cDef : pl[k].rDef;
+      if (!majDef) continue;
+      NSInteger maj = colFlow ? pl[k].cs : pl[k].rs;
+      NSInteger majSpan = colFlow ? pl[k].cspan : pl[k].rspan, minSpan = colFlow ? pl[k].rspan : pl[k].cspan;
+      NSInteger min = [lineCursor[@(maj)] integerValue];
+      for (;;)
+        {
+          widen(min + minSpan);
+          if (fits(maj, min, majSpan, minSpan)) break;
+          min++;
+        }
+      mark(maj, min, majSpan, minSpan);
+      lineCursor[@(maj)] = @(min + minSpan);
+      if (colFlow) { pl[k].rs = min; } else { pl[k].cs = min; }
+      if (colFlow) pl[k].rDef = YES; else pl[k].cDef = YES;   /* placed */
+    }
+
+  /* 3. the rest, in order, with a sparse cursor */
   NSInteger curMaj = 0, curMin = 0;
   for (NSInteger k = 0; k < n; k++)
     {
@@ -835,9 +870,8 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       NSInteger maj, min;
       if (majDef)
         {
-          maj = majStart;
-          for (min = 0; !fits(maj, min, majSpan, minSpan); min++)
-            if (min + minSpan > occMinor) { min = 0; break; }
+          maj = majStart;   /* not reached: placed in step 2 */
+          min = 0;
         }
       else if (minDef)
         {

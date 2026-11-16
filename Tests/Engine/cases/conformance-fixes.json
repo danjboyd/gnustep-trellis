@@ -1049,5 +1049,61 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_row_locked_items_place_first",
+  "note": "CSS Grid 8.5 step 2: items locked to a row go past earlier ones in that row, adding columns; then auto items fill from the start",
+  "root": {
+   "style": {
+    "display": "grid",
+    "gridAutoColumns": "50px",
+    "gridAutoRows": "50px",
+    "justifyContent": "start",
+    "alignContent": "start",
+    "width": 400,
+    "height": 200
+   },
+   "children": [
+    {
+     "style": {
+      "gridColumn": "2",
+      "gridRow": "1"
+     }
+    },
+    {
+     "style": {
+      "gridColumn": "span 2",
+      "gridRow": "1"
+     }
+    },
+    {
+     "style": {
+      "gridRow": "1"
+     }
+    },
+    {}
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "x": 50,
+     "y": 0
+    },
+    {
+     "x": 100,
+     "y": 0,
+     "width": 100
+    },
+    {
+     "x": 200,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 0
+    }
+   ]
+  }
  }
 ]

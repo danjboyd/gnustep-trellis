@@ -1,0 +1,46 @@
+{
+ "id": "wpt-sizing/css/css-sizing/stretch/aspect-ratio-1/3",
+ "source": {
+  "suite": "wpt-sizing",
+  "file": "css/css-sizing/stretch/aspect-ratio-1.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 100,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "aspectRatio": 2,
+   "minHeight": "stretch"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "width": 30,
+     "height": 40
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {}
+  ],
+  "height": 50
+ },
+ "requires": [
+  "aspect-ratio",
+  "block-layout",
+  "intrinsic-size-keyword"
+ ]
+}

@@ -1,0 +1,38 @@
+{
+ "id": "wpt-sizing/css/css-sizing/aspect-ratio/box-sizing-squashed/15",
+ "source": {
+  "suite": "wpt-sizing",
+  "file": "css/css-sizing/aspect-ratio/box-sizing-squashed.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "border-box",
+   "aspectRatio": 0.5,
+   "marginBottom": 10,
+   "height": "auto",
+   "maxWidth": 20,
+   "borderTopWidth": 20,
+   "borderRightWidth": 20,
+   "borderBottomWidth": 20,
+   "borderLeftWidth": 20
+  }
+ },
+ "expected": {
+  "width": 40,
+  "height": 80
+ },
+ "requires": [
+  "aspect-ratio"
+ ]
+}

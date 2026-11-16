@@ -1,0 +1,314 @@
+{
+ "id": "wpt-sizing/css/css-sizing/keyword-sizes-on-flex-item-002/3",
+ "source": {
+  "suite": "wpt-sizing",
+  "file": "css/css-sizing/keyword-sizes-on-flex-item-002.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "inline-flex",
+   "boxSizing": "content-box",
+   "flexDirection": "column",
+   "marginRight": 150,
+   "width": 100,
+   "maxHeight": 100
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": "auto",
+     "marginTop": 5,
+     "marginRight": 5,
+     "marginBottom": 5,
+     "marginLeft": 5,
+     "paddingTop": 2,
+     "paddingRight": 2,
+     "paddingBottom": 2,
+     "paddingLeft": 2,
+     "height": "stretch",
+     "borderTopWidth": 3,
+     "borderRightWidth": 3,
+     "borderBottomWidth": 3,
+     "borderLeftWidth": 3
+    },
+    "measure": {
+     "text": "X X",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": "auto",
+     "marginTop": 5,
+     "marginRight": 5,
+     "marginBottom": 5,
+     "marginLeft": 5,
+     "paddingTop": 2,
+     "paddingRight": 2,
+     "paddingBottom": 2,
+     "paddingLeft": 2,
+     "height": "stretch",
+     "borderTopWidth": 3,
+     "borderRightWidth": 3,
+     "borderBottomWidth": 3,
+     "borderLeftWidth": 3
+    },
+    "measure": {
+     "text": "XXX XXX",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": "auto",
+     "marginTop": 5,
+     "marginRight": 5,
+     "marginBottom": 5,
+     "marginLeft": 5,
+     "paddingTop": 2,
+     "paddingRight": 2,
+     "paddingBottom": 2,
+     "paddingLeft": 2,
+     "height": "stretch",
+     "borderTopWidth": 3,
+     "borderRightWidth": 3,
+     "borderBottomWidth": 3,
+     "borderLeftWidth": 3
+    },
+    "measure": {
+     "text": "XXXXX XXXXX",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": "auto",
+     "marginTop": 5,
+     "marginRight": 5,
+     "marginBottom": 5,
+     "marginLeft": 5,
+     "paddingTop": 2,
+     "paddingRight": 2,
+     "paddingBottom": 2,
+     "paddingLeft": 2,
+     "height": 0,
+     "minHeight": "stretch",
+     "borderTopWidth": 3,
+     "borderRightWidth": 3,
+     "borderBottomWidth": 3,
+     "borderLeftWidth": 3
+    },
+    "measure": {
+     "text": "X X",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": "auto",
+     "marginTop": 5,
+     "marginRight": 5,
+     "marginBottom": 5,
+     "marginLeft": 5,
+     "paddingTop": 2,
+     "paddingRight": 2,
+     "paddingBottom": 2,
+     "paddingLeft": 2,
+     "height": 0,
+     "minHeight": "stretch",
+     "borderTopWidth": 3,
+     "borderRightWidth": 3,
+     "borderBottomWidth": 3,
+     "borderLeftWidth": 3
+    },
+    "measure": {
+     "text": "XXX XXX",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": "auto",
+     "marginTop": 5,
+     "marginRight": 5,
+     "marginBottom": 5,
+     "marginLeft": 5,
+     "paddingTop": 2,
+     "paddingRight": 2,
+     "paddingBottom": 2,
+     "paddingLeft": 2,
+     "height": 0,
+     "minHeight": "stretch",
+     "borderTopWidth": 3,
+     "borderRightWidth": 3,
+     "borderBottomWidth": 3,
+     "borderLeftWidth": 3
+    },
+    "measure": {
+     "text": "XXXXX XXXXX",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": "auto",
+     "marginTop": 5,
+     "marginRight": 5,
+     "marginBottom": 5,
+     "marginLeft": 5,
+     "paddingTop": 2,
+     "paddingRight": 2,
+     "paddingBottom": 2,
+     "paddingLeft": 2,
+     "height": 500,
+     "maxHeight": "stretch",
+     "borderTopWidth": 3,
+     "borderRightWidth": 3,
+     "borderBottomWidth": 3,
+     "borderLeftWidth": 3
+    },
+    "measure": {
+     "text": "X X",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": "auto",
+     "marginTop": 5,
+     "marginRight": 5,
+     "marginBottom": 5,
+     "marginLeft": 5,
+     "paddingTop": 2,
+     "paddingRight": 2,
+     "paddingBottom": 2,
+     "paddingLeft": 2,
+     "height": 500,
+     "maxHeight": "stretch",
+     "borderTopWidth": 3,
+     "borderRightWidth": 3,
+     "borderBottomWidth": 3,
+     "borderLeftWidth": 3
+    },
+    "measure": {
+     "text": "XXX XXX",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": "auto",
+     "marginTop": 5,
+     "marginRight": 5,
+     "marginBottom": 5,
+     "marginLeft": 5,
+     "paddingTop": 2,
+     "paddingRight": 2,
+     "paddingBottom": 2,
+     "paddingLeft": 2,
+     "height": 500,
+     "maxHeight": "stretch",
+     "borderTopWidth": 3,
+     "borderRightWidth": 3,
+     "borderBottomWidth": 3,
+     "borderLeftWidth": 3
+    },
+    "measure": {
+     "text": "XXXXX XXXXX",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "height": 30
+   },
+   {
+    "height": 50
+   },
+   {
+    "height": 50
+   },
+   {
+    "height": 10
+   },
+   {
+    "height": 10
+   },
+   {
+    "height": 10
+   },
+   {
+    "height": 510
+   },
+   {
+    "height": 510
+   },
+   {
+    "height": 510
+   }
+  ]
+ },
+ "requires": [
+  "display-inline-flex",
+  "intrinsic-size-keyword",
+  "measure"
+ ]
+}

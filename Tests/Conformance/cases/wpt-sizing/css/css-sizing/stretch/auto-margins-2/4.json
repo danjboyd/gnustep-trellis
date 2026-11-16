@@ -1,0 +1,60 @@
+{
+ "id": "wpt-sizing/css/css-sizing/stretch/auto-margins-2/4",
+ "source": {
+  "suite": "wpt-sizing",
+  "file": "css/css-sizing/stretch/auto-margins-2.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "width": 200,
+   "height": 200,
+   "position": "relative",
+   "borderTopWidth": 3,
+   "borderRightWidth": 3,
+   "borderBottomWidth": 3,
+   "borderLeftWidth": 3
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "position": "absolute",
+     "marginTop": "auto",
+     "marginRight": "auto",
+     "marginBottom": "auto",
+     "marginLeft": "auto",
+     "top": 0,
+     "bottom": 0,
+     "left": 25,
+     "right": 25,
+     "width": "stretch"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 150,
+    "x": 28
+   }
+  ]
+ },
+ "requires": [
+  "block-layout",
+  "intrinsic-size-keyword"
+ ]
+}

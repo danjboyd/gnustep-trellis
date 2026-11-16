@@ -1,0 +1,69 @@
+{
+ "id": "wpt-sizing/css/css-sizing/stretch/flex-line-005",
+ "source": {
+  "suite": "wpt-sizing",
+  "file": "css/css-sizing/stretch/flex-line-005.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "inline-flex",
+   "boxSizing": "content-box",
+   "width": 100,
+   "marginTop": 10,
+   "marginRight": 10,
+   "marginBottom": 10,
+   "marginLeft": 10,
+   "borderTopWidth": 3,
+   "borderRightWidth": 3,
+   "borderBottomWidth": 3,
+   "borderLeftWidth": 3
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "height": "stretch",
+     "width": 75,
+     "borderTopWidth": 3,
+     "borderRightWidth": 3,
+     "borderBottomWidth": 3,
+     "borderLeftWidth": 3
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "height": 150,
+     "borderTopWidth": 3,
+     "borderRightWidth": 3,
+     "borderBottomWidth": 3,
+     "borderLeftWidth": 3
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "height": 156
+   },
+   {}
+  ]
+ },
+ "requires": [
+  "display-inline-flex",
+  "intrinsic-size-keyword"
+ ]
+}

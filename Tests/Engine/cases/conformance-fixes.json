@@ -897,5 +897,72 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_percent_margin_against_area",
+  "note": "CSS Grid 6.5: percentage margins resolve against the grid area's width",
+  "root": {
+   "style": {
+    "display": "grid",
+    "width": 500,
+    "gridTemplateColumns": "100px",
+    "justifyItems": "start"
+   },
+   "children": [
+    {
+     "style": {
+      "marginLeft": "50%",
+      "width": 10,
+      "height": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "x": 50
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/grid_rtl_start_margin_is_right",
+  "note": "in rtl the inline-start margin is margin-right; margin-left doesn't move a start-aligned item",
+  "direction": "rtl",
+  "root": {
+   "style": {
+    "display": "grid",
+    "width": 500,
+    "gridTemplateColumns": "100px",
+    "justifyItems": "start"
+   },
+   "children": [
+    {
+     "style": {
+      "marginLeft": "50%",
+      "width": 10,
+      "height": 10
+     }
+    },
+    {
+     "style": {
+      "marginRight": "50%",
+      "width": 10,
+      "height": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "x": 490
+    },
+    {
+     "x": 440
+    }
+   ]
+  }
  }
 ]

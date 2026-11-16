@@ -921,7 +921,9 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       for (int e = 0; e < 4; e++)
         {
           it->marginAuto[e] = cs->margin[e].unit == TRUnitAuto;
-          double m = TRGResolve(cs->margin[e], innerW);
+          /* Percentages resolve against the grid area's width, which isn't
+             known yet: they count as 0 while the columns are sized. */
+          double m = TRGResolve(cs->margin[e], NAN);
           it->margin[e] = isnan(m) ? 0 : m;
         }
       double mh = it->margin[TREdgeLeft] + it->margin[TREdgeRight];
@@ -940,6 +942,16 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
   /* ---- Columns ---- */
   TRSizeTracks(colsT, nCols, innerW, colGap, items, n, YES, s->justifyContent);
   double colsTotal = TRPlaceTracks(colsT, nCols, colGap, innerW, s->justifyContent);
+
+  /* Percentage margins, against each item's grid-area width (CSS Grid 6.5). */
+  for (NSInteger k = 0; k < n; k++)
+    {
+      TRGridItem *it = &items[k];
+      double areaW = TRSpanSize(colsT, it->c0, it->c1);
+      for (int e = 0; e < 4; e++)
+        if (it->s->margin[e].unit == TRUnitPercent)
+          it->margin[e] = TRGResolve(it->s->margin[e], areaW);
+    }
 
   /* ---- Row contributions: content height at the resolved column width ---- */
   for (NSInteger k = 0; k < n; k++)
@@ -1034,7 +1046,10 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           if (!isnan(minh)) h = MAX(h, minh);
 
           double freeW = areaW - mh - w, freeH = areaH - mv - h;
-          double offX = it->margin[TREdgeLeft], offY = it->margin[TREdgeTop];
+          /* x is computed from the inline start and mirrored for rtl, so
+             the start-side margin is the right one there. */
+          if (rtl) { BOOL t = autoL; autoL = autoR; autoR = t; }
+          double offX = rtl ? it->margin[TREdgeRight] : it->margin[TREdgeLeft], offY = it->margin[TREdgeTop];
           if (autoL && autoR) offX += MAX(0, freeW) / 2;
           else if (autoL) offX += MAX(0, freeW);
           else if (!autoR)

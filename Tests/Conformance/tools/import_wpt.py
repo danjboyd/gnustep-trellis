@@ -617,15 +617,6 @@ class Page:
                     self.rules.append((parts, specificity(parts), order, decls))
                     order += 1
         self.cache = {}
-        self.area_names = set()
-        for _, _, _, decls in self.rules:
-            for k, v, _ in decls:
-                if k in ("grid-template-areas", "grid-template", "grid"):
-                    for q in re.findall(r'"([^"]*)"', v):
-                        self.area_names.update(t for t in q.split() if t != ".")
-        for m in re.finditer(r'grid-template-areas\s*:\s*((?:"[^"]*"\s*)+)', self.src):
-            for q in re.findall(r'"([^"]*)"', m.group(1)):
-                self.area_names.update(t for t in q.split() if t != ".")
 
     @staticmethod
     def walk(el):

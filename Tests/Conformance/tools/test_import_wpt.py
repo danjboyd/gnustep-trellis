@@ -105,6 +105,26 @@ class Cascade(unittest.TestCase):
         self.assertEqual(out["border-left-width"], "5px")
 
 
+class GridAreas(unittest.TestCase):
+    def test_area_names_come_from_own_container(self):
+        d = tempfile.mkdtemp()
+        with open(os.path.join(d, "t.html"), "w") as f:
+            f.write('<!DOCTYPE html><style>.g1{display:grid;grid-template-areas:". a"}'
+                    '.g2{display:grid;grid-template-areas:"a-start a-end"}</style><body>'
+                    '<div class="g1"><div style="grid-column: a"></div></div>'
+                    '<div class="g2"><div style="grid-column: a"></div>'
+                    '<div style="grid-column: a-start"></div></div></body>')
+        p = W.Page(os.path.join(d, "t.html"))
+        g1, g2 = p.dom.body.element_children()
+        def tags(item):
+            c = W.Converter(p)
+            c.style_for(item, "grid")
+            return c.requires
+        self.assertNotIn("grid-named-lines", tags(g1.element_children()[0]))
+        self.assertIn("grid-named-lines", tags(g2.element_children()[0]))
+        self.assertNotIn("grid-named-lines", tags(g2.element_children()[1]))
+
+
 class Validation(unittest.TestCase):
     def test_left_right_not_valid_for_align(self):
         self.assertNotIn("right", W.VALID_KEYWORDS["align-content"])

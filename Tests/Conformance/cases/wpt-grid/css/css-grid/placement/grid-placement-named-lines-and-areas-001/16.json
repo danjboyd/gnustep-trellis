@@ -93,6 +93,7 @@
   ]
  },
  "requires": [
-  "block-layout"
+  "block-layout",
+  "grid-named-lines"
  ]
 }

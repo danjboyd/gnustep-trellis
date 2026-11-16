@@ -801,7 +801,7 @@ class Converter:
                     raise Skip("float")
                 continue
             if k.startswith("grid"):
-                self.grid_requires(k, v)
+                self.grid_requires(k, v, el)
             if re.search(r"(inline|block)", k) and k not in ("display",):
                 self.requires.add("logical-properties")
             val = norm_value(v, fs, self.requires)
@@ -824,7 +824,7 @@ class Converter:
     PLACEMENT = ("grid-row", "grid-column", "grid-row-start", "grid-row-end",
                  "grid-column-start", "grid-column-end", "grid-area")
 
-    def grid_requires(self, k, v):
+    def grid_requires(self, k, v, el=None):
         if "subgrid" in v:
             self.requires.add("subgrid")
         if "masonry" in v:
@@ -839,8 +839,22 @@ class Converter:
                 if not tok or tok in ("span", "auto") or re.match(r"^-?\d+$", tok):
                     continue
                 base = re.sub(r"-(start|end)$", "", tok)
-                if tok not in self.page.area_names and base not in self.page.area_names:
+                areas = self.parent_areas(el)
+                if tok not in areas and base not in areas:
                     self.requires.add("grid-named-lines")
+
+    def parent_areas(self, el):
+        """Area names of el's own grid container (not page-wide: another
+        grid on the page may define an area with the same name)."""
+        p = el.parent if el is not None else None
+        if p is None or not isinstance(p, El):
+            return set()
+        d = self.page.declared(p)
+        names = set()
+        for k in ("grid-template-areas", "grid-template", "grid"):
+            for q in re.findall(r'"([^"]*)"', d.get(k, "")):
+                names.update(t for t in q.split() if t != ".")
+        return names
 
     def text_measure(self, el, text):
         size, fam, lh = self.page.font(el)

@@ -1,7 +1,7 @@
 {
- "commit": "de415f3",
+ "commit": "e6de997",
  "conformance": {
-  "pass": 2906,
+  "pass": 2908,
   "skipped": 1091,
   "total": 2949
  },
@@ -9,8 +9,8 @@
  "platform": "linux",
  "suites": {
   "engine": {
-   "pass": 110,
-   "total": 110
+   "pass": 111,
+   "total": 111
   },
   "wpt": {
    "cases": 977,
@@ -19,7 +19,7 @@
   },
   "wpt-grid": {
    "cases": 1977,
-   "pass": 1173,
+   "pass": 1175,
    "total": 1205
   },
   "yoga": {

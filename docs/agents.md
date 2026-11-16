@@ -136,10 +136,9 @@ documents. The effects:
 3. **Margins never collapse**, between siblings or through a parent.
 
 The WPT importer tags cases that rely on block flow `requires: block-layout`.
-The runner still runs them: of 176, 132 pass, because a column usually lays
-out a block the same way. The divergence itself shows in `percentage-size`
-(effect 2). Most of the other failures with that tag are importer issues,
-not this.
+The runner still runs them: most pass, because a column usually lays
+out a block the same way. The divergence itself shows in
+`percentage-heights-001` (effect 1) and `percentage-size` (effect 2).
 
 **The most common mistake:** `flex-basis` (and the third value of
 `flex`) applies to the *main* axis. `flex: 1 1 160px` means 160px wide in

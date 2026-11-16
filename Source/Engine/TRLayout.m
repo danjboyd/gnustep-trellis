@@ -537,13 +537,16 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
           /* Intrinsic (fit-content / max-content) sizing: the line's
              content size is the sum of the items' max-content
              contributions (CSS Flexbox 9.9.1), not their flex-basis sizes,
-             so `flex: 1` text does not collapse to its min-content. */
+             so `flex: 1` text does not collapse to its min-content. That
+             is for a row's width; as in browsers, a column's auto height is
+             the sum of its items' hypothetical sizes, so `flex: 1 1 0px`
+             items in an auto-height column are 0 tall. */
           TRFloat content = gaps;
           for (NSInteger j = 0; j < cnt; j++)
             {
               TRItem *it = &li[j];
               TRFloat contrib = it->hypo;
-              if (!it->basisFromContent && it->s->flexGrow > 0)
+              if (isRow && !it->basisFromContent && it->s->flexGrow > 0)
                 {
                   TRMeasureMode cm;
                   TRFloat ca = TRItemCrossAvail(it, availCross, crossMode, multiLine, &cm);

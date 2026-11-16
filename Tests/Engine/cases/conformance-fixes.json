@@ -653,5 +653,42 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/auto_height_column_ignores_contribution_of_zero_basis",
+  "note": "WPT flex-one-sets-flex-basis-to-zero-px/5: an auto-height column is the sum of hypothetical sizes",
+  "root": {
+   "style": {
+    "flexDirection": "column",
+    "width": 200
+   },
+   "children": [
+    {
+     "style": {
+      "flexGrow": 0.5,
+      "flexShrink": 1,
+      "flexBasis": 0,
+      "minHeight": 0
+     },
+     "measure": {
+      "text": "aaaa bbbb",
+      "charWidth": 10,
+      "lineHeight": 10
+     }
+    }
+   ]
+  },
+  "available": {
+   "width": 200,
+   "height": null
+  },
+  "expected": {
+   "height": 0,
+   "children": [
+    {
+     "height": 0
+    }
+   ]
+  }
  }
 ]

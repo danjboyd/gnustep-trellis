@@ -751,6 +751,8 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
       if (s->alignContent == TRAlignStart) ac = wrapReverse ? TRAlignFlexEnd : TRAlignFlexStart;
       if (s->alignContent == TRAlignEnd || s->alignContent == TRAlignLastBaseline)
         ac = wrapReverse ? TRAlignFlexStart : TRAlignFlexEnd;
+      /* safe: overflowing lines align as start. */
+      if (s->alignContentSafe && free < 0) ac = wrapReverse ? TRAlignFlexEnd : TRAlignFlexStart;
       switch (ac)
         {
           case TRAlignStretch:
@@ -820,10 +822,13 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
         }
       TRFloat free = innerMain - used;
       TRFloat lead = 0, between = 0, autoShare = 0;
+      /* safe: an overflowing line aligns as start. */
+      TRAlign ljc = jc;
+      if (s->justifyContentSafe && free < 0) ljc = startIsFlexStart ? TRAlignFlexStart : TRAlignFlexEnd;
       if (autoMargins > 0 && free > 0)
         autoShare = free / autoMargins;
       else
-        switch (jc)
+        switch (ljc)
           {
             case TRAlignFlexEnd: lead = free; break;
             case TRAlignCenter: lead = free / 2; break;

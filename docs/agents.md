@@ -80,7 +80,7 @@ the user's settings. trellis-render refuses to run without it.
 - **Properties:** `display` (`flex`, `none`, `block`), `flex-direction`,
   `flex-wrap`, `flex-flow`, `flex`, `flex-grow`, `flex-shrink`,
   `flex-basis`, `justify-content`, `align-items`, `align-self`,
-  `align-content` (`justify-*` also take physical `left`/`right`), `place-*`, `gap`, `row-gap`, `column-gap`, `order`,
+  `align-content` (`justify-*` also take physical `left`/`right`; `justify-content` and `align-content` take a `safe`/`unsafe` prefix), `place-*`, `gap`, `row-gap`, `column-gap`, `order`,
   `width`, `height`, `min-*`, `max-*`, `aspect-ratio`, `margin` (with
   `auto`), `padding`, `border` (width only for layout), `position`
   (`relative`, `absolute`), `top`, `right`, `bottom`, `left`, `inset`,

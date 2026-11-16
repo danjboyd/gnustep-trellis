@@ -425,10 +425,21 @@ static int TREdgeFromSuffix(NSString *suffix)
   KEYWORD(@"direction", kDirection, direction, TRDirection)
   KEYWORD(@"flex-direction", kFlexDirection, flexDirection, TRFlexDirection)
   KEYWORD(@"flex-wrap", kFlexWrap, flexWrap, TRFlexWrap)
-  KEYWORD(@"justify-content", kJustify, justifyContent, TRAlign)
+  if ([p isEqualToString: @"justify-content"] || [p isEqualToString: @"align-content"])
+    {
+      /* An optional safe/unsafe prefix; unsafe is the default behaviour. */
+      BOOL safe = NO;
+      NSString *kw = v;
+      if ([kw hasPrefix: @"safe "]) { safe = YES; kw = [[kw substringFromIndex: 5] stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]]; }
+      else if ([kw hasPrefix: @"unsafe "]) kw = [[kw substringFromIndex: 7] stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
+      BOOL justify = [p isEqualToString: @"justify-content"];
+      if (!TRLookup(kw, justify ? kJustify : kAlign, &k)) return NO;
+      if (justify) { _s.justifyContent = (TRAlign)k; _s.justifyContentSafe = safe; }
+      else { _s.alignContent = (TRAlign)k; _s.alignContentSafe = safe; }
+      return YES;
+    }
   KEYWORD(@"align-items", kAlign, alignItems, TRAlign)
   KEYWORD(@"align-self", kAlign, alignSelf, TRAlign)
-  KEYWORD(@"align-content", kAlign, alignContent, TRAlign)
   KEYWORD(@"overflow", kOverflow, overflow, TROverflow)
   KEYWORD(@"box-sizing", kBoxSizing, boxSizing, TRBoxSizing)
   LENGTH(@"width", width, YES, NO)
@@ -782,10 +793,14 @@ static NSString *TRKeywordString(const TRKeyword *table, int value)
   KW(@"direction", kDirection, direction)
   KW(@"flex-direction", kFlexDirection, flexDirection)
   KW(@"flex-wrap", kFlexWrap, flexWrap)
-  KW(@"justify-content", kJustify, justifyContent)
+  if (_s.justifyContent != d.justifyContent || _s.justifyContentSafe)
+    [out addObject: [NSString stringWithFormat: @"justify-content: %@%@", _s.justifyContentSafe ? @"safe " : @"",
+                     TRKeywordString(kJustify, _s.justifyContent)]];
   KW(@"align-items", kAlign, alignItems)
   KW(@"align-self", kAlign, alignSelf)
-  KW(@"align-content", kAlign, alignContent)
+  if (_s.alignContent != d.alignContent || _s.alignContentSafe)
+    [out addObject: [NSString stringWithFormat: @"align-content: %@%@", _s.alignContentSafe ? @"safe " : @"",
+                     TRKeywordString(kAlign, _s.alignContent)]];
   KW(@"overflow", kOverflow, overflow)
   KW(@"box-sizing", kBoxSizing, boxSizing)
   if (_s.flexGrow != d.flexGrow) [out addObject: [NSString stringWithFormat: @"flex-grow: %g", _s.flexGrow]];

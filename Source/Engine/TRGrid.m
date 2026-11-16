@@ -627,13 +627,14 @@ static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
 }
 
 /* Positions tracks along an axis, honouring justify/align-content. */
-static double TRPlaceTracks(TRTrack *tr, NSInteger n, double gap, double avail, TRAlign align)
+static double TRPlaceTracks(TRTrack *tr, NSInteger n, double gap, double avail, TRAlign align, BOOL safe)
 {
   double total = 0;
   NSInteger visible = 0;
   for (NSInteger i = 0; i < n; i++) if (!tr[i].collapsed) { total += tr[i].base; visible++; }
   total += visible > 1 ? gap * (visible - 1) : 0;
   double free = isnan(avail) ? 0 : avail - total;
+  if (safe && free < 0) align = TRAlignStart;   /* safe: overflow aligns as start */
   double lead = 0, between = 0;
   switch (align)
     {
@@ -941,7 +942,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
 
   /* ---- Columns ---- */
   TRSizeTracks(colsT, nCols, innerW, colGap, items, n, YES, s->justifyContent);
-  double colsTotal = TRPlaceTracks(colsT, nCols, colGap, innerW, s->justifyContent);
+  double colsTotal = TRPlaceTracks(colsT, nCols, colGap, innerW, s->justifyContent, s->justifyContentSafe);
 
   /* Percentage margins, against each item's grid-area width (CSS Grid 6.5). */
   for (NSInteger k = 0; k < n; k++)
@@ -985,13 +986,13 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
         if (rowsT[i].size.max.kind == TRBreadthPercent) { rowsT[i].size.max.kind = TRBreadthAuto; percentRows = YES; }
       }
   TRSizeTracks(rowsT, nRows, innerH, rowGap, items, n, NO, s->alignContent);
-  double rowsTotal = TRPlaceTracks(rowsT, nRows, rowGap, innerH, s->alignContent);
+  double rowsTotal = TRPlaceTracks(rowsT, nRows, rowGap, innerH, s->alignContent, s->alignContentSafe);
   double contentH = rowsTotal;
   if (percentRows)
     {
       for (NSInteger i = 0; i < nRows; i++) rowsT[i].size = savedRows[i];
       TRSizeTracks(rowsT, nRows, contentH, rowGap, items, n, NO, s->alignContent);
-      rowsTotal = TRPlaceTracks(rowsT, nRows, rowGap, contentH, s->alignContent);
+      rowsTotal = TRPlaceTracks(rowsT, nRows, rowGap, contentH, s->alignContent, s->alignContentSafe);
     }
 
   /* ---- Container size ---- */

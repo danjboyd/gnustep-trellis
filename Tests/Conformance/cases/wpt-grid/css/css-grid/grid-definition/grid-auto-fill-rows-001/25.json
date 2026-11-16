@@ -53,7 +53,6 @@
   ]
  },
  "requires": [
-  "calc",
   "grid-named-lines"
  ]
 }

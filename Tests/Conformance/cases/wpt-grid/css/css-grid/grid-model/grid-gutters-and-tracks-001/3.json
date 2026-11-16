@@ -116,7 +116,6 @@
  },
  "requires": [
   "block-layout",
-  "calc",
   "intrinsic-size-keyword",
   "measure"
  ]

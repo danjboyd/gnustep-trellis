@@ -43,6 +43,18 @@ class Tokens(unittest.TestCase):
         self.assertEqual(W.to_px("+5px", 16), 5)
 
 
+class MathFunctions(unittest.TestCase):
+    def test_calc_tagged_minmax_not(self):
+        r = set()
+        W.norm_value("calc(10% + 25px)", 16, r)
+        self.assertEqual(r, {"css-calc"})
+        r = set()
+        W.norm_value("repeat(2, minmax(10px, 1fr))", 16, r)
+        self.assertEqual(r, set())
+        W.norm_value("max(10px, 5%)", 16, r)
+        self.assertEqual(r, {"css-calc"})
+
+
 class GridShorthand(unittest.TestCase):
     def test_rows_cols(self):
         out = W.expand_grid_shorthand("grid", "100px 200px / 50px 1fr")

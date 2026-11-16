@@ -117,7 +117,6 @@
   "height": 34
  },
  "requires": [
-  "calc",
   "intrinsic-size-keyword"
  ]
 }

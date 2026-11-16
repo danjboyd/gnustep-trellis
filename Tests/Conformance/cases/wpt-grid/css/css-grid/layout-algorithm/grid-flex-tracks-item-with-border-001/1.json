@@ -68,7 +68,6 @@
  },
  "requires": [
   "block-layout",
-  "calc",
   "intrinsic-size-keyword"
  ],
  "droppedChecks": 4

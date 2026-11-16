@@ -68,8 +68,5 @@
   ],
   "width": 64,
   "height": 84
- },
- "requires": [
-  "calc"
- ]
+ }
 }

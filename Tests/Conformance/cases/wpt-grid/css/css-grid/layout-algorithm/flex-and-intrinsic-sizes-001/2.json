@@ -45,7 +45,6 @@
   "height": 20
  },
  "requires": [
-  "calc",
   "intrinsic-size-keyword",
   "measure"
  ]

@@ -86,7 +86,6 @@
   ]
  },
  "requires": [
-  "block-layout",
-  "calc"
+  "block-layout"
  ]
 }

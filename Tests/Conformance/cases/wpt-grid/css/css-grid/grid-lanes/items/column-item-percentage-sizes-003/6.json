@@ -388,7 +388,7 @@
  },
  "requires": [
   "block-layout",
-  "calc",
+  "css-calc",
   "grid-lanes"
  ]
 }

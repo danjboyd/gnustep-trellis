@@ -57,8 +57,5 @@
     "width": 69
    }
   ]
- },
- "requires": [
-  "calc"
- ]
+ }
 }

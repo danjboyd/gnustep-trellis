@@ -104,8 +104,5 @@
   ],
   "width": 200,
   "height": 300
- },
- "requires": [
-  "calc"
- ]
+ }
 }

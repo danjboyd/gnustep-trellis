@@ -70,7 +70,6 @@
   "height": 97
  },
  "requires": [
-  "calc",
   "intrinsic-size-keyword"
  ]
 }

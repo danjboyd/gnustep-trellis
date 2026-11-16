@@ -28,7 +28,6 @@
   "height": 10
  },
  "requires": [
-  "calc",
   "intrinsic-size-keyword"
  ]
 }

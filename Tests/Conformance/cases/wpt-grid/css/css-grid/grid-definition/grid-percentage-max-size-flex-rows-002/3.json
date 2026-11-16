@@ -55,8 +55,8 @@
   "height": 200
  },
  "requires": [
-  "calc",
   "containing-block-height",
+  "css-calc",
   "intrinsic-size-keyword"
  ]
 }

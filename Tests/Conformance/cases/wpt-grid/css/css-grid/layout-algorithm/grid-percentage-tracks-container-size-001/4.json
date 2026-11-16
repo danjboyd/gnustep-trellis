@@ -103,7 +103,7 @@
  },
  "requires": [
   "block-layout",
-  "calc",
+  "css-calc",
   "intrinsic-size-keyword",
   "measure"
  ]

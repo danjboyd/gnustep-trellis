@@ -1,13 +1,31 @@
 {
- "commit": "97d9db7",
- "conformance": {"pass": 2337, "skipped": 1079, "total": 2961},
+ "commit": "5508eb8",
+ "conformance": {
+  "pass": 2428,
+  "skipped": 1079,
+  "total": 2961
+ },
  "date": "2026-11-16",
- "note": "transcribed from the README table gnustep-cssbox wrote at 97d9db7; replace with `scripts/conformance-summary.py record --platform linux`",
  "platform": "linux",
  "suites": {
-  "engine": {"pass": 93, "total": 93},
-  "wpt": {"cases": 977, "pass": 827, "total": 838},
-  "wpt-grid": {"cases": 1977, "pass": 604, "total": 1217},
-  "yoga": {"cases": 1086, "pass": 906, "total": 906}
+  "engine": {
+   "pass": 95,
+   "total": 95
+  },
+  "wpt": {
+   "cases": 977,
+   "pass": 827,
+   "total": 838
+  },
+  "wpt-grid": {
+   "cases": 1977,
+   "pass": 695,
+   "total": 1217
+  },
+  "yoga": {
+   "cases": 1086,
+   "pass": 906,
+   "total": 906
+  }
  }
 }

@@ -105,15 +105,8 @@ and the skip reasons.
 
 ## Current results
 
-On main, the same on Linux (GNUstep, clang) and macOS (Apple clang), as of
-2026-11-16:
-
-| Suite | Pass | Skipped |
-|---|---|---|
-| Yoga gentest | 906/906 | 24 `contains_inner_text_*` cases, marked `skip` (they depend on Yoga's own text measure) |
-| WPT css-flexbox | 827/838 | by `requires` tag; most are `position-static` (128) and `intrinsic-size-keyword` |
-| WPT css-grid | 604/1217 | by `requires` tag; most are `intrinsic-size-keyword`, `display-inline-grid` (193), `grid-named-lines` (131) and `grid-lanes` (107) |
-
-All 11 flexbox failures (`percentage-heights-001`, `percentage-size/2`) come
-from `display: block` being a column. See docs/agents.md section 4. The grid
-failures are engine gaps still being fixed.
+The README's Conformance table is generated from recorded runs on Linux and
+macOS (`docs/conformance/*.json`, written by `make conformance-record`), so
+it's the one source of truth for pass rates. All 11 flexbox failures
+(`percentage-heights-001`, `percentage-size/2`) come from `display: block`
+being a column; see docs/agents.md section 4.

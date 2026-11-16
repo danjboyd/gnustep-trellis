@@ -28,7 +28,8 @@
 @property (nonatomic, strong) NSView *steps;            /* Verify: Done / Changed rows */
 @property (nonatomic, strong) NSView *progress;         /* Project: one segment per item */
 @property (nonatomic, strong) NSView *workItems;        /* Project: the table rows */
-/* Below the body */
+/* The decision bar, pinned under the card's scroller */
+@property (nonatomic, strong) NSView *decision;
 @property (nonatomic, strong) NSTextField *note;
 @property (nonatomic, strong) NSView *actions;          /* AIMDeskAction buttons, in code */
 @property (nonatomic, strong) NSTextField *actionHint;

@@ -27,8 +27,9 @@ reports 0 errors and 0 warnings.
 
 - **Top bar:** dark in both appearances (a fixed pair: #1c1d1f with
   light text). "Helpdesk", then the pulse chips (AIMDeskPulseParts,
-  Mine first, each a filter button), the hotfix count as a tinted chip,
-  and on the right Oldest wait and Unheard. It wraps. Below 640 px it
+  Mine first): flat filter buttons (`bordered="no"`, Trellis 0.3), the
+  active one white and bold, the hotfix count as a tinted chip, and on
+  the right Oldest wait and Unheard. It wraps. Below 640 px it
   keeps ☰ Rail, Mine and the hotfix chip; the other counts are on the
   rail's section rows.
 - **Rail:** 260 px from 640 px up, behind ☰ below that. "Your move · 5"
@@ -37,17 +38,20 @@ reports 0 errors and 0 warnings.
   The other sections are folded to one line with a count. The selected
   row is Highlight.
 - **Card:** a Canvas card, 920 px at most and centred, with a 1 px
-  separator border and 8 px corners. The card column scrolls; the top
-  bar and the rail filter don't.
+  separator border and 8 px corners. The card and the reply card scroll;
+  the top bar, the rail filter, the decision bar and the undo bar don't.
   - **Header (G4):** the gate line ("INTAKE: IS THIS A GOOD TICKET?",
     then #, area and age; a Hotfix tag in front on hotfixes), the title,
-    the requester, and the last-heard chip: Mark when the requester has
-    heard nothing, a quiet chip otherwise.
+    the requester, and the last-heard chip: the warning tint
+    (`-tr-warning-background`, Trellis 0.3) when the requester has heard
+    nothing, a quiet chip otherwise.
   - **Body:** per gate (below).
-  - **Note field** (N), then the **action bar**: AIMDeskAction buttons,
-    title · key, the primary one the default button. It wraps, and the
-    hint ("Shift+Return dispatches without sending") goes right, or under
-    the buttons below 640 px.
+  - **The decision bar** (`#decision`) is pinned under the scroller,
+    the same width as the card: the note field (N), then the action bar
+    (AIMDeskAction buttons, title · key, the primary one the default
+    button). It wraps, and the hint ("Shift+Return dispatches without
+    sending") goes right, or under the buttons below 640 px. So the
+    primary action and Undo are always on screen.
 - **Reply draft (G5):** its own card under the decision: "Reply to … ·
   Draft: <kind> · visible to requester", "E to edit", the body, and
   "Send only · Cmd+Return" and "Redraft · Cmd+R".
@@ -66,11 +70,11 @@ reports 0 errors and 0 warnings.
   "2 agent-web", ...) with the suggestion under it, and Track (Standard,
   Hotfix, Project).
 - **Plan:** diagnosis with its confidence and evidence line, the proposed
-  steps, the blast radius as a three-column panel (one column below
-  640 px), and Alternatives and Evidence as expander rows (▸ button on the
+  steps, the blast radius as a three-column panel on the warning tint
+  (one column below 640 px), and Alternatives and Evidence as expander rows (▸ button on the
   left, "2 · Space to expand" on the right).
 - **Verify:** the Done/Changed step table, with the deviation row on
-  Mark; Proof and Live status in two columns (stacked below 640 px); and
+  the warning tint; Proof and Live status in two columns (stacked below 640 px); and
   Change detail as an expander.
 - **Project:** "3 of 7 work items done" with the counts, a seven-segment
   bar (done CanvasText, needs-you AccentColor, fixing GrayText, open
@@ -87,20 +91,19 @@ reports 0 errors and 0 warnings.
    send · Return", "Approve and send · Return", "Confirm and close ·
    Return", "Open #502 · Return") as two buttons, one per width range.
    In the app, a `shortTitle` on AIMDeskAction would do it.
-2. **Soft tints.** The mockups use soft peach and blue tints. Trellis
-   has no soft warning colour, and on GNUstep `Mark` is pure yellow. So
-   the spec uses Mark only for what needs attention (heard nothing, the
-   Changed row), a quiet panel for the blast radius, and Highlight for
-   "needs you". If you want the mockup's peach, use it as a fixed pair
-   (background and text both fixed), which reads in both appearances. I
-   can also add a `-tr-warning-background` system colour to Trellis.
+2. **Soft tints: done in Trellis 0.3.** `-tr-warning-background` with
+   `-tr-warning-text` is the mockup's peach and brown, a fixed light pair
+   like Mark. The spec uses it for "heard nothing", the blast radius and
+   the Changed rows; "needs you" stays Highlight.
 3. **No segmented control or tab strip yet.** The drawer's tabs are a
    pop-up here (six bezel buttons wrapped to three rows at 360 px).
    Assignee and Track are radio groups, so the selection is the
    control's own state. The number and H/P keys pick them in code.
-4. **The top bar's chips are bezel buttons,** which Adwaita draws as
-   grey pills on the dark bar. Flat chips would need a borderless-button
-   attribute in Trellis markup, which I can add if you want them.
+4. **Flat chips: done in Trellis 0.3.** `<button bordered="no">` with
+   `color:`. Its cell draws the title itself, because the Adwaita theme
+   draws push-button titles in its own colour. If you set a chip's title
+   in code, set `attributedTitle` with the colour, since `-setTitle:`
+   drops it.
 5. **The gate line is written in capitals,** and section labels are
    small bold GrayText in sentence case. Trellis has no `text-transform`
    or `letter-spacing`, and sentence case matches the ask screen.
@@ -109,10 +112,10 @@ reports 0 errors and 0 warnings.
    equivalent while the chat field has focus (the spec shows that state).
 7. **Expanders:** the ▸ rows are buttons; the app inserts the expanded
    content under the row and flips the arrow.
-8. **The card column scrolls as one,** with the reply card in it. At
-   340 the decision buttons are below the fold on long cards. If you
-   want them pinned, move `#actions` out of the scroller, as the Blocked
-   spec did; it costs height at narrow widths.
+8. **The decision bar is pinned** (done, as you asked). At 340 it takes
+   about a quarter of the height (Intake: four rows of buttons with the
+   spec's short titles); shorter `shortTitle`s ("Dispatch", ...) and
+   hiding the hint below 640 px would win some of that back.
 
 ## Reproduce
 
@@ -131,8 +134,10 @@ here to regenerate the other four. Renders run only under
 
 ## Also found
 
-Building this spec found and fixed one Trellis engine bug (1ece127): an
+Building this spec found and fixed one Trellis engine bug (1ece127, in
+v0.2.3): an
 item with `width: 100%; max-width: 920px` in a column had its height
 measured at the unclamped width, so the wrapped action bar overflowed the
 card. It also found a trellis-lint false positive for declarations that
-start on a new line (475fc00).
+start on a new line (475fc00, in v0.2.2). Port against Trellis v0.3.0 or
+later: the spec uses its warning colours and flat buttons.

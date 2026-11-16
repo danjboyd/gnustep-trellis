@@ -66,8 +66,8 @@ COMMON_STYLE = '''
   .hotfix-tag { background-color: #f6c08a; border-radius: 4px; padding: 1px 6px; }
   .expander  { flex-wrap: wrap; gap: 4px 12px; align-items: center; padding: 6px 0; }
   .exp-note  { flex: 0 1 auto; min-width: 0; text-align: right; }
-  .tint      { background-color: Mark; border-radius: 6px; }
-  .tint text, .tint label { color: MarkText; }'''
+  .tint      { background-color: -tr-warning-background; border-radius: 6px; }
+  .tint text, .tint label { color: -tr-warning-text; }'''
 
 # ---------------- Plan ----------------
 build('Plan.trellis',
@@ -93,7 +93,7 @@ header('PLAN: IS THIS THE RIGHT FIX?', '#491 · Sign-in · Opened 31 min ago · 
                 <text>3. Deploy to production and watch the sign-in error rate.</text>
               </column>
             </column>
-            <column class="block blast">
+            <column class="block blast tint">
               <label class="sec">Blast radius</label>
               <box class="blast-grid">
                 <column class="cell"><text class="cell-head">Affects</text><text>Sign-in service, every user signing in</text></column>
@@ -117,7 +117,7 @@ reply('Reply to Sam Ortiz · Draft: diagnosis update · updated after chat · vi
 '<field id="note" placeholder="Note to agent-web (N), optional"/>',
 COMMON_STYLE + '''
   .steps     { gap: 4px; }
-  .blast     { padding: 12px 16px; border-radius: 6px; background-color: -tr-window-background; }
+  .blast     { padding: 12px 16px; }
   .cell-head { font-weight: bold; }
   .blast-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
   @container (max-width: 639px) { .blast-grid { grid-template-columns: minmax(0, 1fr); } }''')

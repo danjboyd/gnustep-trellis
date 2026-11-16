@@ -17,15 +17,16 @@
 <column id="desk" class="desk">
   <!-- @shell-top -->
   <row id="topBar" class="topbar">
-    <button id="railToggle" class="narrow-only" action="toggleRail:">☰ Rail</button>
+    <button id="railToggle" bordered="no" class="narrow-only chip" action="toggleRail:">☰ Rail</button>
     <label class="brand">Helpdesk</label>
     <row id="pulse" class="pulse">
       <!-- Pulse chips: AIMDeskPulseParts, Mine first; added in code. -->
-      <button class="chip" action="filterPulse:">Mine 5</button>
+      <button bordered="no" class="chip active" action="filterPulse:">Mine 5</button>
       <box class="hotfix"><label class="hotfix-text">1 hotfix</label></box>
-      <button class="chip wide-only" action="filterPulse:">With agents 6</button>
-      <button class="chip wide-only" action="filterPulse:">With requesters 2</button>
-      <button class="chip wide-only" action="filterPulse:">Blocked 2</button>
+      <button bordered="no" class="chip wide-only" action="filterPulse:">5 need you</button>
+      <button bordered="no" class="chip wide-only" action="filterPulse:">6 with agents</button>
+      <button bordered="no" class="chip wide-only" action="filterPulse:">2 with requesters</button>
+      <button bordered="no" class="chip wide-only" action="filterPulse:">2 blocked</button>
     </row>
     <spacer class="wide-only"/>
     <row class="waits">
@@ -63,7 +64,8 @@
       </scroll>
     </column>
 
-    <scroll class="main">
+    <column class="main">
+    <scroll class="mainscroll">
       <column class="maincol">
         <column id="card" class="card">
           <column id="cardHeader" class="card-header">
@@ -95,7 +97,7 @@
                 <text>3. Deploy to production and watch the sign-in error rate.</text>
               </column>
             </column>
-            <column class="block blast">
+            <column class="block blast tint">
               <label class="sec">Blast radius</label>
               <box class="blast-grid">
                 <column class="cell"><text class="cell-head">Affects</text><text>Sign-in service, every user signing in</text></column>
@@ -113,23 +115,6 @@
           </column>
           <!-- @/body -->
 
-          <!-- @shell-card-bottom -->
-          <column class="notebox">
-            <!-- @note --><field id="note" placeholder="Note to agent-web (N), optional"/><!-- @/note -->
-          </column>
-          <row id="actions" class="actions">
-            <!-- AIMDeskAction buttons, added in code: title · key; the
-                 primary one is the default button. -->
-            <!-- @actions -->
-            <button class="wide-only" action="deskAction:" default="yes">Approve and send diagnosis update · Return</button>
-            <button class="narrow-only" action="deskAction:" default="yes">Approve and send · Return</button>
-            <button action="deskAction:">Revise · R</button>
-            <button action="deskAction:">Reassign · G</button>
-            <button action="deskAction:">Take over · O</button>
-            <button action="deskAction:">Decline · X</button>
-            <text id="actionHint" class="hint">Shift+Return approves without sending</text>
-            <!-- @/actions -->
-          </row>
         </column>
 
         <column id="reply" class="card reply">
@@ -147,6 +132,27 @@
         </column>
       </column>
     </scroll>
+    <!-- The decision bar is pinned under the scroller, so the primary
+         action is always reachable (the undo bar is pinned too). -->
+    <column id="decision" class="decision">
+        <column class="notebox">
+          <!-- @note --><field id="note" placeholder="Note to agent-web (N), optional"/><!-- @/note -->
+        </column>
+        <row id="actions" class="actions">
+          <!-- AIMDeskAction buttons, added in code: title · key; the
+               primary one is the default button. -->
+          <!-- @actions -->
+            <button class="wide-only" action="deskAction:" default="yes">Approve and send diagnosis update · Return</button>
+            <button class="narrow-only" action="deskAction:" default="yes">Approve and send · Return</button>
+            <button action="deskAction:">Revise · R</button>
+            <button action="deskAction:">Reassign · G</button>
+            <button action="deskAction:">Take over · O</button>
+            <button action="deskAction:">Decline · X</button>
+            <text id="actionHint" class="hint">Shift+Return approves without sending</text>
+          <!-- @/actions -->
+        </row>
+    </column>
+    </column>
 
     <column id="drawer" class="drawer">
       <!-- @drawer -->
@@ -167,7 +173,9 @@
   .topbar    { flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 8px 16px;
                background-color: #1c1d1f; }
   .brand     { color: #ffffff; font-weight: bold; }
-  .pulse     { flex-wrap: wrap; gap: 6px; align-items: center; }
+  .pulse     { flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+  .chip      { color: #e4e5e8; }
+  .active    { color: #ffffff; font-weight: bold; }
   .hotfix    { background-color: #f6c08a; border-radius: 4px; padding: 2px 8px; }
   .hotfix-text { color: #3b1d03; font-weight: bold; }
   .waits     { flex-wrap: wrap; gap: 4px 16px; }
@@ -191,8 +199,11 @@
   .folded    { padding: 4px 8px; gap: 8px; }
   .grow      { flex: 1; min-width: 0; }
 
-  /* Card column */
+  /* Card column: the scroller, then the pinned decision bar */
   .main      { flex: 1; min-width: 0; }
+  .mainscroll { flex: 1; min-height: 0; }
+  .decision  { width: 100%; max-width: 920px; margin: 0 auto; background-color: Canvas;
+               border: 1px; border-color: -tr-separator; border-radius: 8px 8px 0 0; }
   .maincol   { gap: 16px; padding: 20px 24px; }
   .card      { width: 100%; max-width: 920px; margin: 0 auto; background-color: Canvas;
                border: 1px; border-color: -tr-separator; border-radius: 8px; }
@@ -201,8 +212,8 @@
   .gate      { font-size: 12px; font-weight: bold; }
   .meta      { font-size: 12px; color: GrayText; }
   .card-title { font-size: 22px; font-weight: bold; }
-  .heard     { background-color: Mark; border-radius: 4px; padding: 3px 8px; }
-  .heard-text { color: MarkText; font-size: 13px; }
+  .heard     { background-color: -tr-warning-background; border-radius: 4px; padding: 3px 8px; }
+  .heard-text { color: -tr-warning-text; font-size: 13px; }
   .calm      { background-color: -tr-window-background; }
   .calm .heard-text { color: CanvasText; }
 
@@ -218,9 +229,8 @@
   .picker    { gap: 6px; }
   .chips     { flex-wrap: wrap; gap: 6px 14px; }
 
-  .notebox   { padding: 0 24px 16px 24px; }
-  .actions   { flex-wrap: wrap; gap: 8px; align-items: center; padding: 12px 24px;
-               background-color: -tr-window-background; border-radius: 0 0 8px 8px; }
+  .notebox   { padding: 12px 24px 0 24px; }
+  .actions   { flex-wrap: wrap; gap: 8px; align-items: center; padding: 12px 24px; }
   .hint      { font-size: 12px; color: GrayText; flex: 1 1 200px; text-align: right; }
 
   .reply     { gap: 10px; padding: 16px 24px; }
@@ -240,10 +250,10 @@
   .hotfix-tag { background-color: #f6c08a; border-radius: 4px; padding: 1px 6px; }
   .expander  { flex-wrap: wrap; gap: 4px 12px; align-items: center; padding: 6px 0; }
   .exp-note  { flex: 0 1 auto; min-width: 0; text-align: right; }
-  .tint      { background-color: Mark; border-radius: 6px; }
-  .tint text, .tint label { color: MarkText; }
+  .tint      { background-color: -tr-warning-background; border-radius: 6px; }
+  .tint text, .tint label { color: -tr-warning-text; }
   .steps     { gap: 4px; }
-  .blast     { padding: 12px 16px; border-radius: 6px; background-color: -tr-window-background; }
+  .blast     { padding: 12px 16px; }
   .cell-head { font-weight: bold; }
   .blast-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
   @container (max-width: 639px) { .blast-grid { grid-template-columns: minmax(0, 1fr); } }
@@ -256,7 +266,7 @@
     .maincol     { padding: 12px; }
     .card-header { padding: 16px; }
     .card-body   { padding: 12px 16px 16px 16px; }
-    .notebox     { padding: 0 16px 12px 16px; }
+    .notebox     { padding: 10px 16px 0 16px; }
     .actions     { padding: 10px 16px; }
     .reply       { padding: 12px 16px; }
     .checks      { grid-template-columns: minmax(0, 1fr); }

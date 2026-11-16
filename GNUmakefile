@@ -90,3 +90,9 @@ check:: all
 	  echo "== conformance (report only; does not fail the build)"; \
 	  $(CASE_RUNNER) Tests/Conformance/cases | $(CONF_SUMMARY) || true; \
 	fi
+
+# Record this platform's results in docs/conformance/linux.json and
+# regenerate the README table (scripts/conformance-summary.py).
+conformance-record: all
+	LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH python3 -I scripts/conformance-summary.py record --platform linux --runner ./obj/trellis-case
+	python3 -I scripts/conformance-summary.py table

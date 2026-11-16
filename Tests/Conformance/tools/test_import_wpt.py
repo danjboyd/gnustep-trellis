@@ -125,6 +125,20 @@ class GridAreas(unittest.TestCase):
         self.assertNotIn("grid-named-lines", tags(g2.element_children()[1]))
 
 
+class AttributeSelectors(unittest.TestCase):
+    def test_presence_and_value(self):
+        d = tempfile.mkdtemp()
+        with open(os.path.join(d, "t.html"), "w") as f:
+            f.write('<!DOCTYPE html><style>[data-expected-height] { width: 7px }'
+                    ' div[data-k="v"] { height: 3px }</style><body>'
+                    '<div data-expected-height="1" data-k="v"></div><div data-k="w"></div></body>')
+        p = W.Page(os.path.join(d, "t.html"))
+        a, b = p.dom.body.element_children()
+        self.assertEqual(p.declared(a).get("width"), "7px")
+        self.assertEqual(p.declared(a).get("height"), "3px")
+        self.assertNotIn("height", p.declared(b))
+
+
 class Validation(unittest.TestCase):
     def test_left_right_not_valid_for_align(self):
         self.assertNotIn("right", W.VALID_KEYWORDS["align-content"])

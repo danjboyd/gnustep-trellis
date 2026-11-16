@@ -228,7 +228,7 @@ def parse_stylesheet(css):
     return rules
 
 
-COMPOUND_RE = re.compile(r"^(\*|[a-zA-Z][\w-]*)?((?:[.#][\w-]+)*)((?::[\w-]+(?:\([^)]*\))?)*)$")
+COMPOUND_RE = re.compile(r"^(\*|[a-zA-Z][\w-]*)?((?:[.#][\w-]+|\[[\w-]+(?:=(?:\"[^\"]*\"|'[^']*'|[\w-]+))?\])*)((?::[\w-]+(?:\([^)]*\))?)*)$")
 
 
 def parse_selector(sel):
@@ -247,6 +247,9 @@ def parse_selector(sel):
         if not m:
             raise Skip("selector " + t)
         tag, rest, pseudos = m.groups()
+        attrs = [(a, (v1 or v2 or v3) if eq else None) for a, eq, v1, v2, v3 in
+                 re.findall(r"\[([\w-]+)(=(?:\"([^\"]*)\"|'([^']*)'|([\w-]+)))?\]", rest)]
+        rest = re.sub(r"\[[^\]]*\]", "", rest)
         classes = set(re.findall(r"\.([\w-]+)", rest))
         ids = re.findall(r"#([\w-]+)", rest)
         pseudo = re.findall(r":([\w-]+(?:\([^)]*\))?)", pseudos)
@@ -254,7 +257,8 @@ def parse_selector(sel):
             if not re.match(r"^(first-child|last-child|nth-child\(\d+\)|nth-child\((odd|even)\)|nth-of-type\(\d+\)|first-of-type|last-of-type|only-child|not\(\.[\w-]+\))$", p):
                 raise Skip("pseudo :" + p)
         parts.append((comb or " ", {"tag": None if tag in (None, "*") else tag.lower(),
-                                     "classes": classes, "ids": ids, "pseudo": pseudo}))
+                                     "classes": classes, "ids": ids, "pseudo": pseudo,
+                                     "attrs": attrs}))
         comb = None
     return parts
 
@@ -263,7 +267,7 @@ def specificity(parts):
     a = b = c = 0
     for _, comp in parts:
         a += len(comp["ids"])
-        b += len(comp["classes"]) + len(comp["pseudo"])
+        b += len(comp["classes"]) + len(comp["pseudo"]) + len(comp.get("attrs", []))
         c += 1 if comp["tag"] else 0
     return (a, b, c)
 
@@ -281,6 +285,9 @@ def match_compound(el, comp):
         return False
     for i in comp["ids"]:
         if el.id != i:
+            return False
+    for a, v in comp.get("attrs", []):
+        if a not in el.attrs or (v is not None and el.attrs.get(a) != v):
             return False
     for p in comp["pseudo"]:
         sib = siblings(el)
@@ -800,6 +807,11 @@ class Converter:
                 if re.search(r"\b(min-content|max-content|fit-content)\b", val) \
                         and not k.startswith("grid"):
                     self.requires.add("intrinsic-size-keyword")
+                # The css-sizing-4 'stretch' size keyword (and its prefixed
+                # forms); align-*/justify-* 'stretch' is a different thing.
+                if re.search(r"(^|\s)(stretch|-webkit-fill-available|-moz-available)(\s|$)", val) \
+                        and re.match(r"^(min-|max-)?(width|height)$|^flex-basis$", k):
+                    self.requires.add("intrinsic-size-keyword")
             if k == "aspect-ratio":
                 self.requires.add("aspect-ratio")
                 m = re.match(r"^(?:auto\s+)?(\d*\.?\d+)\s*/\s*(\d*\.?\d+)$", str(val))
@@ -1205,6 +1217,13 @@ def convert_file(path, rel, commit):
         if tree["style"].get("display") in ("inline-flex", "inline-grid") or \
                 tree["style"].get("position") in ("absolute", "fixed"):
             conv.root_sizing = "fit-content"
+        rs = tree["style"]
+        if rs.get("aspectRatio") is not None and rs.get("width", "auto") == "auto" \
+                and isinstance(rs.get("height"), (int, float)):
+            # The width comes from height x aspect-ratio, not from stretching
+            # to the container: a given available width would be laid out
+            # exactly, so leave it unconstrained.
+            case["available"] = dict(case["available"], width=None)
         if conv.root_sizing == "fit-content" and conv.sized_by_ancestor:
             # Shrink-to-fit in a narrow container: may size at min-content.
             case.setdefault("requires", []).append("intrinsic-size-keyword")

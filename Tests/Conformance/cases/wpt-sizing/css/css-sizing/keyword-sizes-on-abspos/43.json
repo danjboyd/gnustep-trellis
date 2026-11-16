@@ -1,0 +1,54 @@
+{
+ "id": "wpt-sizing/css/css-sizing/keyword-sizes-on-abspos/43",
+ "source": {
+  "suite": "wpt-sizing",
+  "file": "css/css-sizing/keyword-sizes-on-abspos.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "position": "absolute",
+   "top": 0,
+   "right": 0,
+   "bottom": 0,
+   "left": 0,
+   "marginTop": 5,
+   "marginRight": 5,
+   "marginBottom": 5,
+   "marginLeft": 5,
+   "paddingTop": 2,
+   "paddingRight": 2,
+   "paddingBottom": 2,
+   "paddingLeft": 2,
+   "height": 500,
+   "maxHeight": "max-content",
+   "borderTopWidth": 3,
+   "borderRightWidth": 3,
+   "borderBottomWidth": 3,
+   "borderLeftWidth": 3
+  },
+  "measure": {
+   "text": "XX XX",
+   "charWidth": 20,
+   "lineHeight": 20
+  }
+ },
+ "expected": {
+  "height": 50
+ },
+ "requires": [
+  "intrinsic-size-keyword",
+  "measure"
+ ]
+}

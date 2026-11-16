@@ -18,7 +18,9 @@
 int main(void)
 {
   @autoreleasepool {
-    [NSApplication sharedApplication];
+#ifdef GNUSTEP
+    [NSApplication sharedApplication];   /* on Cocoa it would connect to the WindowServer */
+#endif
     TRBoxView *col = [TRBoxView boxWithStyle: @"flex-direction: column; align-items: stretch"];
     HFW *v = [[HFW alloc] initWithFrame: NSZeroRect];
     [col addSubview: v];

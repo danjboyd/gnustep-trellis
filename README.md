@@ -55,7 +55,8 @@ GNUstep (clang, libobjc2, ARC, libdispatch; GCC is not supported):
 ```sh
 scripts/install-toolchain-debian.sh   # once: builds the toolchain into ~/opt/trellis-toolchain
 . scripts/env.sh
-make && make check
+make && make check     # make -j works; make shared=no builds static Trellis libraries
+make check-gui         # view-level checks, run headless (private Xvfb)
 ```
 
 macOS (plain Apple clang, no Xcode project or GNUstep make needed):

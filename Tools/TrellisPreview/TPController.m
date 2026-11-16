@@ -224,6 +224,33 @@ static NSDate *TPModDate(NSString *path)
                                           userInfo: nil repeats: YES];
 }
 
+/* Files handed to the app: a path on the command line (GNUstep's
+   NSApplication opens those too), Finder or Dock opens on macOS. Handled
+   here, so they never reach NSDocumentController, which has no document
+   types for .trellis and showed an empty "Alert". At launch the window
+   doesn't exist yet: the path is kept and loaded by
+   -applicationDidFinishLaunching:. */
+- (BOOL)application:(NSApplication *)app openFile:(NSString *)file
+{
+  if (![[file pathExtension] isEqualToString: @"trellis"]) return NO;
+  _path = [file stringByStandardizingPath];
+  _mtime = nil;
+  if (_window != nil)
+    {
+      [self reload: nil];
+      [_window makeKeyAndOrderFront: nil];
+    }
+  return YES;
+}
+
+- (void)application:(NSApplication *)app openFiles:(NSArray *)files
+{
+  BOOL ok = NO;
+  for (NSString *f in files)
+    if ([self application: app openFile: f]) { ok = YES; break; }
+  [app replyToOpenOrPrint: ok ? NSApplicationDelegateReplySuccess : NSApplicationDelegateReplyFailure];
+}
+
 - (void)openDocument:(id)sender
 {
   NSOpenPanel *p = [NSOpenPanel openPanel];

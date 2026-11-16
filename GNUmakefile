@@ -15,6 +15,13 @@ endif
 
 include $(GNUSTEP_MAKEFILES)/common.make
 
+# make shared=no builds Trellis's own libraries as static archives. Link
+# GNUstep itself dynamically all the same: gnustep-make would add -static
+# to every link, and a system GNUstep ships no static libgnustep-base.
+ifeq ($(shared),no)
+  STATIC_LDFLAGS :=
+endif
+
 PACKAGE_NAME = Trellis
 VERSION = 0.1.0
 
@@ -70,6 +77,10 @@ include $(GNUSTEP_MAKEFILES)/library.make
 include $(GNUSTEP_MAKEFILES)/tool.make
 include $(GNUSTEP_MAKEFILES)/application.make
 
+# gnustep-make builds the two libraries in parallel under make -j, but
+# libTrellis links against libTrellisEngine: build the engine first.
+libTrellis.all.library.variables: libTrellisEngine.all.library.variables
+
 # --- Tests -------------------------------------------------------------------
 # The conformance report: each failing case id, then the totals, per-suite
 # rates and skip reasons.
@@ -96,3 +107,18 @@ check:: all
 conformance-record: all
 	LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH python3 -I scripts/conformance-summary.py record --platform linux --runner ./obj/trellis-case
 	python3 -I scripts/conformance-summary.py table
+
+# View-level checks that need a GUI: built here and run headless under
+# scripts/run-headless.sh (private Xvfb and GNUSTEP_HOME). Not part of
+# make check, which needs no display.
+GUI_TEST_FLAGS = $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ISource/View -ISource/Engine
+GUI_TEST_LIBS = -L./obj -lTrellis -lTrellisEngine $(shell gnustep-config --gui-libs)
+
+check-gui:: all
+	@mkdir -p obj/gui-tests
+	@$(CC) $(GUI_TEST_FLAGS) Tests/View/size-for-width.m -o obj/gui-tests/size-for-width $(GUI_TEST_LIBS)
+	@$(CC) $(GUI_TEST_FLAGS) Tests/View/preview-open-file.m -o obj/gui-tests/preview-open-file $(GUI_TEST_LIBS)
+	@echo "== view checks (headless)"
+	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH timeout 60 scripts/run-headless.sh obj/gui-tests/size-for-width 2>&1 | grep -v _NET_WORKAREA | tail -1
+	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH timeout 60 scripts/run-headless.sh obj/gui-tests/preview-open-file $(CURDIR)/Examples/TrellisDemo/Settings.trellis 2>&1 | grep -v _NET_WORKAREA | tail -1
+

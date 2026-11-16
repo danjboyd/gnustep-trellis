@@ -151,6 +151,12 @@ static NSSet *TRDefaultUnsupported(void)
     @"intrinsic-size-keyword",   /* width: min-content / max-content / fit-content */
     @"overflow-axis",            /* overflow-x differs from overflow-y */
     @"flex-wrap-balance",        /* css-flexbox-2 flex-wrap: balance */
+    @"grid-named-lines",         /* [name] lines in grid templates */
+    @"subgrid",
+    @"grid-lanes",               /* display: grid-lanes (masonry) */
+    @"display-inline-grid",
+    @"position-sticky",
+    @"grid-template-shorthand",  /* grid / grid-template with area strings */
     nil];
 }
 

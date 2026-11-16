@@ -79,16 +79,22 @@ and licences: [ATTRIBUTION.md](Tests/Conformance/ATTRIBUTION.md)):
 |---|---|---|---|
 | engine | hand-written, `Tests/Engine/cases` | 93/93 | 93/93 |
 | yoga | facebook/yoga gentest, 1086 cases | 906/906 | 906/906 |
-| wpt | web-platform-tests css-flexbox (check-layout), 957 cases | 813/824 (98.7%) | 813/824 (98.7%) |
-| **all conformance** | | **1719/1730 (99.4%)** | **1719/1730 (99.4%)** |
+| wpt | web-platform-tests css-flexbox (check-layout), 977 cases | 827/838 (98.7%) | 827/838 (98.7%) |
+| wpt-grid | web-platform-tests css-grid (check-layout), 1977 cases | 604/1217 (49.6%) | 604/1217 (49.6%) |
+| **all conformance** | | **2337/2961 (78.9%)** | **2337/2961 (78.9%)** |
 
-As of db5893b. 313 cases are skipped because they need features Trellis
+As of 97d9db7. 1079 cases are skipped because they need features Trellis
 leaves out or does differently on purpose (`position: static`,
-`inline-block`, `display: contents`, intrinsic-size keywords, per-axis
-overflow, `flex-wrap: balance`, `-webkit-box`); `trellis-case --all`
-runs them anyway. The 11 failures are the documented consequence of
-`display: block` meaning a column flex container (percentage heights
+`inline-block`, `inline-grid`, `display: contents`, intrinsic-size
+keywords, per-axis overflow, `flex-wrap: balance`, `-webkit-box`, named
+grid lines, subgrid, masonry, `position: sticky`); `trellis-case --all`
+runs them anyway. The 11 flexbox failures are the documented consequence
+of `display: block` meaning a column flex container (percentage heights
 against a block, a fixed-height child shrinking inside a shorter block).
+The grid suite is new; its failures are real engine gaps, being worked
+through (percentage rows in an auto-height grid, absolutely positioned
+grid items, implicit tracks before the explicit grid, `fit-content()`
+tracks, and others).
 
 ## Documents
 

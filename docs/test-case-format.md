@@ -41,7 +41,7 @@ runner (`trellis-case`) reads both.
 | `direction` | no | `ltr` (default) or `rtl` for the root. |
 | `tolerance` | no | Maximum absolute difference per number, default 0.5. |
 | `pixelScale` | no | Pixel-grid rounding. Default 1 (Yoga-style rounding to whole points). 0 disables rounding (use this for WPT cases compared at sub-pixel precision). |
-| `requires` | no | Features the case depends on, for example `["position-static","block-layout"]`. `trellis-case` skips a case that requires a feature Trellis doesn't implement, or does differently on purpose: `position-static`, `display-inline`, `display-inline-block`, `display-contents`, `display--webkit-box`, `logical-properties`, `intrinsic-size-keyword`, `overflow-axis` (overflow-x differs from overflow-y) and `flex-wrap-balance`. It counts the skips by feature. `--all` runs every case, and `--unsupported a,b` replaces the list. |
+| `requires` | no | Features the case depends on, for example `["position-static","block-layout"]`. `trellis-case` skips a case that requires a feature Trellis doesn't implement, or does differently on purpose: `position-static`, `display-inline`, `display-inline-block`, `display-contents`, `display--webkit-box`, `logical-properties`, `intrinsic-size-keyword`, `overflow-axis` (overflow-x differs from overflow-y), `flex-wrap-balance`, `grid-named-lines`, `subgrid`, `grid-lanes` (masonry), `display-inline-grid`, `position-sticky` and `grid-template-shorthand` (`grid`/`grid-template` with area strings). It counts the skips by feature. `--all` runs every case, and `--unsupported a,b` replaces the list. |
 | `skip` | no | A string: the reason this case is known bad and skipped. |
 
 ## Styles
@@ -111,7 +111,9 @@ On main, the same on Linux (GNUstep, clang) and macOS (Apple clang), as of
 | Suite | Pass | Skipped |
 |---|---|---|
 | Yoga gentest | 906/906 | 24 `contains_inner_text_*` cases, marked `skip` (they depend on Yoga's own text measure) |
-| WPT css-flexbox | 813/824 | 289, by `requires` tag; most are `position-static` (128) and `intrinsic-size-keyword` (80) |
+| WPT css-flexbox | 827/838 | by `requires` tag; most are `position-static` (128) and `intrinsic-size-keyword` |
+| WPT css-grid | 604/1217 | by `requires` tag; most are `intrinsic-size-keyword`, `display-inline-grid` (193), `grid-named-lines` (131) and `grid-lanes` (107) |
 
-All 11 WPT failures (`percentage-heights-001`, `percentage-size/2`) come from
-`display: block` being a column. See docs/agents.md section 4.
+All 11 flexbox failures (`percentage-heights-001`, `percentage-size/2`) come
+from `display: block` being a column. See docs/agents.md section 4. The grid
+failures are engine gaps still being fixed.

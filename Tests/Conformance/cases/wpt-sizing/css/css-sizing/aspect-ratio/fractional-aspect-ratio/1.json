@@ -19,7 +19,7 @@
    "display": "block",
    "boxSizing": "content-box",
    "width": 320,
-   "aspectRatio": "1.6"
+   "aspectRatio": 1.6
   }
  },
  "expected": {

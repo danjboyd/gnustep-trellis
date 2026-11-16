@@ -814,9 +814,12 @@ class Converter:
                     self.requires.add("intrinsic-size-keyword")
             if k == "aspect-ratio":
                 self.requires.add("aspect-ratio")
-                m = re.match(r"^(?:auto\s+)?(\d*\.?\d+)\s*/\s*(\d*\.?\d+)$", str(val))
+                # "a / b" -> a number; keep a leading "auto" ("auto 2"), which
+                # means the ratio applies to the content box (css-sizing-4).
+                m = re.match(r"^(auto\s+)?(\d*\.?\d+)(?:\s*/\s*(\d*\.?\d+))?$", str(val))
                 if m:
-                    val = fmt(float(m.group(1)) / float(m.group(2)))
+                    r = fmt(float(m.group(2)) / float(m.group(3) or 1))
+                    val = ("auto %s" % r) if m.group(1) else r
             if k.startswith("overflow"):
                 self.requires.add("overflow")
             if k == "box-sizing" and val == "border-box":

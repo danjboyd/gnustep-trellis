@@ -37,6 +37,7 @@ SUITES = [  # (suite, source description); unknown suites are appended
     ("yoga", "facebook/yoga gentest"),
     ("wpt", "web-platform-tests css-flexbox (check-layout)"),
     ("wpt-grid", "web-platform-tests css-grid (check-layout)"),
+    ("wpt-sizing", "web-platform-tests css-sizing (check-layout)"),
 ]
 
 SUITE_RE = re.compile(r"^\s+([\w.-]+):\s+(\d+)/(\d+)")

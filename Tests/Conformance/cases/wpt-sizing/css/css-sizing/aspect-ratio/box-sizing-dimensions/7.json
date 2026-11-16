@@ -18,7 +18,7 @@
   "style": {
    "display": "block",
    "boxSizing": "border-box",
-   "aspectRatio": 2,
+   "aspectRatio": "auto 2",
    "width": 100,
    "borderTopWidth": 20,
    "borderRightWidth": 20,

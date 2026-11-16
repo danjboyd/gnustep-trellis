@@ -1,8 +1,10 @@
 # Writing Trellis UI: a guide for coding agents
 
-Trellis lays out GNUstep and Cocoa views with CSS Flexbox. If you know CSS
-Flexbox, you already know most of Trellis. This page covers what is
+Trellis lays out GNUstep and Cocoa views with CSS Flexbox and Grid. If you
+know CSS, you already know most of Trellis. This page covers what is
 different, the files you write, and the loop you use to check your work.
+The supported API, which stays stable within a version, is listed in
+[api.md](api.md).
 
 ## 1. The loop
 

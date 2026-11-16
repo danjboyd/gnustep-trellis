@@ -46,6 +46,8 @@ typedef struct {
      overflows, align as start. */
   BOOL justifyContentSafe, alignContentSafe;
 } TRStyleStorage;
+/* TRStyleStorage is internal (docs/api.md): its layout changes between
+   versions. Use TRStyle's properties. */
 
 extern TRStyleStorage TRStyleStorageInitial(void);
 

@@ -1,16 +1,16 @@
 {
- "commit": "78d52cf",
+ "commit": "e8025fb",
  "conformance": {
-  "pass": 2902,
-  "skipped": 1085,
-  "total": 2955
+  "pass": 2903,
+  "skipped": 1091,
+  "total": 2949
  },
  "date": "2026-11-16",
  "platform": "linux",
  "suites": {
   "engine": {
-   "pass": 107,
-   "total": 107
+   "pass": 109,
+   "total": 109
   },
   "wpt": {
    "cases": 977,
@@ -19,8 +19,8 @@
   },
   "wpt-grid": {
    "cases": 1977,
-   "pass": 1169,
-   "total": 1211
+   "pass": 1170,
+   "total": 1205
   },
   "yoga": {
    "cases": 1086,

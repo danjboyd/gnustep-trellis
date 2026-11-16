@@ -83,7 +83,7 @@ and licences: [ATTRIBUTION.md](Tests/Conformance/ATTRIBUTION.md)):
 | yoga | facebook/yoga gentest, 1086 cases | 906/906 | 906/906 |
 | wpt | web-platform-tests css-flexbox (check-layout), 977 cases | 827/838 (98.7%) | 827/838 (98.7%) |
 | wpt-grid | web-platform-tests css-grid (check-layout), 1977 cases | 1201/1201 | 1201/1201 |
-| wpt-sizing | , 125 cases | 20/21 (95.2%) | 21/21 |
+| wpt-sizing | web-platform-tests css-sizing (check-layout), 125 cases | 20/21 (95.2%) | 21/21 |
 | **all conformance** | | **2954/2966 (99.6%)** | **2955/2966 (99.6%)** |
 
 Recorded: Linux e1cf281+dirty (2026-11-16), macOS 85a3e77 (2026-11-16). Skipped by `requires` tag: 1199.

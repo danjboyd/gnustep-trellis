@@ -1,0 +1,261 @@
+<!-- owner: AIMWorkView -->
+<!-- AIManager's Work tab as a Trellis spec: the proposal. All data is
+     made up (agent-a, build-bot, Project Alpha, ...).
+     - The "Focus today" strip (approved mockup, board 3) sits at the top of
+       the wall and scrolls with it: four cards in a row when the wall is
+       760px or wider, two from 400px, one below that.
+     - The wall is a grid of tiles at least 230px wide that stretch to fill,
+       as today, but tiles grow to fit their text instead of clipping at a
+       fixed 110px; the headline wraps and nothing is cut off.
+     - Group headers are sentence case: "Needs you (1)".
+     - The detail panel is a 320px column beside the wall from 760px up;
+       below that it sits under the wall, taking 45% of the height, and
+       both scroll on their own. Its button rows wrap.
+     - Colours are system colours only, so Adwaita light and dark both
+       work: state bars use Mark (needs you), AccentColor (working),
+       GrayText (idle) and -tr-error (stopped). -->
+<column id="work" class="pane">
+  <box class="body">
+    <column class="wallpane">
+      <scroll id="wallScroll" class="wallscroll">
+        <column class="wall">
+          <column id="focus" class="focus">
+            <row class="focus-head">
+              <label class="focus-title" no-outlet="yes">Focus today</label>
+              <text id="focusNote" class="muted small focus-note">kept from Friday · agents' goal mail puts these first</text>
+              <button id="focusChange" action="changeFocus:">Change…</button>
+            </row>
+            <box id="focusCards" class="focus-grid">
+              <column class="card">
+                <row class="card-top"><label class="muted tiny grow">Project Alpha</label><label class="star">★</label></row>
+                <text class="card-title">Release 2.0</text>
+                <row class="card-stage"><box class="chip build"><label class="chip-text build">Build</label></box><label class="muted small">· 2 unread</label></row>
+                <text class="small">build-bot: Windows installer linking, tests running</text>
+              </column>
+              <column class="card">
+                <row class="card-top"><label class="muted tiny grow">Docs site</label><label class="star">★</label></row>
+                <text class="card-title">Upgrade guide</text>
+                <row class="card-stage"><box class="chip build"><label class="chip-text build">Build</label></box><label class="muted small">· draft due today</label></row>
+                <text class="small">docs-bot: migration section in review</text>
+              </column>
+              <column class="card">
+                <row class="card-top"><label class="muted tiny grow">Project Beta</label><label class="star">★</label></row>
+                <text class="card-title">Nightly test suite</text>
+                <row class="card-stage"><box class="chip build"><label class="chip-text build">Build</label></box><label class="muted small">· green yesterday</label></row>
+                <text class="small">test-bot: 412 of 980 tests done</text>
+              </column>
+              <column class="card card-needs">
+                <row class="card-top"><label class="muted tiny grow">Project Alpha</label><label class="star">★</label></row>
+                <text class="card-title">Release channel</text>
+                <row class="card-stage"><box class="chip needs"><label class="chip-text needs">Needs you</label></box></row>
+                <text class="small">agent-a: waiting on your answer</text>
+              </column>
+            </box>
+          </column>
+          <label class="group" no-outlet="yes">Needs you (1)</label>
+          <box class="tiles">
+            <row class="tile selected">
+              <box class="bar needs"></box>
+              <column class="tile-body">
+                <row class="tile-row"><text class="name grow">agent-a</text><box class="pill"><label class="pill-text">acct-2 82%</label></box></row>
+                <row class="tile-row"><text class="status needs-text grow">needs you: pick the release channel</text><text class="muted small where">host-1 · claude</text></row>
+                <text class="badges">ask open</text>
+                <text class="headline">Ship 2.0 as beta or stable? Both builds pass; beta keeps the old updater one more week.</text>
+                <text class="foot mgr-note">Manager: answer before the 3 pm build</text>
+              </column>
+            </row>
+          </box>
+          <label class="group" no-outlet="yes">Working (3)</label>
+          <box class="tiles">
+            <row class="tile">
+              <box class="bar working"></box>
+              <column class="tile-body">
+                <row class="tile-row"><text class="name grow">build-bot</text></row>
+                <row class="tile-row"><text class="status muted grow">building the 2.0 candidate</text><text class="muted small where">host-2 · claude</text></row>
+                <text class="headline">Linking the Windows installer; macOS and Linux packages are done.</text>
+                <text class="foot goal">Today 3/5 · Ship the 2.0 candidate</text>
+              </column>
+            </row>
+            <row class="tile">
+              <box class="bar working"></box>
+              <column class="tile-body">
+                <row class="tile-row"><text class="name grow">docs-bot</text></row>
+                <row class="tile-row"><text class="status muted grow">writing the upgrade guide</text><text class="muted small where">host-1 · claude</text></row>
+                <text class="badges">2 unread</text>
+                <text class="headline">Draft of the migration section is up for review.</text>
+                <text class="foot goal">Today 1/4 · Upgrade guide for 2.0</text>
+              </column>
+            </row>
+            <row class="tile">
+              <box class="bar working"></box>
+              <column class="tile-body">
+                <row class="tile-row"><text class="name grow">test-bot</text><box class="pill"><label class="pill-text">acct-1 64%</label></box></row>
+                <row class="tile-row"><text class="status muted grow">running the nightly suite</text><text class="muted small where">host-3 · codex</text></row>
+                <text class="headline">412 of 980 tests done, no failures so far.</text>
+                <text class="foot goal">Today 2/3 · Nightly suite green</text>
+              </column>
+            </row>
+          </box>
+          <label class="group" no-outlet="yes">Idle (2)</label>
+          <box class="tiles">
+            <row class="tile">
+              <box class="bar idle"></box>
+              <column class="tile-body">
+                <row class="tile-row"><text class="name grow">agent-b</text></row>
+                <row class="tile-row"><text class="status muted grow">idle since 10:40</text><text class="muted small where">host-2 · claude</text></row>
+                <text class="headline">Finished the settings screen; waiting for the next item.</text>
+                <text class="foot purpose">Keeps Project Beta's UI moving</text>
+              </column>
+            </row>
+            <row class="tile">
+              <box class="bar idle"></box>
+              <column class="tile-body">
+                <row class="tile-row"><text class="name grow">data-bot</text></row>
+                <row class="tile-row"><text class="status muted grow">idle since 09:15</text><text class="muted small where">host-3 · claude</text></row>
+                <text class="headline">Weekly numbers exported.</text>
+                <text class="foot purpose">Exports and checks the weekly reports</text>
+              </column>
+            </row>
+          </box>
+          <label class="group" no-outlet="yes">Stopped (1)</label>
+          <box class="tiles">
+            <row class="tile">
+              <box class="bar stopped"></box>
+              <column class="tile-body">
+                <row class="tile-row"><text class="name grow">agent-c</text></row>
+                <row class="tile-row"><text class="status muted grow">stopped</text><text class="muted small where">host-1 · claude</text></row>
+                <text class="badges">session ended</text>
+                <text class="foot purpose">Owns Project Gamma's sync service</text>
+              </column>
+            </row>
+          </box>
+        </column>
+      </scroll>
+    </column>
+
+    <column id="detail" class="detail">
+      <scroll class="detailscroll">
+        <column class="detail-body">
+          <text id="detailName" class="detail-name">agent-a</text>
+          <text id="detailMeta" class="muted">Project Alpha · host-1 · claude</text>
+          <text id="detailHealth" class="muted">Healthy · context 41% · last seen 1 min ago</text>
+          <row class="buttons">
+            <button id="launch" action="launchAgent:">Launch</button>
+            <button id="resume" action="resumeAgent:">Resume</button>
+            <button id="stop" action="stopAgent:">Stop</button>
+          </row>
+          <row class="buttons">
+            <button action="openTerminal:">Terminal</button>
+            <button action="captureScreen:">Capture</button>
+            <button action="clearContext:">Clear</button>
+            <button action="rebind:">Rebind</button>
+            <button action="editAgent:">Edit</button>
+            <button action="retireAgent:">Retire</button>
+          </row>
+          <text id="detailStatus">Needs you: pick the release channel for 2.0.</text>
+
+          <column class="section">
+            <label class="section-label" no-outlet="yes">Goals</label>
+            <text id="goals">Purpose: ships Project Alpha's releases.
+Project goal: 2.0 out by the end of the month.
+Today: answer the release-channel question, then tag the candidate.</text>
+            <row class="buttons">
+              <button action="useDraft:">Use draft</button>
+              <button action="showProject:">Project</button>
+            </row>
+          </column>
+          <column class="section">
+            <label class="section-label" no-outlet="yes">Checks</label>
+            <text id="checks">Build green · tests green · 1 ask open</text>
+          </column>
+          <column class="section">
+            <label id="messageLabel" class="section-label" label-for="message">Message</label>
+            <box class="textbox"><scroll class="message"><view id="message" type="NSTextView"/></scroll></box>
+          </column>
+          <column class="section">
+            <label id="screenLabel" class="section-label" label-for="screen">Screen</label>
+            <box class="textbox"><scroll class="screen"><view id="screen" type="NSTextView"/></scroll></box>
+          </column>
+        </column>
+      </scroll>
+    </column>
+  </box>
+</column>
+
+<style>
+  .pane       { container-type: inline-size; background-color: -tr-window-background; }
+  .body       { flex: 1; min-height: 0; flex-direction: row; }
+  .wallpane   { flex: 1; min-width: 0; container-type: inline-size; }
+  .wallscroll { flex: 1; min-height: 0; }
+  .wall       { gap: 10px; padding: 12px; }
+
+  .focus      { gap: 10px; padding: 12px; background-color: Canvas; border: 1px;
+                border-color: -tr-separator; border-radius: 10px; }
+  .focus-head { flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+  .focus-title { font-weight: bold; }
+  .focus-note { flex: 1 1 200px; min-width: 0; }
+  .focus-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .card       { gap: 4px; padding: 10px; border: 1px; border-color: -tr-separator;
+                border-radius: 8px; }
+  .card-needs { border: 2px; border-color: Mark; padding: 9px; }
+  .card-top   { gap: 6px; }
+  .star       { color: LinkText; }
+  .card-title { font-weight: bold; }
+  .card-stage { flex-wrap: wrap; gap: 4px 6px; align-items: center; }
+  .chip       { flex: none; padding: 0 8px; border-radius: 8px; }
+  .chip.build { background-color: AccentColor; }
+  .chip.needs { background-color: Mark; }
+  .chip-text  { font-size: 11px; font-weight: bold; }
+  .chip-text.build { color: AccentColorText; }
+  .chip-text.needs { color: MarkText; }
+
+  .group      { color: GrayText; font-weight: bold; margin-top: 6px; }
+  .tiles      { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+  .tile       { align-items: stretch; min-height: 110px; background-color: Canvas; border: 1px;
+                border-color: -tr-separator; border-radius: 6px; }
+  .selected   { border: 2px; border-color: AccentColor; }
+  .bar        { flex: none; width: 5px; }
+  .bar.needs   { background-color: Mark; }
+  .bar.working { background-color: AccentColor; }
+  .bar.idle    { background-color: GrayText; }
+  .bar.stopped { background-color: -tr-error; }
+  .tile-body  { flex: 1; min-width: 0; gap: 2px; padding: 8px 10px; }
+  .tile-row   { gap: 8px; align-items: center; }
+  .name       { font-weight: bold; }
+  .pill       { flex: none; padding: 0 8px; border-radius: 8px; background-color: Mark; }
+  .pill-text  { font-size: 10px; font-weight: bold; color: MarkText; }
+  .status     { font-size: 11px; }
+  .needs-text { font-size: 11px; font-weight: bold; color: LinkText; }
+  .where      { flex: none; max-width: 45%; }
+  .badges     { font-size: 11px; font-weight: bold; color: -tr-error; }
+  .headline   { font-size: 12px; }
+  .foot       { font-size: 11px; color: GrayText; }
+  .foot.mgr-note { font-weight: bold; color: CanvasText; }
+
+  .detail     { flex: none; width: 320px; background-color: Canvas; }
+  .detailscroll { flex: 1; min-height: 0; }
+  .detail-body { gap: 8px; padding: 12px 14px; }
+  .detail-name { font-size: 16px; font-weight: bold; }
+  .buttons    { flex-wrap: wrap; gap: 6px; }
+  .section    { gap: 4px; margin-top: 4px; }
+  .section-label { color: GrayText; font-weight: bold; }
+  .textbox    { border: 1px; border-color: -tr-separator; border-radius: 6px; padding: 4px; }
+  .message    { flex: 1; min-height: 72px; }
+  .screen     { flex: 1; min-height: 140px; }
+
+  .muted      { color: GrayText; }
+  .small      { font-size: 12px; }
+  .tiny       { font-size: 11px; }
+  .grow       { flex: 1; min-width: 0; }
+
+  /* The wall's own width sets the Focus columns (it narrows when the
+     detail panel is beside it). */
+  @container (max-width: 759px) { .focus-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @container (max-width: 399px) { .focus-grid { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Narrow window: the detail panel goes under the wall. */
+  @container (max-width: 759px) {
+    .body   { flex-direction: column; }
+    .detail { width: auto; flex: 0 0 45%; }
+  }
+</style>

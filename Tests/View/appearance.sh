@@ -28,7 +28,7 @@ render() {  # file appearance -> prints the number of low-contrast findings
   scripts/run-headless.sh obj/trellis-render "$f" $sample --widths 340,900 --height 680 \
       --theme Adwaita --appearance "$ap" --lint 2>&1 | grep -c "low-contrast"
 }
-for f in Examples/TrellisDemo/*.trellis dogfood/AskDetail.trellis dogfood/tickets/Blocked.trellis dogfood/tickets/Batch.trellis Tests/View/mark.trellis; do
+for f in Examples/TrellisDemo/*.trellis dogfood/AskDetail.trellis dogfood/tickets/Blocked.trellis dogfood/tickets/Batch.trellis dogfood/work/Work.trellis Tests/View/mark.trellis; do
   for ap in light dark; do
     n=$(render "$f" $ap)
     if [ "$n" != 0 ]; then echo "FAIL $f ($ap): $n low-contrast finding(s)"; fail=1; fi

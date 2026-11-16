@@ -184,3 +184,10 @@ TRBoxView *screen = [TRLoader loadFile: @"Inbox.trellis" owner: self error: &err
 Call `-[TRBoxView invalidateSubview:]` after changing a view's content
 outside Trellis, for example an image. Text and title changes on
 NSControls are noticed automatically.
+
+A custom view whose height depends on its width (a text view at natural
+height, say) can implement `-trellisSizeForWidth:` (the `TRSizeForWidth`
+protocol in TRViewMeasure.h). Trellis calls it with the width on offer,
+or `CGFLOAT_MAX` for the view's max-content size, and lays it out in one
+pass. Outlets bind by KVC, so an `IBOutlet` ivar `_title` serves
+`id="title"`, and lint accepts it.

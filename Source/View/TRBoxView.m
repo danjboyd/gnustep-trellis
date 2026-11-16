@@ -231,6 +231,9 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
       n.measureBlock = ^TRSize(TRSize avail, TRMeasureMode wm, TRMeasureMode hm) {
         NSView *v = wv;
         BOOL wraps = [v isKindOfClass: [NSControl class]] && [[(NSControl *)v cell] wraps];
+        /* Width-dependent views (TRSizeForWidth) are never memoized. */
+        if ([v respondsToSelector: @selector(trellisSizeForWidth:)])
+          return TRMeasureView(v, avail, wm, hm);
         if (!wraps)
           {
             NSString *sig = TRContentSignature(v);

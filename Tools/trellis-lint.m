@@ -59,7 +59,12 @@ static BOOL TRScanHeader(NSString *path, NSString *cls, NSMutableSet *outlets, N
             }
         }
       for (NSTextCheckingResult *p in [ivar matchesInString: body options: 0 range: all])
-        [outlets addObject: [body substringWithRange: [p rangeAtIndex: 1]]];
+        {
+          /* KVC binds id="title" to an ivar _title too. */
+          NSString *nm = [body substringWithRange: [p rangeAtIndex: 1]];
+          [outlets addObject: nm];
+          if ([nm hasPrefix: @"_"] && [nm length] > 1) [outlets addObject: [nm substringFromIndex: 1]];
+        }
       for (NSTextCheckingResult *p in [meth matchesInString: body options: 0 range: all])
         [actions addObject: [[body substringWithRange: [p rangeAtIndex: 1]] stringByAppendingString: @":"]];
       *foundClass = name;

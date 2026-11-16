@@ -70,6 +70,12 @@ NSSize TRCellSize(NSCell *cell)
 TRSize TRMeasureView(NSView *view, TRSize available, TRMeasureMode wm, TRMeasureMode hm)
 {
   if (view == nil) return TRSizeMake(0, 0);
+  if ([view respondsToSelector: @selector(trellisSizeForWidth:)])
+    {
+      CGFloat w = (wm == TRMeasureModeUndefined || isnan(available.width)) ? CGFLOAT_MAX : available.width;
+      NSSize s = [(id<TRSizeForWidth>)view trellisSizeForWidth: w];
+      return TRSizeMake(ceil(s.width), ceil(s.height));
+    }
   NSCell *cell = TRCellOf(view);
   if (cell != nil)
     {

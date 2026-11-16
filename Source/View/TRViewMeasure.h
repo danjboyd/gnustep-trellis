@@ -7,7 +7,17 @@
 #import <AppKit/AppKit.h>
 #import "TrellisEngine.h"
 
+/* Views whose height depends on their width (a text view laid out at its
+   natural height, say) implement this; Trellis then measures them in one
+   pass. `width` is the width on offer, or CGFLOAT_MAX for the view's
+   max-content size. Return the border-box size the view needs at that
+   width. After the content changes, call -[TRBoxView invalidateSubview:]. */
+@protocol TRSizeForWidth
+- (NSSize)trellisSizeForWidth:(CGFloat)width;
+@end
+
 /* The content size of a leaf view under a Trellis constraint:
+   - views implementing -trellisSizeForWidth: (TRSizeForWidth);
    - cell-based controls: -[NSCell cellSize], or -cellSizeForBounds: at the
      proposed width for wrapping text;
    - other views: intrinsicContentSize where defined, otherwise 0. */

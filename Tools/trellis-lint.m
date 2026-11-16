@@ -214,11 +214,23 @@ static void TRLintTrellis(NSString *path, NSString *header)
       TRReport(path, @"error", @"syntax", [err localizedDescription]);
       return;
     }
-  NSMutableSet *ids = [NSMutableSet set];
+  /* Ids are unique per scope: the main tree, and each template (a
+     template's copies are separate trees). */
+  NSMutableDictionary *scopes = [NSMutableDictionary dictionary];
   for (TRMarkupElement *e in [doc allElements])
     {
       NSString *ident = [e identifier];
       NSString *where = [NSString stringWithFormat: @"%@:%lu:%lu", path, (unsigned long)e.line, (unsigned long)e.column];
+      TRMarkupElement *scope = nil;
+      for (TRMarkupElement *p = e.parent; p; p = p.parent)
+        if ([p.name isEqualToString: @"template"]) { scope = p; break; }
+      if (scope == nil)
+        for (NSString *k in doc.templates)
+          for (TRMarkupElement *p = e; p; p = p.parent)
+            if (p == doc.templates[k]) scope = p;
+      NSValue *key = [NSValue valueWithNonretainedObject: scope];
+      NSMutableSet *ids = scopes[key];
+      if (ids == nil) scopes[key] = ids = [NSMutableSet set];
       if (ident && [ids containsObject: ident])
         TRReport(where, @"error", @"duplicate-id", [NSString stringWithFormat: @"id '%@' is used twice", ident]);
       if (ident) [ids addObject: ident];

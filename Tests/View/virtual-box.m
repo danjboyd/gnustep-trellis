@@ -183,6 +183,17 @@ int main(void)
       after = moved ? [moved frame].origin.y - Offset(box) : -9999;
       Expect("removal above keeps the anchored item still", moved != nil && fabs(after - before) < 0.5);
 
+      /* A resize keeps the top item at the top (widths change heights). */
+      [box scrollToItemAtIndex: 3000 position: TRVirtualScrollTop];
+      [root setFrame: NSMakeRect(0, 0, 260, 300)];
+      [root layoutTrellis];
+      NSView *top = [box viewForItemAtIndex: 3000];
+      Expect("narrower: the top item stays at the top", top != nil && fabs([top frame].origin.y - Offset(box)) < 0.5);
+      [root setFrame: NSMakeRect(0, 0, 400, 300)];
+      [root layoutTrellis];
+      top = [box viewForItemAtIndex: 3000];
+      Expect("wider again: still at the top", top != nil && fabs([top frame].origin.y - Offset(box)) < 0.5);
+
       /* At the very top, inserts at 0 push content down (no anchoring). */
       ScrollTo(box, 0);
       [box insertItemsAtIndexes: [NSIndexSet indexSetWithIndex: 0]];

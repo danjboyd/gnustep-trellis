@@ -200,51 +200,97 @@ static BOOL TRHotReloadOn(void)
 static NSView *TRFindView(NSString *identifier, NSView *root);
 
 /* Sample content for a <virtual>: "items" cycled up to `repeat` times
-   the count; "{i}" in a string becomes the item's number (from 1), and
-   "_template" picks the template. Used by trellis-render and Preview. */
+   the count. An entry {"_repeat": n, "items": [...]} expands in place to
+   n rounds of its items (a group of a given size). In strings, "{i}" is
+   the item's number in the whole list and "{n}" its number in its run
+   (both from 1; "{n:4}" pads to 4 digits); "_template" picks the
+   template. Used by trellis-render and Preview. */
 @interface TRVirtualSample : NSObject <TRVirtualDataSource>
 {
 @public
   NSArray *items;
   NSInteger repeat;
+  NSMutableArray *runs;      /* [entries, start, count] */
+  NSInteger perRound;
 }
 @end
 
 static char kTRVirtualSampleKey;
 
 @implementation TRVirtualSample
-- (NSInteger)numberOfItemsInVirtualBox:(TRVirtualBox *)box { return (NSInteger)[items count] * repeat; }
-- (NSDictionary *)itemAt:(NSInteger)i
+- (void)buildRuns
 {
-  id it = items[(NSUInteger)i % [items count]];
-  return [it isKindOfClass: [NSDictionary class]] ? it : @{};
+  runs = [NSMutableArray array];
+  NSInteger start = 0;
+  for (id it in items)
+    {
+      NSDictionary *d = [it isKindOfClass: [NSDictionary class]] ? it : @{};
+      NSArray *sub = [d[@"items"] isKindOfClass: [NSArray class]] && d[@"_repeat"] ? d[@"items"] : nil;
+      NSArray *entries = sub ?: @[d];
+      NSInteger count = sub ? (NSInteger)[sub count] * MAX([d[@"_repeat"] integerValue], 0) : 1;
+      if (count == 0 || [entries count] == 0) continue;
+      [runs addObject: @[entries, @(start), @(count)]];
+      start += count;
+    }
+  perRound = start;
+}
+- (NSInteger)numberOfItemsInVirtualBox:(TRVirtualBox *)box
+{
+  if (runs == nil) [self buildRuns];
+  return perRound * repeat;
+}
+- (NSDictionary *)itemAt:(NSInteger)i run:(NSInteger *)inRun
+{
+  if (runs == nil) [self buildRuns];
+  if (perRound == 0) return @{};
+  NSInteger k = i % perRound;
+  for (NSArray *r in runs)
+    {
+      NSInteger st = [r[1] integerValue], c = [r[2] integerValue];
+      if (k < st + c)
+        {
+          NSArray *entries = r[0];
+          if (inRun) *inRun = k - st;
+          return entries[(NSUInteger)(k - st) % [entries count]];
+        }
+    }
+  return @{};
 }
 - (NSString *)virtualBox:(TRVirtualBox *)box templateForItemAtIndex:(NSInteger)i
 {
-  return [self itemAt: i][@"_template"];
+  return [self itemAt: i run: NULL][@"_template"];
 }
-static id TRSampleSubst(id v, NSInteger i)
+static NSString *TRSampleString(NSString *s, NSInteger i, NSInteger n)
 {
-  NSString *n = [NSString stringWithFormat: @"%ld", (long)(i + 1)];
-  if ([v isKindOfClass: [NSString class]])
-    return [(NSString *)v stringByReplacingOccurrencesOfString: @"{i}" withString: n];
+  if ([s rangeOfString: @"{"].location == NSNotFound) return s;
+  s = [s stringByReplacingOccurrencesOfString: @"{i}" withString: [NSString stringWithFormat: @"%ld", (long)(i + 1)]];
+  s = [s stringByReplacingOccurrencesOfString: @"{n}" withString: [NSString stringWithFormat: @"%ld", (long)(n + 1)]];
+  for (int w = 2; w <= 6; w++)
+    s = [s stringByReplacingOccurrencesOfString: [NSString stringWithFormat: @"{n:%d}", w]
+                                     withString: [NSString stringWithFormat: @"%0*ld", w, (long)(n + 1)]];
+  return s;
+}
+static id TRSampleSubst(id v, NSInteger i, NSInteger n)
+{
+  if ([v isKindOfClass: [NSString class]]) return TRSampleString(v, i, n);
   if ([v isKindOfClass: [NSDictionary class]])
     {
       NSMutableDictionary *d = [NSMutableDictionary dictionary];
-      for (id k in v) d[k] = TRSampleSubst(((NSDictionary *)v)[k], i);
+      for (id k in v) d[k] = TRSampleSubst(((NSDictionary *)v)[k], i, n);
       return d;
     }
   if ([v isKindOfClass: [NSArray class]])
     {
       NSMutableArray *a = [NSMutableArray array];
-      for (id x in v) [a addObject: TRSampleSubst(x, i)];
+      for (id x in v) [a addObject: TRSampleSubst(x, i, n)];
       return a;
     }
   return v;
 }
 - (void)virtualBox:(TRVirtualBox *)box configureView:(NSView *)view atIndex:(NSInteger)i
 {
-  NSDictionary *it = TRSampleSubst([self itemAt: i], i);
+  NSInteger n = 0;
+  NSDictionary *it = TRSampleSubst([self itemAt: i run: &n], i, n);
   NSError *err = nil;
   if (![TRLoader applySample: it toView: view depth: 1 error: &err])
     NSLog(@"sample item %ld: %@", (long)i, [err localizedDescription]);

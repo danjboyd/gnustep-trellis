@@ -1,0 +1,132 @@
+{
+ "wall": {
+  "items": [
+   {
+    "_template": "focus"
+   },
+   {
+    "_template": "group",
+    "groupTitle": "Needs you (12)"
+   },
+   {
+    "_repeat": 4,
+    "items": [
+     {
+      "_template": "tile-needs",
+      "name": "agent-n{n:2}",
+      "pill": "acct-2 82%",
+      "status": "needs you: pick the release channel",
+      "where": "host-1 · claude",
+      "badges": "ask open",
+      "headline": "Ship as beta or stable? Both builds pass; beta keeps the old updater one more week.",
+      "foot": "Manager: answer before the 3 pm build"
+     },
+     {
+      "_template": "tile-needs",
+      "name": "agent-n{n:2}",
+      "pill": "acct-1 40%",
+      "status": "needs you: approve the plan",
+      "where": "host-2 · claude",
+      "badges": "plan waiting",
+      "headline": "Plan ready: three steps, no schema change.",
+      "foot": "Today 0/2 · Plan sign-off"
+     },
+     {
+      "_template": "tile-needs",
+      "name": "agent-n{n:2}",
+      "pill": "acct-3 91%",
+      "status": "needs you: a hands-on check",
+      "where": "host-3 · codex",
+      "badges": "2 unread",
+      "headline": "Please click through the new settings screen once.",
+      "foot": "Today 1/3 · Settings screen"
+     }
+    ]
+   },
+   {
+    "_template": "group",
+    "groupTitle": "Working (1,400)"
+   },
+   {
+    "_repeat": 350,
+    "items": [
+     {
+      "_template": "tile-working",
+      "name": "build-{n:4}",
+      "status": "building the candidate",
+      "where": "host-1 · claude",
+      "headline": "Linking the installer; the other packages are done.",
+      "foot": "Today 2/5 · Ship the candidate"
+     },
+     {
+      "_template": "tile-working",
+      "name": "build-{n:4}",
+      "status": "building the candidate",
+      "where": "host-2 · claude",
+      "headline": "Draft of the migration section is up for review, with two open questions about the old settings format.",
+      "foot": "Today 2/5 · Ship the candidate"
+     },
+     {
+      "_template": "tile-working",
+      "name": "build-{n:4}",
+      "status": "building the candidate",
+      "where": "host-3 · codex",
+      "headline": "412 of 980 tests done, no failures so far.",
+      "foot": "Today 2/5 · Ship the candidate"
+     },
+     {
+      "_template": "tile-working",
+      "name": "build-{n:4}",
+      "status": "building the candidate",
+      "where": "host-1 · claude",
+      "headline": "Refactoring the sync client.",
+      "foot": "Today 2/5 · Ship the candidate"
+     }
+    ]
+   },
+   {
+    "_template": "group",
+    "groupTitle": "Idle (500)"
+   },
+   {
+    "_repeat": 250,
+    "items": [
+     {
+      "_template": "tile-idle",
+      "name": "helper-{n:3}",
+      "status": "idle since 10:40",
+      "where": "host-2 · claude",
+      "headline": "Finished the settings screen; waiting for the next item.",
+      "foot": "Keeps Project Beta's UI moving"
+     },
+     {
+      "_template": "tile-idle",
+      "name": "helper-{n:3}",
+      "status": "idle since 09:15",
+      "where": "host-3 · codex",
+      "headline": "Weekly numbers exported.",
+      "foot": "Exports and checks the weekly reports"
+     }
+    ]
+   },
+   {
+    "_template": "group",
+    "groupTitle": "Stopped (88)"
+   },
+   {
+    "_repeat": 88,
+    "items": [
+     {
+      "_template": "tile-stopped",
+      "name": "worker-{n:2}",
+      "status": "stopped",
+      "where": "host-1 · claude",
+      "badges": "session ended",
+      "headline": "Last run ended cleanly.",
+      "foot": "Owns Project Gamma's sync service"
+     }
+    ]
+   }
+  ]
+ }
+}

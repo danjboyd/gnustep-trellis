@@ -467,6 +467,9 @@ static void TRShiftRealized(NSMutableDictionary *realized, NSInteger from, NSInt
               _keyLoopDirty = YES;
               [_dataSource virtualBox: self configureView: v atIndex: (NSInteger)i];
               [_doc addSubview: v];
+              /* Container queries in an item test the box's containers. */
+              if ([v isKindOfClass: [TRBoxView class]])
+                ((TRBoxView *)v).node.containerQueryParent = [self queryParent];
             }
           if (fresh || ![_layout isMeasured: (NSInteger)i])
             {
@@ -530,6 +533,12 @@ static void TRShiftRealized(NSMutableDictionary *realized, NSInteger from, NSInt
       _keyLoopDirty = NO;
       [self relinkKeyViews];
     }
+}
+
+- (TRNode *)queryParent
+{
+  NSView *sv = [self superview];
+  return [sv isKindOfClass: [TRBoxView class]] ? [(TRBoxView *)sv nodeForSubview: self] : nil;
 }
 
 - (NSRect)rectOfItem:(NSInteger)i
@@ -710,22 +719,27 @@ static void TRAddKeyViews(NSView *v, NSMutableArray *out)
   if (!_updating && clip == [self contentView]) [self updateVirtualContent];
 }
 
-- (void)layoutForSize
+/* A resize keeps the item at the top of the viewport where it was (the
+   anchor is taken before the size changes). */
+- (void)resizeWith:(void (^)(void))change
 {
-  [self updateVirtualContent];
+  CGFloat offset = [[self contentView] bounds].origin.y;
+  BOOL anchored = !_updating && offset > 0.5 && _layout.itemCount > 0;
+  TRVirtualAnchor a = anchored ? [_layout anchorForOffset: offset] : (TRVirtualAnchor){ NSNotFound, 0 };
+  change();
+  if (_needsReload) [self syncCount];
+  [self updateWithAnchor: a use: anchored];
 }
 
 /* GNUstep's -setFrame: does not go through -setFrameSize:, so both. */
 - (void)setFrameSize:(NSSize)size
 {
-  [super setFrameSize: size];
-  [self layoutForSize];
+  [self resizeWith: ^{ [super setFrameSize: size]; }];
 }
 
 - (void)setFrame:(NSRect)frame
 {
-  [super setFrame: frame];
-  [self layoutForSize];
+  [self resizeWith: ^{ [super setFrame: frame]; }];
 }
 
 /* ---- Queries ---- */

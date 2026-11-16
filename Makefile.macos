@@ -72,6 +72,10 @@ conformance-record: all
 	python3 -I scripts/conformance-summary.py record --platform macos --runner $(B)/trellis-case
 	python3 -I scripts/conformance-summary.py table
 
+# Unit tests for the conformance importers (Python, no build needed).
+check-importers:
+	python3 -I Tests/Conformance/tools/test_import_wpt.py
+
 clean:
 	rm -rf $(B)
-.PHONY: all gui check conformance-record clean
+.PHONY: all gui check check-importers conformance-record clean

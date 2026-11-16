@@ -79,20 +79,29 @@
     "children": [
      {
       "width": 10,
-      "height": 30
+      "height": 30,
+      "dx": 0,
+      "dy": 50
      }
     ],
     "width": 20,
-    "height": 70
+    "height": 70,
+    "dx": 0,
+    "dy": 50
    },
    {
     "width": 20,
-    "height": 40
+    "height": 40,
+    "dx": 0,
+    "dy": 120
    }
   ]
  },
+ "anchor": [
+  0
+ ],
  "requires": [
   "block-layout"
  ],
- "droppedChecks": 8
+ "droppedChecks": 2
 }

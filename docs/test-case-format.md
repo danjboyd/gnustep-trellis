@@ -42,6 +42,7 @@ runner (`trellis-case`) reads both.
 | `tolerance` | no | Maximum absolute difference per number, default 0.5. |
 | `pixelScale` | no | Pixel-grid rounding. Default 1 (Yoga-style rounding to whole points). 0 disables rounding (use this for WPT cases compared at sub-pixel precision). |
 | `requires` | no | Features the case depends on, for example `["position-static","block-layout"]`. `trellis-case` skips a case that requires a feature Trellis doesn't implement, or does differently on purpose: `position-static`, `display-inline`, `display-inline-block`, `display-contents`, `display--webkit-box`, `logical-properties`, `intrinsic-size-keyword`, `overflow-axis` (overflow-x differs from overflow-y), `flex-wrap-balance`, `grid-named-lines`, `subgrid`, `grid-lanes` (masonry), `display-inline-grid`, `position-sticky` and `grid-template-shorthand` (`grid`/`grid-template` with area strings). It counts the skips by feature. `--all` runs every case, and `--unsupported a,b` replaces the list. |
+| `anchor` | no | Child-index path to a node (`[]` is the root, `[0, 2]` the root's first child's third child). Expected nodes may then carry `dx`/`dy`: their border-box offset from the anchor's border box. The WPT importer uses this for offsets whose offsetParent is `<body>`, where only differences between elements are known. |
 | `skip` | no | A string: the reason this case is known bad and skipped. |
 
 ## Styles

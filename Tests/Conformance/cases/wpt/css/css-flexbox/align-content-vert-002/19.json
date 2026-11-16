@@ -70,16 +70,23 @@
     "children": [
      {
       "width": 30,
-      "height": 10
+      "height": 10,
+      "dx": -84,
+      "dy": 0
      }
     ],
     "width": 30,
-    "height": 20
+    "height": 20,
+    "dx": -84,
+    "dy": 0
    }
   ]
  },
+ "anchor": [
+  0
+ ],
  "requires": [
   "block-layout"
  ],
- "droppedChecks": 6
+ "droppedChecks": 2
 }

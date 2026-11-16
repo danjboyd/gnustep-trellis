@@ -102,9 +102,40 @@ static TRNode *TRBuildNode(NSDictionary *d, NSString **err)
   return n;
 }
 
+/* Border-box origin of n in the root's coordinate space. */
+static TRPoint TRAbsOrigin(TRNode *n)
+{
+  TRPoint p = { 0, 0 };
+  for (TRNode *m = n; m != nil && [m parent] != nil; m = [m parent])
+    {
+      TRRect f = [m layoutFrame];
+      p.x += f.x; p.y += f.y;
+    }
+  return p;
+}
+
+/* "anchor": [i, j, ...] names a node by child indices; "dx"/"dy" on an
+   expected node are its border-box offset from that anchor (WPT offsets
+   whose offsetParent is <body>, where only differences are known). */
+static BOOL gHasAnchor;
+static TRPoint gAnchor;
+
 static void TRCompare(TRNode *n, NSDictionary *exp, NSString *path, TRFloat tol,
                       NSMutableArray *diffs)
 {
+  if (gHasAnchor && (exp[@"dx"] || exp[@"dy"]))
+    {
+      TRPoint a = TRAbsOrigin(n);
+      TRFloat d[2] = { a.x - gAnchor.x, a.y - gAnchor.y };
+      NSString *dk[2] = { @"dx", @"dy" };
+      for (int i = 0; i < 2; i++)
+        {
+          id v = exp[dk[i]];
+          if (v != nil && fabs([v doubleValue] - d[i]) > tol)
+            [diffs addObject: [NSString stringWithFormat: @"%@.%@: expected %g, got %g",
+                                path, dk[i], [v doubleValue], d[i]]];
+        }
+    }
   TRRect f = [n layoutFrame];
   /* "relativeTo": k makes x/y relative to the ancestor k levels up
      (k = 1 is the parent, the default). */
@@ -205,6 +236,24 @@ static TROutcome TRRunCase(NSString *file, NSDictionary *c, NSString **suiteOut)
   [root layoutWithAvailableSize: TRSizeMake(aw, ah) direction: dir];
   TRFloat tol = c[@"tolerance"] ? [c[@"tolerance"] doubleValue] : 0.5;
   NSMutableArray *diffs = [NSMutableArray array];
+  gHasAnchor = NO;
+  if ([c[@"anchor"] isKindOfClass: [NSArray class]])
+    {
+      TRNode *a = root;
+      for (NSNumber *i in c[@"anchor"])
+        {
+          NSArray *kids = [a children];
+          if ([i unsignedIntegerValue] >= [kids count]) { a = nil; break; }
+          a = kids[[i unsignedIntegerValue]];
+        }
+      if (a == nil)
+        [diffs addObject: @"anchor: no such node"];
+      else
+        {
+          gHasAnchor = YES;
+          gAnchor = TRAbsOrigin(a);
+        }
+    }
   TRCompare(root, c[@"expected"], @"root", tol, diffs);
   if ([diffs count] == 0)
     {

@@ -6,15 +6,21 @@
   returns `-cellSize` (libs-gui `Source/NSCell.m:2002`, `// TODO: Resize the
   text to fit`, master 662f890). Trellis measures wrapping text with
   `-[NSAttributedString boundingRectWithSize:options:]` plus the cell's own
-  insets instead (`Source/View/TRViewMeasure.m`). Possibly worth an
-  upstream issue, filed through upstream.propose. Nothing has been filed.
+  insets instead (`Source/View/TRViewMeasure.m`). Reproducer:
+  Tests/Upstream/cellsize-for-bounds.m (plain MRC Objective-C, no blocks;
+  prints FAIL against the libs-gui in our toolchain: 286x15 either way). Possibly worth an upstream issue, filed through
+  upstream.propose. Nothing has been filed.
 - **`NSSliderCell` has no `-cellSize`,** so it inherits NSCell's border-only
   {8, 4} and a slider would get a 4pt-tall frame. Trellis floors a slider's
   cross axis at Cocoa's regular thickness (21pt, 26 with tick marks) on
   GNUstep (`TRCellSize` in `Source/View/TRViewMeasure.m`). Before that,
   Gumdrop, which scales its slider art to the frame, drew no slider at all.
-  Possibly worth an upstream issue, filed through upstream.propose. Nothing
-  has been filed.
+  Reproducer: Tests/Upstream/slider-cellsize.m (plain MRC Objective-C;
+  prints FAIL: 8x4, knobThickness 0). Possibly worth an upstream issue,
+  filed through upstream.propose. Nothing has been filed.
+- The two reproducers are written to build with GCC (no ARC, no blocks)
+  but haven't been compiled with it yet: this VM's gcc has no Objective-C
+  front end (gobjc). Both build and fail as expected with clang.
 - `_NET_WORKAREA` warnings on stderr under bare Xvfb (no window manager)
   are harmless.
 

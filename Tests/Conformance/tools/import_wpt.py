@@ -721,6 +721,8 @@ class Converter:
         self.direction = "ltr"
         self.root_sizing = None
         self.sized_by_ancestor = False
+        self.page_offsets = []          # (expected dict, page x, page y)
+        self.outside_positioned = False # a positioned ancestor above the root
         self.checked = set()
         self.checks = 0
         self.dropped = 0
@@ -952,8 +954,16 @@ class Converter:
             if self.position(anc) != "static":
                 op, k = anc, depth
                 break
+        n = (1 if "data-offset-x" in el.attrs else 0) + (1 if "data-offset-y" in el.attrs else 0)
+        if op is None and self.position(el) != "fixed" and not self.outside_positioned \
+                and not any(self.display(a) == "none" for a in ancestors + [el]):
+            # offsetParent is <body>: a page position. Kept for anchor-relative
+            # checks (dx/dy), which don't depend on where the root sits.
+            ox = float_or_skip(el.attrs["data-offset-x"]) if "data-offset-x" in el.attrs else None
+            oy = float_or_skip(el.attrs["data-offset-y"]) if "data-offset-y" in el.attrs else None
+            self.page_offsets.append((exp, ox, oy))
+            return
         if op is None or self.position(el) == "fixed":
-            n = (1 if "data-offset-x" in el.attrs else 0) + (1 if "data-offset-y" in el.attrs else 0)
             self.dropped += n
             return
         d = self.page.declared(op)
@@ -970,6 +980,38 @@ class Converter:
             self.checks += 1
         if k != 1:
             exp["relativeTo"] = k
+
+    def resolve_page_offsets(self, exp_root):
+        """Turn page offsets (offsetParent = body) into dx/dy relative to an
+        anchor node: the first with both offsets. Returns the anchor's child
+        index path, or None."""
+        anchor = next(((e, x, y) for e, x, y in self.page_offsets
+                       if x is not None and y is not None), None)
+        if anchor is None:
+            for _, x, y in self.page_offsets:
+                self.dropped += (x is not None) + (y is not None)
+            return None
+
+        def path_to(node, target, path):
+            if node is target:
+                return path
+            for i, c in enumerate(node.get("children", [])):
+                r = path_to(c, target, path + [i])
+                if r is not None:
+                    return r
+            return None
+        ae, ax, ay = anchor
+        self.dropped += 2           # the anchor's own offsets are trivially 0
+        for e, x, y in self.page_offsets:
+            if e is ae:
+                continue
+            if x is not None:
+                e["dx"] = fmt(x - ax)
+                self.checks += 1
+            if y is not None:
+                e["dy"] = fmt(y - ay)
+                self.checks += 1
+        return path_to(exp_root, ae, [])
 
     def available_for_root(self, root):
         # Walk up to body: every ancestor must be a plain block without
@@ -1087,12 +1129,18 @@ def convert_file(path, rel, commit):
     for i, root in enumerate(roots):
         conv = Converter(page)
         conv.checked = checked_ids
+        n = root.parent
+        while n is not None and n.tag not in ("body", "html", "#document"):
+            if conv.position(n) != "static":
+                conv.outside_positioned = True
+            n = n.parent
         try:
             tree, exp = conv.build(root, conv.display(root.parent) if root.parent else "block", [])
             avail = conv.available_for_root(root)
         except Skip as e:
             root_skips.append(str(e))
             continue
+        anchor_path = conv.resolve_page_offsets(exp)
         exp.pop("x", None)
         exp.pop("y", None)
         exp.pop("relativeTo", None)
@@ -1124,6 +1172,8 @@ def convert_file(path, rel, commit):
             # Shrink-to-fit root: trellis-case lays a given available width
             # out exactly, so leave it unconstrained (content size).
             case["available"] = {"width": None, "height": None}
+        if anchor_path is not None:
+            case["anchor"] = anchor_path
         if conv.requires or case.get("requires"):
             case["requires"] = sorted(set(case.get("requires", [])) | conv.requires)
         if conv.dropped:

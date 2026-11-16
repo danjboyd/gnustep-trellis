@@ -162,7 +162,9 @@
     "children": [
      {
       "width": 40,
-      "height": 40
+      "height": 40,
+      "dx": 0,
+      "dy": 100
      }
     ]
    },
@@ -170,7 +172,9 @@
     "children": [
      {
       "width": 40,
-      "height": 40
+      "height": 40,
+      "dx": 0,
+      "dy": 200
      }
     ]
    },
@@ -178,15 +182,21 @@
     "children": [
      {
       "width": 40,
-      "height": 40
+      "height": 40,
+      "dx": 0,
+      "dy": 300
      }
     ]
    }
   ]
  },
+ "anchor": [
+  0,
+  0
+ ],
  "requires": [
   "display-inline-grid",
   "subgrid"
  ],
- "droppedChecks": 8
+ "droppedChecks": 2
 }

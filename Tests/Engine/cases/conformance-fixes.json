@@ -1271,5 +1271,68 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_fr_rows_indefinite_and_max_height",
+  "note": "CSS Grid 12.7.1: in an indefinite space an fr track's base counts undivided when its factor is <= 1; a max-height redoes fr sizing as definite",
+  "root": {
+   "style": {
+    "width": 200,
+    "flexDirection": "column",
+    "alignItems": "flex-start"
+   },
+   "children": [
+    {
+     "style": {
+      "display": "grid",
+      "gridTemplateColumns": "50px",
+      "gridTemplateRows": "minmax(10px, 0.5fr) minmax(10px, 2fr)"
+     },
+     "children": [
+      {},
+      {}
+     ]
+    },
+    {
+     "style": {
+      "display": "grid",
+      "gridTemplateColumns": "50px",
+      "gridTemplateRows": "minmax(10px, 1fr) minmax(10px, 4fr)",
+      "maxHeight": 60,
+      "rowGap": 10
+     },
+     "children": [
+      {},
+      {}
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "children": [
+      {
+       "height": 10
+      },
+      {
+       "height": 20
+      }
+     ]
+    },
+    {
+     "height": 60,
+     "children": [
+      {
+       "height": 10
+      },
+      {
+       "y": 20,
+       "height": 40
+      }
+     ]
+    }
+   ]
+  }
  }
 ]

@@ -446,7 +446,7 @@ static BOOL TRResolveLine(TRLine l, NSString *name, NSInteger explicitCount, NSD
 
 static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
                          TRGridItem *items, NSInteger nItems, BOOL columns,
-                         TRAlign contentAlign)
+                         TRAlign contentAlign, double minAvail, double maxAvail)
 {
   /* Initialise. */
   for (NSInteger i = 0; i < n; i++)
@@ -637,32 +637,39 @@ static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
   if (anyFr)
     {
       double frSize = 0;
-      if (!isnan(avail))
-        {
+      /* "Find the size of an fr" in a definite space. */
+      double (^frFor)(double) = ^double(double space) {
+          double fs = 0;
           BOOL inflexible[n ? n : 1];
           for (NSInteger i = 0; i < n; i++) inflexible[i] = (tr[i].size.max.kind != TRBreadthFr) || tr[i].collapsed;
           for (int guard = 0; guard < 16; guard++)
             {
-              double leftover = avail - gaps, sumFr = 0;
+              double leftover = space - gaps, sumFr = 0;
               for (NSInteger i = 0; i < n; i++)
                 {
                   if (inflexible[i]) leftover -= tr[i].base;
                   else sumFr += tr[i].size.max.value;
                 }
               if (sumFr <= 0) break;
-              frSize = MAX(0, leftover) / MAX(1.0, sumFr);
+              fs = MAX(0, leftover) / MAX(1.0, sumFr);
               BOOL changed = NO;
               for (NSInteger i = 0; i < n; i++)
-                if (!inflexible[i] && tr[i].size.max.value * frSize < tr[i].base)
+                if (!inflexible[i] && tr[i].size.max.value * fs < tr[i].base)
                   { inflexible[i] = YES; changed = YES; }
               if (!changed) break;
             }
-        }
+          return fs;
+      };
+      if (!isnan(avail))
+        frSize = frFor(avail);
       else
         {
+          /* Indefinite: the largest of each flexible track's base (divided
+             by its flex factor when that is above 1) and each item's
+             max-content over its flexible tracks (CSS Grid 12.7.1). */
           for (NSInteger i = 0; i < n; i++)
             if (tr[i].size.max.kind == TRBreadthFr && tr[i].size.max.value > 0)
-              frSize = MAX(frSize, tr[i].base / tr[i].size.max.value);
+              frSize = MAX(frSize, tr[i].base / MAX(1.0, tr[i].size.max.value));
           for (NSInteger k = 0; k < nItems; k++)
             {
               TRGridItem *it = &items[k];
@@ -676,6 +683,14 @@ static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
               double maxC = columns ? it->maxW : it->h;
               if (sumFr > 0) frSize = MAX(frSize, (maxC - fixed) / MAX(1.0, sumFr));
             }
+          /* If that would make the grid larger than its max (smaller than
+             its min), redo it with that size as definite space. */
+          double total = gaps;
+          for (NSInteger i = 0; i < n; i++)
+            total += (tr[i].size.max.kind == TRBreadthFr && !tr[i].collapsed)
+              ? MAX(tr[i].base, tr[i].size.max.value * frSize) : tr[i].base;
+          if (!isnan(maxAvail) && total > maxAvail) frSize = frFor(maxAvail);
+          else if (!isnan(minAvail) && total < minAvail) frSize = frFor(minAvail);
         }
       for (NSInteger i = 0; i < n; i++)
         if (tr[i].size.max.kind == TRBreadthFr && !tr[i].collapsed)
@@ -761,6 +776,12 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
   const double colGap = MAX(0, isnan(TRGResolve(s->columnGap, innerW)) ? 0 : TRGResolve(s->columnGap, innerW));
   const double rowGap = MAX(0, isnan(TRGResolve(s->rowGap, innerH)) ? 0 : TRGResolve(s->rowGap, innerH));
   const BOOL rtl = (dir == TRDirectionRTL);
+  /* The grid's own min/max as inner sizes (NAN = none), which bound fr
+     tracks in an indefinite space. */
+  double mxW = TRGBox(s, s->maxWidth, ow, YES, ow), mnW = TRGBox(s, s->minWidth, ow, YES, ow);
+  double mxH = TRGBox(s, s->maxHeight, oh, NO, ow), mnH = TRGBox(s, s->minHeight, oh, NO, ow);
+  const double maxInnerW = isnan(mxW) ? NAN : MAX(0, mxW - pbW), minInnerW = isnan(mnW) ? NAN : MAX(0, mnW - pbW);
+  const double maxInnerH = isnan(mxH) ? NAN : MAX(0, mxH - pbH), minInnerH = isnan(mnH) ? NAN : MAX(0, mnH - pbH);
 
   /* ---- Explicit grid ---- */
   NSInteger nCols = 0, nRows = 0, fitStartC, fitLenC, fitStartR, fitLenR;
@@ -1050,7 +1071,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
     }
 
   /* ---- Columns ---- */
-  TRSizeTracks(colsT, nCols, innerW, colGap, items, n, YES, s->justifyContent);
+  TRSizeTracks(colsT, nCols, innerW, colGap, items, n, YES, s->justifyContent, minInnerW, maxInnerW);
   double colsTotal = TRPlaceTracks(colsT, nCols, colGap, innerW, s->justifyContent, s->justifyContentSafe);
 
   /* Percentage margins, against each item's grid-area width (CSS Grid 6.5). */
@@ -1094,13 +1115,13 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
         if (rowsT[i].size.min.kind == TRBreadthPercent) { rowsT[i].size.min.kind = TRBreadthAuto; percentRows = YES; }
         if (rowsT[i].size.max.kind == TRBreadthPercent) { rowsT[i].size.max.kind = TRBreadthAuto; percentRows = YES; }
       }
-  TRSizeTracks(rowsT, nRows, innerH, rowGap, items, n, NO, s->alignContent);
+  TRSizeTracks(rowsT, nRows, innerH, rowGap, items, n, NO, s->alignContent, minInnerH, maxInnerH);
   double rowsTotal = TRPlaceTracks(rowsT, nRows, rowGap, innerH, s->alignContent, s->alignContentSafe);
   double contentH = rowsTotal;
   if (percentRows)
     {
       for (NSInteger i = 0; i < nRows; i++) rowsT[i].size = savedRows[i];
-      TRSizeTracks(rowsT, nRows, contentH, rowGap, items, n, NO, s->alignContent);
+      TRSizeTracks(rowsT, nRows, contentH, rowGap, items, n, NO, s->alignContent, minInnerH, maxInnerH);
       rowsTotal = TRPlaceTracks(rowsT, nRows, rowGap, contentH, s->alignContent, s->alignContentSafe);
     }
 

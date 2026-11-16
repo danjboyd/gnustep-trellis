@@ -45,19 +45,25 @@ static NSSize TRWrappedCellSize(NSCell *cell, CGFloat cellWidth)
    enough for a thin track, but a theme with a real knob (Gumdrop scales its
    art to the frame) draws nothing. Give the cross axis Cocoa's regular
    slider thickness: 21pt, or 26 with tick marks. Apple's -cellSize is
-   already right. */
+   already right there.
+   Along the track, Apple's -cellSize reports a huge length (40000) meaning
+   "flexible", as -intrinsicContentSize's NSViewNoIntrinsicMetric does, so
+   Trellis treats it as no intrinsic length (GNUstep reports 8). */
 static NSSize TRCellSize(NSCell *cell)
 {
   NSSize s = [cell cellSize];
-#ifdef GNUSTEP
   if ([cell isKindOfClass: [NSSliderCell class]])
     {
       NSSliderCell *sc = (NSSliderCell *)cell;
+      BOOL vertical = ([sc isVertical] == 1);
+      CGFloat *along = vertical ? &s.height : &s.width;
+      if (*along >= 10000) *along = 0;
+#ifdef GNUSTEP
       CGFloat cross = [sc numberOfTickMarks] > 0 ? 26 : 21;
-      if ([sc isVertical] == 1) s.width = MAX(s.width, cross);
+      if (vertical) s.width = MAX(s.width, cross);
       else s.height = MAX(s.height, cross);
-    }
 #endif
+    }
   return s;
 }
 

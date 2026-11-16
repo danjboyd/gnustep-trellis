@@ -400,8 +400,10 @@ static BOOL TRResolveLine(TRLine l, NSString *name, NSInteger explicitCount, NSD
 {
   if (l.kind == TRLineNumber)
     {
+      /* Negative results are lines before the explicit grid; the caller
+         adds implicit tracks there. */
       NSInteger idx = l.n > 0 ? l.n - 1 : explicitCount + 1 + l.n;
-      *out = MAX(0, idx);
+      *out = idx;
       return YES;
     }
   if (l.kind == TRLineName)
@@ -756,7 +758,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           NSInteger start = 0;
           if (sDef && eDef) { if (ei < si) { NSInteger t = si; si = ei; ei = t; } if (ei == si) ei = si + 1; start = si; span = ei - si; def = YES; }
           else if (sDef) { start = si; span = b.kind == TRLineSpan ? b.n : 1; def = YES; }
-          else if (eDef) { span = a.kind == TRLineSpan ? a.n : 1; start = MAX(0, ei - span); def = YES; }
+          else if (eDef) { span = a.kind == TRLineSpan ? a.n : 1; start = ei - span; def = YES; }
           else span = a.kind == TRLineSpan ? a.n : (b.kind == TRLineSpan ? b.n : 1);
           if (axis == 0) { pl[k].rDef = def; pl[k].rs = start; pl[k].rspan = span; }
           else { pl[k].cDef = def; pl[k].cs = start; pl[k].cspan = span; }
@@ -774,6 +776,30 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           occMinor = minorEnd;
         }
     }
+  /* Lines before the explicit grid (CSS Grid 8.3): implicit tracks are
+     added there, and every placement shifts by their count. */
+  NSInteger offR = 0, offC = 0;
+  for (NSInteger k = 0; k < n; k++)
+    {
+      if (pl[k].rDef) offR = MAX(offR, -pl[k].rs);
+      if (pl[k].cDef) offC = MAX(offC, -pl[k].cs);
+    }
+  if (offR > 0 || offC > 0)
+    {
+      NSInteger minorNeed = occMinor + (colFlow ? offR : offC);
+      for (NSInteger k = 0; k < n; k++)
+        {
+          if (pl[k].rDef) pl[k].rs += offR;
+          if (pl[k].cDef) pl[k].cs += offC;
+          NSInteger minorEnd = colFlow ? (pl[k].rDef ? pl[k].rs + pl[k].rspan : pl[k].rspan)
+                                       : (pl[k].cDef ? pl[k].cs + pl[k].cspan : pl[k].cspan);
+          minorNeed = MAX(minorNeed, minorEnd);
+        }
+      occ = [NSMutableData data];   /* nothing is marked yet */
+      occMinor = minorNeed;
+      gridRows += offR; gridCols += offC;
+    }
+
   /* 1. fully definite items */
   for (NSInteger k = 0; k < n; k++)
     if (pl[k].rDef && pl[k].cDef)
@@ -832,6 +858,21 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
 
   /* ---- Implicit tracks ---- */
   TRTrackSize autoCol = TRAutoTrackSize(st->_gridAutoColumns), autoRow = TRAutoTrackSize(st->_gridAutoRows);
+  for (int axis = 0; axis < 2; axis++)
+    {
+      NSInteger off = axis == 0 ? offR : offC;
+      if (off <= 0) continue;
+      TRTrack **tp = axis == 0 ? &rowsT : &colsT;
+      NSInteger *np = axis == 0 ? &nRows : &nCols;
+      TRTrack *nt = calloc((size_t)(*np + off), sizeof(TRTrack));
+      for (NSInteger i = 0; i < off; i++) nt[i].size = axis == 0 ? autoRow : autoCol;
+      if (*np) memcpy(nt + off, *tp, sizeof(TRTrack) * (size_t)*np);
+      free(*tp);
+      *tp = nt;
+      *np += off;
+      if (axis == 0) { if (fitStartR >= 0) fitStartR += off; }
+      else { if (fitStartC >= 0) fitStartC += off; }
+    }
   if (gridCols > nCols)
     {
       colsT = realloc(colsT, sizeof(TRTrack) * gridCols);
@@ -1037,6 +1078,8 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
               NSInteger si = 0, ei = 0;
               BOOL sDef = TRResolveLine(a, aName, expl, names, YES, &si);
               BOOL eDef = TRResolveLine(b, bName, expl, names, NO, &ei);
+              NSInteger off = axis == 0 ? offR : offC;
+              si += off; ei += off;
               if (sDef && !eDef && b.kind == TRLineSpan) { ei = si + b.n; eDef = YES; }
               if (eDef && !sDef && a.kind == TRLineSpan) { si = ei - a.n; sDef = si >= 0; }
               if (sDef && eDef && ei < si) { NSInteger t = si; si = ei; ei = t; }

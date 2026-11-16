@@ -817,5 +817,43 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_negative_line_adds_implicit_track_before",
+  "note": "CSS Grid 8.3: a line before the explicit grid adds implicit tracks there; auto-placement starts at the first track",
+  "root": {
+   "style": {
+    "display": "grid",
+    "width": 100,
+    "gridTemplateRows": "50px",
+    "gridTemplateColumns": "100px"
+   },
+   "children": [
+    {
+     "style": {
+      "gridRow": "-3",
+      "gridColumn": "1",
+      "height": 10
+     }
+    },
+    {
+     "style": {
+      "height": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "y": 0,
+     "height": 10
+    },
+    {
+     "y": 10,
+     "height": 10
+    }
+   ]
+  }
  }
 ]

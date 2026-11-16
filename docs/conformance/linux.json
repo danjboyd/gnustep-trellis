@@ -1,7 +1,7 @@
 {
- "commit": "e8025fb",
+ "commit": "de415f3",
  "conformance": {
-  "pass": 2903,
+  "pass": 2906,
   "skipped": 1091,
   "total": 2949
  },
@@ -9,8 +9,8 @@
  "platform": "linux",
  "suites": {
   "engine": {
-   "pass": 109,
-   "total": 109
+   "pass": 110,
+   "total": 110
   },
   "wpt": {
    "cases": 977,
@@ -19,7 +19,7 @@
   },
   "wpt-grid": {
    "cases": 1977,
-   "pass": 1170,
+   "pass": 1173,
    "total": 1205
   },
   "yoga": {

@@ -1,0 +1,47 @@
+{
+ "id": "wpt-grid/css/css-grid/implicit-grids/grid-item-placed-in-trailing-implicit-column-001/1",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/implicit-grids/grid-item-placed-in-trailing-implicit-column-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "position": "relative",
+   "gridTemplateColumns": 60,
+   "gridTemplateRows": 30,
+   "gridAutoColumns": 80
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "2",
+     "gridRow": "1 / 2"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 80,
+    "height": 30,
+    "x": 60,
+    "y": 0
+   }
+  ]
+ }
+}

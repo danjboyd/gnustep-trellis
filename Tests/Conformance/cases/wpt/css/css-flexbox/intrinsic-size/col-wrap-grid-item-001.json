@@ -58,9 +58,5 @@
     ]
    }
   ]
- },
- "requires": [
-  "block-layout",
-  "display-grid"
- ]
+ }
 }

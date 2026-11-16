@@ -1,0 +1,67 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-items/grid-item-children-percentage-resolution-001/3",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-items/grid-item-children-percentage-resolution-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "alignItems": "start",
+   "justifyItems": "start",
+   "gridTemplateRows": 100,
+   "gridTemplateColumns": 200,
+   "gridTemplateAreas": "none",
+   "gridAutoRows": "auto",
+   "gridAutoColumns": "auto",
+   "gridAutoFlow": "row",
+   "position": "relative"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "width": "50%",
+       "height": "50%"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "width": 0,
+      "height": 0
+     }
+    ],
+    "width": 0,
+    "height": 0
+   }
+  ]
+ },
+ "requires": [
+  "block-layout"
+ ]
+}

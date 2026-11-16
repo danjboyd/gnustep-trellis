@@ -1,0 +1,126 @@
+{
+ "id": "wpt-grid/css/css-grid/alignment/grid-align-justify-margin-border-padding/9",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/alignment/grid-align-justify-margin-border-padding.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "rtl",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "width": "fit-content",
+   "gridTemplateColumns": "100px 200px",
+   "gridTemplateRows": "200px 200px",
+   "paddingTop": 10,
+   "paddingRight": 15,
+   "paddingBottom": 20,
+   "paddingLeft": 30,
+   "position": "relative",
+   "borderTopWidth": 5,
+   "borderRightWidth": 10,
+   "borderBottomWidth": 15,
+   "borderLeftWidth": 20
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "1",
+     "gridRow": "1",
+     "width": 20,
+     "height": 40,
+     "marginTop": 4,
+     "marginRight": 8,
+     "marginBottom": 12,
+     "marginLeft": 16
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "2",
+     "gridRow": "1",
+     "width": 20,
+     "height": 40,
+     "marginTop": 4,
+     "marginRight": 8,
+     "marginBottom": 12,
+     "marginLeft": 16
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "1",
+     "gridRow": "2",
+     "width": 20,
+     "height": 40,
+     "marginTop": 4,
+     "marginRight": 8,
+     "marginBottom": 12,
+     "marginLeft": 16
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "2",
+     "gridRow": "2",
+     "width": 20,
+     "height": 40,
+     "marginTop": 4,
+     "marginRight": 8,
+     "marginBottom": 12,
+     "marginLeft": 16
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 20,
+    "height": 40,
+    "x": 322,
+    "y": 19
+   },
+   {
+    "width": 20,
+    "height": 40,
+    "x": 222,
+    "y": 19
+   },
+   {
+    "width": 20,
+    "height": 40,
+    "x": 322,
+    "y": 219
+   },
+   {
+    "width": 20,
+    "height": 40,
+    "x": 222,
+    "y": 219
+   }
+  ],
+  "width": 375,
+  "height": 450
+ },
+ "requires": [
+  "intrinsic-size-keyword"
+ ]
+}

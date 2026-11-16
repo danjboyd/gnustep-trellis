@@ -37,6 +37,7 @@ import sys
 
 VIEWPORT_CONTENT_WIDTH = 784
 WPT_ROOT = "."
+SUITE = "wpt"
 DEFAULT_FONT_SIZE = 16
 
 VISUAL_PROPS = re.compile(
@@ -79,6 +80,7 @@ DEFAULT_DISPLAY = {"div": "block", "p": "block", "section": "block",
 UA_MARGINS = {"p": "1em 0", "h1": "0.67em 0", "h2": "0.83em 0",
               "h3": "1em 0", "h4": "1.33em 0"}
 SIDES = ("top", "right", "bottom", "left")
+CONTAINERS = ("flex", "inline-flex", "grid", "inline-grid")
 
 _ALIGN = {"normal", "stretch", "center", "start", "end", "flex-start",
           "flex-end", "self-start", "self-end", "baseline", "first baseline",
@@ -92,9 +94,9 @@ VALID_KEYWORDS = {
     "position": {"static", "relative", "absolute", "fixed", "sticky"},
     "box-sizing": {"content-box", "border-box"},
     "justify-content": _ALIGN - {"baseline", "first baseline", "last baseline", "self-start", "self-end"},
-    "align-content": _ALIGN - {"self-start", "self-end"},
-    "align-items": (_ALIGN | {"anchor-center"}) - {"space-between", "space-around", "space-evenly", "auto"},
-    "align-self": (_ALIGN | {"auto"}) - {"space-between", "space-around", "space-evenly"},
+    "align-content": _ALIGN - {"self-start", "self-end", "left", "right", "anchor-center"},
+    "align-items": (_ALIGN | {"anchor-center"}) - {"space-between", "space-around", "space-evenly", "auto", "left", "right"},
+    "align-self": (_ALIGN | {"auto"}) - {"space-between", "space-around", "space-evenly", "left", "right"},
 }
 
 
@@ -422,6 +424,10 @@ def expand(decls):
             pre = "" if k == "inset" else k + "-"
             for s, x in box4(v).items():
                 out[pre + s] = x
+        elif k in ("grid", "grid-template"):
+            out.update(expand_grid_shorthand(k, v))
+        elif k in ("grid-row-gap", "grid-column-gap"):
+            out[k[len("grid-"):]] = v
         elif k in ("gap", "grid-gap"):
             t = v.split()
             out["row-gap"] = t[0]
@@ -498,6 +504,41 @@ def expand_flex(v):
             "flex-basis": bas[0] if bas else "0%"}
 
 
+def expand_grid_shorthand(k, v):
+    """grid / grid-template -> longhands. Forms with area strings or line
+    names are passed through for the engine (and tagged by grid_requires)."""
+    v = v.strip()
+    reset = {"grid-template-rows": "none", "grid-template-columns": "none",
+             "grid-template-areas": "none"}
+    if k == "grid":
+        reset.update({"grid-auto-rows": "auto", "grid-auto-columns": "auto",
+                      "grid-auto-flow": "row"})
+    if v == "none":
+        return reset
+    if '"' in v or "[" in v or "/" not in v:
+        return {k: v}           # complex form: leave to the engine
+    rows, cols = [x.strip() for x in v.split("/", 1)]
+    out = dict(reset)
+    if k == "grid" and "auto-flow" in rows:
+        dense = " dense" if "dense" in rows else ""
+        out["grid-auto-flow"] = "row" + dense
+        auto = re.sub(r"\b(auto-flow|dense)\b", "", rows).strip()
+        if auto:
+            out["grid-auto-rows"] = auto
+        out["grid-template-columns"] = cols
+    elif k == "grid" and "auto-flow" in cols:
+        dense = " dense" if "dense" in cols else ""
+        out["grid-auto-flow"] = "column" + dense
+        auto = re.sub(r"\b(auto-flow|dense)\b", "", cols).strip()
+        if auto:
+            out["grid-auto-columns"] = auto
+        out["grid-template-rows"] = rows
+    else:
+        out["grid-template-rows"] = rows
+        out["grid-template-columns"] = cols
+    return out
+
+
 def camel(k):
     return re.sub(r"-([a-z])", lambda m: m.group(1).upper(), k)
 
@@ -540,6 +581,15 @@ class Page:
                     self.rules.append((parts, specificity(parts), order, decls))
                     order += 1
         self.cache = {}
+        self.area_names = set()
+        for _, _, _, decls in self.rules:
+            for k, v, _ in decls:
+                if k in ("grid-template-areas", "grid-template", "grid"):
+                    for q in re.findall(r'"([^"]*)"', v):
+                        self.area_names.update(t for t in q.split() if t != ".")
+        for m in re.finditer(r'grid-template-areas\s*:\s*((?:"[^"]*"\s*)+)', self.src):
+            for q in re.findall(r'"([^"]*)"', m.group(1)):
+                self.area_names.update(t for t in q.split() if t != ".")
 
     @staticmethod
     def walk(el):
@@ -636,6 +686,7 @@ class Converter:
         self.requires = set()
         self.direction = "ltr"
         self.root_sizing = None
+        self.sized_by_ancestor = False
         self.checked = set()
         self.checks = 0
         self.dropped = 0
@@ -652,11 +703,13 @@ class Converter:
         fs = self.page.font(el)[0]
         style = collections.OrderedDict()
         disp = self.display(el)
-        if parent_display in ("flex", "inline-flex") and disp in ("inline", "inline-block"):
+        if parent_display in CONTAINERS and disp in ("inline", "inline-block"):
             disp = "block"   # flex items are blockified
-        if disp == "inline-flex":
-            self.requires.add("display-inline-flex")
-        elif disp not in ("flex", "none", "block"):
+        if "grid-lanes" in disp:
+            self.requires.add("grid-lanes")
+        elif disp in ("inline-flex", "inline-grid"):
+            self.requires.add("display-" + disp)
+        elif disp not in ("flex", "grid", "none", "block"):
             self.requires.add("display-" + disp)
         style["display"] = disp
         style["boxSizing"] = "content-box"   # Trellis defaults to border-box
@@ -692,13 +745,15 @@ class Converter:
                 continue
             if k in SKIP_PROPS:
                 raise Skip(SKIP_PROPS[k])
+            if k == "position" and v == "sticky":
+                self.requires.add("position-sticky")
             if k == "direction":
                 if not is_root:
                     raise Skip("direction set below case root")
                 self.direction = v.strip()
                 continue
             if k == "float":
-                if parent_display in ("flex", "inline-flex") and not is_root:
+                if parent_display in CONTAINERS and not is_root:
                     continue        # floats don't apply to flex items
                 if is_root:
                     if v.strip() != "none":
@@ -707,13 +762,14 @@ class Converter:
                 if v.strip() != "none":
                     raise Skip("float")
                 continue
-            if k.startswith("grid") or k == "order" and False:
-                self.requires.add("grid")
+            if k.startswith("grid"):
+                self.grid_requires(k, v)
             if re.search(r"(inline|block)", k) and k not in ("display",):
                 self.requires.add("logical-properties")
             val = norm_value(v, fs, self.requires)
             if isinstance(val, str):
-                if re.search(r"\b(min-content|max-content|fit-content)\b", val):
+                if re.search(r"\b(min-content|max-content|fit-content)\b", val) \
+                        and not k.startswith("grid"):
                     self.requires.add("intrinsic-size-keyword")
             if k == "aspect-ratio":
                 self.requires.add("aspect-ratio")
@@ -726,6 +782,27 @@ class Converter:
                 pass
             style[camel(k)] = val
         return style
+
+    PLACEMENT = ("grid-row", "grid-column", "grid-row-start", "grid-row-end",
+                 "grid-column-start", "grid-column-end", "grid-area")
+
+    def grid_requires(self, k, v):
+        if "subgrid" in v:
+            self.requires.add("subgrid")
+        if "masonry" in v:
+            self.requires.add("masonry")
+        if k in ("grid", "grid-template") and '"' in v:
+            self.requires.add("grid-template-shorthand")
+        if k in ("grid-template-columns", "grid-template-rows", "grid-template",
+                 "grid") and "[" in v:
+            self.requires.add("grid-named-lines")
+        if k in self.PLACEMENT:
+            for tok in re.split(r"[\s/]+", v.strip()):
+                if not tok or tok in ("span", "auto") or re.match(r"^-?\d+$", tok):
+                    continue
+                base = re.sub(r"-(start|end)$", "", tok)
+                if tok not in self.page.area_names and base not in self.page.area_names:
+                    self.requires.add("grid-named-lines")
 
     def text_measure(self, el, text):
         size, fam, lh = self.page.font(el)
@@ -780,7 +857,7 @@ class Converter:
             elif c.strip():
                 texts.append(re.sub(r"\s+", " ", c.strip()))
         if texts and kids:
-            if disp not in ("flex", "inline-flex"):
+            if disp not in CONTAINERS:
                 raise Skip("mixed inline content")
         if texts and not kids:
             node["measure"] = self.text_measure(el, " ".join(texts))
@@ -801,7 +878,7 @@ class Converter:
                                         "anonymous": True})
                     child_exp.append({})
                     self.requires.add("measure")
-            if disp not in ("flex", "inline-flex", "none") and child_nodes:
+            if disp not in CONTAINERS + ("none",) and child_nodes:
                 self.requires.add("block-layout")
         if child_nodes:
             node["children"] = child_nodes
@@ -869,6 +946,7 @@ class Converter:
                     for s in ("left", "right"):
                         w -= (to_px(d.get("padding-" + s, "0"), 16) or 0) + \
                              (to_px(d.get("border-%s-width" % s, "0"), 16) or 0)
+                self.sized_by_ancestor = True   # an explicitly narrow container
                 return {"width": fmt(w), "height": None}
             for s in ("left", "right"):
                 for p in ("padding-" + s, "border-%s-width" % s, "margin-" + s):
@@ -877,8 +955,18 @@ class Converter:
             n = n.parent
         if n is not None and n.tag == "body":
             d = self.page.declared(n)
-            if any(k.startswith(("margin", "padding", "width", "border")) for k in d):
+            if "width" in d:
                 raise Skip("body box styled")
+            # Viewport is 800px; body's UA margin is 8px each side.
+            w = 800.0
+            for side in ("left", "right"):
+                for prop, default in (("margin-" + side, "8px"), ("padding-" + side, "0"),
+                                      ("border-%s-width" % side, "0")):
+                    px = to_px(d.get(prop, default), 16)
+                    if not isinstance(px, (int, float)):
+                        raise Skip("body box styled")
+                    w -= px
+            return {"width": fmt(w), "height": None}
         return {"width": VIEWPORT_CONTENT_WIDTH, "height": None}
 
 
@@ -968,9 +1056,9 @@ def convert_file(path, rel, commit):
         if conv.checks == 0:
             continue
         case = {
-            "id": "wpt/%s%s" % (rel[:-5], "" if len(roots) == 1 else "/%d" % i),
+            "id": "%s/%s%s" % (SUITE, rel[:-5], "" if len(roots) == 1 else "/%d" % i),
             "source": {
-                "suite": "wpt",
+                "suite": SUITE,
                 "file": rel,
                 "commit": commit,
                 "license": "BSD-3-Clause",
@@ -983,11 +1071,10 @@ def convert_file(path, rel, commit):
             "root": tree,
             "expected": exp,
         }
-        if tree["style"].get("display") == "inline-flex" or \
+        if tree["style"].get("display") in ("inline-flex", "inline-grid") or \
                 tree["style"].get("position") in ("absolute", "fixed"):
             conv.root_sizing = "fit-content"
-        if conv.root_sizing == "fit-content" and avail["width"] is not None \
-                and avail["width"] < VIEWPORT_CONTENT_WIDTH:
+        if conv.root_sizing == "fit-content" and conv.sized_by_ancestor:
             # Shrink-to-fit in a narrow container: may size at min-content.
             case.setdefault("requires", []).append("intrinsic-size-keyword")
         if conv.root_sizing == "fit-content":
@@ -1005,10 +1092,11 @@ def convert_file(path, rel, commit):
 
 
 def main():
-    global WPT_ROOT
+    global WPT_ROOT, SUITE
     wpt, out_dir = sys.argv[1], sys.argv[2]
     WPT_ROOT = wpt
     sub = sys.argv[3] if len(sys.argv) > 3 else "css/css-flexbox"
+    SUITE = sys.argv[4] if len(sys.argv) > 4 else "wpt"
     commit = subprocess.run(["git", "-C", wpt, "rev-parse", "HEAD"],
                             capture_output=True, text=True, check=True).stdout.strip()
     base = os.path.join(wpt, sub)
@@ -1033,7 +1121,7 @@ def main():
                 continue
             files += 1
             for c in cases:
-                p = os.path.join(out_dir, c["id"][len("wpt/"):] + ".json")
+                p = os.path.join(out_dir, c["id"][len(SUITE) + 1:] + ".json")
                 os.makedirs(os.path.dirname(p), exist_ok=True)
                 with open(p, "w") as f:
                     json.dump(c, f, indent=1)

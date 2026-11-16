@@ -14,6 +14,7 @@ not covered by Trellis's LGPL. Separate copies are in [LICENSES/](LICENSES/).
 |---|---|---|---|
 | `yoga` | https://github.com/facebook/yoga: `tests/generated/*.cpp` (generated from `gentest/fixtures/*.html`) | commit `cac7b345c06804703dc6868f740f04ad8a863f27` | MIT |
 | `wpt` | https://github.com/web-platform-tests/wpt: `css/css-flexbox` tests using `resources/check-layout-th.js` | commit `76f3efc65c27333e528675406167145735718fab` | BSD-3-Clause |
+| `wpt-grid` | https://github.com/web-platform-tests/wpt: `css/css-grid` tests using `resources/check-layout-th.js` | commit `76f3efc65c27333e528675406167145735718fab` | BSD-3-Clause |
 
 ## Yoga: MIT License
 
@@ -61,10 +62,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
     git clone --depth 1 https://github.com/facebook/yoga /tmp/yoga
     git clone --depth 1 --filter=blob:none --sparse https://github.com/web-platform-tests/wpt /tmp/wpt
-    git -C /tmp/wpt sparse-checkout set --no-cone /LICENSE.md css/css-flexbox css/support resources /fonts/ahem.css
-    rm -rf Tests/Conformance/cases/yoga Tests/Conformance/cases/wpt
+    git -C /tmp/wpt sparse-checkout set --no-cone /LICENSE.md css/css-flexbox css/css-grid css/support resources /fonts/ahem.css
+    rm -rf Tests/Conformance/cases/yoga Tests/Conformance/cases/wpt Tests/Conformance/cases/wpt-grid
     python3 -I Tests/Conformance/tools/import_yoga.py /tmp/yoga Tests/Conformance/cases/yoga
     python3 -I Tests/Conformance/tools/import_wpt.py  /tmp/wpt  Tests/Conformance/cases/wpt
+    python3 -I Tests/Conformance/tools/import_wpt.py  /tmp/wpt  Tests/Conformance/cases/wpt-grid css/css-grid wpt-grid
 
 `reference/` holds a Yoga-backed runner used to sanity-check the importers:
 `make -f Tests/Conformance/Makefile.macos check-reference YOGA=/tmp/yoga`.

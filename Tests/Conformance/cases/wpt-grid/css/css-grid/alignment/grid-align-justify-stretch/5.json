@@ -1,0 +1,118 @@
+{
+ "id": "wpt-grid/css/css-grid/alignment/grid-align-justify-stretch/5",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/alignment/grid-align-justify-stretch.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 800,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "position": "relative"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "grid",
+     "boxSizing": "content-box",
+     "alignItems": "start",
+     "justifyItems": "stretch",
+     "width": "fit-content",
+     "gridTemplateColumns": "100px 100px",
+     "gridTemplateRows": "200px 200px",
+     "marginBottom": 20
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "1",
+       "gridRow": "1"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "2",
+       "gridRow": "1",
+       "width": 20,
+       "height": 40
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "1",
+       "gridRow": "2",
+       "width": 20
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "2",
+       "gridRow": "2",
+       "height": 40
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "width": 100,
+      "height": 0,
+      "x": 0,
+      "y": 0,
+      "relativeTo": 2
+     },
+     {
+      "width": 20,
+      "height": 40,
+      "x": 100,
+      "y": 0,
+      "relativeTo": 2
+     },
+     {
+      "width": 20,
+      "height": 0,
+      "x": 0,
+      "y": 200,
+      "relativeTo": 2
+     },
+     {
+      "width": 100,
+      "height": 40,
+      "x": 100,
+      "y": 200,
+      "relativeTo": 2
+     }
+    ],
+    "width": 200,
+    "height": 400
+   }
+  ]
+ },
+ "requires": [
+  "block-layout",
+  "intrinsic-size-keyword"
+ ]
+}

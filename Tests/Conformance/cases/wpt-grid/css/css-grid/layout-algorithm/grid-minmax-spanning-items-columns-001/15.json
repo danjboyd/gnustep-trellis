@@ -1,0 +1,125 @@
+{
+ "id": "wpt-grid/css/css-grid/layout-algorithm/grid-minmax-spanning-items-columns-001/15",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/layout-algorithm/grid-minmax-spanning-items-columns-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "width": 10,
+   "height": 10
+  },
+  "children": [
+   {
+    "style": {
+     "display": "grid",
+     "boxSizing": "content-box",
+     "gridTemplateColumns": "minmax(50px, min-content) minmax(40px, max-content)",
+     "gridTemplateRows": "50px 100px"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridRow": "1 / -1",
+       "gridColumn": "1 / -1",
+       "width": "100%",
+       "height": "100%"
+      },
+      "measure": {
+       "text": "XXXXX XXXXX XXXXX",
+       "charWidth": 10,
+       "lineHeight": 10
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "1",
+       "gridRow": "1",
+       "width": "100%",
+       "height": "100%"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "2",
+       "gridRow": "1",
+       "width": "100%",
+       "height": "100%"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "1",
+       "gridRow": "2",
+       "width": "100%",
+       "height": "100%"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "2",
+       "gridRow": "2",
+       "width": "100%",
+       "height": "100%"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "width": 90,
+      "height": 150
+     },
+     {
+      "width": 50,
+      "height": 50
+     },
+     {
+      "width": 40,
+      "height": 50
+     },
+     {
+      "width": 50,
+      "height": 100
+     },
+     {
+      "width": 40,
+      "height": 100
+     }
+    ]
+   }
+  ]
+ },
+ "requires": [
+  "block-layout",
+  "calc",
+  "measure"
+ ]
+}

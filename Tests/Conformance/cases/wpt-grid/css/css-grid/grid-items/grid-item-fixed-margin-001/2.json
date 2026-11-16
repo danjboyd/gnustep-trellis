@@ -1,0 +1,52 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-items/grid-item-fixed-margin-001/2",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-items/grid-item-fixed-margin-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "height": 0,
+   "gridTemplateColumns": "20px 20px",
+   "gridTemplateRows": "auto"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "height": 60,
+     "marginTop": 5
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "height": 60
+   },
+   {
+    "height": 65
+   }
+  ]
+ }
+}

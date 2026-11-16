@@ -1,0 +1,69 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-items/grid-items-percentage-margins-002/6",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-items/grid-items-percentage-margins-002.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "rtl",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "gridTemplateColumns": "minmax(auto, 100px)",
+   "width": 500,
+   "justifyItems": "start",
+   "position": "relative"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "marginTop": "50%"
+    },
+    "measure": {
+     "text": "X",
+     "charWidth": 10,
+     "lineHeight": 10
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "width": "100%",
+     "height": 10
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 10,
+    "height": 10,
+    "y": 50
+   },
+   {
+    "width": 100,
+    "height": 10,
+    "x": 400,
+    "y": 60
+   }
+  ]
+ },
+ "requires": [
+  "calc",
+  "measure"
+ ],
+ "droppedChecks": 1
+}

@@ -1,0 +1,70 @@
+{
+ "id": "wpt-grid/css/css-grid/layout-algorithm/grid-spanning-items-percentage-grid-001/4",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/layout-algorithm/grid-spanning-items-percentage-grid-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "position": "relative"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "grid",
+     "boxSizing": "content-box",
+     "gridTemplateColumns": "40% 60%",
+     "gridTemplateRows": "30% 70%",
+     "width": 400,
+     "height": 300,
+     "gridAutoColumns": 200,
+     "gridAutoRows": 250
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridRow": "1 / -1",
+       "gridColumn": "1 / -1",
+       "width": "100%",
+       "height": "100%"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "width": 400,
+      "height": 300,
+      "x": 0,
+      "y": 0,
+      "relativeTo": 2
+     }
+    ],
+    "width": 400,
+    "height": 300
+   }
+  ]
+ },
+ "requires": [
+  "block-layout"
+ ]
+}

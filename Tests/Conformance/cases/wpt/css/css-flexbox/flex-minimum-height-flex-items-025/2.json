@@ -55,7 +55,6 @@
   ]
  },
  "requires": [
-  "block-layout",
-  "display-grid"
+  "block-layout"
  ]
 }

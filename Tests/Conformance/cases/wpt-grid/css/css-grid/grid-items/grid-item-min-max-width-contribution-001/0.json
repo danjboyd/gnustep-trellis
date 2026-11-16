@@ -1,0 +1,57 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-items/grid-item-min-max-width-contribution-001/0",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-items/grid-item-min-max-width-contribution-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "inline-grid",
+   "boxSizing": "content-box",
+   "gridTemplateColumns": "auto"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "maxWidth": 50
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "width": 200,
+       "height": 10
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {}
+    ]
+   }
+  ],
+  "width": 50
+ },
+ "requires": [
+  "block-layout",
+  "display-inline-grid"
+ ]
+}

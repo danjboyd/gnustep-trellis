@@ -1,0 +1,120 @@
+{
+ "id": "wpt-grid/css/css-grid/alignment/grid-self-alignment-stretch-009",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/alignment/grid-self-alignment-stretch-009.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "inline-grid",
+   "boxSizing": "content-box",
+   "position": "relative",
+   "width": 250,
+   "height": 250
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridRow": "1",
+     "gridColumn": "1",
+     "justifySelf": "stretch",
+     "alignSelf": "start"
+    },
+    "measure": {
+     "text": "XX X",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridRow": "1",
+     "gridColumn": "2",
+     "justifySelf": "start",
+     "alignSelf": "stretch"
+    },
+    "measure": {
+     "text": "XX X",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridRow": "2",
+     "gridColumn": "1",
+     "justifySelf": "start",
+     "alignSelf": "start"
+    },
+    "measure": {
+     "text": "XX X",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridRow": "2",
+     "gridColumn": "2",
+     "justifySelf": "stretch",
+     "alignSelf": "stretch"
+    },
+    "measure": {
+     "text": "XX X",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 125,
+    "height": 20,
+    "x": 0,
+    "y": 0
+   },
+   {
+    "width": 80,
+    "height": 125,
+    "x": 125,
+    "y": 0
+   },
+   {
+    "width": 80,
+    "height": 20,
+    "x": 0,
+    "y": 125
+   },
+   {
+    "width": 125,
+    "height": 125,
+    "x": 125,
+    "y": 125
+   }
+  ]
+ },
+ "requires": [
+  "display-inline-grid",
+  "measure"
+ ]
+}

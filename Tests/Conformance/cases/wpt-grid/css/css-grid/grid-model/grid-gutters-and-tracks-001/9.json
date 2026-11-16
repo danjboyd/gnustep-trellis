@@ -1,0 +1,106 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-model/grid-gutters-and-tracks-001/9",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-model/grid-gutters-and-tracks-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 800,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "position": "relative"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "grid",
+     "boxSizing": "content-box",
+     "paddingTop": 3,
+     "paddingRight": 7,
+     "paddingBottom": 5,
+     "paddingLeft": 1,
+     "rowGap": 12,
+     "columnGap": 23,
+     "gridTemplateColumns": "10px 20% repeat(2, 30px)",
+     "width": 220,
+     "gridAutoRows": 20,
+     "borderTopWidth": 1,
+     "borderRightWidth": 1,
+     "borderBottomWidth": 1,
+     "borderLeftWidth": 1
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "1",
+       "gridRow": "1"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "2",
+       "gridRow": "2"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "3",
+       "gridRow": "3",
+       "gridArea": "3 / 3"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "width": 10,
+      "height": 20,
+      "x": 2,
+      "y": 4,
+      "relativeTo": 2
+     },
+     {
+      "width": 44,
+      "height": 20,
+      "x": 35,
+      "y": 36,
+      "relativeTo": 2
+     },
+     {
+      "width": 30,
+      "height": 20,
+      "x": 102,
+      "y": 68,
+      "relativeTo": 2
+     }
+    ],
+    "width": 230,
+    "height": 94
+   }
+  ]
+ },
+ "requires": [
+  "block-layout"
+ ]
+}

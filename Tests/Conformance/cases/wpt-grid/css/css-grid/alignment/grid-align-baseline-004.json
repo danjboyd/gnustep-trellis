@@ -1,0 +1,109 @@
+{
+ "id": "wpt-grid/css/css-grid/alignment/grid-align-baseline-004",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/alignment/grid-align-baseline-004.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "gridTemplateRows": "50px 50px 50px",
+   "gridTemplateColumns": "50px 50px",
+   "gridTemplateAreas": "none",
+   "gridAutoFlow": "column",
+   "alignItems": "last baseline",
+   "width": 200,
+   "position": "relative",
+   "borderTopWidth": 3,
+   "borderRightWidth": 3,
+   "borderBottomWidth": 3,
+   "borderLeftWidth": 3
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridArea": "3 / 1",
+     "marginBottom": 10
+    },
+    "children": [
+     {
+      "style": {
+       "display": "inline-block",
+       "boxSizing": "content-box",
+       "width": 20,
+       "height": 20
+      }
+     },
+     {
+      "style": {
+       "display": "inline-block",
+       "boxSizing": "content-box",
+       "width": 20,
+       "height": 20
+      }
+     }
+    ]
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridArea": "1 / 2 / 4 / 2"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "inline-block",
+       "boxSizing": "content-box",
+       "width": 20,
+       "height": 20
+      }
+     },
+     {
+      "style": {
+       "display": "inline-block",
+       "boxSizing": "content-box",
+       "width": 20,
+       "height": 20
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {},
+     {}
+    ],
+    "y": 103
+   },
+   {
+    "children": [
+     {},
+     {}
+    ],
+    "y": 103
+   }
+  ]
+ },
+ "requires": [
+  "block-layout",
+  "display-inline-block"
+ ]
+}

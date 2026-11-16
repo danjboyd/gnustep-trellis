@@ -1,0 +1,162 @@
+{
+ "id": "wpt-grid/css/css-grid/placement/grid-auto-flow-resolution-001/5",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/placement/grid-auto-flow-resolution-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "width": 1000,
+   "height": 1000,
+   "position": "relative"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "grid",
+     "boxSizing": "content-box",
+     "gridAutoFlow": "row",
+     "justifyContent": "start",
+     "gridTemplateColumns": "50px 100px 150px 200px",
+     "gridTemplateRows": "50px 100px 150px 200px"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "1",
+       "gridRow": "auto",
+       "width": "100%",
+       "height": "100%"
+      },
+      "measure": {
+       "text": "XXXXX XXXXX XXXXX",
+       "charWidth": 10,
+       "lineHeight": 10
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "2",
+       "gridRow": "1",
+       "width": "100%",
+       "height": "100%"
+      },
+      "measure": {
+       "text": "XXXXX XXXXX XXXXX",
+       "charWidth": 10,
+       "lineHeight": 10
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "auto",
+       "gridRow": "2",
+       "width": "100%",
+       "height": "100%"
+      },
+      "measure": {
+       "text": "XXXXX XXXXX XXXXX",
+       "charWidth": 10,
+       "lineHeight": 10
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "auto",
+       "gridRow": "1",
+       "width": "100%",
+       "height": "100%"
+      },
+      "measure": {
+       "text": "XXXXX XXXXX XXXXX",
+       "charWidth": 10,
+       "lineHeight": 10
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "auto",
+       "gridRow": "auto",
+       "width": "100%",
+       "height": "100%"
+      },
+      "measure": {
+       "text": "XXXXX XXXXX XXXXX",
+       "charWidth": 10,
+       "lineHeight": 10
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "width": 50,
+      "height": 150,
+      "x": 0,
+      "y": 150,
+      "relativeTo": 2
+     },
+     {
+      "width": 100,
+      "height": 50,
+      "x": 50,
+      "y": 0,
+      "relativeTo": 2
+     },
+     {
+      "width": 50,
+      "height": 100,
+      "x": 0,
+      "y": 50,
+      "relativeTo": 2
+     },
+     {
+      "width": 50,
+      "height": 50,
+      "x": 0,
+      "y": 0,
+      "relativeTo": 2
+     },
+     {
+      "width": 100,
+      "height": 150,
+      "x": 50,
+      "y": 150,
+      "relativeTo": 2
+     }
+    ]
+   }
+  ]
+ },
+ "requires": [
+  "block-layout",
+  "measure"
+ ]
+}

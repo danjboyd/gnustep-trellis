@@ -1,0 +1,136 @@
+{
+ "id": "wpt-grid/css/css-grid/alignment/grid-self-alignment-stretch-011",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/alignment/grid-self-alignment-stretch-011.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "inline-grid",
+   "boxSizing": "content-box",
+   "position": "relative",
+   "width": 250,
+   "height": 250
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridRow": "1",
+     "gridColumn": "1",
+     "justifySelf": "stretch",
+     "alignSelf": "start",
+     "borderTopWidth": 0,
+     "borderRightWidth": 10,
+     "borderBottomWidth": 0,
+     "borderLeftWidth": 0
+    },
+    "measure": {
+     "text": "XX X",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridRow": "1",
+     "gridColumn": "2",
+     "justifySelf": "start",
+     "alignSelf": "stretch",
+     "borderTopWidth": 0,
+     "borderRightWidth": 0,
+     "borderBottomWidth": 20,
+     "borderLeftWidth": 0
+    },
+    "measure": {
+     "text": "XX X",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridRow": "2",
+     "gridColumn": "1",
+     "justifySelf": "start",
+     "alignSelf": "start",
+     "borderTopWidth": 0,
+     "borderRightWidth": 0,
+     "borderBottomWidth": 0,
+     "borderLeftWidth": 0
+    },
+    "measure": {
+     "text": "XX X",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridRow": "2",
+     "gridColumn": "2",
+     "justifySelf": "stretch",
+     "alignSelf": "stretch",
+     "borderTopWidth": 0,
+     "borderRightWidth": 20,
+     "borderBottomWidth": 10,
+     "borderLeftWidth": 0
+    },
+    "measure": {
+     "text": "XX X",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 120,
+    "height": 20,
+    "x": 0,
+    "y": 0
+   },
+   {
+    "width": 80,
+    "height": 130,
+    "x": 120,
+    "y": 0
+   },
+   {
+    "width": 80,
+    "height": 20,
+    "x": 0,
+    "y": 130
+   },
+   {
+    "width": 130,
+    "height": 120,
+    "x": 120,
+    "y": 130
+   }
+  ]
+ },
+ "requires": [
+  "display-inline-grid",
+  "measure"
+ ]
+}

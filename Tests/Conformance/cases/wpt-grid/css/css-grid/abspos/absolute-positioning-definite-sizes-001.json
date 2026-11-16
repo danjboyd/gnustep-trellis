@@ -1,0 +1,76 @@
+{
+ "id": "wpt-grid/css/css-grid/abspos/absolute-positioning-definite-sizes-001",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/abspos/absolute-positioning-definite-sizes-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "gridTemplateRows": "50px 1fr",
+   "gridTemplateColumns": "1fr",
+   "gridTemplateAreas": "none",
+   "position": "absolute",
+   "left": 50,
+   "top": 50,
+   "width": 200,
+   "height": 200,
+   "borderTopWidth": 7,
+   "borderRightWidth": 7,
+   "borderBottomWidth": 7,
+   "borderLeftWidth": 7
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridRowStart": "1"
+    },
+    "measure": {
+     "text": "XXX X",
+     "charWidth": 10,
+     "lineHeight": 10
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridRowStart": "2"
+    },
+    "measure": {
+     "text": "XX XXX XX",
+     "charWidth": 10,
+     "lineHeight": 10
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 200,
+    "height": 50
+   },
+   {
+    "width": 200,
+    "height": 150
+   }
+  ]
+ },
+ "requires": [
+  "measure"
+ ]
+}

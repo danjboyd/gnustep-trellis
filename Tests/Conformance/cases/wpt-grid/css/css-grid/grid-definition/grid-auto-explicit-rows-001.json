@@ -1,0 +1,78 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-definition/grid-auto-explicit-rows-001",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-definition/grid-auto-explicit-rows-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "gridTemplateAreas": "\"a b c\" \"d e f\" \"g e h\"",
+   "gridTemplateRows": "11px 13px",
+   "gridAutoRows": "17px 19px",
+   "gridTemplateColumns": "23px 29px",
+   "gridAutoColumns": "31px 37px"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridArea": "1 / 1 / 2 / 2"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridArea": "1 / 1 / 3 / 3"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridArea": "1 / 1 / 4 / 4"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridArea": "1 / 1 / 5 / 5"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 23,
+    "height": 11
+   },
+   {
+    "width": 52,
+    "height": 24
+   },
+   {
+    "width": 83,
+    "height": 41
+   },
+   {
+    "width": 120,
+    "height": 60
+   }
+  ]
+ }
+}

@@ -1,0 +1,110 @@
+{
+ "id": "wpt-grid/css/css-grid/placement/grid-placement-unknown-named-grid-line-001/16",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/placement/grid-placement-unknown-named-grid-line-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "position": "relative"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "grid",
+     "boxSizing": "content-box",
+     "gridTemplateColumns": "[vertical] 50px [middle vertical] 100px [vertical]",
+     "gridAutoColumns": 10,
+     "gridTemplateRows": "[horizontal] 30px [middle horizontal] 60px [horizontal]",
+     "gridAutoRows": 5
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "span middle / 6",
+       "gridRow": "span middle / 6"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "span 2 middle / 6",
+       "gridRow": "span 2 middle / 6"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "-6 / span middle",
+       "gridRow": "-6 / span middle"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "-6 / span 2 middle",
+       "gridRow": "-6 / span 2 middle"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "width": 130,
+      "height": 75,
+      "x": 80,
+      "y": 45,
+      "relativeTo": 2
+     },
+     {
+      "width": 190,
+      "height": 110,
+      "x": 20,
+      "y": 10,
+      "relativeTo": 2
+     },
+     {
+      "width": 80,
+      "height": 45,
+      "x": 0,
+      "y": 0,
+      "relativeTo": 2
+     },
+     {
+      "width": 190,
+      "height": 110,
+      "x": 0,
+      "y": 0,
+      "relativeTo": 2
+     }
+    ]
+   }
+  ]
+ },
+ "requires": [
+  "block-layout",
+  "grid-named-lines"
+ ]
+}

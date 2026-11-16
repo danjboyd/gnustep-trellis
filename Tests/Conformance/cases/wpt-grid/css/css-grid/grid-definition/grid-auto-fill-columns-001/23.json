@@ -1,0 +1,57 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-definition/grid-auto-fill-columns-001/23",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-definition/grid-auto-fill-columns-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "width": 200,
+   "position": "relative",
+   "justifyContent": "start",
+   "gridAutoColumns": 157,
+   "gridAutoRows": 25,
+   "gridTemplateColumns": "[start] repeat(2, 50px [a]) [middle] repeat(auto-fill, [autofoo] 15px [autobar]) minmax(5%, 10%) [end]",
+   "columnGap": 20,
+   "borderTopWidth": 2,
+   "borderRightWidth": 2,
+   "borderBottomWidth": 2,
+   "borderLeftWidth": 2
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "1 / span 4"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 195,
+    "height": 25,
+    "x": 2,
+    "y": 2
+   }
+  ]
+ },
+ "requires": [
+  "calc",
+  "grid-named-lines"
+ ]
+}

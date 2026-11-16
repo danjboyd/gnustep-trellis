@@ -1,0 +1,57 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-lanes/track-sizing/auto-repeat/row-auto-repeat-010/2",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-lanes/track-sizing/auto-repeat/row-auto-repeat-010.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 600,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid-lanes",
+   "boxSizing": "content-box",
+   "position": "relative",
+   "gridTemplateRows": "repeat(auto-fill, 50px)",
+   "maxWidth": "50%",
+   "maxHeight": "80%",
+   "width": "min-content",
+   "height": "min-content"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridRow": "-2",
+     "width": 300,
+     "height": "100%"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 300,
+    "height": 50,
+    "x": 0,
+    "y": 150
+   }
+  ],
+  "width": 300,
+  "height": 200
+ },
+ "requires": [
+  "block-layout",
+  "grid-lanes",
+  "intrinsic-size-keyword"
+ ]
+}

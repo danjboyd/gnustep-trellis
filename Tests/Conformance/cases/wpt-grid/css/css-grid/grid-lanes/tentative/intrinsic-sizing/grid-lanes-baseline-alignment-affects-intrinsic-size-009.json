@@ -1,0 +1,135 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-lanes/tentative/intrinsic-sizing/grid-lanes-baseline-alignment-affects-intrinsic-size-009",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-lanes/tentative/intrinsic-sizing/grid-lanes-baseline-alignment-affects-intrinsic-size-009.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 800,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid-lanes",
+   "boxSizing": "content-box",
+   "width": 300,
+   "alignItems": "baseline",
+   "fitTolerance": 0,
+   "gridTemplateRows": "minmax(0px, auto) 30px minmax(0px, auto)"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "width": 60
+    },
+    "measure": {
+     "text": "\u00c9",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "width": 60
+    },
+    "measure": {
+     "text": "\u00c9",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "width": 60
+    },
+    "measure": {
+     "text": "\u00c9",
+     "charWidth": 30,
+     "lineHeight": 30
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "paddingTop": 25,
+     "width": 60,
+     "gridRow": "span 2"
+    },
+    "measure": {
+     "text": "\u00c9",
+     "charWidth": 40,
+     "lineHeight": 40
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "paddingBottom": 5,
+     "width": 60,
+     "gridRow": "3"
+    },
+    "measure": {
+     "text": "\u00c9",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "width": 60,
+     "height": "100%",
+     "gridRow": "1",
+     "alignSelf": "normal"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "width": 60,
+     "height": "100%",
+     "gridRow": "3",
+     "alignSelf": "normal"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {},
+   {},
+   {},
+   {},
+   {},
+   {
+    "height": 63
+   },
+   {
+    "height": 35
+   }
+  ],
+  "height": 128
+ },
+ "requires": [
+  "block-layout",
+  "calc",
+  "grid-lanes",
+  "measure"
+ ]
+}

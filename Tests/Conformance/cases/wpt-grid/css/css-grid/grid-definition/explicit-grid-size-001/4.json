@@ -1,0 +1,61 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-definition/explicit-grid-size-001/4",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-definition/explicit-grid-size-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "gridAutoColumns": 10,
+   "gridAutoRows": 10,
+   "position": "relative",
+   "gridTemplateAreas": "\"a\" \"b\""
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "auto",
+     "gridRow": "auto"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "auto",
+     "gridRow": "auto"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 10,
+    "height": 10,
+    "x": 0,
+    "y": 0
+   },
+   {
+    "width": 10,
+    "height": 10,
+    "x": 0,
+    "y": 10
+   }
+  ]
+ }
+}

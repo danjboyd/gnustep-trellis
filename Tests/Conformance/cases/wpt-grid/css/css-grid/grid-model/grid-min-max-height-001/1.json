@@ -1,0 +1,30 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-model/grid-min-max-height-001/1",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-model/grid-min-max-height-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 10,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "maxHeight": 100,
+   "gridTemplateColumns": 40,
+   "gridTemplateRows": "150px 50px"
+  }
+ },
+ "expected": {
+  "width": 10,
+  "height": 100
+ }
+}

@@ -1,0 +1,122 @@
+{
+ "id": "wpt-grid/css/css-grid/alignment/grid-content-alignment-overflow-002/5",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/alignment/grid-content-alignment-overflow-002.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "position": "relative",
+   "marginBottom": 50,
+   "marginRight": 25
+  },
+  "children": [
+   {
+    "style": {
+     "display": "grid",
+     "boxSizing": "border-box",
+     "alignContent": "unsafe end",
+     "justifyContent": "unsafe end",
+     "gridTemplateColumns": "50px 50px",
+     "gridTemplateRows": "100px 100px",
+     "paddingTop": 30,
+     "paddingRight": 30,
+     "paddingBottom": 30,
+     "paddingLeft": 30,
+     "overflow": "hidden",
+     "width": 200,
+     "height": 150
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "1",
+       "gridRow": "1"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "1",
+       "gridRow": "2"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "2",
+       "gridRow": "1"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "2",
+       "gridRow": "2"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "width": 50,
+      "height": 100,
+      "x": 70,
+      "y": -80,
+      "relativeTo": 2
+     },
+     {
+      "width": 50,
+      "height": 100,
+      "x": 70,
+      "y": 20,
+      "relativeTo": 2
+     },
+     {
+      "width": 50,
+      "height": 100,
+      "x": 120,
+      "y": -80,
+      "relativeTo": 2
+     },
+     {
+      "width": 50,
+      "height": 100,
+      "x": 120,
+      "y": 20,
+      "relativeTo": 2
+     }
+    ],
+    "width": 200,
+    "height": 150
+   }
+  ]
+ },
+ "requires": [
+  "block-layout",
+  "overflow"
+ ],
+ "droppedChecks": 2
+}

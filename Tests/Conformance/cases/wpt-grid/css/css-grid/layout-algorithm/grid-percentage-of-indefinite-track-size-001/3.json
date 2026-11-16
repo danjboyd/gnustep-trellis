@@ -1,0 +1,53 @@
+{
+ "id": "wpt-grid/css/css-grid/layout-algorithm/grid-percentage-of-indefinite-track-size-001/3",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/layout-algorithm/grid-percentage-of-indefinite-track-size-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "width": "min-content",
+   "gridTemplateColumns": "minmax(min-content, 25%)",
+   "gridTemplateRows": "minmax(0px, 1%)"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "1",
+     "gridRow": "1"
+    },
+    "measure": {
+     "text": "XXXX X",
+     "charWidth": 10,
+     "lineHeight": 10
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {}
+  ],
+  "width": 40,
+  "height": 20
+ },
+ "requires": [
+  "calc",
+  "intrinsic-size-keyword",
+  "measure"
+ ]
+}

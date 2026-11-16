@@ -1,0 +1,121 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-model/grid-gutters-and-tracks-001/7",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-model/grid-gutters-and-tracks-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 800,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "position": "relative"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "grid",
+     "boxSizing": "content-box",
+     "width": "fit-content",
+     "paddingTop": 3,
+     "paddingRight": 7,
+     "paddingBottom": 5,
+     "paddingLeft": 1,
+     "rowGap": 12,
+     "columnGap": 23,
+     "borderTopWidth": 1,
+     "borderRightWidth": 1,
+     "borderBottomWidth": 1,
+     "borderLeftWidth": 1
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "1",
+       "gridRow": "1"
+      },
+      "measure": {
+       "text": "XX",
+       "charWidth": 10,
+       "lineHeight": 10
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "2",
+       "gridRow": "2"
+      },
+      "measure": {
+       "text": "X X X X",
+       "charWidth": 10,
+       "lineHeight": 10
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "3",
+       "gridRow": "3",
+       "gridArea": "3 / 3"
+      },
+      "measure": {
+       "text": "XXX XX X XX XX",
+       "charWidth": 10,
+       "lineHeight": 10
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "width": 20,
+      "height": 10,
+      "x": 2,
+      "y": 4,
+      "relativeTo": 2
+     },
+     {
+      "width": 30,
+      "height": 20,
+      "x": 45,
+      "y": 26,
+      "relativeTo": 2
+     },
+     {
+      "width": 60,
+      "height": 30,
+      "x": 98,
+      "y": 58,
+      "relativeTo": 2
+     }
+    ],
+    "width": 166,
+    "height": 94
+   }
+  ]
+ },
+ "requires": [
+  "block-layout",
+  "intrinsic-size-keyword",
+  "measure"
+ ]
+}

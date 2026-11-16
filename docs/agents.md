@@ -121,6 +121,26 @@ the user's settings. trellis-render refuses to run without it.
 | `last baseline` | aligns last baselines | aligns as `end` (its fallback) |
 | No block or inline flow, floats or tables | | use rows and columns |
 
+**`display: block` is a column, and that has three visible effects.**
+Trellis keeps this on purpose: one layout model (flex) is predictable,
+fast, and what responsive app UI wants. Browser block flow exists for
+documents. The effects:
+
+1. **Children shrink instead of overflowing.** Items default to
+   `flex-shrink: 1`, so a `height: 100px` child in a 50px-tall block is
+   squeezed down to its content. In a browser it would overflow. Set
+   `flex-shrink: 0` on children that must keep their size.
+2. **Percentage heights resolve.** A child of a definite-height block has a
+   definite height after flexing, so `height: 50%` on a grandchild works.
+   In a browser, an auto-height block makes it `auto`.
+3. **Margins never collapse**, between siblings or through a parent.
+
+The WPT importer tags cases that rely on block flow `requires: block-layout`.
+The runner still runs them: of 176, 132 pass, because a column usually lays
+out a block the same way. The divergence itself shows in `percentage-size`
+(effect 2). Most of the other failures with that tag are importer issues,
+not this.
+
 **The most common mistake:** `flex-basis` (and the third value of
 `flex`) applies to the *main* axis. `flex: 1 1 160px` means 160px wide in
 a row but **160px tall in a column**. If a container switches direction

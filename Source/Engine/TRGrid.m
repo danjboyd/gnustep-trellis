@@ -299,6 +299,7 @@ typedef struct {
   double w, h;                /* final border-box size */
   double x, y;
   NSInteger docOrder;
+  BOOL autoMinW, autoMinH;    /* content-based (automatic) minimum size in that axis */
 } TRGridItem;
 
 static inline double TRGResolve(TRValue v, double ref)
@@ -313,6 +314,8 @@ static inline double TRGResolve(TRValue v, double ref)
 
 /* A width or height as a border-box size: content-box sizes add the
    item's padding and border (percent padding against padRef). */
+static inline TRValue TRZeroValue(void) { TRValue r = { 0, TRUnitPoint }; return r; }
+
 static double TRGBox(const TRStyleStorage *s, TRValue v, double ref, BOOL horizontal, double padRef)
 {
   double r = TRGResolve(v, ref);
@@ -478,7 +481,30 @@ static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
             TRTrack *t = &tr[a];
             if (t->collapsed) continue;
             TRBreadthKind mk = t->size.min.kind;
-            if (mk == TRBreadthAuto || mk == TRBreadthMinContent)
+            /* An automatic minimum is clamped so the margin box fits a fixed
+               maximum track size (CSS Grid 6.6). */
+            double minA = minC;
+            double mg = columns ? it->margin[TREdgeLeft] + it->margin[TREdgeRight]
+                                : it->margin[TREdgeTop] + it->margin[TREdgeBottom];
+            TRValue autoSize = columns ? it->s->width : it->s->height;
+            BOOL sizeAuto = autoSize.unit != TRUnitPoint && autoSize.unit != TRUnitPercent;
+            if (mk == TRBreadthAuto && (columns ? it->autoMinW : it->autoMinH))
+              {
+                /* The content-box part is clamped to the stretch fit (the max
+                   less margins, padding and border), which still count. */
+                double fx = TRBreadthFixedValue(t->size.max, avail);
+                double pb = TRGBox(it->s, TRZeroValue(), NAN, columns, NAN);
+                if (!isnan(fx)) minA = MIN(minC - mg - pb, MAX(0, fx - mg - pb)) + mg + pb;
+              }
+            else if (mk == TRBreadthAuto && sizeAuto)
+              {
+                /* An explicit min-width/height replaces the automatic minimum:
+                   the contribution is that size (a border box) plus margins. */
+                double mn = TRGBox(it->s, columns ? it->s->minWidth : it->s->minHeight, NAN, columns, NAN);
+                if (!isnan(mn)) minA = mn + mg;
+              }
+            if (mk == TRBreadthAuto) t->base = MAX(t->base, minA);
+            else if (mk == TRBreadthMinContent)
               t->base = MAX(t->base, minC);
             else if (mk == TRBreadthMaxContent)
               t->base = MAX(t->base, maxC);
@@ -980,6 +1006,8 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           it->margin[e] = isnan(m) ? 0 : m;
         }
       double mh = it->margin[TREdgeLeft] + it->margin[TREdgeRight];
+      it->autoMinW = cs->width.unit != TRUnitPoint && cs->width.unit != TRUnitPercent && cs->minWidth.unit == TRUnitAuto;
+      it->autoMinH = cs->height.unit != TRUnitPoint && cs->height.unit != TRUnitPercent && cs->minHeight.unit == TRUnitAuto;
       double sw = TRGBox(cs, cs->width, NAN, YES, NAN);
       if (!isnan(sw))
         it->minW = it->maxW = sw + mh;

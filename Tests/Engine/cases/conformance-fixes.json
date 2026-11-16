@@ -1146,5 +1146,68 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_auto_minimum_clamped_by_fixed_max",
+  "note": "CSS Grid 6.6: with a fixed max track size, an automatic minimum's content part is clamped (padding, border and margins still count); an explicit min-width replaces it",
+  "root": {
+   "style": {
+    "display": "grid",
+    "width": 300,
+    "gridTemplateColumns": "minmax(auto, 0px) minmax(auto, 0px) minmax(auto, 0px)",
+    "justifyContent": "start"
+   },
+   "children": [
+    {
+     "style": {
+      "paddingLeft": 5,
+      "paddingRight": 5,
+      "height": 10
+     },
+     "measure": {
+      "text": "XXXX",
+      "charWidth": 25,
+      "lineHeight": 10
+     }
+    },
+    {
+     "style": {
+      "marginLeft": 4,
+      "height": 10
+     },
+     "measure": {
+      "text": "XXXX",
+      "charWidth": 25,
+      "lineHeight": 10
+     }
+    },
+    {
+     "style": {
+      "minWidth": 30,
+      "height": 10
+     },
+     "measure": {
+      "text": "XXXX",
+      "charWidth": 25,
+      "lineHeight": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "x": 0,
+     "width": 10
+    },
+    {
+     "x": 14
+    },
+    {
+     "x": 14,
+     "width": 30
+    }
+   ]
+  }
  }
 ]

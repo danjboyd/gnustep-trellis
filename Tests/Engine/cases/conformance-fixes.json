@@ -1377,5 +1377,61 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/root_content_box_max_height_fit_content",
+  "note": "a root with no available height uses its content-box max-height plus padding and border",
+  "root": {
+   "style": {
+    "boxSizing": "content-box",
+    "maxHeight": 70,
+    "padding": 2,
+    "borderTopWidth": 5,
+    "borderBottomWidth": 5,
+    "width": 50,
+    "flexDirection": "column"
+   },
+   "children": [
+    {
+     "style": {
+      "height": 200,
+      "flexShrink": 0
+     }
+    }
+   ]
+  },
+  "available": {
+   "width": null,
+   "height": null
+  },
+  "expected": {
+   "height": 84
+  }
+ },
+ {
+  "id": "engine/gap_normal_is_zero",
+  "root": {
+   "style": {
+    "display": "grid",
+    "width": 100,
+    "gridTemplateRows": "10px 10px",
+    "rowGap": "normal",
+    "gap": "normal"
+   },
+   "children": [
+    {},
+    {}
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "y": 0
+    },
+    {
+     "y": 10
+    }
+   ]
+  }
  }
 ]

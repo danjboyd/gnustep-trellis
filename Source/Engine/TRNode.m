@@ -232,12 +232,13 @@ static void TRClearDirty(TRNode *n)
         if (s->maxHeight.unit == TRUnitPoint) ah = MIN(ah, s->maxHeight.value + extra[TREdgeTop % 2]);
         if (s->minHeight.unit == TRUnitPoint) ah = MAX(ah, s->minHeight.value + extra[TREdgeTop % 2]);
       }
+    /* A root with max-width/height and no available size: fit-content,
+       bounded by the max as a border box. */
+    if (wm == TRMeasureModeUndefined && s->maxWidth.unit == TRUnitPoint)
+      { aw = s->maxWidth.value + extra[TREdgeLeft % 2]; wm = TRMeasureModeAtMost; }
+    if (hm == TRMeasureModeUndefined && s->maxHeight.unit == TRUnitPoint)
+      { ah = s->maxHeight.value + extra[TREdgeTop % 2]; hm = TRMeasureModeAtMost; }
   }
-  /* A root with max-width/height and no available size: fit-content. */
-  if (wm == TRMeasureModeUndefined && s->maxWidth.unit == TRUnitPoint)
-    { aw = s->maxWidth.value; wm = TRMeasureModeAtMost; }
-  if (hm == TRMeasureModeUndefined && s->maxHeight.unit == TRUnitPoint)
-    { ah = s->maxHeight.value; hm = TRMeasureModeAtMost; }
 
   /* Size a fit-content root's width first, then lay it out at that exact
      width so its children's percentages resolve against it. (As in CSS,

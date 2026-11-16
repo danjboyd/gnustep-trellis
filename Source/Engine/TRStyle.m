@@ -449,6 +449,14 @@ static int TREdgeFromSuffix(NSString *suffix)
   LENGTH(@"max-width", maxWidth, NO, YES)
   LENGTH(@"max-height", maxHeight, NO, YES)
   LENGTH(@"flex-basis", flexBasis, YES, NO)
+  /* gap's "normal" is 0 for flex and grid containers. */
+  if (([p isEqualToString: @"row-gap"] || [p isEqualToString: @"column-gap"])
+      && [v isKindOfClass: [NSString class]]
+      && [[[v lowercaseString] stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]] isEqualToString: @"normal"])
+    {
+      if ([p isEqualToString: @"row-gap"]) _s.rowGap = TRPx(0); else _s.columnGap = TRPx(0);
+      return YES;
+    }
   LENGTH(@"row-gap", rowGap, NO, NO)
   LENGTH(@"column-gap", columnGap, NO, NO)
 #undef KEYWORD
@@ -486,9 +494,13 @@ static int TREdgeFromSuffix(NSString *suffix)
       NSArray *t = TRTokens(v);
       TRValue r, c;
       if ([t count] < 1 || [t count] > 2) return NO;
-      if (!TRParseLength(t[0], &r, NO, NO)) return NO;
+      BOOL (^gapLen)(NSString *, TRValue *) = ^BOOL(NSString *tok, TRValue *out) {
+        if ([[tok lowercaseString] isEqualToString: @"normal"]) { *out = TRPx(0); return YES; }
+        return TRParseLength(tok, out, NO, NO);
+      };
+      if (!gapLen(t[0], &r)) return NO;
       c = r;
-      if ([t count] == 2 && !TRParseLength(t[1], &c, NO, NO)) return NO;
+      if ([t count] == 2 && !gapLen(t[1], &c)) return NO;
       _s.rowGap = r; _s.columnGap = c;
       return YES;
     }

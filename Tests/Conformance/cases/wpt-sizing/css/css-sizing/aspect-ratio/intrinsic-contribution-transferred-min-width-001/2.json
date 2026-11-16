@@ -24,7 +24,7 @@
     "style": {
      "display": "block",
      "boxSizing": "content-box",
-     "aspectRatio": "1",
+     "aspectRatio": 1,
      "minHeight": 200,
      "maxWidth": "min-content"
     },

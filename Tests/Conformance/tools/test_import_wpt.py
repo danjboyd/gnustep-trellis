@@ -139,6 +139,22 @@ class AttributeSelectors(unittest.TestCase):
         self.assertNotIn("height", p.declared(b))
 
 
+class AspectRatio(unittest.TestCase):
+    def ratio(self, v):
+        d = tempfile.mkdtemp()
+        with open(os.path.join(d, "t.html"), "w") as f:
+            f.write('<!DOCTYPE html><body><div style="aspect-ratio: %s"></div></body>' % v)
+        p = W.Page(os.path.join(d, "t.html"))
+        c = W.Converter(p)
+        return c.style_for(p.dom.body.element_children()[0], "block")["aspectRatio"]
+
+    def test_forms(self):
+        self.assertEqual(self.ratio("2 / 1"), 2)
+        self.assertEqual(self.ratio("1.5"), 1.5)
+        self.assertEqual(self.ratio("auto 2/1"), "auto 2")
+        self.assertEqual(self.ratio("auto"), "auto")
+
+
 class Validation(unittest.TestCase):
     def test_left_right_not_valid_for_align(self):
         self.assertNotIn("right", W.VALID_KEYWORDS["align-content"])

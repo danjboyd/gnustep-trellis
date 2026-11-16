@@ -231,6 +231,17 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
 - (void)runScheduledLayout;
 @end
 
+/* An ARC weak reference. GNUstep's weak NSHashTable can hand back an
+   object that is being deallocated; an ARC __weak load returns nil. */
+@interface TRWeakView : NSObject
+{
+@public
+  __weak NSView *view;
+}
+@end
+@implementation TRWeakView
+@end
+
 @implementation TRLayoutTrigger
 - (void)fire
 {
@@ -253,6 +264,8 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
   TRLayoutTrigger *_trigger;
   BOOL _managesKeyViewLoop;
   __weak NSView *_firstKeyView;
+  __weak NSView *_lastKeyView;
+  NSMutableArray *_keyLoopViews;  /* TRWeakView: the views linked last time */
 }
 
 + (instancetype)boxWithStyle:(NSString *)declarations
@@ -524,7 +537,24 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
 /* ---- Keyboard focus order ---- */
 
 - (BOOL)managesKeyViewLoop { return _managesKeyViewLoop; }
-- (void)setManagesKeyViewLoop:(BOOL)yn { _managesKeyViewLoop = yn; }
+- (void)setManagesKeyViewLoop:(BOOL)yn
+{
+  _managesKeyViewLoop = yn;
+  if (!yn)
+    {
+      /* Hand the chain back: unlink what Trellis linked; the app links
+         its own views now. */
+      for (TRWeakView *w in _keyLoopViews)
+        {
+          NSView *v = w->view;
+          if (v != nil) [v setNextKeyView: nil];
+        }
+      _keyLoopViews = nil;
+      _firstKeyView = nil;
+      _lastKeyView = nil;
+      [super setNextKeyView: nil];
+    }
+}
 - (NSView *)firstKeyView { return _firstKeyView; }
 
 /* Focusable views under v in document order (a TRBoxView's subviews in
@@ -573,10 +603,61 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
       ordered[j] = v;
     }
   [ordered addObjectsFromArray: rest];
+  /* Unlink views that left the loop, so no stale chain points into it. */
+  for (TRWeakView *w in _keyLoopViews)
+    {
+      NSView *v = w->view;
+      if (v != nil && [v nextKeyView] != nil) [v setNextKeyView: nil];
+    }
+  if (_keyLoopViews == nil) _keyLoopViews = [NSMutableArray array];
+  [_keyLoopViews removeAllObjects];
+  /* An open chain that wraps through this box: last -> box -> first.
+     The box's -nextKeyView / -previousKeyView lead back in only while a
+     member can become key, so GNUstep's -nextValidKeyView (which walks
+     until it finds a valid view, nil or its start) can't spin forever
+     on a ring whose members are all hidden or disabled. */
   NSUInteger n = [ordered count];
   for (NSUInteger i = 0; i < n; i++)
-    [ordered[i] setNextKeyView: ordered[(i + 1) % n]];
+    {
+      TRWeakView *w = [TRWeakView new];
+      w->view = ordered[i];
+      [_keyLoopViews addObject: w];
+      [ordered[i] setNextKeyView: (i + 1 < n) ? ordered[i + 1] : (NSView *)self];
+    }
   _firstKeyView = n ? ordered[0] : nil;
+  _lastKeyView = n ? ordered[n - 1] : nil;
+  [super setNextKeyView: _firstKeyView];
+}
+
+/* YES when some view of the managed loop can take focus now. */
+- (BOOL)keyLoopHasValidView
+{
+  for (TRWeakView *w in _keyLoopViews)
+    {
+      NSView *v = w->view;
+      if (v != nil && [v canBecomeKeyView]) return YES;
+    }
+  return NO;
+}
+
+/* While Trellis manages the loop, these never return the raw link from
+   NSView: GNUstep's -dealloc asks neighbours for -nextKeyView while a
+   member is being freed, and ARC would retain and autorelease that dying
+   view on the way out. The __weak first/last read nil for it instead. */
+- (NSView *)nextKeyView
+{
+  if (_keyLoopViews == nil) return [super nextKeyView];
+  if (_tearingDown) return nil;
+  NSView *first = _firstKeyView;
+  return (first != nil && [self keyLoopHasValidView]) ? first : nil;
+}
+
+- (NSView *)previousKeyView
+{
+  if (_keyLoopViews == nil) return [super previousKeyView];
+  if (_tearingDown) return nil;
+  NSView *last = _lastKeyView;
+  return (last != nil && [self keyLoopHasValidView]) ? last : nil;
 }
 
 - (void)applyFrames

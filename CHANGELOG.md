@@ -3,6 +3,24 @@
 Trellis follows semantic versioning once 1.0 ships; before that, a minor
 version may change the API listed in docs/api.md, and says so here.
 
+## 0.2.2 (2026-11-16)
+
+No API changes.
+
+- **Fixed:** a hang on GNUstep (0.2.0 to 0.2.1). The managed key-view loop
+  was a closed ring, and GNUstep's `-nextValidKeyView` walks a chain until
+  it finds a view that can become key, nil or its start. So when every
+  view in the ring was hidden or disabled, and the search started outside
+  it, the search never ended. The chain is now open and wraps through the
+  outermost box, which leads back in only while some member can take
+  focus. Views that leave the loop are unlinked, and
+  `managesKeyViewLoop = NO` unlinks what Trellis linked.
+  Tests/View/key-view-hang.m (KEYHANG in `make check-gui`) covers all
+  hidden, all disabled, a hidden box and all `display: none`, with an
+  alarm guard. Walking raw `-nextKeyView` now passes through the box
+  between the last view and the first; Tab (`-nextValidKeyView`) skips
+  it.
+
 ## 0.2.1 (2026-11-16)
 
 No API changes.

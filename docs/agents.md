@@ -80,7 +80,9 @@ the user's settings. trellis-render refuses to run without it.
   drop out and come back by themselves. CSS `order` doesn't change it.
   `tabindex="1"`, `"2"`, ... go first, in that order; `tabindex="-1"`
   leaves a control out. Scrolled content joins the loop. For the first
-  responder, use the root box's `firstKeyView`.
+  responder, use the root box's `firstKeyView`. The loop wraps through
+  the root box, so a screen whose controls are all hidden or disabled
+  never stalls Tab.
 - **Accessibility:** every control needs a name a screen reader can read.
   Name a control with a visible label, `<label label-for="theme">Theme</label>`,
   or with `a11y-label="Snooze"` when there's no visible text (a popup that

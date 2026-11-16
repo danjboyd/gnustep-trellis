@@ -61,7 +61,12 @@
    descendants into a nextKeyView loop after every layout: views with a
    positive tab index first (ascending), then the rest in document order;
    hidden views and tab index -1 are left out. CSS `order` doesn't change
-   it, as in browsers. Set managesKeyViewLoop = NO to build your own. */
+   it, as in browsers. The chain is open and wraps through the box
+   (last -> box -> first): the box's -nextKeyView / -previousKeyView lead
+   back in only while some member can become key, so a loop whose views
+   are all hidden or disabled ends the search instead of spinning. Set
+   managesKeyViewLoop = NO to build your own (Trellis then unlinks the
+   views it linked). */
 @property (nonatomic) BOOL managesKeyViewLoop;          /* default YES */
 - (void)recalculateTrellisKeyViewLoop;
 /* The first view in the loop (for -[NSWindow setInitialFirstResponder:]). */

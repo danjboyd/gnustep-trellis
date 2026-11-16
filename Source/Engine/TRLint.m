@@ -95,7 +95,11 @@ static void TRLintNode(NSDictionary *n, NSString *path, double absX, double absY
       if ([c[@"hidden"] boolValue]) continue;
       double cx = [c[@"x"] doubleValue], cy = [c[@"y"] doubleValue];
       double cw = [c[@"width"] doubleValue], ch = [c[@"height"] doubleValue];
-      if (!clips && (cx < -kTol || cy < -kTol || cx + cw > w + kTol || cy + ch > h + kTol))
+      /* Pixel rounding rounds a measured (text) leaf's fractional size up,
+         as Yoga does, so it may stick out of its parent by up to one
+         pixel; that isn't a layout problem. */
+      double far = c[@"intrinsic"] != nil ? 1.0 + kTol : kTol;
+      if (!clips && (cx < -kTol || cy < -kTol || cx + cw > w + far || cy + ch > h + far))
         TRAdd(out, @"overflow", @"warning", c, cp,
               [NSString stringWithFormat: @"%@ (%g,%g %gx%g) overflows %@ (%gx%g)",
                         TRNodeName(c, cp), cx, cy, cw, ch, name, w, h]);

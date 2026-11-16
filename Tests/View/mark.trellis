@@ -1,0 +1,10 @@
+<!-- MarkText on Mark must stay readable in light and dark: Mark is a
+     light highlight (yellow) in both appearances, so MarkText is black. -->
+<column class="page">
+  <box class="mark"><label class="mark-text">Needs you</label></box>
+</column>
+<style>
+  .page { padding: 12px; background-color: Canvas; }
+  .mark { padding: 0 8px; border-radius: 8px; background-color: Mark; }
+  .mark-text { color: MarkText; font-weight: bold; }
+</style>

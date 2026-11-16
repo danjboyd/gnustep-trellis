@@ -3,6 +3,15 @@
 Trellis follows semantic versioning once 1.0 ships; before that, a minor
 version may change the API listed in docs/api.md, and says so here.
 
+## Unreleased
+
+- **Fixed:** `MarkText` is black: `Mark` is a light highlight in both
+  appearances, and MarkText used to follow the text colour, so it turned
+  near-white on yellow in dark. Tests/View/mark.trellis covers it in
+  appearance.sh.
+- **Lint:** `overflow` allows a measured (text) leaf to stick out of its
+  parent by up to 1 px, the pixel rounding Trellis shares with Yoga.
+
 ## 0.2.0 (2026-11-16)
 
 Adds API (listed in docs/api.md, nothing removed): keyboard focus order,

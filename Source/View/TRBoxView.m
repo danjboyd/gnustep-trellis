@@ -141,7 +141,7 @@ NSColor *TRColorFromCSS(NSString *css)
                @"accentcolor": @"controlAccentColor|selectedControlColor",
                @"accentcolortext": @"alternateSelectedControlTextColor",
                @"linktext": @"linkColor|selectedControlColor|blueColor",
-               @"mark": @"findHighlightColor|yellowColor", @"marktext": @"textColor",
+               @"mark": @"findHighlightColor|yellowColor", @"marktext": @"blackColor",   /* Mark is a light highlight in both appearances */
                /* Trellis extensions */
                @"-tr-window-background": @"windowBackgroundColor",
                @"-tr-separator": @"separatorColor|gridColor",

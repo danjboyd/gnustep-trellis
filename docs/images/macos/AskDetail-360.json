@@ -1,0 +1,265 @@
+{
+  "trellis" : "0.1",
+  "lint" : [
+
+  ],
+  "source" : "..\/..\/Examples\/TrellisDemo\/AskDetail.trellis",
+  "viewport" : {
+    "width" : 360,
+    "scale" : 1,
+    "height" : 374
+  },
+  "theme" : "default",
+  "root" : {
+    "height" : 374,
+    "style" : "flex-direction: column; padding-left: 16px; padding-top: 16px; padding-right: 16px; padding-bottom: 16px; row-gap: 10px; column-gap: 10px; background-color: #ffffff; container-type: inline-size",
+    "x" : 0,
+    "y" : 0,
+    "id" : "ask",
+    "width" : 360,
+    "class" : "TRBoxView",
+    "children" : [
+      {
+        "height" : 62,
+        "style" : "flex-wrap: wrap; align-items: baseline; row-gap: 8px; column-gap: 8px",
+        "x" : 16,
+        "y" : 16,
+        "children" : [
+          {
+            "height" : 16,
+            "style" : "flex-shrink: 0; color: #1c71d8; font-weight: bold",
+            "x" : 0,
+            "y" : 0,
+            "id" : "kind",
+            "width" : 57,
+            "class" : "NSTextField",
+            "intrinsic" : {
+              "width" : 57,
+              "height" : 16
+            },
+            "text" : "approve",
+            "needed" : {
+              "width" : 57,
+              "height" : 16
+            }
+          },
+          {
+            "height" : 38,
+            "style" : "flex-grow: 1; flex-basis: 100%; order: 3; font-size: 15px",
+            "x" : 0,
+            "y" : 24,
+            "id" : "title",
+            "width" : 328,
+            "class" : "NSTextField",
+            "container" : {
+              "matched" : [
+                "(max-width: 359px)"
+              ]
+            },
+            "intrinsic" : {
+              "width" : 413,
+              "height" : 19
+            },
+            "text" : "Tag example-cli v0.1.8 as rc2 and publish the release notes?",
+            "needed" : {
+              "width" : 314,
+              "height" : 38
+            }
+          },
+          {
+            "height" : 16,
+            "style" : "flex-shrink: 0; color: #77767b",
+            "x" : 65,
+            "y" : 0,
+            "id" : "age",
+            "width" : 70,
+            "class" : "NSTextField",
+            "intrinsic" : {
+              "width" : 70,
+              "height" : 16
+            },
+            "text" : "12 min ago",
+            "needed" : {
+              "width" : 70,
+              "height" : 16
+            }
+          }
+        ],
+        "width" : 328,
+        "class" : "TRBoxView",
+        "container" : {
+          "matched" : [
+            "(max-width: 359px)"
+          ]
+        }
+      },
+      {
+        "height" : 32,
+        "style" : "align-items: baseline; row-gap: 6px; column-gap: 6px",
+        "x" : 16,
+        "y" : 88,
+        "children" : [
+          {
+            "height" : 16,
+            "style" : "flex-shrink: 0; color: #77767b",
+            "x" : 0,
+            "y" : 0,
+            "id" : "agent",
+            "width" : 104,
+            "class" : "NSTextField",
+            "intrinsic" : {
+              "width" : 104,
+              "height" : 16
+            },
+            "text" : "agent-a",
+            "needed" : {
+              "width" : 104,
+              "height" : 16
+            }
+          },
+          {
+            "height" : 16,
+            "style" : "flex-shrink: 0; color: #77767b",
+            "x" : 110,
+            "y" : 0,
+            "needed" : {
+              "width" : 8,
+              "height" : 16
+            },
+            "width" : 8,
+            "class" : "NSTextField",
+            "intrinsic" : {
+              "width" : 8,
+              "height" : 16
+            },
+            "text" : "·"
+          },
+          {
+            "height" : 32,
+            "style" : "flex-grow: 1; flex-basis: 0%; color: #77767b",
+            "x" : 124,
+            "y" : 0,
+            "id" : "blocks",
+            "width" : 204,
+            "class" : "NSTextField",
+            "intrinsic" : {
+              "width" : 268,
+              "height" : 16
+            },
+            "text" : "blocks the rc2 tag and the packager update",
+            "needed" : {
+              "width" : 166,
+              "height" : 32
+            }
+          }
+        ],
+        "width" : 328,
+        "class" : "TRBoxView"
+      },
+      {
+        "height" : 64,
+        "style" : "min-height: 48px",
+        "x" : 16,
+        "y" : 130,
+        "id" : "body",
+        "width" : 328,
+        "class" : "NSTextField",
+        "intrinsic" : {
+          "width" : 1279,
+          "height" : 16
+        },
+        "text" : "All tests pass on Linux and Windows. The macOS job is still flaky on the notarization step; I re-ran it twice and it passed the second time. If you approve, I'll tag rc2 now and post the release notes draft for review.",
+        "needed" : {
+          "width" : 328,
+          "height" : 64
+        }
+      },
+      {
+        "height" : 108,
+        "style" : "flex-direction: column; row-gap: 6px; column-gap: 6px",
+        "x" : 16,
+        "y" : 204,
+        "id" : "options",
+        "width" : 328,
+        "class" : "TRBoxView",
+        "children" : [
+          {
+            "height" : 32,
+            "x" : 0,
+            "y" : 0,
+            "id" : "approve",
+            "width" : 328,
+            "class" : "NSButton",
+            "intrinsic" : {
+              "width" : 164,
+              "height" : 32
+            },
+            "title" : "Approve: tag rc2 now"
+          },
+          {
+            "height" : 32,
+            "x" : 0,
+            "y" : 38,
+            "id" : "alternative",
+            "width" : 328,
+            "class" : "NSButton",
+            "intrinsic" : {
+              "width" : 196,
+              "height" : 32
+            },
+            "title" : "Re-run the macOS job first"
+          },
+          {
+            "height" : 32,
+            "x" : 0,
+            "y" : 76,
+            "id" : "defer",
+            "width" : 328,
+            "class" : "NSButton",
+            "intrinsic" : {
+              "width" : 135,
+              "height" : 32
+            },
+            "title" : "Defer to Monday"
+          }
+        ]
+      },
+      {
+        "height" : 32,
+        "style" : "align-items: center; margin-top: 4px; row-gap: 8px; column-gap: 8px",
+        "x" : 16,
+        "y" : 326,
+        "children" : [
+          {
+            "height" : 21,
+            "style" : "flex-grow: 1; flex-basis: 0%",
+            "x" : 0,
+            "y" : 5,
+            "id" : "reply",
+            "width" : 255,
+            "class" : "NSTextField",
+            "intrinsic" : {
+              "width" : 129,
+              "height" : 21
+            }
+          },
+          {
+            "height" : 32,
+            "x" : 263,
+            "y" : 0,
+            "id" : "send",
+            "width" : 65,
+            "class" : "NSButton",
+            "intrinsic" : {
+              "width" : 65,
+              "height" : 32
+            },
+            "title" : "Send"
+          }
+        ],
+        "width" : 328,
+        "class" : "TRBoxView"
+      }
+    ]
+  }
+}

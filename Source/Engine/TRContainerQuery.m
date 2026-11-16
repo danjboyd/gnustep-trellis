@@ -83,6 +83,14 @@ static BOOL TRConditionMatches(TRCondition *c, TRFloat w)
 
 @implementation TRNode (ContainerQueries)
 
+- (TRNode *)containerQueryParent { return _cqParent; }
+- (void)setContainerQueryParent:(TRNode *)p
+{
+  if (_cqParent == p) return;
+  _cqParent = p;
+  [self markDirty];
+}
+
 - (BOOL)addConditionalStyle:(NSString *)declarations when:(NSString *)condition error:(NSError **)error
 {
   TRCondition *c = TRParseCondition(condition, error);
@@ -122,14 +130,26 @@ static BOOL TRIsContainer(TRNode *n)
   return t != nil && ![t isEqualToString: @"normal"];
 }
 
+/* The nearest ancestor with container-type. At the top of a tree the walk
+   continues from its containerQueryParent (scrolled content: the
+   scroller's node in the outer tree); without one, the root is used. */
+static TRNode *TRFindContainer(TRNode *n, TRNode *root)
+{
+  TRNode *c = n->_parent ? n->_parent : n.containerQueryParent;
+  for (int guard = 0; c != nil && guard < 100000; guard++)
+    {
+      if (TRIsContainer(c)) return c;
+      c = c->_parent ? c->_parent : c.containerQueryParent;
+    }
+  return root;
+}
+
 static BOOL TRApply(TRNode *n, TRNode *root)
 {
   BOOL changed = NO;
   if (n->_conditions != nil)
     {
-      TRNode *c = n->_parent;
-      while (c != nil && !TRIsContainer(c)) c = c->_parent;
-      if (c == nil) c = root;
+      TRNode *c = TRFindContainer(n, root);
       TRFloat w = c->_rawFrame.width - c->_lpad[TREdgeLeft] - c->_lpad[TREdgeRight]
                 - c->_lborder[TREdgeLeft] - c->_lborder[TREdgeRight];
       uint64_t mask = 0;

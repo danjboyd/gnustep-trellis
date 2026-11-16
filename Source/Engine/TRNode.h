@@ -106,6 +106,12 @@ typedef TRFloat (^TRBaselineBlock)(TRSize size);
 /* The conditions that matched in the last layout. */
 @property (nonatomic, readonly) NSArray<NSString *> *matchedConditions;
 
+/* Internal (docs/api.md): where a container-query lookup continues when it
+   reaches this root without finding a container. The view layer sets it
+   on a scroller's content tree to the scroller's own node, so queries in
+   scrolled content test the container outside the scroller. */
+@property (nonatomic, weak) TRNode *containerQueryParent;
+
 @end
 
 #endif

@@ -54,6 +54,11 @@ static BOOL TRYes(NSString *v)
 
 - (void)layoutContent
 {
+  /* Container queries in the content test the container outside the
+     scroller (the content box is a separate Trellis root). */
+  NSView *sv = [self superview];
+  if ([sv isKindOfClass: [TRBoxView class]])
+    _box.node.containerQueryParent = [(TRBoxView *)sv nodeForSubview: self];
   NSSize cs = [self contentSize];
   [_box.node layoutWithAvailableSize: TRSizeMake(cs.width, NAN)];
   CGFloat h = MAX(ceil(_box.node.layoutFrame.height), cs.height);

@@ -1,0 +1,16 @@
+<!-- Container queries inside <scroll> must test the container outside the
+     scroller, not the scroller's narrower content. At 300px the pane matches
+     no (max-width: 299px) condition, so #probe stays visible even with a
+     classic (space-taking) scroller. -->
+<column class="pane">
+  <scroll class="doc">
+    <column>
+      <label id="probe" class="probe" no-outlet="yes">probe</label>
+    </column>
+  </scroll>
+</column>
+<style>
+  .pane { container-type: inline-size; height: 200px; }
+  .doc  { flex: 1; }
+  @container (max-width: 299px) { .probe { display: none; } }
+</style>

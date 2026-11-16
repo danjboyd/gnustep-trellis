@@ -22,6 +22,7 @@ typedef struct {
   TRStyle *_style;
   NSMutableArray<TRNode *> *_children;
   __weak TRNode *_parent;
+  __weak TRNode *_cqParent;      /* containerQueryParent */
   TRMeasureBlock _measure;
   TRBaselineBlock _baselineFn;
   BOOL _dirty;

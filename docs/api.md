@@ -70,4 +70,6 @@ carries the resolved colours `background`, `textColor` and
 - `TRNode+Internal.h`, `TRGrid.h`, and everything in `Source/Engine/*.m`
   not declared in an installed header.
 - `TRCellSize` and `TRContentSignature` in TRViewMeasure.h.
+- `-[TRNode containerQueryParent]` (set by the view layer for scrolled
+  content).
 - The layout cache, rounding details below one pixel, and lint wording.

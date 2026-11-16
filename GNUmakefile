@@ -122,4 +122,5 @@ check-gui:: all
 	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH timeout 60 scripts/run-headless.sh obj/gui-tests/size-for-width 2>&1 | grep -v _NET_WORKAREA | tail -1
 	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH timeout 60 scripts/run-headless.sh obj/gui-tests/preview-open-file $(CURDIR)/Examples/TrellisDemo/Settings.trellis 2>&1 | grep -v _NET_WORKAREA | tail -1
 	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH Tests/View/appearance.sh
+	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH Tests/View/scroll-container-query.sh
 

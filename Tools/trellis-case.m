@@ -184,6 +184,7 @@ static NSSet *TRDefaultUnsupported(void)
     @"position-static",          /* abspos is relative to the parent */
     @"display-inline", @"display-inline-block", @"display-contents",
     @"display--webkit-box",
+    @"display-table",            /* display: table and its parts */
     @"logical-properties",       /* inline-size, margin-inline-start, ... */
     @"intrinsic-size-keyword",   /* width: min-content / max-content / fit-content */
     @"overflow-axis",            /* overflow-x differs from overflow-y */

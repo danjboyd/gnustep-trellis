@@ -5,6 +5,14 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Fixed:** `aspect-ratio` on a root box. A definite width or height
+  now gives the other size through the ratio. Sizes are floored at
+  padding plus border and clamped by min/max first, and an empty root
+  with both sizes auto starts from its minimum height. Added
+  `aspect-ratio: auto <ratio>`, whose ratio applies to the content box
+  even under border-box. WPT css-sizing goes from 10/21 to 20/21.
+- `display-table` cases are skipped by default.
+
 - **Added:** accessibility basics. `a11y-label`, `label-for` and
   `role="group|none"` in markup, mapped to NSAccessibility on Cocoa and
   recorded on GNUstep (whose AppKit has no accessibility setters yet).

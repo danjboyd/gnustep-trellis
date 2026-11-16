@@ -240,6 +240,63 @@ static void TRClearDirty(TRNode *n)
       { ah = s->maxHeight.value + extra[TREdgeTop % 2]; hm = TRMeasureModeAtMost; }
   }
 
+  /* aspect-ratio on the root: a definite size in one axis (floored at
+     padding + border and clamped) gives the other through the ratio,
+     which applies to the content box (content-box) or the border box
+     (border-box). An empty root with both sizes auto starts from its
+     minimum height. min/max of the derived axis still apply. */
+  if (!isnan(s->aspectRatio))
+    {
+      TRFloat ar = s->aspectRatio;
+      TRFloat pb[2] = {0, 0};
+      for (int k = 0; k < 4; k++)
+        {
+          TRFloat v = 0;
+          if (s->padding[k].unit == TRUnitPoint) v += s->padding[k].value;
+          else if (s->padding[k].unit == TRUnitPercent && !isnan(available.width)) v += s->padding[k].value * available.width / 100;
+          if (s->border[k].unit == TRUnitPoint) v += s->border[k].value;
+          pb[k % 2] += v;   /* [0] = vertical (top+bottom), [1] = horizontal */
+        }
+      TRFloat pbW = pb[1], pbH = pb[0];
+      BOOL cb = s->boxSizing == TRBoxSizingContentBox;
+      TRFloat cbx[2] = { cb ? pbW : 0, cb ? pbH : 0 };   /* min/max are content sizes in content-box */
+      BOOL wDef = s->width.unit == TRUnitPoint || (s->width.unit == TRUnitPercent && !isnan(available.width));
+      BOOL hDef = s->height.unit == TRUnitPoint || (s->height.unit == TRUnitPercent && !isnan(available.height));
+      #define TR_CLAMP_W(x) ({ TRFloat _v = (x); \
+        if (s->maxWidth.unit == TRUnitPoint) _v = MIN(_v, s->maxWidth.value + cbx[0]); \
+        if (s->minWidth.unit == TRUnitPoint) _v = MAX(_v, s->minWidth.value + cbx[0]); MAX(_v, pbW); })
+      #define TR_CLAMP_H(x) ({ TRFloat _v = (x); \
+        if (s->maxHeight.unit == TRUnitPoint) _v = MIN(_v, s->maxHeight.value + cbx[1]); \
+        if (s->minHeight.unit == TRUnitPoint) _v = MAX(_v, s->minHeight.value + cbx[1]); MAX(_v, pbH); })
+      /* Border-box size in one axis to the other, through the ratio box. */
+      BOOL rcb = cb || s->aspectRatioAuto;   /* the ratio box is the content box */
+      #define TR_W_TO_H(w) (rcb ? ((w) - pbW) / ar + pbH : (w) / ar)
+      #define TR_H_TO_W(h) (rcb ? ((h) - pbH) * ar + pbW : (h) * ar)
+      BOOL empty = [_children count] == 0 && _measure == nil;
+      if (wDef && !hDef)
+        {
+          aw = TR_CLAMP_W(aw);
+          ah = TR_CLAMP_H(TR_W_TO_H(aw)); hm = TRMeasureModeExactly;
+        }
+      else if (hDef && !wDef)
+        {
+          ah = TR_CLAMP_H(ah);
+          aw = TR_CLAMP_W(TR_H_TO_W(ah)); wm = TRMeasureModeExactly;
+        }
+      else if (!wDef && !hDef && empty)
+        {
+          TRFloat h0 = TR_CLAMP_H(pbH);
+          aw = TR_CLAMP_W(TR_H_TO_W(h0));
+          if (!isnan(available.width) && s->width.unit == TRUnitAuto) aw = MIN(aw, MAX(available.width, pbW));
+          wm = TRMeasureModeExactly;
+          ah = TR_CLAMP_H(TR_W_TO_H(aw)); hm = TRMeasureModeExactly;
+        }
+      #undef TR_CLAMP_W
+      #undef TR_CLAMP_H
+      #undef TR_W_TO_H
+      #undef TR_H_TO_W
+    }
+
   /* Size a fit-content root's width first, then lay it out at that exact
      width so its children's percentages resolve against it. (As in CSS,
      a shrink-to-fit width becomes definite; an auto height does not.) */

@@ -428,9 +428,10 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
       TRFloat ar = cs->aspectRatio;
       if (isnan(it->styleMain) && !isnan(it->styleCross) && !isnan(ar))
         {
-          TRFloat crossContent = cs->boxSizing == TRBoxSizingContentBox ? it->styleCross - it->pbCross : it->styleCross;
+          BOOL rcb = cs->boxSizing == TRBoxSizingContentBox || cs->aspectRatioAuto;
+          TRFloat crossContent = rcb ? it->styleCross - it->pbCross : it->styleCross;
           TRFloat mainContent = isRow ? crossContent * ar : crossContent / ar;
-          it->styleMain = cs->boxSizing == TRBoxSizingContentBox ? mainContent + it->pbMain : TRMax(mainContent, it->pbMain);
+          it->styleMain = rcb ? mainContent + it->pbMain : TRMax(mainContent, it->pbMain);
         }
 
       /* flex-basis */

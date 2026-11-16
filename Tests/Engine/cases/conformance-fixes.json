@@ -1813,5 +1813,175 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/root_aspect_ratio_content_box",
+  "note": "aspect-ratio on a root: definite width gives the height (content box)",
+  "available": {
+   "width": 784,
+   "height": null
+  },
+  "root": {
+   "style": {
+    "boxSizing": "content-box",
+    "width": 100,
+    "aspectRatio": 2.5
+   }
+  },
+  "expected": {
+   "width": 100,
+   "height": 40
+  }
+ },
+ {
+  "id": "engine/root_aspect_ratio_border_box",
+  "note": "border-box: the ratio applies to the border box",
+  "available": {
+   "width": 784,
+   "height": null
+  },
+  "root": {
+   "style": {
+    "boxSizing": "border-box",
+    "width": 100,
+    "aspectRatio": 2,
+    "borderTopWidth": 20,
+    "borderRightWidth": 20,
+    "borderBottomWidth": 20,
+    "borderLeftWidth": 20
+   }
+  },
+  "expected": {
+   "width": 100,
+   "height": 50
+  }
+ },
+ {
+  "id": "engine/root_aspect_ratio_auto_ratio",
+  "note": "aspect-ratio: auto 2/1 applies to the content box even in border-box",
+  "available": {
+   "width": 784,
+   "height": null
+  },
+  "root": {
+   "style": {
+    "boxSizing": "border-box",
+    "width": 100,
+    "aspectRatio": "auto 2/1",
+    "borderTopWidth": 20,
+    "borderRightWidth": 20,
+    "borderBottomWidth": 20,
+    "borderLeftWidth": 20
+   }
+  },
+  "expected": {
+   "width": 100,
+   "height": 70
+  }
+ },
+ {
+  "id": "engine/root_aspect_ratio_floored_height",
+  "note": "a height below padding+border is floored before the ratio transfers it",
+  "available": {
+   "width": null,
+   "height": null
+  },
+  "root": {
+   "style": {
+    "boxSizing": "border-box",
+    "height": 20,
+    "aspectRatio": 2,
+    "borderTopWidth": 20,
+    "borderRightWidth": 20,
+    "borderBottomWidth": 20,
+    "borderLeftWidth": 20
+   }
+  },
+  "expected": {
+   "width": 80,
+   "height": 40
+  }
+ },
+ {
+  "id": "engine/root_aspect_ratio_floored_width",
+  "note": "a width below padding+border is floored before the ratio transfers it",
+  "available": {
+   "width": 784,
+   "height": null
+  },
+  "root": {
+   "style": {
+    "boxSizing": "border-box",
+    "width": 20,
+    "aspectRatio": 0.5,
+    "borderTopWidth": 20,
+    "borderRightWidth": 20,
+    "borderBottomWidth": 20,
+    "borderLeftWidth": 20
+   }
+  },
+  "expected": {
+   "width": 40,
+   "height": 80
+  }
+ },
+ {
+  "id": "engine/root_aspect_ratio_both_auto_empty",
+  "note": "an empty root with both sizes auto starts from its minimum height; max-height still clamps",
+  "available": {
+   "width": 784,
+   "height": null
+  },
+  "root": {
+   "style": {
+    "boxSizing": "border-box",
+    "maxHeight": 20,
+    "aspectRatio": 2,
+    "borderTopWidth": 20,
+    "borderRightWidth": 20,
+    "borderBottomWidth": 20,
+    "borderLeftWidth": 20
+   }
+  },
+  "expected": {
+   "width": 80,
+   "height": 40
+  }
+ },
+ {
+  "id": "engine/flex_item_aspect_ratio_auto_ratio",
+  "note": "auto <ratio> on a flex item transfers through its content box",
+  "available": {
+   "width": 300,
+   "height": null
+  },
+  "root": {
+   "style": {
+    "flexDirection": "row",
+    "width": 300,
+    "alignItems": "flex-start"
+   },
+   "children": [
+    {
+     "style": {
+      "flex": "none",
+      "height": 50,
+      "paddingLeft": 10,
+      "paddingRight": 10,
+      "paddingTop": 10,
+      "paddingBottom": 10,
+      "aspectRatio": "auto 2"
+     }
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "width": 80,
+     "height": 50
+    }
+   ]
+  }
  }
 ]

@@ -479,7 +479,11 @@ static int TREdgeFromSuffix(NSString *suffix)
   if ([p isEqualToString: @"aspect-ratio"])
     {
       NSString *t = [v stringByReplacingOccurrencesOfString: @" " withString: @""];
-      if ([t isEqualToString: @"auto"]) { _s.aspectRatio = TRUndefined; return YES; }
+      if ([t isEqualToString: @"auto"]) { _s.aspectRatio = TRUndefined; _s.aspectRatioAuto = NO; return YES; }
+      /* auto && <ratio>, in either order. */
+      BOOL withAuto = NO;
+      if ([t hasPrefix: @"auto"]) { withAuto = YES; t = [t substringFromIndex: 4]; }
+      else if ([t hasSuffix: @"auto"]) { withAuto = YES; t = [t substringToIndex: [t length] - 4]; }
       NSArray *parts = [t componentsSeparatedByString: @"/"];
       TRFloat a, b = 1;
       if (!TRParseNumber(parts[0], &a)) return NO;
@@ -487,6 +491,7 @@ static int TREdgeFromSuffix(NSString *suffix)
       if ([parts count] > 2 || a < 0 || b < 0) return NO;
       /* A degenerate ratio (0, or x/0) behaves as auto (CSS Values 4). */
       _s.aspectRatio = (a == 0 || b == 0) ? TRUndefined : a / b;
+      _s.aspectRatioAuto = withAuto;
       return YES;
     }
   if ([p isEqualToString: @"gap"])
@@ -833,7 +838,7 @@ static NSString *TRKeywordString(const TRKeyword *table, int value)
   LEN(@"min-height", minHeight)
   LEN(@"max-width", maxWidth)
   LEN(@"max-height", maxHeight)
-  if (TRIsDefined(_s.aspectRatio)) [out addObject: [NSString stringWithFormat: @"aspect-ratio: %g", _s.aspectRatio]];
+  if (TRIsDefined(_s.aspectRatio)) [out addObject: [NSString stringWithFormat: @"aspect-ratio: %@%g", _s.aspectRatioAuto ? @"auto " : @"", _s.aspectRatio]];
   static NSString *edges[4] = { @"left", @"top", @"right", @"bottom" };
   for (int i = 0; i < 4; i++)
     {

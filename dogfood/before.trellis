@@ -1,0 +1,90 @@
+<!-- owner: AIMAskDetailView -->
+<!-- AIManager's ask detail as it lays out today, approximated in Trellis
+     for a before/after comparison (from agent-lead's description of
+     AIMAskDetailView -layoutContent, live d661e0d). It is not a proposal.
+     One fixed column: every control has a fixed height, the body gets
+     whatever height is left (minimum 70), the thread gets its own scroller
+     (at least 120 tall), the button rows never wrap, and section labels are
+     ALL CAPS. -->
+<column id="askDetail" class="pane">
+  <text id="context" class="muted">project › agent</text>
+  <text id="title" class="title">Question title</text>
+  <text id="meta" class="muted">kind · blocks: nothing</text>
+  <label id="delivery" class="muted fixed20">Delivered</label>
+  <row id="links" class="row26">
+    <button action="openLink:">MSI build log</button>
+    <button action="openLink:">WiX diff</button>
+  </row>
+
+  <scroll class="body"><text id="body">Body text.</text></scroll>
+  <box id="terminalStrip" class="strip"></box>
+
+  <column id="pick" class="tight">
+    <label id="pickLabel" class="caps">RECOMMENDED</label>
+    <text id="pickTitle" class="pick-title">Option</text>
+    <text id="pickDetail" class="muted">Why.</text>
+    <row class="row30"><button id="doIt" action="doIt:" default="yes">Do it</button></row>
+  </column>
+
+  <column id="otherOptions" class="tight">
+    <label class="caps" no-outlet="yes">OR PICK</label>
+    <row id="optionButtons" class="wrap32">
+      <button action="chooseOption:">Keep per-machine</button>
+      <button action="chooseOption:">Per-user only, no escape hatch</button>
+    </row>
+  </column>
+
+  <label id="replyLabel" class="caps">YOUR REPLY (ENTER SENDS)</label>
+  <box class="replybox"><scroll class="reply"><view id="reply" type="NSTextView"/></scroll></box>
+  <row id="attachments" class="row24">
+    <label id="attachmentName" class="muted">No attachment</label>
+    <button action="openAttachment:">Open…</button>
+    <button action="clearAttachment:">Clear</button>
+  </row>
+
+  <row class="nowrap">
+    <button id="sendReply" action="sendReply:">Send reply</button>
+    <popup id="snooze" action="snooze:" items="Snooze, 1 hour, Tomorrow, Monday"/>
+    <button id="dismiss" action="dismiss:">Dismiss</button>
+    <label id="status" class="muted">Waiting on you</label>
+  </row>
+  <row class="nowrap">
+    <button id="resumeAgent" action="resumeAgent:">Resume agent</button>
+    <button action="openTerminal:">Open terminal</button>
+    <button action="agentSettings:">Agent settings</button>
+  </row>
+
+  <label id="threadLabel" class="caps">THREAD</label>
+  <scroll class="thread"><text id="thread">Thread.</text></scroll>
+
+  <row class="followup">
+    <field id="followUp" placeholder="Follow up with the agent…"/>
+    <button action="sendFollowUp:">Send</button>
+  </row>
+</column>
+
+<style>
+  .pane    { padding: 12px; gap: 6px; background-color: #ffffff; }
+  .pane > * { flex-shrink: 0; }
+  .title   { font-size: 16px; font-weight: bold; min-height: 24px; }
+  .muted   { color: #77767b; }
+  .fixed20 { height: 20px; }
+  .caps    { color: #77767b; font-weight: bold; height: 20px; }
+  .tight   { gap: 4px; }
+  .pick-title { font-weight: bold; }
+  .row26   { height: 26px; gap: 8px; }
+  .row30   { height: 30px; }
+  .row24   { height: 24px; gap: 8px; }
+  .wrap32  { flex-wrap: wrap; gap: 8px; }
+  .nowrap  { gap: 8px; align-items: center; }
+  .nowrap > *, .row24 > *, .row26 > * { flex-shrink: 0; }
+  /* The body takes what's left, never less than 70. */
+  .pane > .body { flex: 1 1 0px; min-height: 70px; }
+  .row26, .row30, .row24, .caps, .fixed20, .replybox, .followup { flex: none; }
+  .strip   { display: none; }
+  .replybox { border: 1px; border-color: #c0bfbc; height: 64px; padding: 4px; }
+  .reply   { flex: 1; }
+  .thread  { flex: none; height: 120px; }
+  .followup { gap: 8px; height: 34px; }
+  #followUp { flex: 1; min-width: 0; }
+</style>

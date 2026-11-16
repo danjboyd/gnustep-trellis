@@ -1098,13 +1098,39 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
     }
 
   /* ---- Columns ---- */
+  /* Percentage columns in a grid whose width depends on its tracks (CSS
+     Grid 7.2.1): sized as auto to find the width, then resolved against
+     it; the grid keeps that width. */
+  BOOL percentCols = NO;
+  TRTrackSize savedCols[nCols ? nCols : 1];
+  if (wm != TRMeasureModeExactly)
+    for (NSInteger i = 0; i < nCols; i++)
+      {
+        savedCols[i] = colsT[i].size;
+        if (colsT[i].size.min.kind == TRBreadthPercent) { colsT[i].size.min.kind = TRBreadthAuto; percentCols = YES; }
+        if (colsT[i].size.max.kind == TRBreadthPercent) { colsT[i].size.max.kind = TRBreadthAuto; percentCols = YES; }
+      }
   TRSizeTracks(colsT, nCols, innerW, colGap, items, n, YES, s->justifyContent, minInnerW, maxInnerW);
+  double contentW = NAN;
+  if (percentCols)
+    {
+      double used = 0;
+      NSInteger vis = 0;
+      for (NSInteger i = 0; i < nCols; i++) if (!colsT[i].collapsed) { used += colsT[i].base; vis++; }
+      used += vis > 1 ? colGap * (vis - 1) : 0;
+      contentW = isnan(innerW) ? used : MIN(innerW, used);
+      if (!isnan(minInnerW)) contentW = MAX(contentW, minInnerW);
+      if (!isnan(maxInnerW)) contentW = MIN(contentW, maxInnerW);
+      for (NSInteger i = 0; i < nCols; i++) colsT[i].size = savedCols[i];
+      TRSizeTracks(colsT, nCols, contentW, colGap, items, n, YES, s->justifyContent, minInnerW, maxInnerW);
+    }
   /* left/right are physical: columns are placed from the inline start and
      mirrored for rtl, where left is the end and right the start. */
   TRAlign colAlign = s->justifyContent;
   if (colAlign == TRAlignLeft) colAlign = rtl ? TRAlignEnd : TRAlignStart;
   else if (colAlign == TRAlignRight) colAlign = rtl ? TRAlignStart : TRAlignEnd;
-  double colsTotal = TRPlaceTracks(colsT, nCols, colGap, innerW, colAlign, s->justifyContentSafe);
+  double colsTotal = TRPlaceTracks(colsT, nCols, colGap, isnan(contentW) ? innerW : contentW, colAlign, s->justifyContentSafe);
+  if (!isnan(contentW)) colsTotal = contentW;
 
   /* Percentage margins, against each item's grid-area width (CSS Grid 6.5). */
   for (NSInteger k = 0; k < n; k++)

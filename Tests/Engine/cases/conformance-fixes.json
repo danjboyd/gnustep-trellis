@@ -1539,5 +1539,40 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_percent_columns_shrink_to_fit",
+  "note": "CSS Grid 7.2.1: percentage columns in a grid sized by its tracks count as auto, then resolve against the result",
+  "root": {
+   "style": {
+    "display": "grid",
+    "gridTemplateColumns": "100%"
+   },
+   "children": [
+    {
+     "style": {
+      "gridColumn": "1"
+     },
+     "measure": {
+      "text": "XX X",
+      "charWidth": 10,
+      "lineHeight": 10
+     }
+    }
+   ]
+  },
+  "available": {
+   "width": null,
+   "height": null
+  },
+  "expected": {
+   "width": 40,
+   "height": 10,
+   "children": [
+    {
+     "width": 40
+    }
+   ]
+  }
  }
 ]

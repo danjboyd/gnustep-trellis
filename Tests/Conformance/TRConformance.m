@@ -27,27 +27,30 @@ TRConfSize TRConfMeasure(NSDictionary *measure, double width, int widthMode,
     NSString *text = measure[@"text"];
     double cw = measure[@"charWidth"] ? [measure[@"charWidth"] doubleValue] : 10;
     double lh = measure[@"lineHeight"] ? [measure[@"lineHeight"] doubleValue] : cw;
-    NSArray *words = [text componentsSeparatedByString:@" "];
-    double maxContent = [text length] * cw;
+    /* "\n" is a forced line break (<br>); each line wraps at spaces. */
     double limit = INFINITY;
     if ((widthMode == 1 || widthMode == 2) && ![measure[@"nowrap"] boolValue])
       limit = width;
-    /* Greedy wrap. */
-    double line = 0, longest = 0;
-    int lines = [text length] ? 1 : 0;
-    for (NSString *w in words) {
-      double ww = [w length] * cw;
-      if (line == 0) {
-        line = ww;
-      } else if (line + cw + ww <= limit + 1e-6) {
-        line += cw + ww;
-      } else {
-        longest = MAX(longest, line);
-        line = ww;
-        lines++;
+    double longest = 0, maxContent = 0;
+    int lines = 0;
+    for (NSString *para in [text componentsSeparatedByString:@"\n"]) {
+      maxContent = MAX(maxContent, [para length] * cw);
+      double line = 0;
+      lines++;
+      for (NSString *w in [para componentsSeparatedByString:@" "]) {
+        double ww = [w length] * cw;
+        if (line == 0) {
+          line = ww;
+        } else if (line + cw + ww <= limit + 1e-6) {
+          line += cw + ww;
+        } else {
+          longest = MAX(longest, line);
+          line = ww;
+          lines++;
+        }
       }
+      longest = MAX(longest, line);
     }
-    longest = MAX(longest, line);
     if (widthMode == 1)
       r.width = width;
     else if (widthMode == 2)

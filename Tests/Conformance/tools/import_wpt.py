@@ -559,6 +559,20 @@ def expand_grid_shorthand(k, v):
     return out
 
 
+def inline_text(nodes):
+    """Text content of inline children, with each <br> as a newline
+    (a forced line break for the Ahem measurer) and white space collapsed."""
+    parts = []
+    for c in nodes:
+        if isinstance(c, El):
+            if c.tag == "br":
+                parts.append("\x00")
+        else:
+            parts.append(re.sub(r"\s+", " ", c))
+    lines = [l.strip(" ") for l in "".join(parts).split("\x00")]
+    return "\n".join(lines)
+
+
 def camel(k):
     return re.sub(r"-([a-z])", lambda m: m.group(1).upper(), k)
 
@@ -875,29 +889,38 @@ class Converter:
                     continue
                 kids.append(c)
             elif c.strip():
-                texts.append(re.sub(r"\s+", " ", c.strip()))
+                texts.append(c)
         if texts and kids:
             if disp not in CONTAINERS:
                 raise Skip("mixed inline content")
         if texts and not kids:
-            node["measure"] = self.text_measure(el, " ".join(texts))
+            node["measure"] = self.text_measure(el, inline_text(el.children))
             self.requires.add("measure")
         child_nodes, child_exp = [], []
         if kids or (texts and kids):
-            for c in el.children:
-                if isinstance(c, El):
-                    if c.tag in IGNORED_TAGS:
-                        continue
-                    n, e = self.build(c, disp, ancestors + [el])
-                    child_nodes.append(n)
-                    child_exp.append(e)
-                elif c.strip():
-                    # Anonymous flex item wrapping a text run.
-                    m = self.text_measure(el, re.sub(r"\s+", " ", c.strip()))
+            run = []        # text and <br> forming one anonymous item
+
+            def flush():
+                if any(isinstance(x, str) and x.strip() for x in run):
+                    m = self.text_measure(el, inline_text(run))
                     child_nodes.append({"style": {"display": "block"}, "measure": m,
                                         "anonymous": True})
                     child_exp.append({})
                     self.requires.add("measure")
+                del run[:]
+            for c in el.children:
+                if isinstance(c, El) and c.tag == "br":
+                    run.append(c)
+                elif isinstance(c, El):
+                    if c.tag in IGNORED_TAGS:
+                        continue
+                    flush()
+                    n, e = self.build(c, disp, ancestors + [el])
+                    child_nodes.append(n)
+                    child_exp.append(e)
+                else:
+                    run.append(c)
+            flush()
             if disp not in CONTAINERS + ("none",) and child_nodes:
                 self.requires.add("block-layout")
         if child_nodes:

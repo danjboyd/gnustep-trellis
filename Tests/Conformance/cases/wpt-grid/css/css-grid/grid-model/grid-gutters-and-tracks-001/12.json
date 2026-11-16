@@ -72,7 +72,7 @@
        "gridColumn": "first / bar"
       },
       "measure": {
-       "text": "XXX XX XX XXXXX",
+       "text": "XXX XX\nXX\nXXXXX",
        "charWidth": 10,
        "lineHeight": 10
       }

@@ -57,7 +57,7 @@
      "gridColumn": "span 2"
     },
     "measure": {
-     "text": "XXXXXXXXXXXXXXXXXXXX X X X",
+     "text": "XXXXXXXXXXXXXXXXXXXX\nX\nX\nX",
      "charWidth": 10,
      "lineHeight": 10
     }

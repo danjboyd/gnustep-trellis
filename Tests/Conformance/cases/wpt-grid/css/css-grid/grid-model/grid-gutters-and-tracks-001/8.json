@@ -61,7 +61,7 @@
        "gridRow": "2"
       },
       "measure": {
-       "text": "X X X X",
+       "text": "X X\nX X",
        "charWidth": 10,
        "lineHeight": 10
       }
@@ -75,7 +75,7 @@
        "gridArea": "3 / 3"
       },
       "measure": {
-       "text": "XXX XX X XX XX",
+       "text": "XXX XX\nX\nXX XX",
        "charWidth": 10,
        "lineHeight": 10
       }

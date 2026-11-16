@@ -9,33 +9,38 @@
 
 static BOOL gVerbose = NO;
 
-/* Ahem-style text: every glyph charWidth wide, wraps at spaces. */
-static TRSize TRAhemMeasure(NSString *text, TRFloat cw, TRFloat lh,
+/* Ahem-style text: every glyph charWidth wide, wraps at spaces; "\n" is a
+   forced line break (an imported <br>); nowrap disables wrapping. */
+static TRSize TRAhemMeasure(NSString *text, TRFloat cw, TRFloat lh, BOOL nowrap,
                             TRSize avail, TRMeasureMode wm)
 {
-  NSArray *words = [text componentsSeparatedByString: @" "];
-  TRFloat maxContent = [text length] * cw;
   if ([text length] == 0) return TRSizeMake(0, 0);
-  TRFloat limit = (wm == TRMeasureModeUndefined) ? INFINITY : avail.width;
-  if (wm == TRMeasureModeExactly || wm == TRMeasureModeAtMost)
+  TRFloat limit = INFINITY;
+  if (!nowrap && (wm == TRMeasureModeExactly || wm == TRMeasureModeAtMost))
     limit = avail.width;
-  TRFloat lineW = 0, maxW = 0;
-  int lines = 1;
-  for (NSString *w in words)
+  TRFloat maxW = 0, maxContent = 0;
+  int lines = 0;
+  for (NSString *para in [text componentsSeparatedByString: @"\n"])
     {
-      TRFloat ww = [w length] * cw;
-      if (lineW == 0)
-        lineW = ww;
-      else if (lineW + cw + ww <= limit + 0.0001)
-        lineW += cw + ww;
-      else
+      maxContent = MAX(maxContent, [para length] * cw);
+      TRFloat lineW = 0;
+      lines++;
+      for (NSString *w in [para componentsSeparatedByString: @" "])
         {
-          maxW = MAX(maxW, lineW);
-          lineW = ww;
-          lines++;
+          TRFloat ww = [w length] * cw;
+          if (lineW == 0)
+            lineW = ww;
+          else if (lineW + cw + ww <= limit + 0.0001)
+            lineW += cw + ww;
+          else
+            {
+              maxW = MAX(maxW, lineW);
+              lineW = ww;
+              lines++;
+            }
         }
+      maxW = MAX(maxW, lineW);
     }
-  maxW = MAX(maxW, lineW);
   if (wm == TRMeasureModeUndefined) maxW = maxContent;
   return TRSizeMake(maxW, lines * lh);
 }
@@ -61,8 +66,9 @@ static TRNode *TRBuildNode(NSDictionary *d, NSString **err)
           NSString *text = m[@"text"];
           TRFloat cw = [m[@"charWidth"] doubleValue] ?: 10;
           TRFloat lh = [m[@"lineHeight"] doubleValue] ?: 10;
+          BOOL nowrap = [m[@"nowrap"] boolValue];
           n.measureBlock = ^TRSize(TRSize avail, TRMeasureMode wm, TRMeasureMode hm) {
-            return TRAhemMeasure(text, cw, lh, avail, wm);
+            return TRAhemMeasure(text, cw, lh, nowrap, avail, wm);
           };
         }
       else

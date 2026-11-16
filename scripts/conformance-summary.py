@@ -5,6 +5,9 @@
     scripts/conformance-summary.py record --platform linux --runner obj/trellis-case
     scripts/conformance-summary.py table            # rewrite the README block
     scripts/conformance-summary.py table --check    # exit 1 if README is stale
+    scripts/conformance-summary.py check --platform linux --runner obj/trellis-case
+                                                    # exit 1 if any suite passes
+                                                    # fewer cases than recorded (CI gate)
 
 `record` runs trellis-case over Tests/Engine/cases and Tests/Conformance/cases
 and writes docs/conformance/<platform>.json (commit, date, per-suite
@@ -98,6 +101,31 @@ def record(args):
           % (args.platform, data["commit"], total["pass"], total["total"], total["skipped"]))
 
 
+def check(args):
+    """CI gate: fail if any suite passes fewer cases than this platform's
+    recorded results (docs/conformance/<platform>.json)."""
+    path = os.path.join(DATA, args.platform + ".json")
+    with open(path) as f:
+        rec = json.load(f)
+    suites, _ = run_cases(args.runner, "Tests/Engine/cases")
+    conf, _ = run_cases(args.runner, "Tests/Conformance/cases")
+    suites.update(conf)
+    bad = []
+    for s, r in sorted(rec["suites"].items()):
+        now = suites.get(s)
+        if now is None:
+            bad.append("%s: missing from this run" % s)
+        elif now["pass"] < r["pass"]:
+            bad.append("%s: %d/%d passing, recorded %d/%d at %s"
+                       % (s, now["pass"], now["total"], r["pass"], r["total"], rec["commit"]))
+        print("%-10s %d/%d (recorded %d/%d)" % (s, now["pass"] if now else 0,
+              now["total"] if now else 0, r["pass"], r["total"]))
+    if bad:
+        print("conformance regression:\n  " + "\n  ".join(bad))
+        sys.exit(1)
+    print("conformance: no regression against %s @ %s" % (args.platform, rec["commit"]))
+
+
 def cell(r):
     if not r:
         return "n/a"
@@ -178,8 +206,11 @@ def main():
     r.add_argument("--runner", required=True)
     t = sub.add_parser("table")
     t.add_argument("--check", action="store_true")
+    c = sub.add_parser("check")
+    c.add_argument("--platform", required=True, choices=[p for p, _ in PLATFORMS])
+    c.add_argument("--runner", required=True)
     args = ap.parse_args()
-    {"record": record, "table": table}[args.cmd](args)
+    {"record": record, "table": table, "check": check}[args.cmd](args)
 
 
 if __name__ == "__main__":

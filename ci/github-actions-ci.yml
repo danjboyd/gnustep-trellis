@@ -1,0 +1,110 @@
+# DRAFT, not active: GitHub only runs workflows under .github/workflows/.
+# Enabling it spends GitHub Actions minutes on the maintainer's private repo, so it waits
+# for his go. To enable: git mv ci/github-actions-ci.yml .github/workflows/ci.yml
+# (see ci/README.md for the minutes estimate).
+#
+# Linux job: the GNUstep toolchain (clang + libobjc2 + libdispatch + GNUstep
+# make/base/gui/back, built by scripts/install-toolchain-debian.sh) is cached,
+# so only a cache miss pays the ~20 min source build.
+# macOS job: present but disabled (macOS runners bill at 10x); mac-02 stays the
+# macOS check until the maintainer decides.
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['docs/**', '**.md']
+  pull_request:
+    paths-ignore: ['docs/**', '**.md']
+  workflow_dispatch:
+    inputs:
+      macos:
+        description: 'Also run the macOS job (bills at 10x)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      TRELLIS_TOOLCHAIN: /home/runner/opt/trellis-toolchain
+      TRELLIS_GNUSTEP_HOME: /home/runner/.cache/trellis-gnustep-home
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            clang lld cmake ninja-build pkg-config git python3 xvfb \
+            libffi-dev libxml2-dev libxslt1-dev libgnutls28-dev libicu-dev \
+            libcurl4-openssl-dev zlib1g-dev \
+            libcairo2-dev libxt-dev libxft-dev libfreetype-dev libfontconfig-dev \
+            libjpeg-dev libtiff-dev libpng-dev libgif-dev libxrandr-dev
+
+      - name: Restore toolchain
+        id: toolchain
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/opt/trellis-toolchain
+          # Bump the suffix to force a rebuild against newer upstream heads.
+          key: toolchain-ubuntu-24.04-${{ hashFiles('scripts/install-toolchain-debian.sh') }}-v1
+
+      - name: Build toolchain (cache miss only)
+        if: steps.toolchain.outputs.cache-hit != 'true'
+        run: PREFIX=$TRELLIS_TOOLCHAIN SRC=$RUNNER_TEMP/gnustep-src J=4 scripts/install-toolchain-debian.sh
+
+      - name: Build Trellis
+        run: |
+          set +u; . scripts/env.sh; set -u
+          make -j4
+
+      - name: make check (engine cases, lint, markup; conformance report)
+        run: |
+          set +u; . scripts/env.sh; set -u
+          make check
+
+      - name: Conformance gate (no suite below the recorded Linux results)
+        run: |
+          set +u; . scripts/env.sh; set -u
+          LD_LIBRARY_PATH=./obj:$LD_LIBRARY_PATH \
+            python3 -I scripts/conformance-summary.py check --platform linux --runner ./obj/trellis-case
+
+      - name: Importer unit tests
+        run: python3 -I Tests/Conformance/tools/test_import_wpt.py
+
+      - name: View checks, headless (Xvfb)
+        run: |
+          set +u; . scripts/env.sh; set -u
+          make check-gui 2>&1 | tee check-gui.log
+          # check-gui pipes each check through tail -1, so require the OK lines explicitly.
+          grep -q 'HOOK OK' check-gui.log
+          grep -q 'APPEARANCE OK' check-gui.log
+
+  macos:
+    # Disabled until the maintainer approves macOS runner minutes (10x). Runs only on a
+    # manual dispatch with macos=true.
+    if: github.event_name == 'workflow_dispatch' && inputs.macos
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and check (Apple clang, no GNUstep)
+        run: make -j3 -f Makefile.macos gui check
+      - name: Conformance gate (no suite below the recorded macOS results)
+        run: python3 -I scripts/conformance-summary.py check --platform macos --runner build/trellis-case
+      - name: Importer unit tests
+        run: make -f Makefile.macos check-importers
+      - name: Window-free render smoke test
+        run: |
+          for s in Dashboard Settings AskDetail; do
+            build/trellis-render Examples/TrellisDemo/$s.trellis --appearance dark --widths 340,900 --lint
+          done

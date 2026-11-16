@@ -72,6 +72,14 @@
             </row>
           </column>
 
+          <!-- Below 520px, Snooze and Dismiss live here instead of the bar,
+               so the bar is just Do it + Send reply. Same actions; the port
+               binds both instances. -->
+          <row class="buttons narrow-only">
+            <popup action="snooze:" items="Snooze, 1 hour, Tomorrow, Monday"/>
+            <button action="dismiss:">Dismiss</button>
+          </row>
+
           <row class="buttons agent">
             <button id="resumeAgent" action="resumeAgent:">Resume agent</button>
             <button action="openTerminal:">Open terminal</button>
@@ -84,8 +92,8 @@
       <row class="bar">
         <button id="doIt" action="doIt:" default="yes">Do it</button>
         <button id="sendReply" action="sendReply:">Send reply</button>
-        <popup id="snooze" action="snooze:" items="Snooze, 1 hour, Tomorrow, Monday"/>
-        <button id="dismiss" action="dismiss:">Dismiss</button>
+        <popup id="snooze" class="wide-only" action="snooze:" items="Snooze, 1 hour, Tomorrow, Monday"/>
+        <button id="dismiss" class="wide-only" action="dismiss:">Dismiss</button>
         <label id="status" class="muted grow">Waiting on you</label>
       </row>
     </column>
@@ -132,6 +140,16 @@
 
   /* Wide: the decision panel becomes a column beside the document, which
      takes the freed width. Each scrolls on its own. */
+  .narrow-only { display: none; }
+
+  /* Below 520px: only Do it and Send reply stay pinned (the status goes
+     under them); Snooze and Dismiss move into the panel's scroller. */
+  @container (max-width: 519px) {
+    .narrow-only { display: flex; }
+    .wide-only   { display: none; }
+    #status      { flex: 1 1 100%; }
+  }
+
   @container (min-width: 760px) {
     .area { flex-direction: row; }
     .doc  { flex: 1 1 0px; }

@@ -31,6 +31,10 @@ The items are from fun-themes' Gumdrop assessment of AIManager (2026-11-13).
      agent actions. Its bar is pinned (Do it, Send reply, Snooze, Dismiss,
      status), so Do it and Send reply are visible without scrolling at
      every size. The follow-up input stays pinned at the bottom.
+   - Below 520 px only Do it and Send reply stay pinned, with the status
+     under them. Snooze and Dismiss move into the panel's scroller, right
+     after the reply box. (The status needs about 111 px and only about 78
+     are left beside the buttons at 340, so it takes its own line.)
 2. **Compact density coherent** (item 3).
    - No fixed control heights (today: 20, 24, 26, 30 and 32 pt rows, and
      a 64 pt reply box). Every control takes its theme's intrinsic size, and
@@ -92,6 +96,9 @@ GNUSTEP_HOME). The Adwaita theme itself is unchanged.
   not in its own scroller.
 - `reply` is an NSTextView in a scroll view, at least 56 pt tall inside a
   bordered box.
+- Snooze and Dismiss appear twice in the spec: in the bar from 520 px up,
+  and in the panel's scroller below that. Only one pair is visible at a
+  time; bind both to the same actions and state.
 - The bar's Send reply is always shown here. The app can disable it while
   the reply box is empty.
 - `links` and `optionButtons` hold stand-in buttons for the render. The app

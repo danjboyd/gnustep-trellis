@@ -494,6 +494,45 @@
                             "y": 260
                           },
                           {
+                            "x": 16,
+                            "container": {
+                              "matched": [
+                                "(max-width: 519px)"
+                              ]
+                            },
+                            "children": [
+                              {
+                                "intrinsic": {
+                                  "height": 34,
+                                  "width": 129
+                                },
+                                "class": "NSPopUpButton",
+                                "x": 0,
+                                "height": 34,
+                                "width": 129,
+                                "title": "Snooze",
+                                "y": 0
+                              },
+                              {
+                                "intrinsic": {
+                                  "height": 34,
+                                  "width": 103
+                                },
+                                "class": "NSButton",
+                                "x": 137,
+                                "height": 34,
+                                "width": 103,
+                                "title": "Dismiss",
+                                "y": 0
+                              }
+                            ],
+                            "width": 308,
+                            "height": 34,
+                            "style": "flex-wrap: wrap; align-items: center; row-gap: 8px; column-gap: 8px",
+                            "class": "TRBoxView",
+                            "y": 364
+                          },
+                          {
                             "children": [
                               {
                                 "x": 0,
@@ -538,13 +577,13 @@
                             "style": "flex-wrap: wrap; align-items: center; row-gap: 8px; column-gap: 8px",
                             "height": 118,
                             "width": 308,
-                            "y": 364
+                            "y": 412
                           }
                         ],
                         "class": "TRBoxView",
                         "x": 0,
                         "style": "flex-direction: column; padding-left: 16px; padding-top: 12px; padding-right: 16px; padding-bottom: 8px; row-gap: 14px; column-gap: 14px",
-                        "height": 490,
+                        "height": 538,
                         "width": 340,
                         "y": 0
                       }
@@ -552,13 +591,13 @@
                     "class": "TRBoxView",
                     "x": 0,
                     "style": "flex-direction: column",
-                    "height": 490,
+                    "height": 538,
                     "width": 340,
                     "y": 0
                   }
                 ],
                 "width": 340,
-                "height": 129,
+                "height": 171,
                 "style": "flex-grow: 1; flex-basis: 0%; min-width: 0px; min-height: 0px",
                 "class": "TRScrollBox",
                 "y": 0,
@@ -593,34 +632,53 @@
                     "id": "sendReply"
                   },
                   {
-                    "x": 16,
-                    "width": 129,
-                    "height": 34,
+                    "x": 0,
+                    "container": {
+                      "matched": [
+                        "(max-width: 519px)"
+                      ]
+                    },
+                    "hidden": true,
                     "intrinsic": {
                       "height": 34,
                       "width": 129
                     },
+                    "width": 10,
+                    "height": 10,
+                    "style": "display: none",
                     "class": "NSPopUpButton",
                     "title": "Snooze",
-                    "y": 50,
+                    "y": 0,
                     "id": "snooze"
                   },
                   {
-                    "x": 153,
-                    "width": 103,
-                    "height": 34,
+                    "x": 0,
+                    "container": {
+                      "matched": [
+                        "(max-width: 519px)"
+                      ]
+                    },
+                    "hidden": true,
                     "intrinsic": {
                       "height": 34,
                       "width": 103
                     },
+                    "width": 10,
+                    "height": 10,
+                    "style": "display: none",
                     "class": "NSButton",
                     "title": "Dismiss",
-                    "y": 50,
+                    "y": 0,
                     "id": "dismiss"
                   },
                   {
                     "x": 16,
                     "text": "Waiting on you",
+                    "container": {
+                      "matched": [
+                        "(max-width: 519px)"
+                      ]
+                    },
                     "needed": {
                       "height": 18,
                       "width": 111
@@ -631,18 +689,18 @@
                     },
                     "width": 308,
                     "height": 18,
-                    "style": "flex-grow: 1; flex-basis: 100px; color: #77767b",
+                    "style": "flex-grow: 1; flex-basis: 100%; color: #77767b",
                     "class": "NSTextField",
-                    "y": 92,
+                    "y": 50,
                     "id": "status"
                   }
                 ],
                 "class": "TRBoxView",
                 "x": 0,
                 "style": "flex-wrap: wrap; align-items: center; padding-left: 16px; padding-top: 8px; padding-right: 16px; padding-bottom: 10px; row-gap: 8px; column-gap: 8px",
-                "height": 120,
+                "height": 78,
                 "width": 340,
-                "y": 129
+                "y": 171
               }
             ],
             "class": "TRBoxView",

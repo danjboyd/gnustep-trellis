@@ -511,6 +511,45 @@
                             "y": 260
                           },
                           {
+                            "x": 16,
+                            "container": {
+                              "matched": [
+                                "(max-width: 519px)"
+                              ]
+                            },
+                            "children": [
+                              {
+                                "intrinsic": {
+                                  "height": 34,
+                                  "width": 129
+                                },
+                                "class": "NSPopUpButton",
+                                "x": 0,
+                                "height": 34,
+                                "width": 129,
+                                "title": "Snooze",
+                                "y": 0
+                              },
+                              {
+                                "intrinsic": {
+                                  "height": 34,
+                                  "width": 103
+                                },
+                                "class": "NSButton",
+                                "x": 137,
+                                "height": 34,
+                                "width": 103,
+                                "title": "Dismiss",
+                                "y": 0
+                              }
+                            ],
+                            "width": 308,
+                            "height": 34,
+                            "style": "flex-wrap: wrap; align-items: center; row-gap: 8px; column-gap: 8px",
+                            "class": "TRBoxView",
+                            "y": 364
+                          },
+                          {
                             "children": [
                               {
                                 "x": 0,
@@ -555,13 +594,13 @@
                             "style": "flex-wrap: wrap; align-items: center; row-gap: 8px; column-gap: 8px",
                             "height": 118,
                             "width": 308,
-                            "y": 364
+                            "y": 412
                           }
                         ],
                         "class": "TRBoxView",
                         "x": 0,
                         "style": "flex-direction: column; padding-left: 16px; padding-top: 12px; padding-right: 16px; padding-bottom: 8px; row-gap: 14px; column-gap: 14px",
-                        "height": 490,
+                        "height": 538,
                         "width": 340,
                         "y": 0
                       }
@@ -569,7 +608,7 @@
                     "class": "TRBoxView",
                     "x": 0,
                     "style": "flex-direction: column",
-                    "height": 503,
+                    "height": 538,
                     "width": 340,
                     "y": 0
                   }

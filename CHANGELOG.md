@@ -3,7 +3,10 @@
 Trellis follows semantic versioning once 1.0 ships; before that, a minor
 version may change the API listed in docs/api.md, and says so here.
 
-## Unreleased
+## 0.2.0 (2026-11-16)
+
+Adds API (listed in docs/api.md, nothing removed): keyboard focus order,
+accessibility attributes, dev hot reload.
 
 - **Added:** opt-in dev hot reload. With `TRELLIS_HOT_RELOAD=1`, the
   `TRHotReload` default or `+[TRLoader setHotReloadEnabled:]`, boxes

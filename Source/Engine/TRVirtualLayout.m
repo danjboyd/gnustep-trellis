@@ -23,6 +23,7 @@ typedef struct {
   NSMutableData *_measured;       /* BOOL per item: measured at this width */
   /* Derived (valid while !_dirtyColumns / !_dirtyRows) */
   BOOL _dirtyColumns, _dirtyRows;
+  NSInteger _dirtyTopsFrom;       /* first row whose top is stale; NSNotFound = none */
   NSMutableData *_colX, *_colW;   /* TRFloat per column */
   NSInteger _cols;
   TRFloat _padTop, _padBottom, _rowGap;
@@ -44,6 +45,7 @@ typedef struct {
       _colW = [NSMutableData data];
       _rows = [NSMutableData data];
       _dirtyColumns = _dirtyRows = YES;
+      _dirtyTopsFrom = NSNotFound;
     }
   return self;
 }
@@ -97,9 +99,19 @@ typedef struct {
   TRFloat *h = [_heights mutableBytes];
   BOOL *m = [_measured mutableBytes];
   if (m[item] && h[item] == height) return;
+  TRFloat old = [self heightOfItem: item];
   h[item] = height;
   m[item] = YES;
-  _dirtyRows = YES;
+  if (old == height) return;
+  if (_dirtyRows || _dirtyColumns) { _dirtyRows = YES; return; }
+  /* Only heights changed: fix this row, and tops from here on lazily. */
+  NSInteger r = [self rowOfItem: item];
+  TRVRow *row = &((TRVRow *)[_rows mutableBytes])[r];
+  TRFloat rh = 0;
+  for (NSInteger i = row->first; i < row->first + row->count; i++) rh = MAX(rh, [self heightOfItem: i]);
+  if (rh == row->height) return;
+  row->height = rh;
+  if (_dirtyTopsFrom == NSNotFound || r < _dirtyTopsFrom) _dirtyTopsFrom = r;
 }
 
 - (BOOL)isMeasured:(NSInteger)item
@@ -192,11 +204,29 @@ typedef struct {
   return _estimatedSize;
 }
 
+/* Recomputes row tops (and the content height) from the first stale row. */
+- (void)resolveTops
+{
+  if (_dirtyTopsFrom == NSNotFound) return;
+  TRVRow *rows = [_rows mutableBytes];
+  NSInteger from = _dirtyTopsFrom;
+  _dirtyTopsFrom = NSNotFound;
+  TRFloat y = from > 0 ? rows[from - 1].top + rows[from - 1].height + _rowGap : _padTop;
+  for (NSInteger r = from; r < _rowCount; r++)
+    {
+      rows[r].top = y;
+      y += rows[r].height + _rowGap;
+    }
+  if (_rowCount > 0) y -= _rowGap;
+  _content = y + _padBottom;
+}
+
 - (void)resolveRows
 {
   [self resolveColumns];
-  if (!_dirtyRows) return;
+  if (!_dirtyRows) { [self resolveTops]; return; }
   _dirtyRows = NO;
+  _dirtyTopsFrom = NSNotFound;
   BOOL grid = (_mode == TRVirtualModeGrid);
   NSInteger cols = grid ? _cols : 1;
   [_rows setLength: 0];
@@ -256,6 +286,24 @@ typedef struct {
       if (rows[mid].top + rows[mid].height + _rowGap > y) hi = mid; else lo = mid + 1;
     }
   return lo;
+}
+
+- (TRFloat)widthForItem:(NSInteger)item
+{
+  [self resolveColumns];
+  if (item < 0 || item >= _count) return 0;
+  const TRFloat *cx = [_colX bytes], *cw = [_colW bytes];
+  if (_mode != TRVirtualModeGrid) return cw[0];
+  if (_spansFullRow && _spansFullRow(item)) return cx[_cols - 1] + cw[_cols - 1] - cx[0];
+  /* Equal columns (auto-fill, repeat(n, 1fr)) need no rows. */
+  BOOL equal = YES;
+  for (NSInteger c = 1; c < _cols; c++) if (fabs(cw[c] - cw[0]) > 0.01) { equal = NO; break; }
+  return equal ? cw[0] : [self frameForItem: item].width;
+}
+
+- (TRFloat)heightForItem:(NSInteger)item
+{
+  return (item >= 0 && item < _count) ? [self heightOfItem: item] : 0;
 }
 
 - (TRRect)frameForItem:(NSInteger)item

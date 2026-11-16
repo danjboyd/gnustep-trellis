@@ -409,7 +409,7 @@ static void TRShiftRealized(NSMutableDictionary *realized, NSInteger from, NSInt
 
 - (CGFloat)measureView:(NSView *)v atIndex:(NSInteger)i
 {
-  CGFloat w = [_layout frameForItem: i].width;
+  CGFloat w = [_layout widthForItem: i];
   CGFloat h;
   if ([v isKindOfClass: [TRBoxView class]])
     h = [(TRBoxView *)v heightForWidth: w];
@@ -470,10 +470,8 @@ static void TRShiftRealized(NSMutableDictionary *realized, NSInteger from, NSInt
             }
           if (fresh || ![_layout isMeasured: (NSInteger)i])
             {
-              BOOL was = [_layout isMeasured: (NSInteger)i];
-              CGFloat old = [_layout contentHeight];
-              [self measureView: v atIndex: (NSInteger)i];
-              if (!was || [_layout contentHeight] != old) changed = YES;
+              CGFloat old = [_layout heightForItem: (NSInteger)i];
+              if ([self measureView: v atIndex: (NSInteger)i] != old) changed = YES;
             }
         }
       if (!changed) break;

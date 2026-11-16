@@ -74,6 +74,13 @@ the user's settings. trellis-render refuses to run without it.
   must have a matching property, unless you write `no-outlet="yes"`.
 - **Actions:** `action="compose:"` sends `compose:` to the owner, which
   must implement it.
+- **Keyboard focus:** Tab follows document order, as in a browser:
+  Trellis links the controls into the window's key-view loop after every
+  layout, so controls hidden by `display: none` (or a container query)
+  drop out and come back by themselves. CSS `order` doesn't change it.
+  `tabindex="1"`, `"2"`, ... go first, in that order; `tabindex="-1"`
+  leaves a control out. Scrolled content joins the loop. For the first
+  responder, use the root box's `firstKeyView`.
 - **Sample content:** put it in `Screen.sample.json`, keyed by id. It's
   used only by trellis-render.
 

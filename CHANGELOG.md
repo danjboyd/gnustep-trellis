@@ -5,6 +5,12 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Added:** keyboard focus order. The outermost TRBoxView links its
+  controls into a nextKeyView loop in document order after every layout,
+  skipping hidden ones (container queries included); `tabindex="N"`
+  overrides it and `tabindex="-1"` leaves a control out. API:
+  `managesKeyViewLoop`, `-recalculateTrellisKeyViewLoop`, `firstKeyView`,
+  `TRSetTabIndex`/`TRTabIndex`.
 - **Fixed:** container queries inside a `<scroll>` now test the nearest
   container outside the scroller. They used to test the scroller's
   content box, so a classic, space-taking scroller shifted the

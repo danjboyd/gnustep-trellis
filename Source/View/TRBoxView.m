@@ -9,6 +9,19 @@
 
 #import "TRBoxView.h"
 #import "TRViewMeasure.h"
+#import <objc/runtime.h>
+
+static char kTRTabIndexKey;
+
+void TRSetTabIndex(NSView *view, NSInteger index)
+{
+  objc_setAssociatedObject(view, &kTRTabIndexKey, index ? @(index) : nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+NSInteger TRTabIndex(NSView *view)
+{
+  return [objc_getAssociatedObject(view, &kTRTabIndexKey) integerValue];
+}
 
 /* ------------------------------------------------------------------ */
 #pragma mark Colours
@@ -153,6 +166,8 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
   NSMapTable *_appliedStyles;     /* view -> style last pushed to the control */
   BOOL _applyingFrames;
   BOOL _layoutScheduled;
+  BOOL _managesKeyViewLoop;
+  __weak NSView *_firstKeyView;
 }
 
 + (instancetype)boxWithStyle:(NSString *)declarations
@@ -177,6 +192,7 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
       _node.context = self;
       _signatures = [NSMapTable weakToStrongObjectsMapTable];
       _appliedStyles = [NSMapTable weakToWeakObjectsMapTable];
+      _managesKeyViewLoop = YES;
       [self setAutoresizesSubviews: NO];
     }
   return self;
@@ -399,6 +415,65 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
   NSSize sz = [self bounds].size;
   [_node layoutWithAvailableSize: TRSizeMake(sz.width, sz.height)];
   [self applyFrames];
+  [self recalculateTrellisKeyViewLoop];
+}
+
+/* ---- Keyboard focus order ---- */
+
+- (BOOL)managesKeyViewLoop { return _managesKeyViewLoop; }
+- (void)setManagesKeyViewLoop:(BOOL)yn { _managesKeyViewLoop = yn; }
+- (NSView *)firstKeyView { return _firstKeyView; }
+
+/* Focusable views under v in document order (a TRBoxView's subviews in
+   node order, a scroller's document view, other containers' subviews). */
+static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
+{
+  if ([v isHidden]) return;
+  if ([v isKindOfClass: [TRBoxView class]])
+    {
+      for (TRNode *c in ((TRBoxView *)v).node.children)
+        if ([c.context isKindOfClass: [NSView class]]) TRCollectKeyViews(c.context, out);
+      return;
+    }
+  if ([v isKindOfClass: [NSScrollView class]])
+    {
+      NSView *doc = [(NSScrollView *)v documentView];
+      if (doc) TRCollectKeyViews(doc, out);
+      return;
+    }
+  if ([v acceptsFirstResponder] || [v canBecomeKeyView])
+    {
+      if (TRTabIndex(v) >= 0) [out addObject: v];
+      return;
+    }
+  for (NSView *sub in [v subviews]) TRCollectKeyViews(sub, out);
+}
+
+- (void)recalculateTrellisKeyViewLoop
+{
+  if (!_managesKeyViewLoop) return;
+  /* Only the outermost Trellis box (scrolled content joins its loop). */
+  for (NSView *p = [self superview]; p != nil; p = [p superview])
+    if ([p isKindOfClass: [TRBoxView class]]) return;
+  NSMutableArray *views = [NSMutableArray array];
+  TRCollectKeyViews(self, views);
+  /* Positive tab indexes first (ascending, stable), then document order. */
+  NSMutableArray *ordered = [NSMutableArray array], *rest = [NSMutableArray array];
+  for (NSView *v in views) [(TRTabIndex(v) > 0 ? ordered : rest) addObject: v];
+  /* Stable insertion sort by tab index (lists are short). */
+  for (NSUInteger i = 1; i < [ordered count]; i++)
+    {
+      NSView *v = ordered[i];
+      NSInteger k = TRTabIndex(v);
+      NSUInteger j = i;
+      while (j > 0 && TRTabIndex(ordered[j - 1]) > k) { ordered[j] = ordered[j - 1]; j--; }
+      ordered[j] = v;
+    }
+  [ordered addObjectsFromArray: rest];
+  NSUInteger n = [ordered count];
+  for (NSUInteger i = 0; i < n; i++)
+    [ordered[i] setNextKeyView: ordered[(i + 1) % n]];
+  _firstKeyView = n ? ordered[0] : nil;
 }
 
 - (void)applyFrames

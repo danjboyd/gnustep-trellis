@@ -12,7 +12,7 @@ the layout engine (Foundation only), and `TRBoxView.h`, `TRLoader.h` and
 
 The markup and CSS described in [agents.md](agents.md), sections 2 to 4,
 are public: element names, attributes (`id`, `class`, `action`,
-`no-outlet`, `default`, `wraps`, `placeholder`, `items`, `type`, ...), the
+`no-outlet`, `default`, `wraps`, `placeholder`, `tabindex`, `items`, `type`, ...), the
 `<!-- owner: Class -->` comment, `<style>` with the listed properties,
 selectors and `@container` queries, and the `Screen.sample.json`
 convention. Unknown properties and bad values stay errors.
@@ -32,11 +32,12 @@ theme (since 0.1.1).
 |---|---|---|
 | `+[TRLoader loadFile:owner:error:]`, `+loadDocument:owner:error:` | TRLoader.h | Build a view tree from a .trellis file, binding outlets by `id` (KVC: properties or ivars, `_name` included) and actions by `action=`. |
 | `+[TRLoader instantiateTemplate:...]`, `+applySample:toView:error:`, `+viewWithIdentifier:inView:` | TRLoader.h | Templates, sample content, lookup by id. |
-| `TRBoxView`: `+boxWithStyle:`, `-initWithStyle:`, `style`, `-setStyleDeclarations:`, `-addSubview:style:`, `-setStyleDeclarations:forSubview:`, `-nodeForSubview:`, `-addConditionalStyle:when:`, `-invalidateSubview:`, `-layoutTrellis`, `-rootBox`, `node` | TRBoxView.h | A view whose subviews Trellis lays out. Plain `-addSubview:` works too (intrinsic size). |
+| `TRBoxView`: `+boxWithStyle:`, `-initWithStyle:`, `style`, `-setStyleDeclarations:`, `-addSubview:style:`, `-setStyleDeclarations:forSubview:`, `-nodeForSubview:`, `-addConditionalStyle:when:`, `-invalidateSubview:`, `-layoutTrellis`, `-rootBox`, `node`; since 0.2 `managesKeyViewLoop`, `-recalculateTrellisKeyViewLoop`, `firstKeyView` | TRBoxView.h | A view whose subviews Trellis lays out. Plain `-addSubview:` works too (intrinsic size). |
 | `TRScrollBox` (`contentBox`) | TRLoader.h | The view `<scroll>` creates. |
 | `TRSizeForWidth` protocol: `-trellisSizeForWidth:` | TRViewMeasure.h | Opt-in height-for-width measuring for custom views (CGFLOAT_MAX = max-content). |
 | `TRMeasureView`, `TRBaselineOfView` | TRViewMeasure.h | How Trellis measures a leaf view; usable from custom measure blocks. |
 | `TRColorFromCSS` | TRBoxView.h | CSS colour string to NSColor. |
+| `TRSetTabIndex`, `TRTabIndex` (since 0.2) | TRBoxView.h | A view's tab index (markup `tabindex`). |
 
 ## Engine (libTrellisEngine, Foundation only)
 

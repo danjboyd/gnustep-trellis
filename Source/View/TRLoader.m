@@ -238,6 +238,7 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
 
   NSString *ident = [e identifier];
   if (ident) [v setIdentifier: ident];
+  if (a[@"tabindex"]) TRSetTabIndex(v, [a[@"tabindex"] integerValue]);
 
   /* Action. */
   NSString *action = a[@"action"];

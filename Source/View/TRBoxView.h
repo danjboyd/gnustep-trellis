@@ -57,10 +57,23 @@
 /* The outermost TRBoxView of this tree. */
 - (TRBoxView *)rootBox;
 
+/* Keyboard focus order. The outermost TRBoxView links its focusable
+   descendants into a nextKeyView loop after every layout: views with a
+   positive tab index first (ascending), then the rest in document order;
+   hidden views and tab index -1 are left out. CSS `order` doesn't change
+   it, as in browsers. Set managesKeyViewLoop = NO to build your own. */
+@property (nonatomic) BOOL managesKeyViewLoop;          /* default YES */
+- (void)recalculateTrellisKeyViewLoop;
+/* The first view in the loop (for -[NSWindow setInitialFirstResponder:]). */
+@property (nonatomic, readonly) NSView *firstKeyView;
 @end
 
-/* CSS colour strings: #rgb, #rrggbb, #rrggbbaa, rgb(), rgba(), and a few
-   names (black, white, gray/grey, red, green, blue, transparent). */
+/* The tab index of a view (markup: tabindex="N"); 0 when unset. */
+void TRSetTabIndex(NSView *view, NSInteger index);
+NSInteger TRTabIndex(NSView *view);
+
+/* CSS colour strings: #rgb, #rrggbb, #rrggbbaa, rgb(), rgba(), a few
+   names, and CSS system colours (Canvas, CanvasText, ...; dynamic). */
 NSColor *TRColorFromCSS(NSString *css);
 
 #endif

@@ -3,6 +3,19 @@
 Trellis follows semantic versioning once 1.0 ships; before that, a minor
 version may change the API listed in docs/api.md, and says so here.
 
+## Unreleased
+
+- **Added (experimental, not yet in docs/api.md):** `TRVirtualLayout`,
+  the window engine for virtualized lists and grids
+  (docs/design-virtualization.md, step 1). It keeps only item heights
+  (estimated until measured). Grid columns come from the real grid
+  engine, so any `grid-template-columns` works, and full-row items act
+  as group headers. It answers which items a viewport needs (with
+  overscan), item frames and content height, and scroll anchors through
+  measures, inserts and removals. Tests/Engine/virtual-layout.m runs in
+  `make check`. 10k grid items: 0.4 ms to build, under 0.1 ms per
+  scroll step with remeasuring.
+
 ## 0.3.0 (2026-11-16)
 
 Adds API (listed in docs/api.md, nothing removed):

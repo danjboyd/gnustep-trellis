@@ -7,3 +7,4 @@
 #import "TRTypes.h"
 #import "TRStyle.h"
 #import "TRNode.h"
+#import "TRVirtualLayout.h"

@@ -35,10 +35,11 @@ libTrellisEngine_OBJC_FILES = \
 	Source/Engine/TRContainerQuery.m \
 	Source/Engine/TRLint.m \
 	Source/Engine/TRMarkup.m \
-	Source/Engine/TRGrid.m
+	Source/Engine/TRGrid.m \
+	Source/Engine/TRVirtualLayout.m
 libTrellisEngine_HEADER_FILES_DIR = Source/Engine
 libTrellisEngine_HEADER_FILES_INSTALL_DIR = Trellis
-libTrellisEngine_HEADER_FILES = TRTypes.h TRStyle.h TRNode.h TRLint.h TRMarkup.h TrellisEngine.h
+libTrellisEngine_HEADER_FILES = TRTypes.h TRStyle.h TRNode.h TRLint.h TRMarkup.h TRVirtualLayout.h TrellisEngine.h
 
 # --- The view layer: AppKit (GNUstep or Apple) --------------------------------
 libTrellis_OBJC_FILES = \
@@ -96,6 +97,10 @@ LINT = LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH ./obj/trellis-lint
 check:: all
 	@echo "== engine cases"
 	@$(CASE_RUNNER) Tests/Engine/cases
+	@echo "== virtual layout"
+	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ISource/Engine Tests/Engine/virtual-layout.m \
+	  -o obj/virtual-layout -L./obj -lTrellisEngine $(shell gnustep-config --base-libs)
+	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH ./obj/virtual-layout
 	@echo "== .trellis files (syntax, styles, bindings)"
 	@$(LINT) Examples/TrellisDemo/AskDetail.trellis --owner Examples/TrellisDemo/AskDetailController.h
 	@$(LINT) Examples/TrellisDemo/Settings.trellis --owner Examples/TrellisDemo/SettingsController.h

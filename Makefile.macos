@@ -9,7 +9,7 @@ CFLAGS  += -DTR_NO_HOT_RELOAD
 endif
 B       := build
 
-ENGINE_SRC := Source/Engine/TRStyle.m Source/Engine/TRNode.m Source/Engine/TRLayout.m Source/Engine/TRContainerQuery.m Source/Engine/TRLint.m Source/Engine/TRMarkup.m Source/Engine/TRGrid.m
+ENGINE_SRC := Source/Engine/TRStyle.m Source/Engine/TRNode.m Source/Engine/TRLayout.m Source/Engine/TRContainerQuery.m Source/Engine/TRLint.m Source/Engine/TRMarkup.m Source/Engine/TRGrid.m Source/Engine/TRVirtualLayout.m
 
 VIEW_SRC   := Source/View/TRBoxView.m Source/View/TRViewMeasure.m Source/View/TRLoader.m
 

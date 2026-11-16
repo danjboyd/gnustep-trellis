@@ -58,7 +58,37 @@ scripts/install-toolchain-debian.sh   # once: builds the toolchain into ~/opt/tr
 make && make check
 ```
 
-macOS: `make -f Makefile.macos check`.
+macOS (plain Apple clang, no Xcode project or GNUstep make needed):
+
+```sh
+make -f Makefile.macos check   # engine, trellis-case, engine + conformance cases
+make -f Makefile.macos gui     # libTrellis (views), trellis-lint/-render/-bench, TrellisPreview.app
+```
+
+On macOS `trellis-render` draws the view tree straight into a bitmap,
+with no window or `NSApplication`, so it runs headless over ssh.
+
+## Conformance
+
+`make check` runs Trellis's own engine cases and then the imported
+Flexbox conformance suites in [Tests/Conformance](Tests/Conformance)
+(format: [docs/test-case-format.md](docs/test-case-format.md); sources
+and licences: [ATTRIBUTION.md](Tests/Conformance/ATTRIBUTION.md)):
+
+| Suite | Source | Linux (GNUstep) | macOS (Cocoa) |
+|---|---|---|---|
+| engine | hand-written, `Tests/Engine/cases` | 93/93 | 93/93 |
+| yoga | facebook/yoga gentest, 1086 cases | 906/906 | 906/906 |
+| wpt | web-platform-tests css-flexbox (check-layout), 957 cases | 813/824 (98.7%) | 813/824 (98.7%) |
+| **all conformance** | | **1719/1730 (99.4%)** | **1719/1730 (99.4%)** |
+
+As of db5893b. 313 cases are skipped because they need features Trellis
+leaves out or does differently on purpose (`position: static`,
+`inline-block`, `display: contents`, intrinsic-size keywords, per-axis
+overflow, `flex-wrap: balance`, `-webkit-box`); `trellis-case --all`
+runs them anyway. The 11 failures are the documented consequence of
+`display: block` meaning a column flex container (percentage heights
+against a block, a fixed-height child shrinking inside a shorter block).
 
 ## Documents
 

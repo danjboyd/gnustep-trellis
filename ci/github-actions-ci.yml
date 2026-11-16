@@ -3,7 +3,7 @@
 # for his go. To enable: git mv ci/github-actions-ci.yml .github/workflows/ci.yml
 # (see ci/README.md for the minutes estimate).
 #
-# Linux job: the GNUstep toolchain (clang + libobjc2 + libdispatch + GNUstep
+# Linux job (packages per docs/building.md): the GNUstep toolchain (clang + libobjc2 + libdispatch + GNUstep
 # make/base/gui/back, built by scripts/install-toolchain-debian.sh) is cached,
 # so only a cache miss pays the ~20 min source build.
 # macOS job: present but disabled (macOS runners bill at 10x); mac-02 stays the
@@ -46,9 +46,9 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             clang lld cmake ninja-build pkg-config git python3 xvfb \
             libffi-dev libxml2-dev libxslt1-dev libgnutls28-dev libicu-dev \
-            libcurl4-openssl-dev zlib1g-dev \
+            libcurl4-gnutls-dev zlib1g-dev libavahi-client-dev libbsd-dev libgmp-dev \
             libcairo2-dev libxt-dev libxft-dev libfreetype-dev libfontconfig-dev \
-            libjpeg-dev libtiff-dev libpng-dev libgif-dev libxrandr-dev
+            libjpeg-dev libtiff-dev libpng-dev libgif-dev libxrandr-dev libxext-dev
 
       - name: Restore toolchain
         id: toolchain
@@ -84,10 +84,8 @@ jobs:
       - name: View checks, headless (Xvfb)
         run: |
           set +u; . scripts/env.sh; set -u
-          make check-gui 2>&1 | tee check-gui.log
-          # check-gui pipes each check through tail -1, so require the OK lines explicitly.
-          grep -q 'HOOK OK' check-gui.log
-          grep -q 'APPEARANCE OK' check-gui.log
+          # Exits non-zero if any view check fails (HOOK, OPENFILE, APPEARANCE, SCROLLQUERY).
+          make check-gui
 
   macos:
     # Disabled until the maintainer approves macOS runner minutes (10x). Runs only on a

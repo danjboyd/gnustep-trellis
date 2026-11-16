@@ -622,11 +622,17 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
       TRWeakView *w = [TRWeakView new];
       w->view = ordered[i];
       [_keyLoopViews addObject: w];
+#ifdef GNUSTEP
       [ordered[i] setNextKeyView: (i + 1 < n) ? ordered[i + 1] : (NSView *)self];
+#else
+      [ordered[i] setNextKeyView: ordered[(i + 1) % n]];
+#endif
     }
   _firstKeyView = n ? ordered[0] : nil;
   _lastKeyView = n ? ordered[n - 1] : nil;
+#ifdef GNUSTEP
   [super setNextKeyView: _firstKeyView];
+#endif
 }
 
 /* YES when some view of the managed loop can take focus now. */
@@ -644,6 +650,7 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
    NSView: GNUstep's -dealloc asks neighbours for -nextKeyView while a
    member is being freed, and ARC would retain and autorelease that dying
    view on the way out. The __weak first/last read nil for it instead. */
+#ifdef GNUSTEP
 - (NSView *)nextKeyView
 {
   if (_keyLoopViews == nil) return [super nextKeyView];
@@ -659,6 +666,7 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
   NSView *last = _lastKeyView;
   return (last != nil && [self keyLoopHasValidView]) ? last : nil;
 }
+#endif
 
 - (void)applyFrames
 {

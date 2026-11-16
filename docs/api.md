@@ -1,6 +1,6 @@
-# Trellis public API (v0.2)
+# Trellis public API (v0.3)
 
-This page lists what Trellis 0.2 promises to keep. Anything here changes
+This page lists what Trellis 0.3 promises to keep. Anything here changes
 only with a version bump and a CHANGELOG entry; anything not listed is
 internal and may change without notice.
 
@@ -23,9 +23,13 @@ Colours: hex, `rgb()`/`rgba()`, a few names, and the CSS system colours
 `ButtonBorder`, `GrayText`, `Highlight`, `HighlightText`, `SelectedItem`,
 `SelectedItemText`, `AccentColor`, `AccentColorText`, `LinkText`, `Mark`,
 `MarkText`), plus `-tr-window-background`, `-tr-separator`,
-`-tr-secondary-text` and `-tr-error`. System colours resolve to AppKit's
-dynamic colours when the view draws, so they follow the appearance and
-theme (since 0.1.1).
+`-tr-secondary-text` and `-tr-error`, and since 0.3 `-tr-warning-background`
+and `-tr-warning-text` (a fixed light pair, like `Mark`/`MarkText`). System
+colours resolve to AppKit's dynamic colours when the view draws, so they
+follow the appearance and theme (since 0.1.1).
+
+Since 0.3, `<button bordered="no">` makes a flat, title-only button, and
+`color:` on a button colours its title.
 
 ## AppKit layer (libTrellis)
 
@@ -35,6 +39,7 @@ theme (since 0.1.1).
 | `+[TRLoader instantiateTemplate:...]`, `+applySample:toView:error:`, `+viewWithIdentifier:inView:` | TRLoader.h | Templates, sample content, lookup by id. |
 | `TRBoxView`: `+boxWithStyle:`, `-initWithStyle:`, `style`, `-setStyleDeclarations:`, `-addSubview:style:`, `-setStyleDeclarations:forSubview:`, `-nodeForSubview:`, `-addConditionalStyle:when:`, `-invalidateSubview:`, `-layoutTrellis`, `-rootBox`, `node`; since 0.2 `managesKeyViewLoop`, `-recalculateTrellisKeyViewLoop`, `firstKeyView` | TRBoxView.h | A view whose subviews Trellis lays out. Plain `-addSubview:` works too (intrinsic size). |
 | `TRScrollBox` (`contentBox`) | TRLoader.h | The view `<scroll>` creates. |
+| `TRFlatButtonCell` (since 0.3) | TRLoader.h | The cell of `<button bordered="no">`: draws its attributed title itself, so its colour shows under any theme. |
 | Hot reload (since 0.2): `+[TRLoader setHotReloadEnabled:]`, `+hotReloadEnabled`, `+reloadChangedFiles`, `-trellisDidReload:` (owner, optional), `TRLoaderDidReloadNotification`, `TRELLIS_HOT_RELOAD` / `TRHotReload` | TRLoader.h | Development only: rebuilds boxes loaded from files when the files change. |
 | `TRSizeForWidth` protocol: `-trellisSizeForWidth:` | TRViewMeasure.h | Opt-in height-for-width measuring for custom views (CGFLOAT_MAX = max-content). |
 | `TRMeasureView`, `TRBaselineOfView` | TRViewMeasure.h | How Trellis measures a leaf view; usable from custom measure blocks. |

@@ -1,0 +1,17 @@
+<!-- Flat buttons on a fixed dark bar, and the warning pair on Canvas:
+     appearance.sh renders this in light and dark and expects no
+     low-contrast finding. -->
+<column class="page">
+  <row class="bar">
+    <button bordered="no" class="flat" action="go:" no-outlet="yes">Mine 5</button>
+    <button bordered="no" class="flat" action="go:" no-outlet="yes">With agents 6</button>
+  </row>
+  <box class="warn"><text class="warn-text">Requester has heard nothing yet</text></box>
+</column>
+<style>
+  .page { background-color: Canvas; padding: 8px; gap: 8px; }
+  .bar  { background-color: #1c1d1f; padding: 6px; gap: 8px; }
+  .flat { color: #e4e5e8; }
+  .warn { background-color: -tr-warning-background; padding: 4px 8px; border-radius: 4px; }
+  .warn-text { color: -tr-warning-text; }
+</style>

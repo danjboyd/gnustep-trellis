@@ -148,6 +148,12 @@ NSColor *TRColorFromCSS(NSString *css)
                @"-tr-secondary-text": @"secondaryLabelColor|disabledControlTextColor",
                @"-tr-error": @"systemRedColor|redColor" };
     });
+    /* Soft warning tint: like Mark, a light pair that reads the same in
+       both appearances (fixed, so it never flips to a dark brown). */
+    if ([c isEqualToString: @"-tr-warning-background"])
+      return [NSColor colorWithCalibratedRed: 0xFC/255.0 green: 0xEE/255.0 blue: 0xDD/255.0 alpha: 1];
+    if ([c isEqualToString: @"-tr-warning-text"])
+      return [NSColor colorWithCalibratedRed: 0x8A/255.0 green: 0x3B/255.0 blue: 0x06/255.0 alpha: 1];
     NSString *names = sys[c];
     if (names != nil)
       for (NSString *name in [names componentsSeparatedByString: @"|"])
@@ -199,6 +205,23 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
     {
       NSColor *col = TRColorFromCSS(v);
       if (col) [(NSTextField *)ctl setTextColor: col];
+    }
+  else if (v != nil && [ctl isKindOfClass: [NSButton class]])
+    {
+      /* Buttons have no text colour; colour the title instead (for flat,
+         bordered="no" buttons on a coloured bar). A later -setTitle:
+         drops it; set -attributedTitle, or call -invalidateSubview:. */
+      NSColor *col = TRColorFromCSS(v);
+      NSButton *b = (NSButton *)ctl;
+      if (col)
+        {
+          NSMutableParagraphStyle *ps = [NSMutableParagraphStyle new];
+          [ps setAlignment: NSCenterTextAlignment];
+          NSDictionary *attrs = @{ NSForegroundColorAttributeName: col,
+                                   NSFontAttributeName: [b font] ?: [NSFont systemFontOfSize: 0],
+                                   NSParagraphStyleAttributeName: ps };
+          [b setAttributedTitle: [[NSAttributedString alloc] initWithString: [b title] attributes: attrs]];
+        }
     }
   if ((v = decls[@"text-align"]) != nil)
     {

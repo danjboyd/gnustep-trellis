@@ -32,7 +32,7 @@ render() {  # file appearance -> prints the number of low-contrast findings, or 
   if [ $rc -ne 0 ] || ! grep -q "lint finding(s)" <<<"$out"; then echo "CRASH(rc=$rc)"; return; fi
   grep -c "low-contrast" <<<"$out"
 }
-for f in Examples/TrellisDemo/*.trellis dogfood/AskDetail.trellis dogfood/tickets/Blocked.trellis dogfood/tickets/Batch.trellis dogfood/work/Work.trellis dogfood/desk/*.trellis Tests/View/mark.trellis; do
+for f in Examples/TrellisDemo/*.trellis dogfood/AskDetail.trellis dogfood/tickets/Blocked.trellis dogfood/tickets/Batch.trellis dogfood/work/Work.trellis dogfood/desk/*.trellis Tests/View/mark.trellis Tests/View/flat-chips.trellis; do
   for ap in light dark; do
     n=$(render "$f" $ap)
     if [ "${n#CRASH}" != "$n" ]; then echo "FAIL $f ($ap): trellis-render $n"; fail=1

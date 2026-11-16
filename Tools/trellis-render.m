@@ -118,7 +118,10 @@ static NSDictionary *TRDumpView(NSView *v, TRNode *node)
   if ([v isKindOfClass: [NSTextField class]] && [(NSTextField *)v isEditable]) d[@"editable"] = @YES;
   else if ([v isKindOfClass: [NSButton class]] && ![(NSButton *)v isBordered])
     {
-      NSString *hex = TRHexOfColor([NSColor controlTextColor]);
+      /* A flat button's title colour: its attributed title's, if set. */
+      NSAttributedString *t = [(NSButton *)v attributedTitle];
+      NSColor *c = [t length] ? [t attribute: NSForegroundColorAttributeName atIndex: 0 effectiveRange: NULL] : nil;
+      NSString *hex = TRHexOfColor(c ?: [NSColor controlTextColor]);
       if (hex) d[@"textColor"] = hex;
     }
   if ([v isKindOfClass: [NSControl class]] && [(NSControl *)v cell] != nil)

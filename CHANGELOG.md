@@ -3,6 +3,21 @@
 Trellis follows semantic versioning once 1.0 ships; before that, a minor
 version may change the API listed in docs/api.md, and says so here.
 
+## 0.3.0 (2026-11-16)
+
+Adds API (listed in docs/api.md, nothing removed):
+
+- **Added:** `-tr-warning-background` and `-tr-warning-text`, a soft
+  peach and dark brown pair that stays light in both appearances, like
+  `Mark`/`MarkText`.
+- **Added:** `<button bordered="no">` for flat, title-only buttons, and
+  `color:` on buttons (it colours the title). Their cell,
+  `TRFlatButtonCell`, draws the title itself: the Adwaita theme draws
+  push-button titles in its own colour. trellis-render reports a flat
+  button's real title colour to the contrast lint.
+  Tests/View/flat-chips.trellis checks both in appearance.sh.
+- **Dogfood:** the desk spec uses both, and pins its decision bar.
+
 ## 0.2.3 (2026-11-16)
 
 No API changes.

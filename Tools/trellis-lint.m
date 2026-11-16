@@ -109,7 +109,8 @@ static BOOL TRIsFixedColour(NSString *v)
       @"canvas", @"canvastext", @"field", @"fieldtext", @"buttonface", @"buttontext", @"buttonborder",
       @"graytext", @"highlight", @"highlighttext", @"selecteditem", @"selecteditemtext",
       @"accentcolor", @"accentcolortext", @"linktext", @"mark", @"marktext",
-      @"-tr-window-background", @"-tr-separator", @"-tr-secondary-text", @"-tr-error", nil];
+      @"-tr-window-background", @"-tr-separator", @"-tr-secondary-text", @"-tr-error",
+      @"-tr-warning-background", @"-tr-warning-text", nil];
   return ![dynamic containsObject: v];
 }
 

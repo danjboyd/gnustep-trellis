@@ -120,6 +120,36 @@ static BOOL TRYes(NSString *v)
 
 /* ------------------------------------------------------------------ */
 
+@implementation TRFlatButtonCell
+
+- (void)drawInteriorWithFrame:(NSRect)frame inView:(NSView *)view
+{
+  NSAttributedString *t = [self attributedTitle];
+  if ([t length] == 0) return;
+  if (![self isEnabled] || [self isHighlighted])
+    {
+      NSMutableAttributedString *m = [t mutableCopy];
+      NSColor *c = [t attribute: NSForegroundColorAttributeName atIndex: 0 effectiveRange: NULL]
+                   ?: [NSColor controlTextColor];
+      [m addAttribute: NSForegroundColorAttributeName value: [c colorWithAlphaComponent: 0.6]
+                range: NSMakeRange(0, [m length])];
+      t = m;
+    }
+  NSSize s = [t size];
+  NSRect r = NSMakeRect(NSMidX(frame) - s.width / 2, NSMidY(frame) - s.height / 2, s.width, s.height);
+  [t drawInRect: [view centerScanRect: r]];
+}
+
+- (NSSize)cellSize
+{
+  NSSize s = [[self attributedTitle] size];
+  return NSMakeSize(ceil(s.width) + 8, ceil(s.height) + 4);
+}
+
+@end
+
+/* ------------------------------------------------------------------ */
+
 @interface TRPlaceholderView : TRBoxView
 @end
 @implementation TRPlaceholderView
@@ -213,9 +243,15 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
   else if ([n isEqualToString: @"button"] || [n isEqualToString: @"checkbox"] || [n isEqualToString: @"radio"])
     {
       NSButton *b = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 10, 10)];
+      BOOL flat = [n isEqualToString: @"button"] && a[@"bordered"] != nil && !TRYes(a[@"bordered"]);
+      /* bordered="no": a flat, title-only button (chips on a bar). Its cell
+         draws the title itself, so a color: set on it shows even under
+         themes that draw push-button titles in their own colour. */
+      if (flat) [b setCell: [[TRFlatButtonCell alloc] initTextCell: @""]];
       if ([n isEqualToString: @"checkbox"]) [b setButtonType: NSSwitchButton];
       else if ([n isEqualToString: @"radio"]) [b setButtonType: NSRadioButton];
-      else [b setBezelStyle: NSRoundedBezelStyle];
+      else if (!flat) [b setBezelStyle: NSRoundedBezelStyle];
+      if (flat) [b setBordered: NO];
       [b setTitle: a[@"title"] ?: text ?: @""];
       if (a[@"state"]) [b setState: TRYes(a[@"state"]) ? NSOnState : NSOffState];
       if (TRYes(a[@"default"])) [b setKeyEquivalent: @"\r"];

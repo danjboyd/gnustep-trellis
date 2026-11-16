@@ -15,7 +15,8 @@
      label                non-editable NSTextField (text content = string)
      text                 wrapping, non-editable NSTextField
      field                editable NSTextField (placeholder=, secure="yes")
-     button               NSButton (title= or text content, action=, default="yes")
+     button               NSButton (title= or text content, action=, default="yes",
+                          bordered="no" for a flat, title-only button)
      checkbox, radio      NSButton switch/radio (title=, state="on")
      popup                NSPopUpButton (<item>Title</item> children or items="A,B")
      image                NSImageView (src= file relative to the .trellis file, or name=)
@@ -75,6 +76,11 @@
 @end
 
 extern NSString *const TRLoaderDidReloadNotification;
+
+/* The cell of <button bordered="no">: a title-only button that draws
+   its (attributed) title itself, in the colour its style sets. */
+@interface TRFlatButtonCell : NSButtonCell
+@end
 
 /* An NSScrollView whose document view is a Trellis column. */
 @interface TRScrollBox : NSScrollView

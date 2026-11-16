@@ -74,6 +74,9 @@ the user's settings. trellis-render refuses to run without it.
   must have a matching property, unless you write `no-outlet="yes"`.
 - **Actions:** `action="compose:"` sends `compose:` to the owner, which
   must implement it.
+- **Flat buttons:** `<button bordered="no">` draws the title only (chips
+  on a coloured bar); `color:` colours a button's title. Setting the
+  title later in code drops the colour: set `attributedTitle` instead.
 - **Keyboard focus:** Tab follows document order, as in a browser:
   Trellis links the controls into the window's key-view loop after every
   layout, so controls hidden by `display: none` (or a container query)
@@ -128,6 +131,10 @@ the user's settings. trellis-render refuses to run without it.
   accent colour doesn't adapt to Dark), `Highlight` with `HighlightText` for selections,
   `ButtonFace`/`ButtonText`, `Field`/`FieldText`, `LinkText`,
   `-tr-separator` for borders and `-tr-error` for errors.
+  `Mark` with `MarkText` and `-tr-warning-background` with
+  `-tr-warning-text` (a soft peach with dark brown) are highlights that
+  stay light in both appearances: always pair them with their own text
+  colour.
   - A fixed colour (`#fff`) next to a system one breaks in the other
     appearance: white text on white.
   - trellis-lint warns (`colour-pair`) about a fixed background with text

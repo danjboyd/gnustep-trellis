@@ -137,7 +137,9 @@ static void TROutline(NSView *v, NSPoint origin)
 static NSData *TRRenderPNG(TRBoxView *box, BOOL outlines)
 {
   NSRect b = [box bounds];
+#ifdef GNUSTEP
   [box display];
+#endif
   NSBitmapImageRep *rep = [box bitmapImageRepForCachingDisplayInRect: b];
   [box cacheDisplayInRect: b toBitmapImageRep: rep];
   if (outlines)
@@ -240,7 +242,12 @@ int main(int argc, const char **argv)
           [defs removeVolatileDomainForName: NSArgumentDomain];
           [defs setVolatileDomain: args forName: NSArgumentDomain];
         }
+#ifdef GNUSTEP
       [NSApplication sharedApplication];
+#endif
+      /* On macOS no NSApplication or window is created: the view tree draws
+         straight into a bitmap (cacheDisplayInRect:), so rendering never
+         needs a WindowServer/Aqua session and is safe over ssh. */
 
       int lintErrors = 0;
       for (NSNumber *wn in widths)
@@ -269,12 +276,14 @@ int main(int argc, const char **argv)
               [box.node layoutWithAvailableSize: TRSizeMake(W, NAN)];
               H = ceil(box.node.layoutFrame.height);
             }
+#ifdef GNUSTEP
           NSWindow *win = [[NSWindow alloc] initWithContentRect: NSMakeRect(0, 0, W, H)
                                                       styleMask: NSBorderlessWindowMask
                                                         backing: NSBackingStoreBuffered
                                                           defer: NO];
           [win setReleasedWhenClosed: NO];
           [win setContentView: box];
+#endif
           [box setFrame: NSMakeRect(0, 0, W, H)];
           [box layoutTrellis];
 
@@ -307,7 +316,9 @@ int main(int argc, const char **argv)
             }
           printf("%s: %gx%g, %lu lint finding(s)\n", [screen UTF8String], W, H,
                  (unsigned long)[lint count]);
+#ifdef GNUSTEP
           [win close];
+#endif
         }
       return lintErrors ? 1 : 0;
     }

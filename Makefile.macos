@@ -7,7 +7,12 @@ B       := build
 
 ENGINE_SRC := Source/Engine/TRStyle.m Source/Engine/TRNode.m Source/Engine/TRLayout.m Source/Engine/TRContainerQuery.m Source/Engine/TRLint.m Source/Engine/TRMarkup.m Source/Engine/TRGrid.m
 
+VIEW_SRC   := Source/View/TRBoxView.m Source/View/TRViewMeasure.m Source/View/TRLoader.m
+
 all: $(B)/libTrellisEngine.dylib $(B)/trellis-case
+
+# Views, tools and the Preview app (AppKit). Building needs no GUI session.
+gui: $(B)/libTrellis.dylib $(B)/trellis-lint $(B)/trellis-render $(B)/trellis-bench $(B)/TrellisPreview.app
 
 $(B):
 	mkdir -p $(B)
@@ -20,6 +25,39 @@ $(B)/trellis-case: Tools/trellis-case.m $(B)/libTrellisEngine.dylib
 	$(CC) $(CFLAGS) -framework Foundation -L$(B) -lTrellisEngine \
 	  -Wl,-rpath,@executable_path Tools/trellis-case.m -o $@
 
+$(B)/libTrellis.dylib: $(VIEW_SRC) Source/View/*.h $(B)/libTrellisEngine.dylib
+	$(CC) $(CFLAGS) -ISource/View -dynamiclib -install_name @rpath/libTrellis.dylib \
+	  -framework AppKit -L$(B) -lTrellisEngine $(VIEW_SRC) -o $@
+
+$(B)/trellis-lint: Tools/trellis-lint.m $(B)/libTrellisEngine.dylib
+	$(CC) $(CFLAGS) -framework Foundation -L$(B) -lTrellisEngine \
+	  -Wl,-rpath,@executable_path Tools/trellis-lint.m -o $@
+
+$(B)/trellis-bench: Tools/trellis-bench.m $(B)/libTrellisEngine.dylib
+	$(CC) $(CFLAGS) -framework Foundation -L$(B) -lTrellisEngine \
+	  -Wl,-rpath,@executable_path Tools/trellis-bench.m -o $@
+
+$(B)/trellis-render: Tools/trellis-render.m Tools/TRSamples.m $(B)/libTrellis.dylib
+	$(CC) $(CFLAGS) -ISource/View -framework AppKit -L$(B) -lTrellis -lTrellisEngine \
+	  -Wl,-rpath,@executable_path Tools/trellis-render.m Tools/TRSamples.m -o $@
+
+$(B)/TrellisPreview.app: Tools/TrellisPreview/TPController.m $(B)/libTrellis.dylib
+	rm -rf $@ && mkdir -p $@/Contents/MacOS $@/Contents/Frameworks
+	$(CC) $(CFLAGS) -ISource/View -framework AppKit -L$(B) -lTrellis -lTrellisEngine \
+	  -Wl,-rpath,@executable_path/../Frameworks Tools/TrellisPreview/TPController.m \
+	  -o $@/Contents/MacOS/TrellisPreview
+	cp $(B)/libTrellis.dylib $(B)/libTrellisEngine.dylib $@/Contents/Frameworks/
+	printf '%s\n' '<?xml version="1.0" encoding="UTF-8"?>' \
+	  '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' \
+	  '<plist version="1.0"><dict>' \
+	  '<key>CFBundleExecutable</key><string>TrellisPreview</string>' \
+	  '<key>CFBundleIdentifier</key><string>org.gnustep.trellis.preview</string>' \
+	  '<key>CFBundleName</key><string>Trellis Preview</string>' \
+	  '<key>CFBundlePackageType</key><string>APPL</string>' \
+	  '<key>NSPrincipalClass</key><string>NSApplication</string>' \
+	  '<key>NSHighResolutionCapable</key><true/>' \
+	  '</dict></plist>' > $@/Contents/Info.plist
+
 # The conformance report: each failing case id, then the totals, per-suite
 # rates and skip reasons.
 CONF_SUMMARY = sed -n -e 's/^FAIL \([^ :]*\).*/  fail: \1/p' -e '/^PASS /,$$p'
@@ -30,4 +68,4 @@ check: all
 
 clean:
 	rm -rf $(B)
-.PHONY: all check clean
+.PHONY: all gui check clean

@@ -5,6 +5,23 @@
 # fixture must have one in dark. Run from the repo root, after make.
 set -u
 fail=0
+# On GNUstep the checks need the Adwaita theme; without it every count is
+# misleading, so say so and fail.
+if [ "$(uname)" != Darwin ]; then
+  . scripts/env.sh >/dev/null 2>&1 || true
+  priv=${TRELLIS_GNUSTEP_HOME:-$HOME/.cache/trellis-gnustep-home}
+  found=""
+  for d in "$priv/GNUstep/Library/Themes" \
+           "$(gnustep-config --variable=GNUSTEP_LOCAL_LIBRARY 2>/dev/null)/Themes" \
+           "$(gnustep-config --variable=GNUSTEP_SYSTEM_LIBRARY 2>/dev/null)/Themes" \
+           "$(gnustep-config --variable=GNUSTEP_NETWORK_LIBRARY 2>/dev/null)/Themes"; do
+    [ -d "$d/Adwaita.theme" ] && found="$d" && break
+  done
+  if [ -z "$found" ]; then
+    echo "APPEARANCE FAIL: Adwaita theme not installed (looked in the private GNUSTEP_HOME and the LOCAL/SYSTEM/NETWORK Themes folders)"
+    exit 1
+  fi
+fi
 render() {  # file appearance -> prints the number of low-contrast findings
   local f=$1 ap=$2 sample=""
   [ -f "${f%.trellis}.sample.json" ] && sample="--sample ${f%.trellis}.sample.json"

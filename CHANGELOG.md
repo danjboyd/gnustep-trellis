@@ -5,6 +5,12 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Added:** accessibility basics. `a11y-label`, `label-for` and
+  `role="group|none"` in markup, mapped to NSAccessibility on Cocoa and
+  recorded on GNUstep (whose AppKit has no accessibility setters yet).
+  trellis-lint warns `unlabeled` and rejects a `label-for` without a
+  target or an unsupported `role`. The demos and dogfood proposals now
+  label every control.
 - **Added:** keyboard focus order. The outermost TRBoxView links its
   controls into a nextKeyView loop in document order after every layout,
   skipping hidden ones (container queries included); `tabindex="N"`

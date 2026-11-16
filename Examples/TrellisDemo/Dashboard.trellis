@@ -17,7 +17,7 @@
     <column class="card"><label class="k" no-outlet="yes">Open asks</label><label id="asks" class="v">4</label></column>
     <column class="card"><label class="k" no-outlet="yes">Items done today</label><label id="done" class="v">37</label></column>
     <column class="card"><label class="k" no-outlet="yes">Week used</label><label id="week" class="v">9%</label></column>
-    <column class="card"><label class="k" no-outlet="yes">Builds</label><progress id="builds" value="70" max="100"/></column>
+    <column class="card"><label class="k" no-outlet="yes" label-for="builds">Builds</label><progress id="builds" value="70" max="100"/></column>
   </box>
   <scroll class="log">
     <text id="log">Log output appears here.</text>

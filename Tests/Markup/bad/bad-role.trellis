@@ -1,0 +1,2 @@
+<!-- expect: role "heading" is not supported (use group or none) -->
+<column role="heading"><label>Title</label></column>

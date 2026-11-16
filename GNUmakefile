@@ -119,6 +119,7 @@ check-gui:: all
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/size-for-width.m -o obj/gui-tests/size-for-width $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/preview-open-file.m -o obj/gui-tests/preview-open-file $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/key-view-loop.m -o obj/gui-tests/key-view-loop $(GUI_TEST_LIBS)
+	@$(CC) $(GUI_TEST_FLAGS) Tests/View/accessibility.m -o obj/gui-tests/accessibility $(GUI_TEST_LIBS)
 	@echo "== view checks (headless)"
 	@export LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH; status=0; \
 	  timeout 60 scripts/run-headless.sh obj/gui-tests/size-for-width > obj/gui-tests/hook.log 2>&1 || status=1; \
@@ -127,6 +128,8 @@ check-gui:: all
 	  grep -v _NET_WORKAREA obj/gui-tests/openfile.log | tail -1; \
 	  timeout 60 scripts/run-headless.sh obj/gui-tests/key-view-loop > obj/gui-tests/keyview.log 2>&1 || status=1; \
 	  grep -v _NET_WORKAREA obj/gui-tests/keyview.log | tail -1; \
+	  timeout 60 scripts/run-headless.sh obj/gui-tests/accessibility > obj/gui-tests/a11y.log 2>&1 || status=1; \
+	  grep -v _NET_WORKAREA obj/gui-tests/a11y.log | tail -1; \
 	  Tests/View/appearance.sh || status=1; \
 	  Tests/View/scroll-container-query.sh || status=1; \
 	  exit $$status

@@ -27,6 +27,14 @@
 - **Text-field cells wrap by default on GNUstep** (Apple's labels don't).
   The loader sets `wraps` explicitly on every label and field, so layout
   and lint behave the same on both platforms.
+- **No accessibility API on views.** GNUstep's AppKit declares the
+  NSAccessibility protocols, but NSView and the controls implement none of
+  the setters (`setAccessibilityLabel:`, `setAccessibilityTitleUIElement:`,
+  `setAccessibilityRole:`, `setAccessibilityElement:`), and there's no
+  bridge to AT-SPI. Trellis records `a11y-label`, `label-for` and `role`
+  (readable with `TRAccessibilityLabel` and friends) and sets them on
+  NSAccessibility only where the selectors exist, so they take effect on
+  Cocoa today and on GNUstep once libs-gui gains them.
 - **NSScanner** on GNUstep doesn't skip leading whitespace when a scan
   fails; Apple's does. Trellis parsers avoid NSScanner for multi-token
   input.

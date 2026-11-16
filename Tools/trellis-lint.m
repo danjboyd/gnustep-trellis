@@ -162,6 +162,48 @@ static void TRLintColours(TRMarkupDocument *doc, NSString *path)
     }
 }
 
+/* Accessibility: every control needs a name assistive apps can read. */
+static void TRLintAccessibility(TRMarkupDocument *doc, NSString *path)
+{
+  NSMutableSet *ids = [NSMutableSet set], *labelled = [NSMutableSet set];
+  for (TRMarkupElement *e in [doc allElements])
+    {
+      if ([e identifier]) [ids addObject: [e identifier]];
+      if (e.attributes[@"label-for"]) [labelled addObject: e.attributes[@"label-for"]];
+    }
+  NSSet *needsLabel = [NSSet setWithObjects: @"field", @"popup", @"slider", @"progress", @"image", @"view", nil];
+  NSSet *titled = [NSSet setWithObjects: @"button", @"checkbox", @"radio", nil];
+  for (TRMarkupElement *e in [doc allElements])
+    {
+      NSString *where = [NSString stringWithFormat: @"%@:%lu:%lu", path, (unsigned long)e.line, (unsigned long)e.column];
+      NSDictionary *a = e.attributes;
+      NSString *target = a[@"label-for"];
+      if (target && ![ids containsObject: target])
+        TRReport(where, @"error", @"label-for", [NSString stringWithFormat: @"label-for=\"%@\": no element with that id", target]);
+      NSString *role = a[@"role"];
+      if (role && ![role isEqualToString: @"group"] && ![role isEqualToString: @"none"])
+        TRReport(where, @"error", @"role", [NSString stringWithFormat: @"role \"%@\" is not supported (use group or none)", role]);
+      if ([role isEqualToString: @"none"] || [a[@"a11y-label"] length]) continue;
+      if ([e identifier] && [labelled containsObject: [e identifier]]) continue;
+      NSString *n = e.name;
+      if ([needsLabel containsObject: n])
+        {
+          if ([n isEqualToString: @"field"] && [a[@"placeholder"] length]) continue;
+          NSString *ident = [e identifier];
+          TRReport(where, @"warning", @"unlabeled", ident
+            ? [NSString stringWithFormat: @"<%@ id=\"%@\"> has no accessible name: add a <label label-for=\"%@\">, a11y-label=\"...\", or role=\"none\" if it's decorative", n, ident, ident]
+            : [NSString stringWithFormat: @"<%@> has no accessible name: add a11y-label=\"...\" (or an id and a <label label-for>), or role=\"none\" if it's decorative", n]);
+        }
+      else if ([titled containsObject: n])
+        {
+          NSString *t = [e.text stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+          if ([t length] == 0)
+            TRReport(where, @"warning", @"unlabeled", [NSString stringWithFormat:
+              @"<%@> has no title: give it text or a11y-label=\"...\"", n]);
+        }
+    }
+}
+
 static void TRLintTrellis(NSString *path, NSString *header)
 {
   NSError *err = nil;
@@ -195,6 +237,7 @@ static void TRLintTrellis(NSString *path, NSString *header)
         }
     }
   TRLintColours(doc, path);
+  TRLintAccessibility(doc, path);
   if (header == nil) return;
   NSMutableSet *outlets = [NSMutableSet set], *actions = [NSMutableSet set];
   NSString *cls = nil;

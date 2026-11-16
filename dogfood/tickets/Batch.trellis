@@ -70,7 +70,7 @@
         <button action="endBatch:">End the batch Esc</button>
       </row>
 
-      <box class="composerbox batch-hidden"><scroll class="composer"><view id="composer" type="NSTextView"/></scroll></box>
+      <box class="composerbox batch-hidden"><scroll class="composer"><view id="composer" type="NSTextView" a11y-label="Reply to the requester"/></scroll></box>
     </column>
   </box>
 

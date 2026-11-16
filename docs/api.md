@@ -12,7 +12,8 @@ the layout engine (Foundation only), and `TRBoxView.h`, `TRLoader.h` and
 
 The markup and CSS described in [agents.md](agents.md), sections 2 to 4,
 are public: element names, attributes (`id`, `class`, `action`,
-`no-outlet`, `default`, `wraps`, `placeholder`, `tabindex`, `items`, `type`, ...), the
+`no-outlet`, `default`, `wraps`, `placeholder`, `tabindex`, `a11y-label`,
+`label-for`, `role` (`group`, `none`), `items`, `type`, ...), the
 `<!-- owner: Class -->` comment, `<style>` with the listed properties,
 selectors and `@container` queries, and the `Screen.sample.json`
 convention. Unknown properties and bad values stay errors.
@@ -38,6 +39,7 @@ theme (since 0.1.1).
 | `TRMeasureView`, `TRBaselineOfView` | TRViewMeasure.h | How Trellis measures a leaf view; usable from custom measure blocks. |
 | `TRColorFromCSS` | TRBoxView.h | CSS colour string to NSColor. |
 | `TRSetTabIndex`, `TRTabIndex` (since 0.2) | TRBoxView.h | A view's tab index (markup `tabindex`). |
+| `TRSetAccessibilityLabel`/`TRAccessibilityLabel`, `TRSetAccessibilityTitleView`/`TRAccessibilityTitleView`, `TRSetAccessibilityRole`/`TRAccessibilityRole` (since 0.2) | TRBoxView.h | Accessibility name, label link and role; also pushed to NSAccessibility on Cocoa. |
 
 ## Engine (libTrellisEngine, Foundation only)
 

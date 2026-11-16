@@ -10,8 +10,66 @@
 #import "TRBoxView.h"
 #import "TRViewMeasure.h"
 #import <objc/runtime.h>
+#import <objc/message.h>
 
-static char kTRTabIndexKey;
+static char kTRTabIndexKey, kTRA11yLabelKey, kTRA11yTitleKey, kTRA11yRoleKey;
+
+/* Cocoa's NSAccessibility setters, called only where they exist. */
+static void TRSendObject(NSView *v, NSString *selName, id value)
+{
+  SEL sel = NSSelectorFromString(selName);
+  if ([v respondsToSelector: sel]) ((void (*)(id, SEL, id))objc_msgSend)(v, sel, value);
+}
+
+static void TRSendBool(NSView *v, NSString *selName, BOOL value)
+{
+  SEL sel = NSSelectorFromString(selName);
+  if ([v respondsToSelector: sel]) ((void (*)(id, SEL, BOOL))objc_msgSend)(v, sel, value);
+}
+
+void TRSetAccessibilityLabel(NSView *view, NSString *label)
+{
+  objc_setAssociatedObject(view, &kTRA11yLabelKey, [label copy], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+  TRSendObject(view, @"setAccessibilityLabel:", label);
+}
+
+NSString *TRAccessibilityLabel(NSView *view)
+{
+  NSString *l = objc_getAssociatedObject(view, &kTRA11yLabelKey);
+  if ([l length]) return l;
+  NSView *t = TRAccessibilityTitleView(view);
+  if ([t isKindOfClass: [NSTextField class]]) return [(NSTextField *)t stringValue];
+  return nil;
+}
+
+void TRSetAccessibilityTitleView(NSView *view, NSView *titleView)
+{
+  objc_setAssociatedObject(view, &kTRA11yTitleKey, titleView, OBJC_ASSOCIATION_ASSIGN);
+  TRSendObject(view, @"setAccessibilityTitleUIElement:", titleView);
+  if (titleView) TRSendObject(titleView, @"setAccessibilityServesAsTitleForUIElements:", @[view]);
+}
+
+NSView *TRAccessibilityTitleView(NSView *view)
+{
+  return objc_getAssociatedObject(view, &kTRA11yTitleKey);
+}
+
+void TRSetAccessibilityRole(NSView *view, NSString *role)
+{
+  objc_setAssociatedObject(view, &kTRA11yRoleKey, [role copy], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+  if ([role isEqualToString: @"none"])
+    TRSendBool(view, @"setAccessibilityElement:", NO);
+  else if ([role isEqualToString: @"group"])
+    {
+      TRSendBool(view, @"setAccessibilityElement:", YES);
+      TRSendObject(view, @"setAccessibilityRole:", @"AXGroup");   /* NSAccessibilityGroupRole */
+    }
+}
+
+NSString *TRAccessibilityRole(NSView *view)
+{
+  return objc_getAssociatedObject(view, &kTRA11yRoleKey);
+}
 
 void TRSetTabIndex(NSView *view, NSInteger index)
 {

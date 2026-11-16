@@ -60,7 +60,7 @@
           </column>
 
           <column class="section">
-            <label id="replyLabel" class="section-label">Your reply (Enter sends)</label>
+            <label id="replyLabel" class="section-label" label-for="reply">Your reply (Enter sends)</label>
             <box class="replybox"><scroll class="reply"><view id="reply" type="NSTextView"/></scroll></box>
             <!-- Shown only once something is attached (via the reply box). -->
             <row id="attachments" class="buttons attachments">
@@ -76,7 +76,7 @@
                so the bar is just Do it + Send reply. Same actions; the port
                binds both instances. -->
           <row class="buttons narrow-only">
-            <popup action="snooze:" items="Snooze, 1 hour, Tomorrow, Monday"/>
+            <popup action="snooze:" a11y-label="Snooze" items="Snooze, 1 hour, Tomorrow, Monday"/>
             <button action="dismiss:">Dismiss</button>
           </row>
 
@@ -92,7 +92,7 @@
       <row class="bar">
         <button id="doIt" action="doIt:" default="yes">Do it</button>
         <button id="sendReply" action="sendReply:">Send reply</button>
-        <popup id="snooze" class="wide-only" action="snooze:" items="Snooze, 1 hour, Tomorrow, Monday"/>
+        <popup id="snooze" class="wide-only" action="snooze:" a11y-label="Snooze" items="Snooze, 1 hour, Tomorrow, Monday"/>
         <button id="dismiss" class="wide-only" action="dismiss:">Dismiss</button>
         <label id="status" class="muted grow">Waiting on you</label>
       </row>

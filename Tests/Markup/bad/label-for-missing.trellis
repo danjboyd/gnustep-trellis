@@ -1,0 +1,2 @@
+<!-- expect: label-for="email": no element with that id -->
+<column><label label-for="email">Email</label><field id="mail" placeholder="you@example.com"/></column>

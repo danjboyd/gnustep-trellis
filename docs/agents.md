@@ -81,6 +81,16 @@ the user's settings. trellis-render refuses to run without it.
   `tabindex="1"`, `"2"`, ... go first, in that order; `tabindex="-1"`
   leaves a control out. Scrolled content joins the loop. For the first
   responder, use the root box's `firstKeyView`.
+- **Accessibility:** every control needs a name a screen reader can read.
+  Name a control with a visible label, `<label label-for="theme">Theme</label>`,
+  or with `a11y-label="Snooze"` when there's no visible text (a popup that
+  shows its value, an icon button, a text view). `role="group"` names a
+  container (with `a11y-label`); `role="none"` hides a decorative image.
+  trellis-lint warns `unlabeled` for fields (a placeholder counts),
+  popups, sliders, progress bars, images and custom views without a name,
+  and for buttons and checkboxes without a title. On Cocoa these reach
+  NSAccessibility; on GNUstep they're recorded but not yet exposed (see
+  known-issues.md).
 - **Sample content:** put it in `Screen.sample.json`, keyed by id. It's
   used only by trellis-render.
 

@@ -68,7 +68,7 @@
         <button action="prerequisites:">Prerequisites… B</button>
       </row>
 
-      <box class="composerbox"><scroll class="composer"><view id="composer" type="NSTextView"/></scroll></box>
+      <box class="composerbox"><scroll class="composer"><view id="composer" type="NSTextView" a11y-label="Reply to the requester"/></scroll></box>
     </column>
   </box>
 

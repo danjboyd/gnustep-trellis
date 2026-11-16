@@ -20,6 +20,43 @@ static NSError *TRLoadError(TRMarkupDocument *doc, TRMarkupElement *e, NSString 
                          userInfo: @{NSLocalizedDescriptionKey: full}];
 }
 
+static char kTRPendingLabelFor, kTRPendingLabelForElement;
+
+/* Every view under root, scrolled content included. */
+static void TRAllViews(NSView *v, NSMutableArray *out)
+{
+  [out addObject: v];
+  if ([v isKindOfClass: [NSScrollView class]] && [(NSScrollView *)v documentView])
+    TRAllViews([(NSScrollView *)v documentView], out);
+  else
+    for (NSView *s in [v subviews]) TRAllViews(s, out);
+}
+
+/* Links each label-for label to its control. */
+static BOOL TRResolveLabelFor(NSView *root, TRMarkupDocument *doc, NSError **error)
+{
+  NSMutableArray *views = [NSMutableArray array];
+  TRAllViews(root, views);
+  NSMutableDictionary *byId = [NSMutableDictionary dictionary];
+  for (NSView *v in views) if ([v identifier]) byId[[v identifier]] = v;
+  for (NSView *v in views)
+    {
+      NSString *target = objc_getAssociatedObject(v, &kTRPendingLabelFor);
+      if (target == nil) continue;
+      TRMarkupElement *e = objc_getAssociatedObject(v, &kTRPendingLabelForElement);
+      objc_setAssociatedObject(v, &kTRPendingLabelFor, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+      objc_setAssociatedObject(v, &kTRPendingLabelForElement, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+      NSView *control = byId[target];
+      if (control == nil)
+        {
+          if (error) *error = TRLoadError(doc, e, @"label-for=\"%@\": no element with that id", target);
+          return NO;
+        }
+      TRSetAccessibilityTitleView(control, v);
+    }
+  return YES;
+}
+
 static BOOL TRYes(NSString *v)
 {
   return v && ([v isEqualToString: @"yes"] || [v isEqualToString: @"true"] || [v isEqualToString: @"on"]
@@ -240,6 +277,24 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
   if (ident) [v setIdentifier: ident];
   if (a[@"tabindex"]) TRSetTabIndex(v, [a[@"tabindex"] integerValue]);
 
+  /* Accessibility. label-for is resolved once the whole tree exists. */
+  if (a[@"a11y-label"]) TRSetAccessibilityLabel(v, a[@"a11y-label"]);
+  NSString *role = a[@"role"];
+  if (role)
+    {
+      if (![role isEqualToString: @"group"] && ![role isEqualToString: @"none"])
+        {
+          if (error) *error = TRLoadError(doc, e, @"role \"%@\" is not supported (use group or none)", role);
+          return nil;
+        }
+      TRSetAccessibilityRole(v, role);
+    }
+  if (a[@"label-for"])
+    {
+      objc_setAssociatedObject(v, &kTRPendingLabelFor, a[@"label-for"], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+      objc_setAssociatedObject(v, &kTRPendingLabelForElement, e, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+
   /* Action. */
   NSString *action = a[@"action"];
   if (action)
@@ -338,6 +393,7 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
   NSView *v = [self viewForElement: root document: doc owner: owner error: error];
   if (v == nil) return nil;
   if (![self applyStylesOf: root toView: v inBox: nil document: doc error: error]) return nil;
+  if (!TRResolveLabelFor(v, doc, error)) return nil;
   return (TRBoxView *)v;
 }
 
@@ -360,6 +416,7 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
       && ![self applyStylesOf: e toView: v inBox: nil document: doc error: error])
     return nil;
   (void)owner;
+  if (!TRResolveLabelFor(v, doc, error)) return nil;
   return v;
 }
 

@@ -72,6 +72,20 @@
 void TRSetTabIndex(NSView *view, NSInteger index);
 NSInteger TRTabIndex(NSView *view);
 
+/* Accessibility (markup: a11y-label, label-for, role). Trellis records
+   these on every platform; on Cocoa they are also set through
+   NSAccessibility. GNUstep's AppKit has no accessibility setters yet, so
+   there they are only readable through these functions. */
+void TRSetAccessibilityLabel(NSView *view, NSString *label);
+/* The explicit label, else the text of the view's title view, else nil. */
+NSString *TRAccessibilityLabel(NSView *view);
+/* The label that names a control (markup: <label label-for="id">). */
+void TRSetAccessibilityTitleView(NSView *view, NSView *titleView);
+NSView *TRAccessibilityTitleView(NSView *view);
+/* "group" (a named container) or "none" (hidden from assistive apps). */
+void TRSetAccessibilityRole(NSView *view, NSString *role);
+NSString *TRAccessibilityRole(NSView *view);
+
 /* CSS colour strings: #rgb, #rrggbb, #rrggbbaa, rgb(), rgba(), a few
    names, and CSS system colours (Canvas, CanvasText, ...; dynamic). */
 NSColor *TRColorFromCSS(NSString *css);

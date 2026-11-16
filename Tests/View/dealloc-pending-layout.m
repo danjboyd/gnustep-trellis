@@ -1,4 +1,4 @@
-/* Regression check (aimanager's crash on v0.1.1): a box tree freed while
+/* Regression check (an app crash on v0.1.1): a box tree freed while
    a deferred layout is pending must not be messaged afterwards. Also
    checks that a pending layout still runs for a live box. Run it with
    NSZombieEnabled=YES to turn a stray message into a hard failure.

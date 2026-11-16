@@ -20,9 +20,11 @@ on:
         type: boolean
         default: false
 
+# Superseded PR runs are cancelled; runs on main always finish, so main is
+# tested at every push and a cache-miss toolchain build gets to save its cache.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read

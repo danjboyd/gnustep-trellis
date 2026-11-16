@@ -91,6 +91,18 @@ static CGFloat TRHex(NSString *s, NSUInteger i, NSUInteger len)
   return len == 1 ? (v * 17) / 255.0 : v / 255.0;
 }
 
+/* A fixed CSS colour. CSS hex and rgb() are sRGB: on Cocoa make them in
+   sRGB (calibrated would be generic RGB, and shift on screen); GNUstep
+   treats calibrated RGB as sRGB. */
+static NSColor *TRSRGB(CGFloat r, CGFloat g, CGFloat b, CGFloat a)
+{
+#ifdef GNUSTEP
+  return [NSColor colorWithCalibratedRed: r green: g blue: b alpha: a];
+#else
+  return [NSColor colorWithSRGBRed: r green: g blue: b alpha: a];
+#endif
+}
+
 NSColor *TRColorFromCSS(NSString *css)
 {
   NSString *c = [[css stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]] lowercaseString];
@@ -99,11 +111,9 @@ NSColor *TRColorFromCSS(NSString *css)
       NSString *h = [c substringFromIndex: 1];
       NSUInteger n = [h length];
       if (n == 3 || n == 4)
-        return [NSColor colorWithCalibratedRed: TRHex(h, 0, 1) green: TRHex(h, 1, 1)
-                                          blue: TRHex(h, 2, 1) alpha: n == 4 ? TRHex(h, 3, 1) : 1];
+        return TRSRGB(TRHex(h, 0, 1), TRHex(h, 1, 1), TRHex(h, 2, 1), n == 4 ? TRHex(h, 3, 1) : 1);
       if (n == 6 || n == 8)
-        return [NSColor colorWithCalibratedRed: TRHex(h, 0, 2) green: TRHex(h, 2, 2)
-                                          blue: TRHex(h, 4, 2) alpha: n == 8 ? TRHex(h, 6, 2) : 1];
+        return TRSRGB(TRHex(h, 0, 2), TRHex(h, 2, 2), TRHex(h, 4, 2), n == 8 ? TRHex(h, 6, 2) : 1);
       return nil;
     }
   if ([c hasPrefix: @"rgb"])
@@ -119,9 +129,8 @@ NSColor *TRColorFromCSS(NSString *css)
       if ([parts count] < 3) return nil;
       CGFloat a = [parts count] > 3 ? [parts[3] doubleValue] : 1;
       if ([parts count] > 3 && [parts[3] hasSuffix: @"%"]) a /= 100.0;
-      return [NSColor colorWithCalibratedRed: [parts[0] doubleValue] / 255.0
-                                       green: [parts[1] doubleValue] / 255.0
-                                        blue: [parts[2] doubleValue] / 255.0 alpha: a];
+      return TRSRGB([parts[0] doubleValue] / 255.0, [parts[1] doubleValue] / 255.0,
+                    [parts[2] doubleValue] / 255.0, a);
     }
   /* CSS system colours (CSS Color 4) map to AppKit's dynamic colours, so
      they follow the appearance (Light/Dark on macOS, the theme on
@@ -151,9 +160,9 @@ NSColor *TRColorFromCSS(NSString *css)
     /* Soft warning tint: like Mark, a light pair that reads the same in
        both appearances (fixed, so it never flips to a dark brown). */
     if ([c isEqualToString: @"-tr-warning-background"])
-      return [NSColor colorWithCalibratedRed: 0xFC/255.0 green: 0xEE/255.0 blue: 0xDD/255.0 alpha: 1];
+      return TRSRGB(0xFC/255.0, 0xEE/255.0, 0xDD/255.0, 1);
     if ([c isEqualToString: @"-tr-warning-text"])
-      return [NSColor colorWithCalibratedRed: 0x8A/255.0 green: 0x3B/255.0 blue: 0x06/255.0 alpha: 1];
+      return TRSRGB(0x8A/255.0, 0x3B/255.0, 0x06/255.0, 1);
     NSString *names = sys[c];
     if (names != nil)
       for (NSString *name in [names componentsSeparatedByString: @"|"])
@@ -168,7 +177,7 @@ NSColor *TRColorFromCSS(NSString *css)
   if ([c isEqualToString: @"white"]) return [NSColor whiteColor];
   if ([c isEqualToString: @"gray"] || [c isEqualToString: @"grey"]) return [NSColor grayColor];
   if ([c isEqualToString: @"red"]) return [NSColor redColor];
-  if ([c isEqualToString: @"green"]) return [NSColor colorWithCalibratedRed: 0 green: 0.5 blue: 0 alpha: 1];
+  if ([c isEqualToString: @"green"]) return TRSRGB(0, 0.5, 0, 1);
   if ([c isEqualToString: @"blue"]) return [NSColor blueColor];
   return nil;
 }

@@ -137,7 +137,9 @@ static BOOL TRYes(NSString *v)
     }
   NSSize s = [t size];
   NSRect r = NSMakeRect(NSMidX(frame) - s.width / 2, NSMidY(frame) - s.height / 2, s.width, s.height);
-  [t drawInRect: [view centerScanRect: r]];
+  /* drawAtPoint: never wraps; drawInRect: with the text's exact width
+     can wrap the last word onto a clipped second line after rounding. */
+  [t drawAtPoint: [view centerScanRect: r].origin];
 }
 
 - (NSSize)cellSize

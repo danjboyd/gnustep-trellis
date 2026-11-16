@@ -16,6 +16,9 @@ Adds API (listed in docs/api.md, nothing removed):
   push-button titles in its own colour. trellis-render reports a flat
   button's real title colour to the contrast lint.
   Tests/View/flat-chips.trellis checks both in appearance.sh.
+- **Fixed (Cocoa):** fixed CSS colours (hex, `rgb()`) are made in sRGB,
+  as CSS defines them; they were generic RGB and drew slightly shifted.
+  GNUstep is unchanged.
 - **Dogfood:** the desk spec uses both, and pins its decision bar.
 
 ## 0.2.3 (2026-11-16)

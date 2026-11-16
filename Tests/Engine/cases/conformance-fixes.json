@@ -1574,5 +1574,37 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_auto_repeat_from_max_height",
+  "note": "CSS Grid 7.2.3.2: with an indefinite height, auto-fill repeats as many rows as fit in max-height",
+  "root": {
+   "style": {
+    "display": "grid",
+    "width": 100,
+    "gridTemplateRows": "repeat(auto-fill, 50px)",
+    "maxHeight": 200
+   },
+   "children": [
+    {
+     "style": {
+      "gridRow": "-2"
+     }
+    }
+   ]
+  },
+  "available": {
+   "width": 300,
+   "height": null
+  },
+  "expected": {
+   "height": 200,
+   "children": [
+    {
+     "y": 150,
+     "height": 50
+    }
+   ]
+  }
  }
 ]

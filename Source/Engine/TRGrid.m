@@ -346,7 +346,8 @@ static double TRBreadthFixedValue(TRBreadth b, double avail)
 
 /* Expands a template + auto-repeat into concrete tracks. */
 static TRTrack *TRBuildTracks(NSString *tmpl, double avail, double gap, NSInteger *count,
-                              NSInteger *autoFitStart, NSInteger *autoFitLen)
+                              NSInteger *autoFitStart, NSInteger *autoFitLen,
+                              double minAvail, double maxAvail)
 {
   *autoFitStart = -1; *autoFitLen = 0;
   TRTrackList l = {0};
@@ -374,11 +375,20 @@ static TRTrack *TRBuildTracks(NSString *tmpl, double avail, double gap, NSIntege
           if (isnan(v) || (!isnan(mn) && mn > v)) v = mn;
           groupSize += isnan(v) ? 0 : v;
         }
-      if (!isnan(avail) && groupSize > 0)
+      /* CSS Grid 7.2.3.2: with an indefinite size, as many as fit in the
+         max size, or else the fewest that reach the min size. */
+      double room = !isnan(avail) ? avail : maxAvail;
+      double per = groupSize + gap * l.groupLen;
+      if (!isnan(room) && groupSize > 0)
         {
-          double space = avail - fixedOther - gap * others;
-          double per = groupSize + gap * l.groupLen;
+          double space = room - fixedOther - gap * others;
           reps = (int)floor((space + gap) / per);
+          if (reps < 1) reps = 1;
+        }
+      else if (!isnan(minAvail) && groupSize > 0)
+        {
+          double space = minAvail - fixedOther - gap * others;
+          reps = (int)ceil((space + gap) / per);
           if (reps < 1) reps = 1;
         }
     }
@@ -806,8 +816,8 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
 
   /* ---- Explicit grid ---- */
   NSInteger nCols = 0, nRows = 0, fitStartC, fitLenC, fitStartR, fitLenR;
-  TRTrack *colsT = TRBuildTracks(st->_gridTemplateColumns, innerW, colGap, &nCols, &fitStartC, &fitLenC);
-  TRTrack *rowsT = TRBuildTracks(st->_gridTemplateRows, innerH, rowGap, &nRows, &fitStartR, &fitLenR);
+  TRTrack *colsT = TRBuildTracks(st->_gridTemplateColumns, innerW, colGap, &nCols, &fitStartC, &fitLenC, minInnerW, maxInnerW);
+  TRTrack *rowsT = TRBuildTracks(st->_gridTemplateRows, innerH, rowGap, &nRows, &fitStartR, &fitLenR, minInnerH, maxInnerH);
   NSArray *areas = st->_gridTemplateAreas;
   NSInteger areaRows = [areas count], areaCols = areaRows ? [areas[0] count] : 0;
   NSInteger explicitCols = MAX(nCols, areaCols), explicitRows = MAX(nRows, areaRows);

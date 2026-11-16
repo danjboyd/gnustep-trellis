@@ -311,6 +311,24 @@ static inline double TRGResolve(TRValue v, double ref)
     }
 }
 
+/* A width or height as a border-box size: content-box sizes add the
+   item's padding and border (percent padding against padRef). */
+static double TRGBox(const TRStyleStorage *s, TRValue v, double ref, BOOL horizontal, double padRef)
+{
+  double r = TRGResolve(v, ref);
+  if (isnan(r)) return NAN;
+  TREdge a = horizontal ? TREdgeLeft : TREdgeTop, b = horizontal ? TREdgeRight : TREdgeBottom;
+  double pb = 0;
+  TREdge es[2] = { a, b };
+  for (int i = 0; i < 2; i++)
+    {
+      double pd = TRGResolve(s->padding[es[i]], padRef), bd = TRGResolve(s->border[es[i]], NAN);
+      pb += (isnan(pd) ? 0 : MAX(0, pd)) + (isnan(bd) ? 0 : MAX(0, bd));
+    }
+  if (s->boxSizing == TRBoxSizingContentBox) return MAX(0, r) + pb;
+  return MAX(r, pb);
+}
+
 static inline BOOL TRIsFitContent(TRBreadthKind k)
 {
   return k == TRBreadthFitContent || k == TRBreadthFitContentPercent;
@@ -962,7 +980,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           it->margin[e] = isnan(m) ? 0 : m;
         }
       double mh = it->margin[TREdgeLeft] + it->margin[TREdgeRight];
-      double sw = TRGResolve(cs->width, NAN);
+      double sw = TRGBox(cs, cs->width, NAN, YES, NAN);
       if (!isnan(sw))
         it->minW = it->maxW = sw + mh;
       else
@@ -996,10 +1014,10 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       double areaW = TRSpanSize(colsT, it->c0, it->c1);
       double mh = it->margin[TREdgeLeft] + it->margin[TREdgeRight];
       double mv = it->margin[TREdgeTop] + it->margin[TREdgeBottom];
-      double sh = TRGResolve(cs->height, NAN);
+      double sh = TRGBox(cs, cs->height, NAN, NO, NAN);
       if (!isnan(sh)) { it->h = sh + mv; continue; }
       TRAlign js = cs->justifySelf == TRAlignAuto ? s->justifyItems : cs->justifySelf;
-      double sw = TRGResolve(cs->width, areaW);
+      double sw = TRGBox(cs, cs->width, areaW, YES, areaW);
       BOOL stretchW = isnan(sw) && (js == TRAlignNormal || js == TRAlignStretch)
                       && !it->marginAuto[TREdgeLeft] && !it->marginAuto[TREdgeRight];
       double w = !isnan(sw) ? sw : MAX(0, areaW - mh);
@@ -1051,7 +1069,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           double mv = it->margin[TREdgeTop] + it->margin[TREdgeBottom];
           TRAlign js = cs->justifySelf == TRAlignAuto ? s->justifyItems : cs->justifySelf;
           TRAlign as = cs->alignSelf == TRAlignAuto ? s->alignItems : cs->alignSelf;
-          double sw = TRGResolve(cs->width, areaW), sh = TRGResolve(cs->height, areaH);
+          double sw = TRGBox(cs, cs->width, areaW, YES, areaW), sh = TRGBox(cs, cs->height, areaH, NO, areaW);
           double ar = cs->aspectRatio;
           if (isnan(sw) && !isnan(sh) && !isnan(ar)) sw = sh * ar;
           if (isnan(sh) && !isnan(sw) && !isnan(ar)) sh = sw / ar;
@@ -1066,7 +1084,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
                                        areaW, areaH, NO, dir);
               w = sz.width;
             }
-          double minw = TRGResolve(cs->minWidth, areaW), maxw = TRGResolve(cs->maxWidth, areaW);
+          double minw = TRGBox(cs, cs->minWidth, areaW, YES, areaW), maxw = TRGBox(cs, cs->maxWidth, areaW, YES, areaW);
           if (!isnan(maxw)) w = MIN(w, maxw);
           if (!isnan(minw)) w = MAX(w, minw);
           if (!isnan(sh)) h = sh;
@@ -1076,7 +1094,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
               TRSize sz = TRLayoutNode(it->node, w, NAN, TRMeasureModeExactly, TRMeasureModeUndefined, areaW, areaH, NO, dir);
               h = sz.height;
             }
-          double minh = TRGResolve(cs->minHeight, areaH), maxh = TRGResolve(cs->maxHeight, areaH);
+          double minh = TRGBox(cs, cs->minHeight, areaH, NO, areaW), maxh = TRGBox(cs, cs->maxHeight, areaH, NO, areaW);
           if (!isnan(maxh)) h = MIN(h, maxh);
           if (!isnan(minh)) h = MAX(h, minh);
 
@@ -1170,7 +1188,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           double cbW = cbEnd[1] - cbStart[1], cbH = cbEnd[0] - cbStart[0];
           double L = TRGResolve(cs->inset[TREdgeLeft], cbW), R = TRGResolve(cs->inset[TREdgeRight], cbW);
           double T = TRGResolve(cs->inset[TREdgeTop], cbH), B = TRGResolve(cs->inset[TREdgeBottom], cbH);
-          double w = TRGResolve(cs->width, cbW), h = TRGResolve(cs->height, cbH);
+          double w = TRGBox(cs, cs->width, cbW, YES, cbW), h = TRGBox(cs, cs->height, cbH, NO, cbW);
           if (isnan(w) && !isnan(L) && !isnan(R)) w = MAX(0, cbW - L - R);
           if (isnan(h) && !isnan(T) && !isnan(B)) h = MAX(0, cbH - T - B);
           if (isnan(w) || isnan(h))

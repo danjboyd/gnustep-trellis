@@ -1105,5 +1105,46 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_content_box_item_size",
+  "note": "a content-box grid item's width/height/min/max add its padding and border",
+  "root": {
+   "style": {
+    "display": "grid",
+    "width": 200,
+    "gridTemplateColumns": "auto",
+    "justifyItems": "start"
+   },
+   "children": [
+    {
+     "style": {
+      "boxSizing": "content-box",
+      "width": 60,
+      "height": 10,
+      "paddingRight": 3,
+      "borderLeftWidth": 2
+     }
+    },
+    {
+     "style": {
+      "width": 60,
+      "height": 10,
+      "paddingRight": 3
+     }
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "width": 65,
+     "height": 10
+    },
+    {
+     "width": 60
+    }
+   ]
+  }
  }
 ]

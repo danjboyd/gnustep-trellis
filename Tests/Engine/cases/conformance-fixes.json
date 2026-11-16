@@ -722,5 +722,50 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_fit_content_track_caps_at_n",
+  "note": "fit-content(N): minmax(auto, max-content) with the limit capped at N",
+  "root": {
+   "style": {
+    "display": "grid",
+    "width": 400,
+    "gridTemplateColumns": "fit-content(100px) fit-content(100px) 1fr"
+   },
+   "children": [
+    {
+     "measure": {
+      "text": "aaaa bbbb cccc",
+      "charWidth": 10,
+      "lineHeight": 10
+     }
+    },
+    {
+     "measure": {
+      "text": "aa",
+      "charWidth": 10,
+      "lineHeight": 10
+     }
+    },
+    {}
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "x": 0,
+     "width": 100,
+     "height": 20
+    },
+    {
+     "x": 100,
+     "width": 20
+    },
+    {
+     "x": 120,
+     "width": 280
+    }
+   ]
+  }
  }
 ]

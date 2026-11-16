@@ -23,7 +23,9 @@
 
 typedef enum {
   TRBreadthFixed, TRBreadthPercent, TRBreadthFr, TRBreadthAuto,
-  TRBreadthMinContent, TRBreadthMaxContent
+  TRBreadthMinContent, TRBreadthMaxContent,
+  /* fit-content(N) as a maximum: max-content, capped at N (px or %). */
+  TRBreadthFitContent, TRBreadthFitContentPercent
 } TRBreadthKind;
 
 typedef struct { TRBreadthKind kind; double value; } TRBreadth;
@@ -87,7 +89,17 @@ static BOOL TRParseTrackSize(NSString *t, TRTrackSize *ts)
       if (ts->min.kind == TRBreadthFr) return NO;   /* fr is not allowed as a minimum */
       return YES;
     }
-  if ([lt hasPrefix: @"fit-content("]) return NO;
+  if ([lt hasPrefix: @"fit-content("] && [lt hasSuffix: @")"])
+    {
+      /* fit-content(N) = minmax(auto, max-content), the limit capped at N. */
+      TRBreadth n;
+      if (!TRParseBreadth([t substringWithRange: NSMakeRange(12, [t length] - 13)], &n)) return NO;
+      if (n.kind != TRBreadthFixed && n.kind != TRBreadthPercent) return NO;
+      ts->min.kind = TRBreadthAuto; ts->min.value = 0;
+      ts->max.kind = n.kind == TRBreadthFixed ? TRBreadthFitContent : TRBreadthFitContentPercent;
+      ts->max.value = n.value;
+      return YES;
+    }
   TRBreadth b;
   if (!TRParseBreadth(t, &b)) return NO;
   if (b.kind == TRBreadthFr)
@@ -299,6 +311,11 @@ static inline double TRGResolve(TRValue v, double ref)
     }
 }
 
+static inline BOOL TRIsFitContent(TRBreadthKind k)
+{
+  return k == TRBreadthFitContent || k == TRBreadthFitContentPercent;
+}
+
 static double TRBreadthFixedValue(TRBreadth b, double avail)
 {
   if (b.kind == TRBreadthFixed) return b.value;
@@ -446,7 +463,7 @@ static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
             else if (mk == TRBreadthMaxContent)
               t->base = MAX(t->base, maxC);
             TRBreadthKind xk = t->size.max.kind;
-            if (xk == TRBreadthAuto || xk == TRBreadthMaxContent)
+            if (xk == TRBreadthAuto || xk == TRBreadthMaxContent || TRIsFitContent(xk))
               { t->limit = limitSet[a] ? MAX(t->limit, maxC) : maxC; limitSet[a] = YES; }
             else if (xk == TRBreadthMinContent)
               { t->limit = limitSet[a] ? MAX(t->limit, minC) : minC; limitSet[a] = YES; }
@@ -476,7 +493,8 @@ static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
               for (NSInteger i = a; i < b; i++)
                 {
                   TRBreadthKind xk = tr[i].size.max.kind;
-                  if (xk == TRBreadthAuto || xk == TRBreadthMaxContent || xk == TRBreadthMinContent)
+                  if (xk == TRBreadthAuto || xk == TRBreadthMaxContent || xk == TRBreadthMinContent
+                      || TRIsFitContent(xk))
                     {
                       double cur = limitSet[i] ? tr[i].limit : tr[i].base;
                       tr[i].limit = cur + extraL / intrinsic;
@@ -488,6 +506,14 @@ static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
   for (NSInteger i = 0; i < n; i++)
     {
       if (!limitSet[i] && tr[i].size.max.kind != TRBreadthFr) tr[i].limit = tr[i].base;
+      TRBreadthKind xk = tr[i].size.max.kind;
+      if (TRIsFitContent(xk))
+        {
+          /* Capped at N; a percentage of an indefinite size leaves it uncapped. */
+          double cap = xk == TRBreadthFitContent ? tr[i].size.max.value
+            : (isnan(avail) ? INFINITY : tr[i].size.max.value * avail / 100.0);
+          tr[i].limit = MIN(tr[i].limit, cap);
+        }
       if (tr[i].limit < tr[i].base) tr[i].limit = tr[i].base;
     }
 

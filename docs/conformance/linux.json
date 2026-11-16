@@ -1,7 +1,7 @@
 {
- "commit": "e1cf281+dirty",
+ "commit": "afc8787",
  "conformance": {
-  "pass": 2954,
+  "pass": 2955,
   "skipped": 1199,
   "total": 2966
  },
@@ -24,7 +24,7 @@
   },
   "wpt-sizing": {
    "cases": 125,
-   "pass": 20,
+   "pass": 21,
    "total": 21
   },
   "yoga": {

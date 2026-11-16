@@ -30,7 +30,7 @@
      "boxSizing": "content-box"
     },
     "measure": {
-     "text": "XX X X X X",
+     "text": "XX\nX\nX\nX\nX",
      "charWidth": 25,
      "lineHeight": 25
     }

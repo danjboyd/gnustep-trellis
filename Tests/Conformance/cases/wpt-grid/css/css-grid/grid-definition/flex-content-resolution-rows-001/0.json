@@ -35,7 +35,7 @@
      "height": "100%"
     },
     "measure": {
-     "text": "X X X",
+     "text": "X\nX\nX",
      "charWidth": 10,
      "lineHeight": 10
     }
@@ -50,7 +50,7 @@
      "height": "100%"
     },
     "measure": {
-     "text": "X X X X X",
+     "text": "X\nX\nX\nX\nX",
      "charWidth": 10,
      "lineHeight": 10
     }

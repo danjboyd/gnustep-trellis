@@ -56,7 +56,7 @@
      "borderLeftWidth": 0
     },
     "measure": {
-     "text": "XX X X XXX X XX XXX",
+     "text": "XX X\nX XXX\nX\nXX XXX",
      "charWidth": 10,
      "lineHeight": 10
     }
@@ -94,7 +94,7 @@
      "borderLeftWidth": 0
     },
     "measure": {
-     "text": "XX X X XXX X XX XXX",
+     "text": "XX X\nX XXX\nX\nXX XXX",
      "charWidth": 10,
      "lineHeight": 10
     }

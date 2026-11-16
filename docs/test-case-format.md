@@ -83,6 +83,9 @@ on top when it matches. See `TRNode -addConditionalStyle:when:error:`.
   each line is `lineHeight` tall. Its min-content width is the longest word;
   its max-content width is the whole string. Use it for WPT Ahem cases and
   Yoga measure-function cases.
+  A `"\n"` in the text is a forced line break (an imported `<br>`): each
+  line wraps on its own, and max-content is the longest line.
+  `"nowrap": true` (from `white-space: nowrap`/`pre`) disables wrapping.
 - `"baseline": N` (optional, with either form) gives the leaf's first
   baseline, measured from its top border edge. Without it, the baseline is
   the bottom of the border box.

@@ -59,7 +59,7 @@
        "gridRow": "2"
       },
       "measure": {
-       "text": "XX X XX XX",
+       "text": "XX\nX\nXX XX",
        "charWidth": 10,
        "lineHeight": 10
       }

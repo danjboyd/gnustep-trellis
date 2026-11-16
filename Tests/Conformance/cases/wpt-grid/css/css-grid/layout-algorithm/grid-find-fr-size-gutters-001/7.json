@@ -58,7 +58,7 @@
      "boxSizing": "content-box"
     },
     "measure": {
-     "text": "XXXXXXXX X X X",
+     "text": "XXXXXXXX\nX\nX\nX",
      "charWidth": 10,
      "lineHeight": 10
     }

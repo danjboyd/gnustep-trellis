@@ -5,16 +5,48 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
-- **Added (experimental, not yet in docs/api.md):** `TRVirtualLayout`,
-  the window engine for virtualized lists and grids
-  (docs/design-virtualization.md, step 1). It keeps only item heights
-  (estimated until measured). Grid columns come from the real grid
-  engine, so any `grid-template-columns` works, and full-row items act
-  as group headers. It answers which items a viewport needs (with
-  overscan), item frames and content height, and scroll anchors through
-  measures, inserts and removals. Tests/Engine/virtual-layout.m runs in
-  `make check`. 10k grid items: 0.4 ms to build, under 0.1 ms per
-  scroll step with remeasuring.
+## 0.4.0 (2026-11-17)
+
+Adds API (listed in docs/api.md, nothing removed): virtualized lists and
+grids (docs/design-virtualization.md).
+
+- **Added:** `<virtual layout="list|grid">` and `TRVirtualBox`, a scroll
+  view that builds views only for the items on screen (plus overscan):
+  - each item is a copy of a `<template>`, reused from a pool per
+    template; a template whose root has `grid-column: 1 / -1` takes a
+    whole row (group headers);
+  - items are measured when they come on screen, and scroll anchoring
+    keeps the top item still through measures, inserts, removals and
+    resizes;
+  - Tab walks the visible items in order and scrolls the next one in past
+    the edge (Shift-Tab too); the focused item is never recycled;
+  - the box is a list or grid for accessibility, with the full count and
+    columns, and each item records its index, row and column
+    (`TRAccessibilityCollection`, `TRAccessibilityPosition`;
+    NSAccessibility on Cocoa);
+  - container queries inside items test the box's containers.
+- **Added:** `TRVirtualLayout`, the window engine (Foundation only):
+  item heights only, grid columns from the real grid engine.
+- **Added:** `TRVirtualDataSource`, `-[TRBoxView heightForWidth:]`,
+  `TRKeyViewProvider`, `TRApplyLeafStyle`,
+  `+[TRLoader instantiateTemplateElement:ofDocument:error:]`.
+- **Added:** sample files fill a virtual box (`items`, runs with
+  `_repeat`, `{i}` / `{n}` / `{n:W}`, `scroll-to`); trellis-render and
+  TrellisPreview dump and lint its visible items.
+- **trellis-lint:** checks `<virtual>` (template children, `template=`,
+  `layout=`); duplicate ids are counted per template.
+- **Fixed:** a template whose root is a control now gets its text style
+  (it had none).
+- **Measured** at 10,000 items on Linux: the engine scrolls at 0.24 ms
+  per viewport step (list) and 0.67 ms (grid with headers), flat at
+  100,000, with +5 MB peak RSS against +89 MB for one ordinary tree of
+  the same rows; real views in a 900x800 window, 0.95 ms (list) and
+  2.8 ms (grid) per step with at most 47 and 133 views alive.
+- **Tests:** Tests/Engine/virtual-layout.m (`make check`),
+  Tests/View/virtual-box.m and virtual-bench.m (`make check-gui`, zombies
+  on), `trellis-bench --virtual N`.
+- **Dogfood:** dogfood/work/Work-virtual.trellis, the Work wall with
+  2,000 made-up agents.
 
 ## 0.3.0 (2026-11-16)
 

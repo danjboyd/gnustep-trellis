@@ -210,6 +210,36 @@ it a row. Lint reports this as `stretched`.
 - **Hide on narrow screens:** `@container (max-width: 499px) { #share { display: none } }`.
 - **Scrolling content:** wrap it in `<scroll>`. The scroll view takes the
   remaining space (`flex: 1`), and its content is a column.
+- **Long lists and walls (hundreds of items or more): `<virtual>`.** Only
+  the items on screen get views, so 10,000 rows cost what 30 do. Each
+  item is a copy of a `<template>`; the owner's code (or a sample file)
+  supplies the data. Ids may repeat across templates.
+
+  ```xml
+  <virtual id="wall" layout="grid" template="tile" estimated-size="110">
+    <template id="tile"><column class="tile"><label id="name"/><text id="status"/></column></template>
+    <template id="group"><label id="title" class="group"/></template>
+  </virtual>
+  <style>
+    #wall  { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; padding: 12px; }
+    .group { grid-column: 1 / -1; font-weight: bold; }   /* a whole row: a header */
+  </style>
+  ```
+
+  - `layout="list"` (default) is one item per row; `grid` uses the
+    element's `grid-template-columns`. Margins on items are ignored; use
+    `padding` inside the template.
+  - Sample file: `{"wall": {"items": [{"_template": "group", "title":
+    "Working (3)"}, {"_repeat": 3, "items": [{"name": "agent-{n:2}",
+    "status": "Working"}]}]}}`. `trellis-render` then shows the wall
+    filled, and lints the visible items.
+  - In code, set `dataSource` (`TRVirtualDataSource`: count, configure a
+    view for an index, optionally the template per index) and report
+    changes with `-insertItemsAtIndexes:` and friends. A reused view still
+    holds the previous item's content, so set every field.
+  - Keyboard and accessibility come built in: Tab walks the items in
+    order and scrolls past the edge; the box is a list or grid with the
+    full count.
 
 ## 6. From code
 

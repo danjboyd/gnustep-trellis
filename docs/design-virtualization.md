@@ -1,6 +1,22 @@
 # Design: virtualized lists and grids
 
-Status: proposal (2026-11-16). Nothing here is implemented yet.
+Status: implemented in 0.4 (2026-11-16): TRVirtualLayout, TRVirtualBox,
+`<virtual>`, focus, accessibility, benchmarks and the Work-wall spec
+(dogfood/work/Work-virtual.trellis). Differences from this proposal:
+
+- **No item keys yet.** Sizes, focus and realized views follow indexes,
+  shifted on insert and remove; `keyForItemAtIndex:` is not asked.
+- **No `selected` class toggle.** The app draws selection (or uses a
+  template for the selected state).
+- **Only visible items join the key-view loop**, plus the focused item
+  if it scrolled away; overscan items don't, so focus never lands off
+  screen. The sentinels sit just outside the visible items.
+- **Rows update in place on measure:** a measured height fixes its row
+  and recomputes row tops lazily from there (no Fenwick tree needed so
+  far: 0.25 ms per step at 100,000 items).
+- **Measured** (Linux, `trellis-bench --virtual 10000`, and
+  Tests/View/virtual-bench.m with real views in a 900x800 window): see
+  CHANGELOG 0.4.0.
 
 ## Why
 

@@ -516,43 +516,72 @@ static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
           }
         else if (!crossesFlex)
           {
-            double have = gap * (span - 1), haveL = gap * (span - 1);
+            /* A spanning item, in the phases of CSS Grid 12.5.1. */
+            const double gapsS = gap * (span - 1);
+            /* 1. Intrinsic minimums take its min-content contribution. */
+            double have = gapsS;
             int intrinsic = 0;
             for (NSInteger i = a; i < b; i++)
               {
                 have += tr[i].base;
-                haveL += isinf(tr[i].limit) ? tr[i].base : tr[i].limit;
                 TRBreadthKind mk = tr[i].size.min.kind;
                 if (mk == TRBreadthAuto || mk == TRBreadthMinContent || mk == TRBreadthMaxContent) intrinsic++;
               }
-            if (intrinsic == 0) continue;
             double extra = minC - have;
-            if (extra > 0)
+            if (intrinsic > 0 && extra > 0)
               for (NSInteger i = a; i < b; i++)
                 {
                   TRBreadthKind mk = tr[i].size.min.kind;
                   if (mk == TRBreadthAuto || mk == TRBreadthMinContent || mk == TRBreadthMaxContent)
                     tr[i].base += extra / intrinsic;
                 }
-            /* Limits from the bases as they are now (the step above may
-               have raised them), so the extra isn't counted twice. */
-            haveL = gap * (span - 1);
-            for (NSInteger i = a; i < b; i++)
-              haveL += (limitSet[i] && !isinf(tr[i].limit)) ? MAX(tr[i].limit, tr[i].base) : tr[i].base;
-            double extraL = maxC - haveL;
-            if (extraL > 0)
+            /* 2. Max-content minimums take its max-content contribution. */
+            {
+              int mcTracks = 0;
+              double haveB = gapsS;
               for (NSInteger i = a; i < b; i++)
                 {
-                  TRBreadthKind xk = tr[i].size.max.kind;
-                  if (xk == TRBreadthAuto || xk == TRBreadthMaxContent || xk == TRBreadthMinContent
-                      || TRIsFitContent(xk))
-                    {
-                      /* A growth limit is never below the base. */
-                      double cur = limitSet[i] ? MAX(tr[i].limit, tr[i].base) : tr[i].base;
-                      tr[i].limit = cur + extraL / intrinsic;
-                      limitSet[i] = YES;
-                    }
+                  haveB += tr[i].base;
+                  if (tr[i].size.min.kind == TRBreadthMaxContent) mcTracks++;
                 }
+              double extraM = maxC - haveB;
+              if (mcTracks > 0 && extraM > 0)
+                for (NSInteger i = a; i < b; i++)
+                  if (tr[i].size.min.kind == TRBreadthMaxContent)
+                    tr[i].base += extraM / mcTracks;
+            }
+            /* 3. Growth limits, from the bases as they are now; a limit is
+               never below its base. Intrinsic maximums take the min-content
+               contribution, then max-content/auto/fit-content maximums take
+               the max-content contribution. */
+            for (int phase = 0; phase < 2; phase++)
+              {
+                double target = phase == 0 ? minC : maxC;
+                double haveL = gapsS;
+                int nTracks = 0;
+                for (NSInteger i = a; i < b; i++)
+                  {
+                    haveL += (limitSet[i] && !isinf(tr[i].limit)) ? MAX(tr[i].limit, tr[i].base) : tr[i].base;
+                    TRBreadthKind xk = tr[i].size.max.kind;
+                    BOOL takes = phase == 0
+                      ? (xk == TRBreadthAuto || xk == TRBreadthMaxContent || xk == TRBreadthMinContent || TRIsFitContent(xk))
+                      : (xk == TRBreadthAuto || xk == TRBreadthMaxContent || TRIsFitContent(xk));
+                    if (takes) nTracks++;
+                  }
+                double extraL = target - haveL;
+                if (nTracks == 0 || extraL <= 0) continue;
+                for (NSInteger i = a; i < b; i++)
+                  {
+                    TRBreadthKind xk = tr[i].size.max.kind;
+                    BOOL takes = phase == 0
+                      ? (xk == TRBreadthAuto || xk == TRBreadthMaxContent || xk == TRBreadthMinContent || TRIsFitContent(xk))
+                      : (xk == TRBreadthAuto || xk == TRBreadthMaxContent || TRIsFitContent(xk));
+                    if (!takes) continue;
+                    double cur = (limitSet[i] && !isinf(tr[i].limit)) ? MAX(tr[i].limit, tr[i].base) : tr[i].base;
+                    tr[i].limit = cur + extraL / nTracks;
+                    limitSet[i] = YES;
+                  }
+              }
           }
       }
   for (NSInteger i = 0; i < n; i++)

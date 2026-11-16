@@ -1209,5 +1209,67 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_spanning_item_phases",
+  "note": "CSS Grid 12.5.1: a spanning item's max-content goes to max-content maximums even when every minimum is fixed",
+  "root": {
+   "style": {
+    "width": 105,
+    "flexDirection": "column"
+   },
+   "children": [
+    {
+     "style": {
+      "display": "grid",
+      "gridTemplateColumns": "minmax(50px, min-content) minmax(40px, max-content)",
+      "gridTemplateRows": "50px"
+     },
+     "children": [
+      {
+       "style": {
+        "gridRow": "1",
+        "gridColumn": "1 / -1"
+       },
+       "measure": {
+        "text": "XXX XXX XXX",
+        "charWidth": 10,
+        "lineHeight": 10
+       }
+      },
+      {
+       "style": {
+        "gridRow": "1",
+        "gridColumn": "1"
+       }
+      },
+      {
+       "style": {
+        "gridRow": "1",
+        "gridColumn": "2"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "children": [
+      {
+       "width": 105
+      },
+      {
+       "width": 50
+      },
+      {
+       "x": 50,
+       "width": 55
+      }
+     ]
+    }
+   ]
+  }
  }
 ]

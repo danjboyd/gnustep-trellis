@@ -3,7 +3,7 @@
   "lint" : [
 
   ],
-  "source" : "..\/..\/Examples\/TrellisDemo\/AskDetail.trellis",
+  "source" : "..\/..\/..\/Examples\/TrellisDemo\/AskDetail.trellis",
   "viewport" : {
     "width" : 360,
     "scale" : 1,
@@ -12,7 +12,7 @@
   "theme" : "default",
   "root" : {
     "height" : 374,
-    "style" : "flex-direction: column; padding-left: 16px; padding-top: 16px; padding-right: 16px; padding-bottom: 16px; row-gap: 10px; column-gap: 10px; background-color: #ffffff; container-type: inline-size",
+    "style" : "flex-direction: column; padding-left: 16px; padding-top: 16px; padding-right: 16px; padding-bottom: 16px; row-gap: 10px; column-gap: 10px; background-color: Canvas; container-type: inline-size",
     "x" : 0,
     "y" : 0,
     "id" : "ask",
@@ -27,7 +27,7 @@
         "children" : [
           {
             "height" : 16,
-            "style" : "flex-shrink: 0; color: #1c71d8; font-weight: bold",
+            "style" : "flex-shrink: 0; color: LinkText; font-weight: bold",
             "x" : 0,
             "y" : 0,
             "id" : "kind",
@@ -41,34 +41,36 @@
             "needed" : {
               "width" : 57,
               "height" : 16
-            }
+            },
+            "textColor" : "#0068da"
           },
           {
-            "height" : 38,
+            "id" : "title",
             "style" : "flex-grow: 1; flex-basis: 100%; order: 3; font-size: 15px",
             "x" : 0,
+            "intrinsic" : {
+              "width" : 414,
+              "height" : 19
+            },
             "y" : 24,
-            "id" : "title",
             "width" : 328,
-            "class" : "NSTextField",
+            "textColor" : "#000000d8",
             "container" : {
               "matched" : [
                 "(max-width: 359px)"
               ]
             },
-            "intrinsic" : {
-              "width" : 413,
-              "height" : 19
-            },
+            "height" : 38,
             "text" : "Tag example-cli v0.1.8 as rc2 and publish the release notes?",
+            "class" : "NSTextField",
             "needed" : {
-              "width" : 314,
+              "width" : 315,
               "height" : 38
             }
           },
           {
             "height" : 16,
-            "style" : "flex-shrink: 0; color: #77767b",
+            "style" : "flex-shrink: 0; color: GrayText",
             "x" : 65,
             "y" : 0,
             "id" : "age",
@@ -82,7 +84,8 @@
             "needed" : {
               "width" : 70,
               "height" : 16
-            }
+            },
+            "textColor" : "#0000007f"
           }
         ],
         "width" : 328,
@@ -101,26 +104,27 @@
         "children" : [
           {
             "height" : 16,
-            "style" : "flex-shrink: 0; color: #77767b",
+            "style" : "flex-shrink: 0; color: GrayText",
             "x" : 0,
             "y" : 0,
             "id" : "agent",
-            "width" : 104,
+            "width" : 52,
             "class" : "NSTextField",
             "intrinsic" : {
-              "width" : 104,
+              "width" : 52,
               "height" : 16
             },
             "text" : "agent-a",
             "needed" : {
-              "width" : 104,
+              "width" : 52,
               "height" : 16
-            }
+            },
+            "textColor" : "#0000007f"
           },
           {
             "height" : 16,
-            "style" : "flex-shrink: 0; color: #77767b",
-            "x" : 110,
+            "style" : "flex-shrink: 0; color: GrayText",
+            "x" : 58,
             "y" : 0,
             "needed" : {
               "width" : 8,
@@ -132,15 +136,16 @@
               "width" : 8,
               "height" : 16
             },
-            "text" : "·"
+            "text" : "·",
+            "textColor" : "#0000007f"
           },
           {
             "height" : 32,
-            "style" : "flex-grow: 1; flex-basis: 0%; color: #77767b",
-            "x" : 124,
+            "style" : "flex-grow: 1; flex-basis: 0%; color: GrayText",
+            "x" : 72,
             "y" : 0,
             "id" : "blocks",
-            "width" : 204,
+            "width" : 256,
             "class" : "NSTextField",
             "intrinsic" : {
               "width" : 268,
@@ -148,9 +153,10 @@
             },
             "text" : "blocks the rc2 tag and the packager update",
             "needed" : {
-              "width" : 166,
+              "width" : 226,
               "height" : 32
-            }
+            },
+            "textColor" : "#0000007f"
           }
         ],
         "width" : 328,
@@ -172,7 +178,8 @@
         "needed" : {
           "width" : 328,
           "height" : 64
-        }
+        },
+        "textColor" : "#000000d8"
       },
       {
         "height" : 108,
@@ -238,6 +245,7 @@
             "id" : "reply",
             "width" : 255,
             "class" : "NSTextField",
+            "editable" : true,
             "intrinsic" : {
               "width" : 129,
               "height" : 21
@@ -260,6 +268,8 @@
         "width" : 328,
         "class" : "TRBoxView"
       }
-    ]
+    ],
+    "windowBackground" : "#ececec",
+    "background" : "#ffffff"
   }
 }

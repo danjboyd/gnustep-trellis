@@ -1,15 +1,9 @@
 {
   "trellis" : "0.1",
   "lint" : [
-    {
-      "rule" : "undersized",
-      "path" : "root\/5\/1",
-      "message" : "#fontSize (NSSlider) is 360x28, smaller than its intrinsic 40000x28",
-      "id" : "fontSize",
-      "severity" : "error"
-    }
+
   ],
-  "source" : "..\/..\/Examples\/TrellisDemo\/Settings.trellis",
+  "source" : "..\/..\/..\/Examples\/TrellisDemo\/Settings.trellis",
   "viewport" : {
     "width" : 800,
     "scale" : 1,
@@ -40,7 +34,8 @@
           "width" : 103,
           "height" : 20
         },
-        "text" : "Preferences"
+        "text" : "Preferences",
+        "textColor" : "#000000d8"
       },
       {
         "height" : 21,
@@ -68,28 +63,30 @@
               "width" : 85,
               "height" : 16
             },
-            "text" : "Display name"
+            "text" : "Display name",
+            "textColor" : "#000000d8"
           },
           {
-            "height" : 21,
+            "id" : "displayName",
             "style" : "flex-grow: 1; flex-basis: 0%; max-width: 360px",
             "x" : 132,
+            "intrinsic" : {
+              "width" : 38,
+              "height" : 21
+            },
             "y" : 0,
-            "id" : "displayName",
             "width" : 360,
-            "class" : "NSTextField",
+            "editable" : true,
             "container" : {
               "matched" : [
                 "(min-width: 480px)"
               ]
             },
-            "intrinsic" : {
-              "width" : 32,
-              "height" : 21
-            },
-            "text" : "the maintainer",
+            "height" : 21,
+            "text" : "Alice",
+            "class" : "NSTextField",
             "needed" : {
-              "width" : 32,
+              "width" : 38,
               "height" : 21
             }
           }
@@ -128,7 +125,8 @@
               "width" : 46,
               "height" : 16
             },
-            "text" : "Theme"
+            "text" : "Theme",
+            "textColor" : "#000000d8"
           },
           {
             "height" : 25,
@@ -184,7 +182,8 @@
               "width" : 50,
               "height" : 16
             },
-            "text" : "Density"
+            "text" : "Density",
+            "textColor" : "#000000d8"
           },
           {
             "height" : 25,
@@ -240,7 +239,8 @@
               "width" : 56,
               "height" : 16
             },
-            "text" : "Updates"
+            "text" : "Updates",
+            "textColor" : "#000000d8"
           },
           {
             "height" : 18,
@@ -259,7 +259,8 @@
               "width" : 222,
               "height" : 18
             },
-            "title" : "Check for updates automatically"
+            "title" : "Check for updates automatically",
+            "textColor" : "#000000d8"
           }
         ],
         "width" : 760,
@@ -296,7 +297,8 @@
               "width" : 59,
               "height" : 16
             },
-            "text" : "Font size"
+            "text" : "Font size",
+            "textColor" : "#000000d8"
           },
           {
             "height" : 28,
@@ -312,7 +314,7 @@
               ]
             },
             "intrinsic" : {
-              "width" : 40000,
+              "width" : 0,
               "height" : 28
             }
           }
@@ -375,6 +377,7 @@
         "width" : 760,
         "class" : "TRBoxView"
       }
-    ]
+    ],
+    "windowBackground" : "#ececec"
   }
 }

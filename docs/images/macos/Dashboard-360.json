@@ -3,7 +3,7 @@
   "lint" : [
 
   ],
-  "source" : "..\/..\/Examples\/TrellisDemo\/Dashboard.trellis",
+  "source" : "..\/..\/..\/Examples\/TrellisDemo\/Dashboard.trellis",
   "viewport" : {
     "width" : 360,
     "scale" : 1,
@@ -12,7 +12,7 @@
   "theme" : "default",
   "root" : {
     "height" : 446,
-    "style" : "display: grid; padding-left: 16px; padding-top: 16px; padding-right: 16px; padding-bottom: 16px; row-gap: 12px; column-gap: 12px; grid-template-columns: 1fr; grid-template-rows: auto auto auto 1fr; grid-template-areas: \"head\" \"side\" \"cards\" \"log\"; background-color: #f6f5f4; container-type: inline-size",
+    "style" : "display: grid; padding-left: 16px; padding-top: 16px; padding-right: 16px; padding-bottom: 16px; row-gap: 12px; column-gap: 12px; grid-template-columns: 1fr; grid-template-rows: auto auto auto 1fr; grid-template-areas: \"head\" \"side\" \"cards\" \"log\"; background-color: -tr-window-background; container-type: inline-size",
     "x" : 0,
     "y" : 0,
     "id" : "dashboard",
@@ -45,7 +45,8 @@
               "width" : 47,
               "height" : 21
             },
-            "text" : "Fleet"
+            "text" : "Fleet",
+            "textColor" : "#000000d8"
           },
           {
             "y" : 16,
@@ -68,6 +69,7 @@
                 "(max-width: 599px)"
               ]
             },
+            "editable" : true,
             "intrinsic" : {
               "width" : 84,
               "height" : 21
@@ -97,7 +99,7 @@
         "children" : [
           {
             "height" : 32,
-            "style" : "color: #77767b",
+            "style" : "color: GrayText",
             "x" : 0,
             "y" : 0,
             "needed" : {
@@ -110,7 +112,8 @@
               "width" : 54,
               "height" : 16
             },
-            "text" : "Projects"
+            "text" : "Projects",
+            "textColor" : "#0000007f"
           },
           {
             "height" : 32,
@@ -119,34 +122,34 @@
             "title" : "Project Alpha",
             "class" : "NSButton",
             "intrinsic" : {
-              "width" : 119,
+              "width" : 115,
               "height" : 32
             },
-            "width" : 119
+            "width" : 115
           },
           {
             "height" : 32,
-            "x" : 185,
+            "x" : 181,
             "y" : 0,
-            "title" : "AIManager",
+            "title" : "Project Beta",
             "class" : "NSButton",
             "intrinsic" : {
-              "width" : 100,
+              "width" : 109,
               "height" : 32
             },
-            "width" : 100
+            "width" : 109
           },
           {
             "height" : 32,
             "x" : 0,
             "y" : 38,
-            "title" : "agent-b",
+            "title" : "Project Gamma",
             "class" : "NSButton",
             "intrinsic" : {
-              "width" : 66,
+              "width" : 127,
               "height" : 32
             },
-            "width" : 66
+            "width" : 127
           }
         ],
         "width" : 328,
@@ -168,13 +171,13 @@
         "children" : [
           {
             "height" : 68,
-            "style" : "flex-direction: column; padding-left: 10px; border-left-width: 1px; padding-top: 10px; border-top-width: 1px; padding-right: 10px; border-right-width: 1px; padding-bottom: 10px; border-bottom-width: 1px; row-gap: 4px; column-gap: 4px; background-color: #ffffff; border-color: #deddda; border-radius: 6px; border-style: solid",
+            "style" : "flex-direction: column; padding-left: 10px; border-left-width: 1px; padding-top: 10px; border-top-width: 1px; padding-right: 10px; border-right-width: 1px; padding-bottom: 10px; border-bottom-width: 1px; row-gap: 4px; column-gap: 4px; background-color: Canvas; border-color: -tr-separator; border-radius: 6px; border-style: solid",
             "x" : 0,
             "y" : 0,
             "children" : [
               {
                 "height" : 16,
-                "style" : "color: #77767b",
+                "style" : "color: GrayText",
                 "x" : 11,
                 "y" : 11,
                 "needed" : {
@@ -187,7 +190,8 @@
                   "width" : 87,
                   "height" : 16
                 },
-                "text" : "Agents online"
+                "text" : "Agents online",
+                "textColor" : "#0000007f"
               },
               {
                 "height" : 26,
@@ -205,21 +209,23 @@
                 "needed" : {
                   "width" : 26,
                   "height" : 26
-                }
+                },
+                "textColor" : "#000000d8"
               }
             ],
             "width" : 159,
-            "class" : "TRBoxView"
+            "class" : "TRBoxView",
+            "background" : "#ffffff"
           },
           {
             "height" : 68,
-            "style" : "flex-direction: column; padding-left: 10px; border-left-width: 1px; padding-top: 10px; border-top-width: 1px; padding-right: 10px; border-right-width: 1px; padding-bottom: 10px; border-bottom-width: 1px; row-gap: 4px; column-gap: 4px; background-color: #ffffff; border-color: #deddda; border-radius: 6px; border-style: solid",
+            "style" : "flex-direction: column; padding-left: 10px; border-left-width: 1px; padding-top: 10px; border-top-width: 1px; padding-right: 10px; border-right-width: 1px; padding-bottom: 10px; border-bottom-width: 1px; row-gap: 4px; column-gap: 4px; background-color: Canvas; border-color: -tr-separator; border-radius: 6px; border-style: solid",
             "x" : 169,
             "y" : 0,
             "children" : [
               {
                 "height" : 16,
-                "style" : "color: #77767b",
+                "style" : "color: GrayText",
                 "x" : 11,
                 "y" : 11,
                 "needed" : {
@@ -232,7 +238,8 @@
                   "width" : 68,
                   "height" : 16
                 },
-                "text" : "Open asks"
+                "text" : "Open asks",
+                "textColor" : "#0000007f"
               },
               {
                 "height" : 26,
@@ -250,21 +257,23 @@
                 "needed" : {
                   "width" : 19,
                   "height" : 26
-                }
+                },
+                "textColor" : "#000000d8"
               }
             ],
             "width" : 159,
-            "class" : "TRBoxView"
+            "class" : "TRBoxView",
+            "background" : "#ffffff"
           },
           {
             "height" : 68,
-            "style" : "flex-direction: column; padding-left: 10px; border-left-width: 1px; padding-top: 10px; border-top-width: 1px; padding-right: 10px; border-right-width: 1px; padding-bottom: 10px; border-bottom-width: 1px; row-gap: 4px; column-gap: 4px; background-color: #ffffff; border-color: #deddda; border-radius: 6px; border-style: solid",
+            "style" : "flex-direction: column; padding-left: 10px; border-left-width: 1px; padding-top: 10px; border-top-width: 1px; padding-right: 10px; border-right-width: 1px; padding-bottom: 10px; border-bottom-width: 1px; row-gap: 4px; column-gap: 4px; background-color: Canvas; border-color: -tr-separator; border-radius: 6px; border-style: solid",
             "x" : 0,
             "y" : 78,
             "children" : [
               {
                 "height" : 16,
-                "style" : "color: #77767b",
+                "style" : "color: GrayText",
                 "x" : 11,
                 "y" : 11,
                 "needed" : {
@@ -277,7 +286,8 @@
                   "width" : 109,
                   "height" : 16
                 },
-                "text" : "Items done today"
+                "text" : "Items done today",
+                "textColor" : "#0000007f"
               },
               {
                 "height" : 26,
@@ -295,21 +305,23 @@
                 "needed" : {
                   "width" : 31,
                   "height" : 26
-                }
+                },
+                "textColor" : "#000000d8"
               }
             ],
             "width" : 159,
-            "class" : "TRBoxView"
+            "class" : "TRBoxView",
+            "background" : "#ffffff"
           },
           {
             "height" : 68,
-            "style" : "flex-direction: column; padding-left: 10px; border-left-width: 1px; padding-top: 10px; border-top-width: 1px; padding-right: 10px; border-right-width: 1px; padding-bottom: 10px; border-bottom-width: 1px; row-gap: 4px; column-gap: 4px; background-color: #ffffff; border-color: #deddda; border-radius: 6px; border-style: solid",
+            "style" : "flex-direction: column; padding-left: 10px; border-left-width: 1px; padding-top: 10px; border-top-width: 1px; padding-right: 10px; border-right-width: 1px; padding-bottom: 10px; border-bottom-width: 1px; row-gap: 4px; column-gap: 4px; background-color: Canvas; border-color: -tr-separator; border-radius: 6px; border-style: solid",
             "x" : 169,
             "y" : 78,
             "children" : [
               {
                 "height" : 16,
-                "style" : "color: #77767b",
+                "style" : "color: GrayText",
                 "x" : 11,
                 "y" : 11,
                 "needed" : {
@@ -322,7 +334,8 @@
                   "width" : 71,
                   "height" : 16
                 },
-                "text" : "Week used"
+                "text" : "Week used",
+                "textColor" : "#0000007f"
               },
               {
                 "height" : 26,
@@ -340,21 +353,23 @@
                 "needed" : {
                   "width" : 40,
                   "height" : 26
-                }
+                },
+                "textColor" : "#000000d8"
               }
             ],
             "width" : 159,
-            "class" : "TRBoxView"
+            "class" : "TRBoxView",
+            "background" : "#ffffff"
           },
           {
             "height" : 60,
-            "style" : "flex-direction: column; padding-left: 10px; border-left-width: 1px; padding-top: 10px; border-top-width: 1px; padding-right: 10px; border-right-width: 1px; padding-bottom: 10px; border-bottom-width: 1px; row-gap: 4px; column-gap: 4px; background-color: #ffffff; border-color: #deddda; border-radius: 6px; border-style: solid",
+            "style" : "flex-direction: column; padding-left: 10px; border-left-width: 1px; padding-top: 10px; border-top-width: 1px; padding-right: 10px; border-right-width: 1px; padding-bottom: 10px; border-bottom-width: 1px; row-gap: 4px; column-gap: 4px; background-color: Canvas; border-color: -tr-separator; border-radius: 6px; border-style: solid",
             "x" : 0,
             "y" : 156,
             "children" : [
               {
                 "height" : 16,
-                "style" : "color: #77767b",
+                "style" : "color: GrayText",
                 "x" : 11,
                 "y" : 11,
                 "needed" : {
@@ -367,7 +382,8 @@
                   "width" : 41,
                   "height" : 16
                 },
-                "text" : "Builds"
+                "text" : "Builds",
+                "textColor" : "#0000007f"
               },
               {
                 "height" : 18,
@@ -380,13 +396,14 @@
               }
             ],
             "width" : 159,
-            "class" : "TRBoxView"
+            "class" : "TRBoxView",
+            "background" : "#ffffff"
           }
         ]
       },
       {
         "height" : 60,
-        "style" : "flex-grow: 1; flex-basis: 0%; min-width: 0px; min-height: 60px; grid-row: log \/ log; grid-column: log \/ log; background-color: #ffffff",
+        "style" : "flex-grow: 1; flex-basis: 0%; min-width: 0px; min-height: 60px; grid-row: log \/ log; grid-column: log \/ log; background-color: Canvas",
         "x" : 16,
         "y" : 370,
         "children" : [
@@ -411,7 +428,8 @@
                   "width" : 202,
                   "height" : 480
                 },
-                "text" : "18:00 agent-0: finished item 100\n18:01 agent-1: finished item 101\n18:02 agent-2: finished item 102\n18:03 agent-3: finished item 103\n18:04 agent-4: finished item 104\n18:05 agent-5: finished item 105\n18:06 agent-6: finished item 106\n18:07 agent-0: finished item 107\n18:08 agent-1: finished item 108\n18:09 agent-2: finished item 109\n18:10 agent-3: finished item 110\n18:11 agent-4: finished item 111\n18:12 agent-5: finished item 112\n18:13 agent-6: finished item 113\n18:14 agent-0: finished item 114\n18:15 agent-1: finished item 115\n18:16 agent-2: finished item 116\n18:17 agent-3: finished item 117\n18:18 agent-4: finished item 118\n18:19 agent-5: finished item 119\n18:20 agent-6: finished item 120\n18:21 agent-0: finished item 121\n18:22 agent-1: finished item 122\n18:23 agent-2: finished item 123\n18:24 agent-3: finished item 124\n18:25 agent-4: finished item 125\n18:26 agent-5: finished item 126\n18:27 agent-6: finished item 127\n18:28 agent-0: finished item 128\n18:29 agent-1: finished item 129"
+                "text" : "18:00 agent-0: finished item 100\n18:01 agent-1: finished item 101\n18:02 agent-2: finished item 102\n18:03 agent-3: finished item 103\n18:04 agent-4: finished item 104\n18:05 agent-5: finished item 105\n18:06 agent-6: finished item 106\n18:07 agent-0: finished item 107\n18:08 agent-1: finished item 108\n18:09 agent-2: finished item 109\n18:10 agent-3: finished item 110\n18:11 agent-4: finished item 111\n18:12 agent-5: finished item 112\n18:13 agent-6: finished item 113\n18:14 agent-0: finished item 114\n18:15 agent-1: finished item 115\n18:16 agent-2: finished item 116\n18:17 agent-3: finished item 117\n18:18 agent-4: finished item 118\n18:19 agent-5: finished item 119\n18:20 agent-6: finished item 120\n18:21 agent-0: finished item 121\n18:22 agent-1: finished item 122\n18:23 agent-2: finished item 123\n18:24 agent-3: finished item 124\n18:25 agent-4: finished item 125\n18:26 agent-5: finished item 126\n18:27 agent-6: finished item 127\n18:28 agent-0: finished item 128\n18:29 agent-1: finished item 129",
+                "textColor" : "#000000d8"
               }
             ],
             "width" : 328,
@@ -420,8 +438,11 @@
         ],
         "width" : 328,
         "class" : "TRScrollBox",
+        "background" : "#ffffff",
         "overflow" : "scroll"
       }
-    ]
+    ],
+    "background" : "#ececec",
+    "windowBackground" : "#ececec"
   }
 }

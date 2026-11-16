@@ -1,15 +1,9 @@
 {
   "trellis" : "0.1",
   "lint" : [
-    {
-      "rule" : "undersized",
-      "path" : "root\/5\/1",
-      "message" : "#fontSize (NSSlider) is 320x28, smaller than its intrinsic 40000x28",
-      "id" : "fontSize",
-      "severity" : "error"
-    }
+
   ],
-  "source" : "..\/..\/Examples\/TrellisDemo\/Settings.trellis",
+  "source" : "..\/..\/..\/Examples\/TrellisDemo\/Settings.trellis",
   "viewport" : {
     "width" : 360,
     "scale" : 1,
@@ -40,7 +34,8 @@
           "width" : 103,
           "height" : 20
         },
-        "text" : "Preferences"
+        "text" : "Preferences",
+        "textColor" : "#000000d8"
       },
       {
         "height" : 41,
@@ -58,11 +53,12 @@
             "y" : 0,
             "width" : 320,
             "class" : "NSTextField",
-            "text" : "Display name",
             "intrinsic" : {
               "width" : 85,
               "height" : 16
-            }
+            },
+            "text" : "Display name",
+            "textColor" : "#000000d8"
           },
           {
             "height" : 21,
@@ -72,13 +68,14 @@
             "id" : "displayName",
             "width" : 320,
             "class" : "NSTextField",
+            "editable" : true,
             "intrinsic" : {
-              "width" : 32,
+              "width" : 38,
               "height" : 21
             },
-            "text" : "the maintainer",
+            "text" : "Alice",
             "needed" : {
-              "width" : 32,
+              "width" : 38,
               "height" : 21
             }
           }
@@ -102,11 +99,12 @@
             "y" : 0,
             "width" : 320,
             "class" : "NSTextField",
-            "text" : "Theme",
             "intrinsic" : {
               "width" : 46,
               "height" : 16
-            }
+            },
+            "text" : "Theme",
+            "textColor" : "#000000d8"
           },
           {
             "height" : 25,
@@ -142,11 +140,12 @@
             "y" : 0,
             "width" : 320,
             "class" : "NSTextField",
-            "text" : "Density",
             "intrinsic" : {
               "width" : 50,
               "height" : 16
-            }
+            },
+            "text" : "Density",
+            "textColor" : "#000000d8"
           },
           {
             "height" : 25,
@@ -182,11 +181,12 @@
             "y" : 0,
             "width" : 320,
             "class" : "NSTextField",
-            "text" : "Updates",
             "intrinsic" : {
               "width" : 56,
               "height" : 16
-            }
+            },
+            "text" : "Updates",
+            "textColor" : "#000000d8"
           },
           {
             "height" : 18,
@@ -200,7 +200,8 @@
               "width" : 222,
               "height" : 18
             },
-            "title" : "Check for updates automatically"
+            "title" : "Check for updates automatically",
+            "textColor" : "#000000d8"
           }
         ],
         "width" : 320,
@@ -222,11 +223,12 @@
             "y" : 0,
             "width" : 320,
             "class" : "NSTextField",
-            "text" : "Font size",
             "intrinsic" : {
               "width" : 59,
               "height" : 16
-            }
+            },
+            "text" : "Font size",
+            "textColor" : "#000000d8"
           },
           {
             "height" : 28,
@@ -237,7 +239,7 @@
             "width" : 320,
             "class" : "NSSlider",
             "intrinsic" : {
-              "width" : 40000,
+              "width" : 0,
               "height" : 28
             }
           }
@@ -295,6 +297,7 @@
         "width" : 320,
         "class" : "TRBoxView"
       }
-    ]
+    ],
+    "windowBackground" : "#ececec"
   }
 }

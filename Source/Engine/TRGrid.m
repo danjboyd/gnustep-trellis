@@ -1075,7 +1075,12 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
 
   /* ---- Columns ---- */
   TRSizeTracks(colsT, nCols, innerW, colGap, items, n, YES, s->justifyContent, minInnerW, maxInnerW);
-  double colsTotal = TRPlaceTracks(colsT, nCols, colGap, innerW, s->justifyContent, s->justifyContentSafe);
+  /* left/right are physical: columns are placed from the inline start and
+     mirrored for rtl, where left is the end and right the start. */
+  TRAlign colAlign = s->justifyContent;
+  if (colAlign == TRAlignLeft) colAlign = rtl ? TRAlignEnd : TRAlignStart;
+  else if (colAlign == TRAlignRight) colAlign = rtl ? TRAlignStart : TRAlignEnd;
+  double colsTotal = TRPlaceTracks(colsT, nCols, colGap, innerW, colAlign, s->justifyContentSafe);
 
   /* Percentage margins, against each item's grid-area width (CSS Grid 6.5). */
   for (NSInteger k = 0; k < n; k++)

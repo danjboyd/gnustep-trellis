@@ -1433,5 +1433,40 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_justify_content_left_in_rtl_is_end",
+  "note": "justify-content left/right are physical: in an rtl grid left is the end",
+  "direction": "rtl",
+  "root": {
+   "style": {
+    "display": "grid",
+    "width": 200,
+    "gridTemplateColumns": "50px 50px",
+    "justifyContent": "left"
+   },
+   "children": [
+    {
+     "style": {
+      "height": 10
+     }
+    },
+    {
+     "style": {
+      "height": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "x": 50
+    },
+    {
+     "x": 0
+    }
+   ]
+  }
  }
 ]

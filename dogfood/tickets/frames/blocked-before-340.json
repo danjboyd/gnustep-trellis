@@ -1,0 +1,904 @@
+{
+  "root": {
+    "x": 0,
+    "children": [
+      {
+        "x": 0,
+        "children": [
+          {
+            "x": 0,
+            "hidden": true,
+            "intrinsic": {
+              "height": 34,
+              "width": 91
+            },
+            "width": 10,
+            "height": 10,
+            "style": "display: none; flex-shrink: 0",
+            "class": "NSButton",
+            "title": "\u2630 Rail",
+            "y": 0,
+            "id": "railToggle"
+          },
+          {
+            "x": 6,
+            "width": 86,
+            "height": 34,
+            "intrinsic": {
+              "height": 34,
+              "width": 86
+            },
+            "style": "flex-shrink: 0",
+            "class": "NSButton",
+            "title": "P1: 1",
+            "y": -5
+          },
+          {
+            "x": 96,
+            "width": 137,
+            "height": 34,
+            "intrinsic": {
+              "height": 34,
+              "width": 137
+            },
+            "style": "flex-shrink: 0",
+            "class": "NSButton",
+            "title": "Need you: 6",
+            "y": -5
+          },
+          {
+            "x": 237,
+            "width": 120,
+            "height": 34,
+            "intrinsic": {
+              "height": 34,
+              "width": 120
+            },
+            "style": "flex-shrink: 0",
+            "class": "NSButton",
+            "title": "Replies: 2",
+            "y": -5
+          },
+          {
+            "x": 361,
+            "width": 125,
+            "height": 34,
+            "intrinsic": {
+              "height": 34,
+              "width": 125
+            },
+            "style": "flex-shrink: 0",
+            "class": "NSButton",
+            "title": "Blocked: 1",
+            "y": -5
+          }
+        ],
+        "width": 340,
+        "height": 24,
+        "style": "align-items: center; flex-shrink: 0; height: 24px; padding-left: 6px; padding-right: 6px; row-gap: 4px; column-gap: 4px",
+        "class": "TRBoxView",
+        "y": 0,
+        "id": "pulse"
+      },
+      {
+        "class": "NSBox",
+        "x": 0,
+        "style": "align-self: stretch; flex-shrink: 0; min-width: 1px; min-height: 1px",
+        "height": 1,
+        "width": 340,
+        "y": 24
+      },
+      {
+        "x": 0,
+        "children": [
+          {
+            "children": [
+              {
+                "x": 6,
+                "intrinsic": {
+                  "height": 34,
+                  "width": 20
+                },
+                "width": 258,
+                "height": 24,
+                "style": "flex-shrink: 0; height: 24px",
+                "class": "NSTextField",
+                "y": 6,
+                "id": "filter"
+              },
+              {
+                "x": 6,
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "x": 0,
+                            "text": "YOUR MOVE 6",
+                            "needed": {
+                              "height": 18,
+                              "width": 114
+                            },
+                            "width": 258,
+                            "height": 22,
+                            "intrinsic": {
+                              "height": 18,
+                              "width": 114
+                            },
+                            "style": "height: 22px; margin-top: 6px; color: #77767b; font-weight: bold",
+                            "class": "NSTextField",
+                            "y": 6
+                          },
+                          {
+                            "x": 0,
+                            "text": "Verify",
+                            "needed": {
+                              "height": 18,
+                              "width": 43
+                            },
+                            "width": 258,
+                            "height": 20,
+                            "intrinsic": {
+                              "height": 18,
+                              "width": 43
+                            },
+                            "style": "height: 20px; color: #77767b",
+                            "class": "NSTextField",
+                            "y": 28
+                          },
+                          {
+                            "children": [
+                              {
+                                "x": 8,
+                                "text": "2396 Fuel log export missing columns",
+                                "needed": {
+                                  "height": 18,
+                                  "width": 312
+                                },
+                                "width": 242,
+                                "height": 18,
+                                "intrinsic": {
+                                  "height": 18,
+                                  "width": 312
+                                },
+                                "style": "font-weight: bold",
+                                "class": "NSTextField",
+                                "y": 2
+                              },
+                              {
+                                "x": 8,
+                                "text": "Bob Example \u00b7 2h \u25cf",
+                                "needed": {
+                                  "height": 18,
+                                  "width": 120
+                                },
+                                "width": 242,
+                                "height": 18,
+                                "intrinsic": {
+                                  "height": 18,
+                                  "width": 120
+                                },
+                                "style": "color: #77767b",
+                                "class": "NSTextField",
+                                "y": 20
+                              }
+                            ],
+                            "class": "TRBoxView",
+                            "x": 0,
+                            "style": "flex-direction: column; height: 38px; padding-left: 8px; padding-top: 2px; padding-right: 8px; padding-bottom: 2px",
+                            "height": 38,
+                            "width": 258,
+                            "y": 48
+                          },
+                          {
+                            "children": [
+                              {
+                                "x": 8,
+                                "text": "2398 Map tiles blank offline",
+                                "needed": {
+                                  "height": 18,
+                                  "width": 229
+                                },
+                                "width": 242,
+                                "height": 18,
+                                "intrinsic": {
+                                  "height": 18,
+                                  "width": 229
+                                },
+                                "style": "font-weight: bold",
+                                "class": "NSTextField",
+                                "y": 2
+                              },
+                              {
+                                "x": 8,
+                                "text": "Carol Example \u00b7 3h",
+                                "needed": {
+                                  "height": 18,
+                                  "width": 96
+                                },
+                                "width": 242,
+                                "height": 18,
+                                "intrinsic": {
+                                  "height": 18,
+                                  "width": 96
+                                },
+                                "style": "color: #77767b",
+                                "class": "NSTextField",
+                                "y": 20
+                              }
+                            ],
+                            "class": "TRBoxView",
+                            "x": 0,
+                            "style": "flex-direction: column; height: 38px; padding-left: 8px; padding-top: 2px; padding-right: 8px; padding-bottom: 2px",
+                            "height": 38,
+                            "width": 258,
+                            "y": 86
+                          },
+                          {
+                            "x": 0,
+                            "text": "\u25b8 WITH AGENTS 4",
+                            "needed": {
+                              "height": 18,
+                              "width": 141
+                            },
+                            "width": 258,
+                            "height": 22,
+                            "intrinsic": {
+                              "height": 18,
+                              "width": 141
+                            },
+                            "style": "height: 22px; margin-top: 6px; color: #77767b; font-weight: bold",
+                            "class": "NSTextField",
+                            "y": 130
+                          },
+                          {
+                            "x": 0,
+                            "text": "\u25b8 WITH REQUESTERS 2",
+                            "needed": {
+                              "height": 18,
+                              "width": 183
+                            },
+                            "width": 258,
+                            "height": 22,
+                            "intrinsic": {
+                              "height": 18,
+                              "width": 183
+                            },
+                            "style": "height: 22px; margin-top: 6px; color: #77767b; font-weight: bold",
+                            "class": "NSTextField",
+                            "y": 158
+                          },
+                          {
+                            "x": 0,
+                            "text": "\u25be BLOCKED 1",
+                            "needed": {
+                              "height": 18,
+                              "width": 103
+                            },
+                            "width": 258,
+                            "height": 22,
+                            "intrinsic": {
+                              "height": 18,
+                              "width": 103
+                            },
+                            "style": "height: 22px; margin-top: 6px; color: #77767b; font-weight: bold",
+                            "class": "NSTextField",
+                            "y": 186
+                          },
+                          {
+                            "children": [
+                              {
+                                "x": 8,
+                                "text": "2409 Field tablets can't sync after the 11/14 update",
+                                "needed": {
+                                  "height": 18,
+                                  "width": 429
+                                },
+                                "width": 242,
+                                "height": 18,
+                                "intrinsic": {
+                                  "height": 18,
+                                  "width": 429
+                                },
+                                "style": "font-weight: bold",
+                                "class": "NSTextField",
+                                "y": 2
+                              },
+                              {
+                                "x": 8,
+                                "text": "Alice Example \u00b7 5h \u25f7",
+                                "needed": {
+                                  "height": 18,
+                                  "width": 125
+                                },
+                                "width": 242,
+                                "height": 18,
+                                "intrinsic": {
+                                  "height": 18,
+                                  "width": 125
+                                },
+                                "style": "color: #77767b",
+                                "class": "NSTextField",
+                                "y": 20
+                              }
+                            ],
+                            "class": "TRBoxView",
+                            "x": 0,
+                            "style": "flex-direction: column; height: 38px; padding-left: 8px; padding-top: 2px; padding-right: 8px; padding-bottom: 2px; background-color: #dbe7fa",
+                            "height": 38,
+                            "width": 258,
+                            "y": 208
+                          },
+                          {
+                            "x": 0,
+                            "text": "\u25b8 PROJECTS 3",
+                            "needed": {
+                              "height": 18,
+                              "width": 108
+                            },
+                            "width": 258,
+                            "height": 22,
+                            "intrinsic": {
+                              "height": 18,
+                              "width": 108
+                            },
+                            "style": "height: 22px; margin-top: 6px; color: #77767b; font-weight: bold",
+                            "class": "NSTextField",
+                            "y": 252
+                          },
+                          {
+                            "x": 0,
+                            "text": "\u25b8 SNOOZED 1",
+                            "needed": {
+                              "height": 18,
+                              "width": 107
+                            },
+                            "width": 258,
+                            "height": 22,
+                            "intrinsic": {
+                              "height": 18,
+                              "width": 107
+                            },
+                            "style": "height: 22px; margin-top: 6px; color: #77767b; font-weight: bold",
+                            "class": "NSTextField",
+                            "y": 280
+                          }
+                        ],
+                        "class": "TRBoxView",
+                        "x": 0,
+                        "style": "flex-direction: column",
+                        "height": 302,
+                        "width": 258,
+                        "y": 0
+                      }
+                    ],
+                    "class": "TRBoxView",
+                    "x": 0,
+                    "style": "flex-direction: column",
+                    "height": 582,
+                    "width": 258,
+                    "y": 0
+                  }
+                ],
+                "width": 258,
+                "height": 582,
+                "style": "flex-grow: 1; flex-basis: 0px; min-width: 0px; min-height: 0px",
+                "class": "TRScrollBox",
+                "y": 36,
+                "id": "rail",
+                "overflow": "scroll"
+              }
+            ],
+            "class": "TRBoxView",
+            "x": 0,
+            "style": "flex-direction: column; flex-shrink: 0; width: 270px; padding-left: 6px; padding-top: 6px; padding-right: 6px; padding-bottom: 6px; row-gap: 6px; column-gap: 6px; background-color: #f6f5f4",
+            "height": 624,
+            "width": 270,
+            "y": 0
+          },
+          {
+            "x": 270,
+            "children": [
+              {
+                "x": 8,
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "x": 0,
+                            "text": "TKT-1409 Field tablets can't sync after the 11/14 update",
+                            "needed": {
+                              "height": 76,
+                              "width": 160
+                            },
+                            "intrinsic": {
+                              "height": 19,
+                              "width": 504
+                            },
+                            "width": 184,
+                            "height": 76,
+                            "style": "font-size: 16px; font-weight: bold",
+                            "class": "NSTextField",
+                            "y": 0,
+                            "id": "card"
+                          },
+                          {
+                            "x": 0,
+                            "text": "Alice Example \u00b7 Field Ops \u00b7 P2 \u00b7 opened 5h ago",
+                            "needed": {
+                              "height": 36,
+                              "width": 167
+                            },
+                            "width": 184,
+                            "height": 36,
+                            "intrinsic": {
+                              "height": 18,
+                              "width": 314
+                            },
+                            "style": "color: #77767b",
+                            "class": "NSTextField",
+                            "y": 82
+                          },
+                          {
+                            "x": 0,
+                            "text": "Since the 11/14 update, tablets in the north site stop syncing after about ten minutes. A restart fixes it until the next shift. Three crews are affected.",
+                            "needed": {
+                              "height": 126,
+                              "width": 180
+                            },
+                            "width": 184,
+                            "height": 126,
+                            "intrinsic": {
+                              "height": 18,
+                              "width": 1108
+                            },
+                            "class": "NSTextField",
+                            "y": 124
+                          },
+                          {
+                            "x": 0,
+                            "text": "Waiting on",
+                            "needed": {
+                              "height": 18,
+                              "width": 89
+                            },
+                            "width": 184,
+                            "height": 18,
+                            "intrinsic": {
+                              "height": 18,
+                              "width": 89
+                            },
+                            "style": "font-weight: bold",
+                            "class": "NSTextField",
+                            "y": 256
+                          },
+                          {
+                            "x": 0,
+                            "text": "\u2022 TKT-1402 Monthly budget export times out (in progress)",
+                            "needed": {
+                              "height": 54,
+                              "width": 173
+                            },
+                            "width": 184,
+                            "height": 54,
+                            "intrinsic": {
+                              "height": 18,
+                              "width": 400
+                            },
+                            "class": "NSTextField",
+                            "y": 280
+                          },
+                          {
+                            "x": 0,
+                            "text": "\u2022 Vendor licence for the sync add-on \u00b7 by 2026-12-01 (condition 4) \u00b7 declined",
+                            "needed": {
+                              "height": 72,
+                              "width": 180
+                            },
+                            "width": 184,
+                            "height": 72,
+                            "intrinsic": {
+                              "height": 18,
+                              "width": 564
+                            },
+                            "style": "color: #c01c28",
+                            "class": "NSTextField",
+                            "y": 340
+                          },
+                          {
+                            "x": 0,
+                            "text": "It goes back to plan gate when they clear. B changes them.",
+                            "needed": {
+                              "height": 54,
+                              "width": 184
+                            },
+                            "width": 184,
+                            "height": 54,
+                            "intrinsic": {
+                              "height": 18,
+                              "width": 441
+                            },
+                            "style": "color: #77767b",
+                            "class": "NSTextField",
+                            "y": 418
+                          },
+                          {
+                            "x": 0,
+                            "text": "Blocks: TKT-1415",
+                            "needed": {
+                              "height": 18,
+                              "width": 121
+                            },
+                            "width": 184,
+                            "height": 18,
+                            "intrinsic": {
+                              "height": 18,
+                              "width": 121
+                            },
+                            "style": "color: #77767b",
+                            "class": "NSTextField",
+                            "y": 478
+                          }
+                        ],
+                        "class": "TRBoxView",
+                        "x": 0,
+                        "style": "flex-direction: column; row-gap: 6px; column-gap: 6px",
+                        "height": 496,
+                        "width": 184,
+                        "y": 0
+                      }
+                    ],
+                    "class": "TRBoxView",
+                    "x": 0,
+                    "style": "flex-direction: column",
+                    "height": 496,
+                    "width": 184,
+                    "y": 0
+                  }
+                ],
+                "width": 184,
+                "height": 364,
+                "style": "flex-grow: 1; flex-basis: 0px; min-width: 0px; min-height: 0px",
+                "class": "TRScrollBox",
+                "y": 8,
+                "overflow": "scroll"
+              },
+              {
+                "children": [
+                  {
+                    "x": 0,
+                    "text": "Ids to add, -id to remove, or a condition: 2283, -2290, Parts on order by 12/1, -c4",
+                    "needed": {
+                      "height": 72,
+                      "width": 172
+                    },
+                    "intrinsic": {
+                      "height": 18,
+                      "width": 597
+                    },
+                    "width": 184,
+                    "height": 18,
+                    "style": "height: 18px; color: #77767b",
+                    "class": "NSTextField",
+                    "y": 0,
+                    "id": "noteHint"
+                  },
+                  {
+                    "x": 0,
+                    "intrinsic": {
+                      "height": 34,
+                      "width": 20
+                    },
+                    "width": 184,
+                    "height": 24,
+                    "style": "height: 24px",
+                    "class": "NSTextField",
+                    "y": 18,
+                    "id": "note"
+                  }
+                ],
+                "class": "TRBoxView",
+                "x": 8,
+                "style": "flex-direction: column; flex-shrink: 0",
+                "height": 42,
+                "width": 184,
+                "y": 378
+              },
+              {
+                "x": 8,
+                "children": [
+                  {
+                    "x": 0,
+                    "width": 159,
+                    "height": 34,
+                    "intrinsic": {
+                      "height": 34,
+                      "width": 159
+                    },
+                    "style": "flex-shrink: 0",
+                    "class": "NSButton",
+                    "title": "Still blocked \u23ce",
+                    "y": 0
+                  },
+                  {
+                    "x": 167,
+                    "width": 218,
+                    "height": 34,
+                    "intrinsic": {
+                      "height": 34,
+                      "width": 218
+                    },
+                    "style": "flex-shrink: 0",
+                    "class": "NSButton",
+                    "title": "Go ahead without it G",
+                    "y": 0
+                  },
+                  {
+                    "x": 393,
+                    "width": 180,
+                    "height": 34,
+                    "intrinsic": {
+                      "height": 34,
+                      "width": 180
+                    },
+                    "style": "flex-shrink: 0",
+                    "class": "NSButton",
+                    "title": "Prerequisites\u2026 B",
+                    "y": 0
+                  }
+                ],
+                "width": 184,
+                "height": 34,
+                "style": "align-items: center; flex-shrink: 0; height: 34px; row-gap: 8px; column-gap: 8px",
+                "class": "TRBoxView",
+                "y": 426,
+                "id": "actions"
+              },
+              {
+                "children": [
+                  {
+                    "x": 3,
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "class": "NSTextView",
+                            "x": 0,
+                            "id": "composer",
+                            "height": 17,
+                            "width": 178,
+                            "y": 0
+                          }
+                        ],
+                        "class": "TRBoxView",
+                        "x": 0,
+                        "style": "flex-direction: column",
+                        "height": 144,
+                        "width": 178,
+                        "y": 0
+                      }
+                    ],
+                    "width": 178,
+                    "height": 144,
+                    "style": "flex-grow: 1; flex-basis: 0%; min-width: 0px; min-height: 0px",
+                    "class": "TRScrollBox",
+                    "y": 3,
+                    "overflow": "scroll"
+                  }
+                ],
+                "class": "TRBoxView",
+                "x": 8,
+                "style": "flex-shrink: 0; height: 150px; padding-left: 2px; border-left-width: 1px; padding-top: 2px; border-top-width: 1px; padding-right: 2px; border-right-width: 1px; padding-bottom: 2px; border-bottom-width: 1px; border-color: #c0bfbc",
+                "height": 150,
+                "width": 184,
+                "y": 466
+              }
+            ],
+            "width": 200,
+            "height": 624,
+            "style": "flex-direction: column; overflow: hidden; flex-grow: 1; flex-shrink: 0; flex-basis: 200px; min-width: 200px; padding-left: 8px; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; row-gap: 6px; column-gap: 6px",
+            "class": "TRBoxView",
+            "y": 0,
+            "overflow": "hidden"
+          }
+        ],
+        "width": 340,
+        "height": 624,
+        "style": "overflow: hidden; flex-grow: 1; flex-basis: 0px; min-height: 0px",
+        "class": "TRBoxView",
+        "y": 25,
+        "overflow": "hidden"
+      },
+      {
+        "class": "NSBox",
+        "x": 0,
+        "style": "align-self: stretch; flex-shrink: 0; min-width: 1px; min-height: 1px",
+        "height": 1,
+        "width": 340,
+        "y": 649
+      },
+      {
+        "children": [
+          {
+            "x": 8,
+            "text": "Prerequisites changed on TKT-1409: +2283 \u00b7 goes in 10 s",
+            "needed": {
+              "height": 18,
+              "width": 416
+            },
+            "intrinsic": {
+              "height": 18,
+              "width": 416
+            },
+            "width": 166,
+            "height": 18,
+            "style": "flex-grow: 1; flex-basis: 0px; min-width: 0px; color: #77767b",
+            "class": "NSTextField",
+            "y": 6,
+            "id": "undoLabel"
+          },
+          {
+            "x": 182,
+            "intrinsic": {
+              "height": 34,
+              "width": 153
+            },
+            "width": 150,
+            "height": 34,
+            "style": "flex-shrink: 0; width: 150px",
+            "class": "NSButton",
+            "title": "Undo (Ctrl+Z)",
+            "y": -2,
+            "id": "undo"
+          }
+        ],
+        "class": "TRBoxView",
+        "x": 0,
+        "style": "align-items: center; flex-shrink: 0; height: 30px; padding-left: 8px; padding-right: 8px; row-gap: 8px; column-gap: 8px",
+        "height": 30,
+        "width": 340,
+        "y": 650
+      }
+    ],
+    "width": 340,
+    "height": 680,
+    "style": "flex-direction: column; background-color: #ffffff",
+    "class": "TRBoxView",
+    "y": 0,
+    "id": "desk"
+  },
+  "trellis": "0.1",
+  "lint": [
+    {
+      "rule": "overflow",
+      "severity": "warning",
+      "message": "NSButton at root/0/1 (6,-5 86x34) overflows #pulse (340x24)",
+      "path": "root/0/1"
+    },
+    {
+      "rule": "offscreen",
+      "severity": "warning",
+      "message": "NSButton at root/0/1 (6,-5 86x34) extends outside the 340x680 viewport",
+      "path": "root/0/1"
+    },
+    {
+      "rule": "overflow",
+      "severity": "warning",
+      "message": "NSButton at root/0/2 (96,-5 137x34) overflows #pulse (340x24)",
+      "path": "root/0/2"
+    },
+    {
+      "rule": "offscreen",
+      "severity": "warning",
+      "message": "NSButton at root/0/2 (96,-5 137x34) extends outside the 340x680 viewport",
+      "path": "root/0/2"
+    },
+    {
+      "rule": "overflow",
+      "severity": "warning",
+      "message": "NSButton at root/0/3 (237,-5 120x34) overflows #pulse (340x24)",
+      "path": "root/0/3"
+    },
+    {
+      "rule": "offscreen",
+      "severity": "warning",
+      "message": "NSButton at root/0/3 (237,-5 120x34) extends outside the 340x680 viewport",
+      "path": "root/0/3"
+    },
+    {
+      "rule": "overflow",
+      "severity": "warning",
+      "message": "NSButton at root/0/4 (361,-5 125x34) overflows #pulse (340x24)",
+      "path": "root/0/4"
+    },
+    {
+      "rule": "offscreen",
+      "severity": "warning",
+      "message": "NSButton at root/0/4 (361,-5 125x34) extends outside the 340x680 viewport",
+      "path": "root/0/4"
+    },
+    {
+      "id": "filter",
+      "rule": "undersized",
+      "severity": "error",
+      "message": "#filter (NSTextField) is 258x24, smaller than its intrinsic 20x34",
+      "path": "root/2/0/0"
+    },
+    {
+      "rule": "clipped-text",
+      "severity": "error",
+      "message": "NSTextField at root/2/0/1/0/0/2/0: text needs 312x18, has 242x18",
+      "path": "root/2/0/1/0/0/2/0"
+    },
+    {
+      "rule": "clipped-text",
+      "severity": "error",
+      "message": "NSTextField at root/2/0/1/0/0/7/0: text needs 429x18, has 242x18",
+      "path": "root/2/0/1/0/0/7/0"
+    },
+    {
+      "id": "noteHint",
+      "rule": "clipped-text",
+      "severity": "error",
+      "message": "#noteHint: text needs 172x72, has 184x18",
+      "path": "root/2/1/1/0"
+    },
+    {
+      "id": "note",
+      "rule": "undersized",
+      "severity": "error",
+      "message": "#note (NSTextField) is 184x24, smaller than its intrinsic 20x34",
+      "path": "root/2/1/1/1"
+    },
+    {
+      "rule": "overflow",
+      "severity": "warning",
+      "message": "NSButton at root/2/1/2/1 (167,0 218x34) overflows #actions (184x34)",
+      "path": "root/2/1/2/1"
+    },
+    {
+      "rule": "overflow",
+      "severity": "warning",
+      "message": "NSButton at root/2/1/2/2 (393,0 180x34) overflows #actions (184x34)",
+      "path": "root/2/1/2/2"
+    },
+    {
+      "id": "undoLabel",
+      "rule": "clipped-text",
+      "severity": "error",
+      "message": "#undoLabel: text needs 416x18, has 166x18",
+      "path": "root/4/0"
+    },
+    {
+      "id": "undo",
+      "rule": "overflow",
+      "severity": "warning",
+      "message": "#undo (182,-2 150x34) overflows TRBoxView at root/4 (340x30)",
+      "path": "root/4/1"
+    },
+    {
+      "id": "undo",
+      "rule": "undersized",
+      "severity": "error",
+      "message": "#undo (NSButton) is 150x34, smaller than its intrinsic 153x34",
+      "path": "root/4/1"
+    },
+    {
+      "id": "undo",
+      "rule": "offscreen",
+      "severity": "warning",
+      "message": "#undo (182,648 150x34) extends outside the 340x680 viewport",
+      "path": "root/4/1"
+    }
+  ],
+  "source": "dogfood/tickets/before-Blocked.trellis",
+  "viewport": {
+    "scale": 1,
+    "height": 680,
+    "width": 340
+  },
+  "theme": "Adwaita"
+}

@@ -1,0 +1,138 @@
+<!-- owner: AIMTriageDeskView -->
+<!-- AIManager's Tickets triage desk, Intake batch dispatch: the proposal.
+     Same desk as Blocked.trellis. Seven Intake tickets are in the batch
+     (Shift+J/K); the card lists them, the action bar dispatches, and the
+     shared undo bar carries the 10 s hold.
+     - Batch members are marked in the rail (a ✓ and a tint), so it's
+       visible what Shift+J/K has collected.
+     - The batch list scrolls inside the card; the action bar and the undo
+       bar stay fixed at every width.
+     - The note field and composer are hidden in batch mode, as in the app.
+     - The undo text here is the hold-state text, shown with the batch card
+       so its wrapping can be checked at 340px. -->
+<column id="desk" class="desk">
+  <row id="pulse" class="pulse">
+    <button id="railToggle" class="narrow-only" action="toggleRail:">☰ Rail · 7 in batch</button>
+    <button class="chip urgent" action="filterPulse:">P1: 1</button>
+    <button class="chip" action="filterPulse:">Need you: 6</button>
+    <button class="chip" action="filterPulse:">Intake: 9</button>
+    <button class="chip" action="filterPulse:">Blocked: 1</button>
+  </row>
+  <separator/>
+
+  <box class="body">
+    <column class="railpane">
+      <field id="filter" placeholder="Filter tickets"/>
+      <scroll id="rail" class="rail">
+        <column class="rail-list">
+          <label class="section" no-outlet="yes">Your move 9</label>
+          <label class="group" no-outlet="yes">Intake · 7 in batch</label>
+          <column class="row inbatch"><text class="row-title">✓ 2401  Weekly report shows last month</text><label class="row-meta">Bob Example · 20m</label></column>
+          <column class="row inbatch"><text class="row-title">✓ 2403  VPN drops on the office Wi-Fi</text><label class="row-meta">Carol Example · 35m</label></column>
+          <column class="row inbatch"><text class="row-title">✓ 2404  New hire needs agent-b access</text><label class="row-meta">HR · 1h</label></column>
+          <column class="row inbatch"><text class="row-title">✓ 2405  Printer queue stuck in Ops</text><label class="row-meta">Alice Example · 1h</label></column>
+          <column class="row inbatch-selected"><text class="row-title">✓ 2406  Installer asks for admin</text><label class="row-meta">Dave Example · 2h</label></column>
+          <column class="row inbatch"><text class="row-title">✓ 2407  Packager build slow on CI</text><label class="row-meta">agent-a · 2h</label></column>
+          <column class="row inbatch"><text class="row-title">✓ 2408  Dashboard tiles overlap</text><label class="row-meta">Bob Example · 3h</label></column>
+          <column class="row"><text class="row-title">2410  Laptop battery swelling</text><label class="row-meta">Facilities · 3h</label></column>
+          <column class="row"><text class="row-title">2411  Request: second monitor</text><label class="row-meta">Carol Example · 4h</label></column>
+          <label class="section" no-outlet="yes">▸ With agents 4</label>
+          <label class="section" no-outlet="yes">▸ Blocked 1</label>
+        </column>
+      </scroll>
+    </column>
+
+    <column class="main">
+      <scroll class="cardscroll">
+        <column class="cardtext">
+          <text id="card" class="batch-title">Batch dispatch · 7 tickets</text>
+          <text class="muted">Shift+J/K adds or removes a ticket. ⏎ sends each to its suggested agent; flagged ones are left out.</text>
+          <column class="item"><text class="item-title">TKT-1401  Weekly report shows last month</text><text class="item-line">→ agent-c   ✓ enough detail</text></column>
+          <column class="item"><text class="item-title">TKT-1403  VPN drops on the office Wi-Fi</text><text class="item-line warn">→ agent-c   ✗ enough detail</text></column>
+          <column class="item"><text class="item-title">TKT-1404  New hire needs agent-b access</text><text class="item-line">→ agent-b   ✓ enough detail</text></column>
+          <column class="item"><text class="item-title">TKT-1405  Printer queue stuck in Ops</text><text class="item-line muted">no suggested agent: left out</text></column>
+          <column class="item"><text class="item-title">TKT-1406  Installer asks for admin</text><text class="item-line">→ agent-a   ✓ enough detail</text></column>
+          <column class="item"><text class="item-title">TKT-1407  Packager build slow on CI</text><text class="item-line">→ agent-a   ✓ enough detail</text></column>
+          <column class="item"><text class="item-title">TKT-1408  Dashboard tiles overlap</text><text class="item-line muted">reading…</text></column>
+        </column>
+      </scroll>
+
+      <column class="note batch-hidden">
+        <text id="noteHint" class="muted">Hint</text>
+        <field id="note" placeholder="Note"/>
+      </column>
+
+      <row id="actions" class="actions">
+        <!-- Buttons are added in code; the batch set. -->
+        <button class="wide-only" action="dispatchBatch:" default="yes">Dispatch 5 to their suggested agents ⏎</button>
+        <!-- Below 640px the long label doesn't fit (364px of 316). -->
+        <button class="narrow-only" action="dispatchBatch:" default="yes">Dispatch 5 ⏎</button>
+        <button action="endBatch:">End the batch Esc</button>
+      </row>
+
+      <box class="composerbox batch-hidden"><scroll class="composer"><view id="composer" type="NSTextView"/></scroll></box>
+    </column>
+  </box>
+
+  <separator/>
+  <row class="undo">
+    <text id="undoLabel" class="muted grow">Dispatch 5: TKT-1401 → agent-c, TKT-1404 → agent-b, TKT-1406 → agent-a, TKT-1407 → agent-a, … · goes in 10 s</text>
+    <button id="undo" action="undo:">Undo (Ctrl+Z)</button>
+  </row>
+</column>
+
+<style>
+  .desk      { container-type: inline-size; background-color: #ffffff; }
+  .pulse     { flex-wrap: wrap; gap: 6px; padding: 8px 12px; align-items: center; }
+  .narrow-only { display: none; }
+  .body      { flex: 1; min-height: 0; flex-direction: row; }
+
+  .railpane  { flex: none; width: 270px; gap: 8px; padding: 10px 10px 0 12px;
+               background-color: #f6f5f4; }
+  .rail      { flex: 1; min-height: 0; }
+  .rail-list { gap: 4px; padding-bottom: 10px; }
+  .section   { color: #5e5c64; font-weight: bold; margin-top: 8px; }
+  .group     { color: #5e5c64; margin-top: 2px; }
+  .row       { gap: 1px; padding: 5px 8px; border-radius: 6px; }
+  .row-title { font-weight: bold; }
+  .row-meta  { color: #77767b; }
+  .selected  { background-color: #dbe7fa; }
+
+  .main      { flex: 1; min-width: 0; gap: 10px; padding: 12px 16px 12px 16px; }
+  .cardscroll { flex: 1; min-height: 120px; }
+  .cardtext  { gap: 8px; }
+  .card-title { font-size: 16px; font-weight: bold; }
+  .heading   { font-weight: bold; margin-top: 6px; }
+  .muted     { color: #77767b; }
+  .warn      { color: #c01c28; }
+  .note      { gap: 4px; }
+  .actions   { flex-wrap: wrap; gap: 8px; align-items: center; }
+  .composerbox { border: 1px; border-color: #c0bfbc; border-radius: 6px; padding: 4px; }
+  .composer  { flex: 1; min-height: 96px; }
+
+  /* Batch mode. */
+  .batch-hidden { display: none; }
+  .batch-title { font-size: 18px; font-weight: bold; }
+  .item      { gap: 2px; }
+  .item-title { font-weight: bold; }
+  .item-line { margin-left: 16px; }
+  .inbatch   { background-color: #eef3fc; }
+  .inbatch-selected { background-color: #dbe7fa; }
+  .undo      { gap: 10px; padding: 8px 12px 10px 12px; align-items: center; }
+  .grow      { flex: 1; min-width: 0; }
+
+  /* Narrow: the rail hides behind ☰; the composer gets shorter. */
+  @container (max-width: 639px) {
+    .narrow-only { display: flex; }
+    .railpane    { display: none; }
+    /* The other counts are on the rail's section headers, behind ☰. */
+    .chip        { display: none; }
+    .wide-only   { display: none; }
+    .urgent      { display: flex; }
+    .main        { padding: 10px 12px; }
+    .composer    { min-height: 56px; }
+    /* The undo text gets the full width; the button goes under it. */
+    .undo        { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; }
+    .grow        { flex: 1 1 100%; }
+  }
+</style>

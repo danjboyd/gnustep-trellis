@@ -1,0 +1,120 @@
+<!-- owner: AIMTriageDeskView -->
+<!-- AIManager's Tickets desk (Batch state) as it lays out today, approximated
+     in Trellis for a before/after comparison (from agent-tickets'
+     description of AIMTriageDeskView -layout). Not a proposal. -->
+<column id="desk" class="desk">
+  <row id="pulse" class="pulse">
+    <button id="railToggle" class="narrow-only" action="toggleRail:">☰ Rail · 7 in batch</button>
+    <button class="chip urgent" action="filterPulse:">P1: 1</button>
+    <button class="chip" action="filterPulse:">Need you: 6</button>
+    <button class="chip" action="filterPulse:">Intake: 9</button>
+    <button class="chip" action="filterPulse:">Blocked: 1</button>
+  </row>
+  <separator/>
+
+  <box class="body">
+    <column class="railpane">
+      <field id="filter" placeholder="Filter tickets"/>
+      <scroll id="rail" class="rail">
+        <column class="rail-list">
+          <label class="section" no-outlet="yes">YOUR MOVE 9</label>
+          <label class="group" no-outlet="yes">Intake · 7 in batch</label>
+          <column class="row inbatch"><label class="row-title">✓ 2401  Weekly report shows last month</label><label class="row-meta">Bob Example · 20m</label></column>
+          <column class="row inbatch"><label class="row-title">✓ 2403  VPN drops on the office Wi-Fi</label><label class="row-meta">Carol Example · 35m</label></column>
+          <column class="row inbatch"><label class="row-title">✓ 2404  New hire needs agent-b access</label><label class="row-meta">HR · 1h</label></column>
+          <column class="row inbatch"><label class="row-title">✓ 2405  Printer queue stuck in Ops</label><label class="row-meta">Alice Example · 1h</label></column>
+          <column class="row inbatch-selected"><label class="row-title">✓ 2406  Installer asks for admin</label><label class="row-meta">Dave Example · 2h</label></column>
+          <column class="row inbatch"><label class="row-title">✓ 2407  Packager build slow on CI</label><label class="row-meta">agent-a · 2h</label></column>
+          <column class="row inbatch"><label class="row-title">✓ 2408  Dashboard tiles overlap</label><label class="row-meta">Bob Example · 3h</label></column>
+          <column class="row"><label class="row-title">2410  Laptop battery swelling</label><label class="row-meta">Facilities · 3h</label></column>
+          <column class="row"><label class="row-title">2411  Request: second monitor</label><label class="row-meta">Carol Example · 4h</label></column>
+          <label class="section" no-outlet="yes">▸ WITH AGENTS 4</label>
+          <label class="section" no-outlet="yes">▸ BLOCKED 1</label>
+        </column>
+      </scroll>
+    </column>
+
+    <column class="main">
+      <scroll class="cardscroll">
+        <column class="cardtext">
+          <text id="card" class="batch-title">Batch dispatch · 7 tickets</text>
+          <text class="muted">Shift+J/K adds or removes a ticket. ⏎ sends each to its suggested agent; flagged ones are left out.</text>
+          <column class="item"><text class="item-title">TKT-1401  Weekly report shows last month</text><text class="item-line">→ agent-c   ✓ enough detail</text></column>
+          <column class="item"><text class="item-title">TKT-1403  VPN drops on the office Wi-Fi</text><text class="item-line warn">→ agent-c   ✗ enough detail</text></column>
+          <column class="item"><text class="item-title">TKT-1404  New hire needs agent-b access</text><text class="item-line">→ agent-b   ✓ enough detail</text></column>
+          <column class="item"><text class="item-title">TKT-1405  Printer queue stuck in Ops</text><text class="item-line muted">no suggested agent: left out</text></column>
+          <column class="item"><text class="item-title">TKT-1406  Installer asks for admin</text><text class="item-line">→ agent-a   ✓ enough detail</text></column>
+          <column class="item"><text class="item-title">TKT-1407  Packager build slow on CI</text><text class="item-line">→ agent-a   ✓ enough detail</text></column>
+          <column class="item"><text class="item-title">TKT-1408  Dashboard tiles overlap</text><text class="item-line muted">reading…</text></column>
+        </column>
+      </scroll>
+
+      <column class="note batch-hidden">
+        <text id="noteHint" class="muted">Hint</text>
+        <field id="note" placeholder="Note"/>
+      </column>
+
+      <row id="actions" class="actions">
+        <!-- Buttons are added in code; the batch set. -->
+        <button class="wide-only" action="dispatchBatch:" default="yes">Dispatch 5 to their suggested agents ⏎</button>
+        <button action="endBatch:">End the batch Esc</button>
+      </row>
+
+      <box class="composerbox batch-hidden"><scroll class="composer"><view id="composer" type="NSTextView"/></scroll></box>
+    </column>
+  </box>
+
+  <separator/>
+  <row class="undo">
+    <label id="undoLabel" class="muted">Dispatch 5: TKT-1401 → agent-c, TKT-1404 → agent-b, TKT-1406 → agent-a, TKT-1407 → agent-a, … · goes in 10 s</label>
+    <button id="undo" action="undo:">Undo (Ctrl+Z)</button>
+  </row>
+</column>
+
+<style>
+  /* Today's AIMTriageDeskView -layout, approximated: fixed constants
+     (RailWidth 270, PulseHeight 24, BarHeight 34, UndoHeight 30,
+     ComposeHeight 150), the card at least 200 wide, nothing wraps. What
+     doesn't fit is clipped; the undo bar stays pinned. */
+  .desk      { background-color: #ffffff; }
+  .desk > *  { flex-shrink: 0; }
+  .pulse     { height: 24px; gap: 4px; padding: 0 6px; align-items: center; }
+  .pulse > * { flex-shrink: 0; }
+  .narrow-only { display: none; }
+  .body      { flex: 1 1 0px; min-height: 0; flex-direction: row; overflow: hidden; }
+  .railpane  { flex: none; width: 270px; gap: 6px; padding: 6px; background-color: #f6f5f4; }
+  .railpane > * { flex-shrink: 0; }
+  #filter    { height: 24px; }
+  .rail      { flex: 1 1 0px; min-height: 0; }
+  .rail-list { gap: 0px; }
+  .section   { color: #77767b; font-weight: bold; height: 22px; margin-top: 6px; }
+  .group     { color: #77767b; height: 20px; }
+  .row       { height: 38px; padding: 2px 8px; }
+  .row-title { font-weight: bold; }
+  .row-meta  { color: #77767b; }
+  .selected, .inbatch-selected { background-color: #dbe7fa; }
+  .main      { flex: 1 0 200px; min-width: 200px; gap: 6px; padding: 8px; overflow: hidden; }
+  .main > *  { flex-shrink: 0; }
+  .main > .cardscroll { flex: 1 1 0px; min-height: 0; }
+  .cardtext  { gap: 6px; }
+  .card-title, .batch-title { font-size: 16px; font-weight: bold; }
+  .heading   { font-weight: bold; }
+  .item-title { font-weight: bold; }
+  .item-line { margin-left: 16px; }
+  .muted     { color: #77767b; }
+  .warn      { color: #c01c28; }
+  .note      { gap: 0px; }
+  #noteHint  { height: 18px; }
+  #note      { height: 24px; }
+  .actions   { height: 34px; gap: 8px; align-items: center; }
+  .actions > * { flex-shrink: 0; }
+  .wide-only { display: flex; }
+  .composerbox { height: 150px; border: 1px; border-color: #c0bfbc; padding: 2px; }
+  .composer  { flex: 1; }
+  .batch-hidden { display: none; }
+  .undo      { height: 30px; gap: 8px; padding: 0 8px; align-items: center; }
+  .undo > *  { flex-shrink: 0; }
+  /* The app's undo label truncates beside the fixed 150pt Undo button. */
+  #undoLabel { flex: 1 1 0px; min-width: 0; }
+  #undo      { width: 150px; }
+</style>

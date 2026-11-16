@@ -1,0 +1,127 @@
+<!-- owner: AIMTriageDeskView -->
+<!-- AIManager's Tickets triage desk, Blocked state: the proposal.
+     The rail's Blocked section is open with its one ticket selected; the
+     card is a declined-prerequisite card with the B note field open, so
+     "Still blocked" (keep) is the primary action.
+     - The rail is 270px beside the card from 640px up. Below that it is
+       hidden and the pulse strip's ☰ button opens it (as an overlay in the
+       app), so the card, the primary action and the undo bar get the width.
+     - Below 640px the pulse strip keeps ☰ and the urgent P1 chip; the
+       other counts are on the rail's section headers.
+     - No fixed control heights: the pulse strip, hint line, note field,
+       action bar and undo bar take their controls' sizes, and rows wrap.
+     - The card (and its blocker list) scrolls; the note field, the action
+       bar and the undo bar never scroll away.
+     - Section labels are quiet sentence case, as on the ask screen. -->
+<column id="desk" class="desk">
+  <row id="pulse" class="pulse">
+    <button id="railToggle" class="narrow-only" action="toggleRail:">☰ Rail</button>
+    <button class="chip urgent" action="filterPulse:">P1: 1</button>
+    <button class="chip" action="filterPulse:">Need you: 6</button>
+    <button class="chip" action="filterPulse:">Replies: 2</button>
+    <button class="chip" action="filterPulse:">Blocked: 1</button>
+  </row>
+  <separator/>
+
+  <box class="body">
+    <column class="railpane">
+      <field id="filter" placeholder="Filter tickets"/>
+      <scroll id="rail" class="rail">
+        <column class="rail-list">
+          <label class="section" no-outlet="yes">Your move 6</label>
+          <label class="group" no-outlet="yes">Verify</label>
+          <column class="row"><text class="row-title">2396  Fuel log export missing columns</text><label class="row-meta">Bob Example · 2h ●</label></column>
+          <column class="row"><text class="row-title">2398  Map tiles blank offline</text><label class="row-meta">Carol Example · 3h</label></column>
+          <label class="section" no-outlet="yes">▸ With agents 4</label>
+          <label class="section" no-outlet="yes">▸ With requesters 2</label>
+          <label class="section" no-outlet="yes">▾ Blocked 1</label>
+          <column class="row selected"><text class="row-title">2409  Field tablets can't sync after the 11/14 update</text><label class="row-meta">Alice Example · 5h ◷</label></column>
+          <label class="section" no-outlet="yes">▸ Projects 3</label>
+          <label class="section" no-outlet="yes">▸ Snoozed 1</label>
+        </column>
+      </scroll>
+    </column>
+
+    <column class="main">
+      <scroll class="cardscroll">
+        <column class="cardtext">
+          <text id="card" class="card-title">TKT-1409  Field tablets can't sync after the 11/14 update</text>
+          <text class="muted">Alice Example · Field Ops · P2 · opened 5h ago</text>
+          <text>Since the 11/14 update, tablets in the north site stop syncing after about ten minutes. A restart fixes it until the next shift. Three crews are affected.</text>
+          <label class="heading" no-outlet="yes">Waiting on</label>
+          <text>• TKT-1402 Monthly budget export times out (in progress)</text>
+          <text class="warn">• Vendor licence for the sync add-on · by 2026-12-01 (condition 4) · declined</text>
+          <text class="muted">It goes back to plan gate when they clear. B changes them.</text>
+          <text class="muted">Blocks: TKT-1415</text>
+        </column>
+      </scroll>
+
+      <column class="note">
+        <text id="noteHint" class="muted">Ids to add, -id to remove, or a condition: 2283, -2290, Parts on order by 12/1, -c4</text>
+        <field id="note" placeholder="Prerequisites"/>
+      </column>
+
+      <row id="actions" class="actions">
+        <!-- Buttons are added in code; the declined-prerequisite set. -->
+        <button action="stillBlocked:" default="yes">Still blocked ⏎</button>
+        <button action="goAheadWithout:">Go ahead without it G</button>
+        <button action="prerequisites:">Prerequisites… B</button>
+      </row>
+
+      <box class="composerbox"><scroll class="composer"><view id="composer" type="NSTextView"/></scroll></box>
+    </column>
+  </box>
+
+  <separator/>
+  <row class="undo">
+    <text id="undoLabel" class="muted grow">Prerequisites changed on TKT-1409: +2283 · goes in 10 s</text>
+    <button id="undo" action="undo:">Undo (Ctrl+Z)</button>
+  </row>
+</column>
+
+<style>
+  .desk      { container-type: inline-size; background-color: #ffffff; }
+  .pulse     { flex-wrap: wrap; gap: 6px; padding: 8px 12px; align-items: center; }
+  .narrow-only { display: none; }
+  .body      { flex: 1; min-height: 0; flex-direction: row; }
+
+  .railpane  { flex: none; width: 270px; gap: 8px; padding: 10px 10px 0 12px;
+               background-color: #f6f5f4; }
+  .rail      { flex: 1; min-height: 0; }
+  .rail-list { gap: 4px; padding-bottom: 10px; }
+  .section   { color: #5e5c64; font-weight: bold; margin-top: 8px; }
+  .group     { color: #5e5c64; margin-top: 2px; }
+  .row       { gap: 1px; padding: 5px 8px; border-radius: 6px; }
+  .row-title { font-weight: bold; }
+  .row-meta  { color: #77767b; }
+  .selected  { background-color: #dbe7fa; }
+
+  .main      { flex: 1; min-width: 0; gap: 10px; padding: 12px 16px 12px 16px; }
+  .cardscroll { flex: 1; min-height: 120px; }
+  .cardtext  { gap: 8px; }
+  .card-title { font-size: 16px; font-weight: bold; }
+  .heading   { font-weight: bold; margin-top: 6px; }
+  .muted     { color: #77767b; }
+  .warn      { color: #c01c28; }
+  .note      { gap: 4px; }
+  .actions   { flex-wrap: wrap; gap: 8px; align-items: center; }
+  .composerbox { border: 1px; border-color: #c0bfbc; border-radius: 6px; padding: 4px; }
+  .composer  { flex: 1; min-height: 96px; }
+
+  .undo      { gap: 10px; padding: 8px 12px 10px 12px; align-items: center; }
+  .grow      { flex: 1; min-width: 0; }
+
+  /* Narrow: the rail hides behind ☰; the composer gets shorter. */
+  @container (max-width: 639px) {
+    .narrow-only { display: flex; }
+    .railpane    { display: none; }
+    /* The other counts are on the rail's section headers, behind ☰. */
+    .chip        { display: none; }
+    .urgent      { display: flex; }
+    .main        { padding: 10px 12px; }
+    .composer    { min-height: 56px; }
+    /* The undo text gets the full width; the button goes under it. */
+    .undo        { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; }
+    .grow        { flex: 1 1 100%; }
+  }
+</style>

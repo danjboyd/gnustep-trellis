@@ -1751,5 +1751,67 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_exact_area_name_before_suffix",
+  "note": "CSS Grid 8.3.1: grid-column: a-start names the area 'a-start' when one exists",
+  "root": {
+   "style": {
+    "display": "grid",
+    "width": 350,
+    "justifyContent": "start",
+    "gridTemplateColumns": "50px 100px 200px",
+    "gridTemplateRows": "50px 100px",
+    "gridTemplateAreas": "\". a-start a-start\" \"c a-end a-end\""
+   },
+   "children": [
+    {
+     "style": {
+      "gridColumn": "a-start",
+      "gridRow": "a-end"
+     }
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "x": 50,
+     "width": 300,
+     "y": 50,
+     "height": 100
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/grid_abspos_overconstrained_rtl_keeps_right",
+  "note": "CSS 2 10.3.7: an over-constrained abspos box in an rtl grid keeps right",
+  "direction": "rtl",
+  "root": {
+   "style": {
+    "display": "grid",
+    "width": 200,
+    "height": 100
+   },
+   "children": [
+    {
+     "style": {
+      "position": "absolute",
+      "width": 100,
+      "left": 10,
+      "right": 30,
+      "height": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "x": 70
+    }
+   ]
+  }
  }
 ]

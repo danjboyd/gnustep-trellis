@@ -462,7 +462,10 @@ static BOOL TRResolveLine(TRLine l, NSString *name, NSInteger explicitCount, NSD
     {
       NSString *key = name;
       NSString *suffix = isStart ? @"-start" : @"-end";
-      if ([key hasSuffix: @"-start"] || [key hasSuffix: @"-end"])
+      /* An area named exactly so comes first (its implicit name-start and
+         name-end lines, CSS Grid 8.3.1); only then is a -start/-end
+         suffix read as naming another area's edge. */
+      if (areaLines[key] == nil && ([key hasSuffix: @"-start"] || [key hasSuffix: @"-end"]))
         {
           suffix = [key hasSuffix: @"-start"] ? @"-start" : @"-end";
           key = [key substringToIndex: [key length] - [suffix length]];
@@ -1386,7 +1389,10 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
               if (isnan(h)) h = sz.height;
             }
           TRLayoutNode(c, w, h, TRMeasureModeExactly, TRMeasureModeExactly, cbW, cbH, YES, dir);
-          double x = !isnan(L) ? cbX + L : (!isnan(R) ? cbX + cbW - R - w : (rtl ? cbX + cbW - w : cbX));
+          /* Over-constrained (both insets and a width): the containing
+             block's direction decides, so rtl keeps right (CSS 2 10.3.7). */
+          BOOL useRight = !isnan(R) && (isnan(L) || rtl);
+          double x = useRight ? cbX + cbW - R - w : (!isnan(L) ? cbX + L : (rtl ? cbX + cbW - w : cbX));
           double y = !isnan(T) ? cbY + T : (!isnan(B) ? cbY + cbH - B - h : cbY);
           c->_rawFrame = TRRectMake(x, y, w, h);
           c->_lineIndex = -1;

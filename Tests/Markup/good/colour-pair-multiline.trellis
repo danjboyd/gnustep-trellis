@@ -1,0 +1,11 @@
+<!-- A fixed text colour on a fixed background declared on its own line
+     inside the rule: no colour-pair warning (trellis-lint used to miss
+     declarations that started after a newline). -->
+<row class="bar"><label class="on-bar">Status</label></row>
+<style>
+  .bar    { padding: 8px;
+            background-color: #1c1d1f; }
+  .on-bar {
+    color: #e4e5e8;
+  }
+</style>

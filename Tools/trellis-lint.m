@@ -88,9 +88,9 @@ static NSDictionary *TRColourDecls(TRMarkupDocument *doc, TRMarkupElement *e)
           NSRange colon = [decl rangeOfString: @":"];
           if (colon.location == NSNotFound) continue;
           NSString *k = [[[decl substringToIndex: colon.location] stringByTrimmingCharactersInSet:
-                           [NSCharacterSet whitespaceCharacterSet]] lowercaseString];
+                           [NSCharacterSet whitespaceAndNewlineCharacterSet]] lowercaseString];
           NSString *v = [[[decl substringFromIndex: NSMaxRange(colon)] stringByTrimmingCharactersInSet:
-                           [NSCharacterSet whitespaceCharacterSet]] lowercaseString];
+                           [NSCharacterSet whitespaceAndNewlineCharacterSet]] lowercaseString];
           if ([k isEqualToString: @"background"]) k = @"background-color";
           if ([k isEqualToString: @"background-color"] || [k isEqualToString: @"color"]) d[k] = v;
         }

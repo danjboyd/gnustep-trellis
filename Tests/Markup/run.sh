@@ -13,4 +13,14 @@ for f in Tests/Markup/bad/*.trellis; do
   fi
 done
 echo "markup error cases: $((n-fail))/$n"
-[ $fail -eq 0 ]
+# Each good/*.trellis must lint with no errors and no warnings.
+g=0; gfail=0
+for f in Tests/Markup/good/*.trellis; do
+  g=$((g+1))
+  out=$($LINT "$f" 2>&1)
+  if [ $? -ne 0 ] || grep -qE "(error|warning) \[" <<<"$out"; then
+    echo "FAIL $f: wanted no findings, got: $out"; gfail=$((gfail+1))
+  fi
+done
+echo "markup clean cases: $((g-gfail))/$g"
+[ $fail -eq 0 ] && [ $gfail -eq 0 ]

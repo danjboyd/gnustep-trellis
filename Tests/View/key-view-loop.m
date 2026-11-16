@@ -26,8 +26,8 @@ static NSString *Loop(TRBoxView *box)
   NSView *first = box.firstKeyView, *v = first;
   for (int i = 0; v != nil && i < 32; i++)
     {
-      /* The chain wraps through the outermost box (last -> box -> first). */
-      if (v == box) { v = [v nextKeyView]; if (v == first) break; continue; }
+      /* On GNUstep the chain wraps through a sentinel outside the tree. */
+      if (![v isDescendantOf: box]) { v = [v nextKeyView]; if (v == first) break; continue; }
       [ids addObject: [v identifier] ?: @"?"];
       v = [v nextKeyView];
       if (v == first) break;

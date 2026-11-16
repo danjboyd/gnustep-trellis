@@ -22,19 +22,24 @@ if [ "$(uname)" != Darwin ]; then
     exit 1
   fi
 fi
-render() {  # file appearance -> prints the number of low-contrast findings
-  local f=$1 ap=$2 sample=""
+render() {  # file appearance -> prints the number of low-contrast findings, or CRASH
+  local f=$1 ap=$2 sample="" out rc
   [ -f "${f%.trellis}.sample.json" ] && sample="--sample ${f%.trellis}.sample.json"
-  scripts/run-headless.sh obj/trellis-render "$f" $sample --widths 340,900 --height 680 \
-      --theme Adwaita --appearance "$ap" --lint 2>&1 | grep -c "low-contrast"
+  out=$(scripts/run-headless.sh obj/trellis-render "$f" $sample --widths 340,900 --height 680 \
+      --theme Adwaita --appearance "$ap" --lint 2>&1)
+  rc=$?
+  # A crash prints no findings, so check the exit status and the summary line.
+  if [ $rc -ne 0 ] || ! grep -q "lint finding(s)" <<<"$out"; then echo "CRASH(rc=$rc)"; return; fi
+  grep -c "low-contrast" <<<"$out"
 }
 for f in Examples/TrellisDemo/*.trellis dogfood/AskDetail.trellis dogfood/tickets/Blocked.trellis dogfood/tickets/Batch.trellis dogfood/work/Work.trellis Tests/View/mark.trellis; do
   for ap in light dark; do
     n=$(render "$f" $ap)
-    if [ "$n" != 0 ]; then echo "FAIL $f ($ap): $n low-contrast finding(s)"; fail=1; fi
+    if [ "${n#CRASH}" != "$n" ]; then echo "FAIL $f ($ap): trellis-render $n"; fail=1
+    elif [ "$n" != 0 ]; then echo "FAIL $f ($ap): $n low-contrast finding(s)"; fail=1; fi
   done
 done
 n=$(render Tests/View/fixed-background.trellis dark)
-if [ "$n" = 0 ]; then echo "FAIL fixed-background (dark): expected low-contrast"; fail=1; fi
+if [ "$n" = 0 ] || [ "${n#CRASH}" != "$n" ]; then echo "FAIL fixed-background (dark): expected low-contrast, got $n"; fail=1; fi
 [ $fail = 0 ] && echo "APPEARANCE OK"
 exit $fail

@@ -242,6 +242,52 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
 @implementation TRWeakView
 @end
 
+#ifdef GNUSTEP
+/* The wrap point of a managed key-view chain on GNUstep: last -> sentinel
+   -> first. GNUstep's -nextValidKeyView walks nextKeyView until it finds
+   a view that can become key, nil or its start, so a closed ring whose
+   members are all hidden or disabled made it spin. The sentinel leads
+   back in only while a member can take focus, and is nil otherwise.
+   Its getters never return NSView's raw link, only the box's __weak
+   first/last (nil for a view being freed): GNUstep's -dealloc calls
+   -nextKeyView on neighbours, and ARC would retain and autorelease a
+   dying view on the way out. It is never added to a window. */
+@interface TRKeyLoopSentinel : NSView
+{
+@public
+  NSArray *members;              /* TRWeakView, shared with the box */
+  __weak NSView *first, *last;
+  BOOL tearingDown;
+}
+@end
+
+@implementation TRKeyLoopSentinel
+- (void)dealloc { tearingDown = YES; }
+- (BOOL)acceptsFirstResponder { return NO; }
+- (BOOL)hasValidMember
+{
+  for (TRWeakView *w in members)
+    {
+      NSView *v = w->view;
+      if (v != nil && [v canBecomeKeyView]) return YES;
+    }
+  return NO;
+}
+- (NSView *)nextKeyView
+{
+  if (tearingDown) return nil;
+  NSView *f = first;
+  return (f != nil && [self hasValidMember]) ? f : nil;
+}
+- (NSView *)previousKeyView
+{
+  if (tearingDown) return nil;
+  NSView *l = last;
+  return (l != nil && [self hasValidMember]) ? l : nil;
+}
+@end
+#endif
+
 @implementation TRLayoutTrigger
 - (void)fire
 {
@@ -266,6 +312,9 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
   __weak NSView *_firstKeyView;
   __weak NSView *_lastKeyView;
   NSMutableArray *_keyLoopViews;  /* TRWeakView: the views linked last time */
+#ifdef GNUSTEP
+  TRKeyLoopSentinel *_keyLoopSentinel;
+#endif
 }
 
 + (instancetype)boxWithStyle:(NSString *)declarations
@@ -552,7 +601,10 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
       _keyLoopViews = nil;
       _firstKeyView = nil;
       _lastKeyView = nil;
-      [super setNextKeyView: nil];
+#ifdef GNUSTEP
+      [_keyLoopSentinel setNextKeyView: nil];
+      _keyLoopSentinel = nil;
+#endif
     }
 }
 - (NSView *)firstKeyView { return _firstKeyView; }
@@ -611,19 +663,22 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
     }
   if (_keyLoopViews == nil) _keyLoopViews = [NSMutableArray array];
   [_keyLoopViews removeAllObjects];
-  /* An open chain that wraps through this box: last -> box -> first.
-     The box's -nextKeyView / -previousKeyView lead back in only while a
-     member can become key, so GNUstep's -nextValidKeyView (which walks
-     until it finds a valid view, nil or its start) can't spin forever
-     on a ring whose members are all hidden or disabled. */
+  /* GNUstep: an open chain that wraps through a sentinel (see
+     TRKeyLoopSentinel). Cocoa: a closed ring; AppKit's search stops by
+     itself, and its bookkeeping relies on the plain getters. */
   NSUInteger n = [ordered count];
+#ifdef GNUSTEP
+  if (_keyLoopSentinel == nil && n > 0)
+    _keyLoopSentinel = [[TRKeyLoopSentinel alloc] initWithFrame: NSZeroRect];
+  if (_keyLoopSentinel != nil) _keyLoopSentinel->members = _keyLoopViews;
+#endif
   for (NSUInteger i = 0; i < n; i++)
     {
       TRWeakView *w = [TRWeakView new];
       w->view = ordered[i];
       [_keyLoopViews addObject: w];
 #ifdef GNUSTEP
-      [ordered[i] setNextKeyView: (i + 1 < n) ? ordered[i + 1] : (NSView *)self];
+      [ordered[i] setNextKeyView: (i + 1 < n) ? ordered[i + 1] : (NSView *)_keyLoopSentinel];
 #else
       [ordered[i] setNextKeyView: ordered[(i + 1) % n]];
 #endif
@@ -631,42 +686,15 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
   _firstKeyView = n ? ordered[0] : nil;
   _lastKeyView = n ? ordered[n - 1] : nil;
 #ifdef GNUSTEP
-  [super setNextKeyView: _firstKeyView];
-#endif
-}
-
-/* YES when some view of the managed loop can take focus now. */
-- (BOOL)keyLoopHasValidView
-{
-  for (TRWeakView *w in _keyLoopViews)
+  if (_keyLoopSentinel != nil)
     {
-      NSView *v = w->view;
-      if (v != nil && [v canBecomeKeyView]) return YES;
+      _keyLoopSentinel->first = _firstKeyView;
+      _keyLoopSentinel->last = _lastKeyView;
+      /* The raw link too, so GNUstep's back-pointer bookkeeping matches. */
+      [_keyLoopSentinel setNextKeyView: _firstKeyView];
     }
-  return NO;
-}
-
-/* While Trellis manages the loop, these never return the raw link from
-   NSView: GNUstep's -dealloc asks neighbours for -nextKeyView while a
-   member is being freed, and ARC would retain and autorelease that dying
-   view on the way out. The __weak first/last read nil for it instead. */
-#ifdef GNUSTEP
-- (NSView *)nextKeyView
-{
-  if (_keyLoopViews == nil) return [super nextKeyView];
-  if (_tearingDown) return nil;
-  NSView *first = _firstKeyView;
-  return (first != nil && [self keyLoopHasValidView]) ? first : nil;
-}
-
-- (NSView *)previousKeyView
-{
-  if (_keyLoopViews == nil) return [super previousKeyView];
-  if (_tearingDown) return nil;
-  NSView *last = _lastKeyView;
-  return (last != nil && [self keyLoopHasValidView]) ? last : nil;
-}
 #endif
+}
 
 - (void)applyFrames
 {

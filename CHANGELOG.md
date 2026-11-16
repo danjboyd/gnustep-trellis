@@ -11,9 +11,9 @@ No API changes.
   was a closed ring, and GNUstep's `-nextValidKeyView` walks a chain until
   it finds a view that can become key, nil or its start. So when every
   view in the ring was hidden or disabled, and the search started outside
-  it, the search never ended. The chain is now open and wraps through the
-  outermost box, which leads back in only while some member can take
-  focus. On Cocoa the loop stays a closed ring, as in 0.2.1: AppKit's
+  it, the search never ended. On GNUstep the chain is now open and wraps
+  through a private sentinel view, which leads back in only while some
+  member can take focus. On Cocoa the loop stays a closed ring, as in 0.2.1: AppKit's
   search stops on its own, and overriding the key-view getters there
   leaves dangling back-pointers (found by the macOS check). Views that
   leave the loop are unlinked, and
@@ -21,8 +21,8 @@ No API changes.
   Tests/View/key-view-hang.m (KEYHANG in `make check-gui`) covers all
   hidden, all disabled, a hidden box and all `display: none`, with an
   alarm guard. On GNUstep, walking raw `-nextKeyView` now passes through
-  the box between the last view and the first; Tab (`-nextValidKeyView`)
-  skips it.
+  the sentinel (a view outside the tree) between the last view and the
+  first; Tab (`-nextValidKeyView`) skips it.
 
 ## 0.2.1 (2026-11-16)
 

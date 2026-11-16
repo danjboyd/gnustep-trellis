@@ -61,11 +61,11 @@
    descendants into a nextKeyView loop after every layout: views with a
    positive tab index first (ascending), then the rest in document order;
    hidden views and tab index -1 are left out. CSS `order` doesn't change
-   it, as in browsers. On GNUstep the chain is open and wraps through the
-   box (last -> box -> first): the box's -nextKeyView / -previousKeyView
-   lead back in only while some member can become key, so a loop whose
-   views are all hidden or disabled ends the search instead of spinning
-   (GNUstep's -nextValidKeyView doesn't stop on its own). On Cocoa it is a
+   it, as in browsers. On GNUstep the chain is open and wraps through a
+   private sentinel view (last -> sentinel -> first) that leads back in
+   only while some member can become key, so a loop whose views are all
+   hidden or disabled ends the search instead of spinning (GNUstep's
+   -nextValidKeyView doesn't stop on its own). On Cocoa it is a
    closed ring (last -> first): AppKit's search stops by itself, and its
    key-view bookkeeping relies on the plain getters. Set
    managesKeyViewLoop = NO to build your own (Trellis then unlinks the

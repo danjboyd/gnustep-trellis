@@ -198,6 +198,7 @@
   ]
  },
  "requires": [
+  "abspos-ancestor-cb",
   "block-layout"
  ]
 }

@@ -917,6 +917,10 @@ class Converter:
                     if c.tag in IGNORED_TAGS:
                         continue
                     flush()
+                    if self.position(c) in ("absolute", "fixed") and self.position(el) == "static":
+                        # CSS: the containing block is a positioned ancestor
+                        # further up; Trellis always uses the parent's padding box.
+                        self.requires.add("abspos-ancestor-cb")
                     n, e = self.build(c, disp, ancestors + [el])
                     child_nodes.append(n)
                     child_exp.append(e)
@@ -1012,6 +1016,27 @@ class Converter:
                 e["dy"] = fmt(y - ay)
                 self.checks += 1
         return path_to(exp_root, ae, [])
+
+    def available_height_for_root(self, root):
+        """The parent's definite content height, when the root's own height
+        constraints are percentages that resolve against it. (A given
+        available height is laid out exactly, so it's only passed when the
+        root sizes itself from it.)"""
+        d = self.page.declared(root)
+        if not any("%" in d.get(k, "") for k in ("height", "min-height", "max-height")):
+            return None
+        p = root.parent
+        if p is None or p.tag in ("body", "html", "#document"):
+            return None
+        pd = self.page.declared(p)
+        h = to_px(pd.get("height", "auto"), self.page.font(p)[0])
+        if not isinstance(h, (int, float)):
+            return None
+        if pd.get("box-sizing") == "border-box":
+            for s in ("top", "bottom"):
+                h -= (to_px(pd.get("padding-" + s, "0"), 16) or 0) + \
+                     (to_px(pd.get("border-%s-width" % s, "0"), 16) or 0)
+        return fmt(h)
 
     def available_for_root(self, root):
         # Walk up to body: every ancestor must be a plain block without
@@ -1137,6 +1162,9 @@ def convert_file(path, rel, commit):
         try:
             tree, exp = conv.build(root, conv.display(root.parent) if root.parent else "block", [])
             avail = conv.available_for_root(root)
+            ah = conv.available_height_for_root(root)
+            if ah is not None:
+                avail = dict(avail, height=ah)
         except Skip as e:
             root_skips.append(str(e))
             continue

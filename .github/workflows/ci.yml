@@ -1,13 +1,10 @@
-# DRAFT, not active: GitHub only runs workflows under .github/workflows/.
-# Enabling it spends GitHub Actions minutes on this private repo, so it waits
-# for his go. To enable: git mv ci/github-actions-ci.yml .github/workflows/ci.yml
-# (see ci/README.md for the minutes estimate).
+# Trellis CI. Public repo, so the Linux job runs free on pushes to main and PRs.
 #
 # Linux job (packages per docs/building.md): the GNUstep toolchain (clang + libobjc2 + libdispatch + GNUstep
 # make/base/gui/back, built by scripts/install-toolchain-debian.sh) is cached,
 # so only a cache miss pays the ~20 min source build.
-# macOS job: present but disabled (macOS runners bill at 10x); a project Mac stays
-# the macOS check until the maintainer decides.
+# macOS job: manual dispatch only (macos=true); the macOS check is otherwise
+# run on a project Mac.
 name: CI
 
 on:

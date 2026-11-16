@@ -2,7 +2,7 @@
 # Each bad/*.trellis must fail trellis-lint with the message in its
 # "<!-- expect: ... -->" first line.
 cd "$(dirname "$0")/../.."
-LINT="./obj/trellis-lint"
+LINT="${LINT:-./obj/trellis-lint}"
 fail=0; n=0
 for f in Tests/Markup/bad/*.trellis; do
   n=$((n+1))

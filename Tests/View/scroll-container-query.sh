@@ -2,8 +2,10 @@
 # Renders Tests/View/scroll-container-query.trellis at 300px with the
 # default theme (a classic scroller) and checks #probe is not hidden.
 set -u
+# RENDER: the trellis-render command (macOS: build/trellis-render).
+RENDER=${RENDER:-scripts/run-headless.sh obj/trellis-render}
 out=$(mktemp -d)
-scripts/run-headless.sh obj/trellis-render Tests/View/scroll-container-query.trellis \
+$RENDER Tests/View/scroll-container-query.trellis \
   --width 300 --height 200 --json "$out/q.json" >/dev/null 2>&1
 python3 -I - "$out/q.json" <<'PY'
 import json, sys

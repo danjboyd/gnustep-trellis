@@ -420,6 +420,14 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
       it->maxMain = isRow ? mxW : mxH;
       it->minCross = TRMax(TRDefault(isRow ? mnH : mnW, 0), it->pbCross);
       it->maxCross = isRow ? mxH : mxW;
+      /* A definite cross size is clamped by min/max before anything is
+         measured at it (width: 100%; max-width: 920px in a column must lay
+         out its content at 920, or wrapped rows inside come out short). */
+      if (!isnan(it->styleCross))
+        {
+          it->styleCross = TRMax(TRClamp(it->styleCross, it->minCross, it->maxCross), it->pbCross);
+          if (isRow) sh = it->styleCross; else sw = it->styleCross;
+        }
 
       it->align = TRResolveAlignSelf(cs, s);
       if (!isRow && it->align == TRAlignBaseline) it->align = TRAlignFlexStart;

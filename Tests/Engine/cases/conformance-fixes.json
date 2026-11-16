@@ -1983,5 +1983,106 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/percent_width_clamped_by_max_width_sets_height",
+  "root": {
+   "style": {
+    "flexDirection": "column",
+    "width": 100
+   },
+   "children": [
+    {
+     "style": {
+      "width": "100%",
+      "maxWidth": 50,
+      "flexDirection": "row",
+      "flexWrap": "wrap"
+     },
+     "children": [
+      {
+       "style": {
+        "width": 20,
+        "height": 10
+       }
+      },
+      {
+       "style": {
+        "width": 20,
+        "height": 10
+       }
+      },
+      {
+       "style": {
+        "width": 20,
+        "height": 10
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "height": 20,
+   "children": [
+    {
+     "width": 50,
+     "height": 20
+    }
+   ]
+  },
+  "note": "A definite cross size is clamped by max-width before the item's content height is measured (found by the desk spec)"
+ },
+ {
+  "id": "engine/percent_width_clamped_by_max_width_auto_margins",
+  "root": {
+   "style": {
+    "flexDirection": "column",
+    "width": 100
+   },
+   "children": [
+    {
+     "style": {
+      "width": "100%",
+      "maxWidth": 50,
+      "marginLeft": "auto",
+      "marginRight": "auto",
+      "flexDirection": "row",
+      "flexWrap": "wrap"
+     },
+     "children": [
+      {
+       "style": {
+        "width": 20,
+        "height": 10
+       }
+      },
+      {
+       "style": {
+        "width": 20,
+        "height": 10
+       }
+      },
+      {
+       "style": {
+        "width": 20,
+        "height": 10
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "height": 20,
+   "children": [
+    {
+     "x": 25,
+     "width": 50,
+     "height": 20
+    }
+   ]
+  },
+  "note": "Same, centred with auto margins"
  }
 ]

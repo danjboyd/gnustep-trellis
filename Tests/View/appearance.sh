@@ -25,7 +25,7 @@ fi
 render() {  # file appearance -> prints the number of low-contrast findings, or CRASH
   local f=$1 ap=$2 sample="" out rc
   [ -f "${f%.trellis}.sample.json" ] && sample="--sample ${f%.trellis}.sample.json"
-  out=$(scripts/run-headless.sh obj/trellis-render "$f" $sample --widths 340,900 --height 680 \
+  out=$(${RENDER:-scripts/run-headless.sh obj/trellis-render} "$f" $sample --widths 340,900 --height 680 \
       --theme Adwaita --appearance "$ap" --lint 2>&1)
   rc=$?
   # A crash prints no findings, so check the exit status and the summary line.

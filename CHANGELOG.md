@@ -3,6 +3,16 @@
 Trellis follows semantic versioning once 1.0 ships; before that, a minor
 version may change the API listed in docs/api.md, and says so here.
 
+## Unreleased
+
+- **Fixed:** a flex item's definite cross size is clamped by its min/max
+  before its content is measured. A column item with `width: 100%;
+  max-width: 920px` measured its height at the full width, so a wrapping
+  row inside it came out a row short and overflowed. Two engine cases.
+- **Tests:** Tests/Markup/run.sh takes `LINT=`, and appearance.sh and
+  scroll-container-query.sh take `RENDER=`, so the macOS job can point
+  them at its build.
+
 ## 0.2.2 (2026-11-16)
 
 No API changes.

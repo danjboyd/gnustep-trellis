@@ -690,5 +690,37 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_percent_rows_in_auto_height_grid",
+  "note": "WPT grid-percentage-rows-indefinite-height: percentage rows size as auto, then resolve against the grid's height",
+  "root": {
+   "style": {
+    "display": "grid",
+    "width": 100,
+    "gridTemplateRows": "auto 60%"
+   },
+   "children": [
+    {
+     "style": {
+      "gridColumn": "1",
+      "gridRow": "2",
+      "height": 25
+     }
+    }
+   ]
+  },
+  "available": {
+   "width": 200,
+   "height": null
+  },
+  "expected": {
+   "height": 25,
+   "children": [
+    {
+     "y": 10
+    }
+   ]
+  }
  }
 ]

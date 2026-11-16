@@ -879,13 +879,32 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
                                TRMeasureModeUndefined, areaW, NAN, NO, dir);
       it->h = sz.height + mv;
     }
+  /* Percentage rows in a grid of indefinite height (CSS Grid 7.2.1): size
+     them as auto to find the grid's height, then resolve them against that
+     height and size the rows again. The grid keeps the first height. */
+  BOOL percentRows = NO;
+  TRTrackSize savedRows[nRows ? nRows : 1];
+  if (isnan(innerH))
+    for (NSInteger i = 0; i < nRows; i++)
+      {
+        savedRows[i] = rowsT[i].size;
+        if (rowsT[i].size.min.kind == TRBreadthPercent) { rowsT[i].size.min.kind = TRBreadthAuto; percentRows = YES; }
+        if (rowsT[i].size.max.kind == TRBreadthPercent) { rowsT[i].size.max.kind = TRBreadthAuto; percentRows = YES; }
+      }
   TRSizeTracks(rowsT, nRows, innerH, rowGap, items, n, NO, s->alignContent);
   double rowsTotal = TRPlaceTracks(rowsT, nRows, rowGap, innerH, s->alignContent);
+  double contentH = rowsTotal;
+  if (percentRows)
+    {
+      for (NSInteger i = 0; i < nRows; i++) rowsT[i].size = savedRows[i];
+      TRSizeTracks(rowsT, nRows, contentH, rowGap, items, n, NO, s->alignContent);
+      rowsTotal = TRPlaceTracks(rowsT, nRows, rowGap, contentH, s->alignContent);
+    }
 
   /* ---- Container size ---- */
   double W = wm == TRMeasureModeExactly ? aw : colsTotal + pbW;
   if (wm == TRMeasureModeAtMost) W = MIN(aw, W);
-  double H = hm == TRMeasureModeExactly ? ah : rowsTotal + pbH;
+  double H = hm == TRMeasureModeExactly ? ah : contentH + pbH;
   if (hm == TRMeasureModeAtMost) H = MIN(ah, H);
   W = MAX(W, pbW);
   H = MAX(H, pbH);

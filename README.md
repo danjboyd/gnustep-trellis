@@ -92,13 +92,13 @@ Skipped cases need features Trellis
 leaves out or does differently on purpose (`position: static`,
 `inline-block`, `inline-grid`, `display: contents`, intrinsic-size
 keywords, per-axis overflow, `flex-wrap: balance`, `-webkit-box`, named
-grid lines, subgrid, masonry, `position: sticky`); `trellis-case --all`
+grid lines, subgrid, masonry, `position: sticky`, `calc()`, ancestor
+containing blocks for abspos); `trellis-case --all`
 runs them anyway. The 11 flexbox failures are the documented consequence
 of `display: block` meaning a column flex container (percentage heights
 against a block, a fixed-height child shrinking inside a shorter block).
-The grid suite is new; its failures are real engine gaps, being worked
-through (absolutely positioned grid items, implicit tracks before the
-explicit grid, the automatic minimum size of grid items, and others).
+The 3 grid failures are edge cases: implicit line names generated from
+area names such as `a-start` (2), and an abspos containing-block case.
 `make conformance-record` (or `make -f Makefile.macos conformance-record`)
 re-records a platform and regenerates the table.
 

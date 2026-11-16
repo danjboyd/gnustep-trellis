@@ -1,0 +1,59 @@
+{
+ "id": "wpt/css/css-flexbox/percentage-size/7",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/percentage-size.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "height": 50
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "boxSizing": "content-box",
+     "height": 50,
+     "flexDirection": "column"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "flexGrow": 0,
+       "flexShrink": 0,
+       "flexBasis": "50%"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "height": 25
+     }
+    ]
+   }
+  ]
+ },
+ "requires": [
+  "block-layout"
+ ]
+}

@@ -1,0 +1,50 @@
+{
+ "id": "yoga/Percentage/percentage_width_height_undefined_parent_size/rtl",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGPercentageTest.html",
+  "generated": "tests/generated/YGPercentageTest.cpp",
+  "test": "percentage_width_height_undefined_parent_size",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "rtl",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "position": "absolute"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "position": "relative",
+     "width": "50%",
+     "height": "50%"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 0,
+  "height": 0,
+  "children": [
+   {
+    "x": 0,
+    "y": 0,
+    "width": 0,
+    "height": 0
+   }
+  ]
+ }
+}

@@ -1,0 +1,76 @@
+{
+ "id": "wpt/css/css-flexbox/percentage-heights-001/0",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/percentage-heights-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "boxSizing": "content-box",
+   "width": 50
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "minHeight": 0,
+     "minWidth": 0
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "overflow": "hidden",
+       "height": "50%"
+      },
+      "children": [
+       {
+        "style": {
+         "display": "block",
+         "boxSizing": "content-box",
+         "width": 50,
+         "height": 50
+        }
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "height": 50
+       }
+      ],
+      "height": 25
+     }
+    ],
+    "height": 50
+   }
+  ],
+  "height": 50
+ },
+ "requires": [
+  "block-layout",
+  "overflow"
+ ]
+}

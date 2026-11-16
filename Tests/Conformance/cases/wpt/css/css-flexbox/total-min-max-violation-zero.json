@@ -1,0 +1,62 @@
+{
+ "id": "wpt/css/css-flexbox/total-min-max-violation-zero",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/total-min-max-violation-zero.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "boxSizing": "content-box",
+   "width": 300,
+   "height": 300,
+   "borderTopWidth": 3,
+   "borderRightWidth": 3,
+   "borderBottomWidth": 3,
+   "borderLeftWidth": 3
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "flexGrow": 0,
+     "flexShrink": "1",
+     "flexBasis": 300,
+     "minWidth": 250
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "flexGrow": 0,
+     "flexShrink": "1",
+     "flexBasis": 300,
+     "minWidth": 0,
+     "maxWidth": 50
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 250
+   },
+   {
+    "width": 50
+   }
+  ]
+ }
+}

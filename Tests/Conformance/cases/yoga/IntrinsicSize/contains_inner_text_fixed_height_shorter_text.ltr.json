@@ -1,0 +1,61 @@
+{
+ "id": "yoga/IntrinsicSize/contains_inner_text_fixed_height_shorter_text/ltr",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGIntrinsicSizeTest.html",
+  "generated": "tests/generated/YGIntrinsicSizeTest.cpp",
+  "test": "contains_inner_text_fixed_height_shorter_text",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "ltr",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "position": "absolute",
+   "width": 2000,
+   "height": 2000,
+   "alignItems": "flex-start"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "row",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "position": "relative",
+     "height": 100
+    },
+    "measure": {
+     "text": "Lorem ipsum",
+     "charWidth": 10,
+     "lineHeight": 10
+    }
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 2000,
+  "height": 2000,
+  "children": [
+   {
+    "x": 0,
+    "y": 0,
+    "width": 110,
+    "height": 100
+   }
+  ]
+ },
+ "skip": "Yoga's test measure function (tests/util/TestUtil.cpp) wraps over-long words differently from the Ahem stand-in",
+ "requires": [
+  "measure"
+ ]
+}

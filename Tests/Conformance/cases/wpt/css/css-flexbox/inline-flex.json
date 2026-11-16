@@ -1,0 +1,105 @@
+{
+ "id": "wpt/css/css-flexbox/inline-flex",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/inline-flex.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "position": "relative"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "inline-block",
+     "boxSizing": "content-box",
+     "height": 50,
+     "width": 50
+    }
+   },
+   {
+    "style": {
+     "display": "inline-flex",
+     "boxSizing": "content-box",
+     "height": 50,
+     "width": 50
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "flexGrow": "1",
+       "flexShrink": "1",
+       "flexBasis": "0%"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "flexGrow": "1",
+       "flexShrink": "1",
+       "flexBasis": "0%"
+      }
+     }
+    ]
+   },
+   {
+    "style": {
+     "display": "inline-block",
+     "boxSizing": "content-box",
+     "height": 50,
+     "width": 50
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 50,
+    "height": 50,
+    "x": 0,
+    "y": 0
+   },
+   {
+    "children": [
+     {
+      "width": 25
+     },
+     {
+      "width": 25
+     }
+    ],
+    "width": 50,
+    "height": 50,
+    "x": 50,
+    "y": 0
+   },
+   {
+    "width": 50,
+    "height": 50,
+    "x": 100,
+    "y": 0
+   }
+  ]
+ },
+ "requires": [
+  "block-layout",
+  "display-inline-block",
+  "display-inline-flex"
+ ]
+}

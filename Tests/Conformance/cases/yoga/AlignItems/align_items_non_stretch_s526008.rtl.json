@@ -1,0 +1,110 @@
+{
+ "id": "yoga/AlignItems/align_items_non_stretch_s526008/rtl",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGAlignItemsTest.html",
+  "generated": "tests/generated/YGAlignItemsTest.cpp",
+  "test": "align_items_non_stretch_s526008",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "rtl",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "position": "absolute",
+   "width": 400,
+   "height": 400
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "row",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "position": "relative"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "flex",
+       "flexDirection": "column",
+       "alignContent": "flex-start",
+       "flexShrink": 0,
+       "position": "relative",
+       "alignItems": "flex-start"
+      },
+      "children": [
+       {
+        "style": {
+         "display": "flex",
+         "flexDirection": "column",
+         "alignContent": "flex-start",
+         "flexShrink": 0,
+         "position": "relative"
+        },
+        "children": [
+         {
+          "style": {
+           "display": "flex",
+           "flexDirection": "column",
+           "alignContent": "flex-start",
+           "flexShrink": 0,
+           "position": "relative",
+           "width": 0,
+           "height": 10
+          }
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 400,
+  "height": 400,
+  "children": [
+   {
+    "x": 0,
+    "y": 0,
+    "width": 400,
+    "height": 10,
+    "children": [
+     {
+      "x": 400,
+      "y": 0,
+      "width": 0,
+      "height": 10,
+      "children": [
+       {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 10,
+        "children": [
+         {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 10
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

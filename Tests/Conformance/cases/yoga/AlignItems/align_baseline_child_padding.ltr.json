@@ -1,0 +1,102 @@
+{
+ "id": "yoga/AlignItems/align_baseline_child_padding/ltr",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGAlignItemsTest.html",
+  "generated": "tests/generated/YGAlignItemsTest.cpp",
+  "test": "align_baseline_child_padding",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "ltr",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "row",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "position": "absolute",
+   "width": 100,
+   "height": 100,
+   "alignItems": "baseline",
+   "paddingLeft": 5,
+   "paddingTop": 5,
+   "paddingRight": 5,
+   "paddingBottom": 5
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "position": "relative",
+     "width": 50,
+     "height": 50
+    }
+   },
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "position": "relative",
+     "width": 50,
+     "height": 20,
+     "paddingLeft": 5,
+     "paddingTop": 5,
+     "paddingRight": 5,
+     "paddingBottom": 5
+    },
+    "children": [
+     {
+      "style": {
+       "display": "flex",
+       "flexDirection": "column",
+       "alignContent": "flex-start",
+       "flexShrink": 0,
+       "position": "relative",
+       "width": 50,
+       "height": 10
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 100,
+  "height": 100,
+  "children": [
+   {
+    "x": 5,
+    "y": 5,
+    "width": 50,
+    "height": 50
+   },
+   {
+    "x": 55,
+    "y": 40,
+    "width": 50,
+    "height": 20,
+    "children": [
+     {
+      "x": 5,
+      "y": 5,
+      "width": 50,
+      "height": 10
+     }
+    ]
+   }
+  ]
+ },
+ "requires": [
+  "align-baseline"
+ ]
+}

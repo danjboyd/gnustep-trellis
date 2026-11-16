@@ -1,0 +1,84 @@
+{
+ "id": "wpt/css/css-flexbox/intrinsic-size/row-wrap-001/2",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/intrinsic-size/row-wrap-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "boxSizing": "content-box",
+   "flexWrap": "wrap",
+   "height": 100
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "flexGrow": "1",
+     "flexShrink": 0,
+     "flexBasis": 50,
+     "width": 200
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "width": 100
+      }
+     }
+    ]
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "flexGrow": "2",
+     "flexShrink": 0,
+     "flexBasis": 150,
+     "width": 50
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "width": 100
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {}
+    ]
+   },
+   {
+    "children": [
+     {}
+    ]
+   }
+  ],
+  "width": 200
+ },
+ "requires": [
+  "block-layout",
+  "intrinsic-size-keyword"
+ ]
+}

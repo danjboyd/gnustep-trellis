@@ -55,11 +55,23 @@ static void TRCheckIsolation(void)
 
 /* A colour as #rrggbb[aa], resolved now (dynamic colours under the current
    appearance and theme). */
+#ifndef GNUSTEP
+static NSAppearance *gAppearance;   /* --appearance on Cocoa */
+#endif
+
 static NSString *TRHexOfColor(NSColor *c)
 {
   if (c == nil) return nil;
+#ifdef GNUSTEP
   NSColor *rgb = [c colorUsingColorSpaceName: NSCalibratedRGBColorSpace];
   if (rgb == nil) rgb = [c colorUsingColorSpaceName: NSDeviceRGBColorSpace];
+#else
+  /* sRGB, resolved under the rendered appearance (dynamic colours). */
+  __block NSColor *rgb = nil;
+  void (^resolve)(void) = ^{ rgb = [c colorUsingColorSpace: [NSColorSpace sRGBColorSpace]]; };
+  if (gAppearance) [gAppearance performAsCurrentDrawingAppearance: resolve];
+  else resolve();
+#endif
   if (rgb == nil) return nil;
   int r = (int)lround([rgb redComponent] * 255), g = (int)lround([rgb greenComponent] * 255);
   int b = (int)lround([rgb blueComponent] * 255), a = (int)lround([rgb alphaComponent] * 255);
@@ -101,6 +113,9 @@ static NSDictionary *TRDumpView(NSView *v, TRNode *node)
       NSString *hex = TRHexOfColor([(NSTextField *)v textColor]);
       if (hex) d[@"textColor"] = hex;
     }
+  /* Editable fields: Cocoa's intrinsic width is the placeholder's, which
+     the lint shouldn't hold a field to. */
+  if ([v isKindOfClass: [NSTextField class]] && [(NSTextField *)v isEditable]) d[@"editable"] = @YES;
   else if ([v isKindOfClass: [NSButton class]] && ![(NSButton *)v isBordered])
     {
       NSString *hex = TRHexOfColor([NSColor controlTextColor]);
@@ -172,6 +187,26 @@ static NSData *TRRenderPNG(TRBoxView *box, BOOL outlines)
 #endif
   NSBitmapImageRep *rep = [box bitmapImageRepForCachingDisplayInRect: b];
   [box cacheDisplayInRect: b toBitmapImageRep: rep];
+  {
+    /* Where the screen paints no background, show the window background
+       (as a window on screen would), drawn under what's there. */
+    NSGraphicsContext *ctx = [NSGraphicsContext graphicsContextWithBitmapImageRep: rep];
+    [NSGraphicsContext saveGraphicsState];
+    [NSGraphicsContext setCurrentContext: ctx];
+    void (^fill)(void) = ^{
+      [[NSColor windowBackgroundColor] set];
+#ifdef GNUSTEP
+      NSRectFillUsingOperation(b, NSCompositeDestinationOver);
+#else
+      NSRectFillUsingOperation(b, NSCompositingOperationDestinationOver);
+#endif
+    };
+#ifndef GNUSTEP
+    if (gAppearance) [gAppearance performAsCurrentDrawingAppearance: fill]; else
+#endif
+    fill();
+    [NSGraphicsContext restoreGraphicsState];
+  }
   if (outlines)
     {
       NSGraphicsContext *ctx = [NSGraphicsContext graphicsContextWithBitmapImageRep: rep];
@@ -332,14 +367,14 @@ int main(int argc, const char **argv)
               NSAppearance *ap = [NSAppearance appearanceNamed:
                 [appearance isEqualToString: @"dark"] ? NSAppearanceNameDarkAqua : NSAppearanceNameAqua];
               [box setAppearance: ap];
-              [NSAppearance setCurrentAppearance: ap];   /* dynamic colours resolve under it */
+              gAppearance = ap;   /* dynamic colours in the dump resolve under it */
             }
 #endif
           [box setFrame: NSMakeRect(0, 0, W, H)];
           [box layoutTrellis];
 
           NSMutableDictionary *tree = [TRDumpView(box, box.node) mutableCopy];
-          NSString *winBg = TRHexOfColor([NSColor windowBackgroundColor]);
+          NSString *winBg = TRHexOfColor([NSColor windowBackgroundColor]);   /* resolved under the appearance */
           if (winBg) tree[@"windowBackground"] = winBg;
           NSArray *lint = TRLintFrameTree(tree, W, H);
           for (NSDictionary *f in lint)

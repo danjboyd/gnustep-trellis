@@ -105,7 +105,8 @@ the user's settings. trellis-render refuses to run without it.
   and the GNUstep theme (Adwaita light or dark, Gumdrop). Use `Canvas` with
   `CanvasText` for a content background and its text,
   `-tr-window-background` for panels, `GrayText` for secondary text,
-  `AccentColor`, `Highlight` with `HighlightText` for selections,
+  `AccentColor` for accented backgrounds (`LinkText` for coloured text: Cocoa's
+  accent colour doesn't adapt to Dark), `Highlight` with `HighlightText` for selections,
   `ButtonFace`/`ButtonText`, `Field`/`FieldText`, `LinkText`,
   `-tr-separator` for borders and `-tr-error` for errors.
   - A fixed colour (`#fff`) next to a system one breaks in the other

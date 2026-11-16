@@ -48,6 +48,9 @@ static void TRLintNode(NSDictionary *n, NSString *path, double absX, double absY
   else if (intrinsic)
     {
       double iw = [intrinsic[@"width"] doubleValue], ih = [intrinsic[@"height"] doubleValue];
+      /* An editable field's intrinsic width (Cocoa: its placeholder) isn't
+         a minimum; only its height is checked. */
+      if ([n[@"editable"] boolValue]) iw = 0;
       if (iw > w + kTol || ih > h + kTol)
         TRAdd(out, @"undersized", @"error", n, path,
               [NSString stringWithFormat: @"%@ (%@) is %gx%g, smaller than its intrinsic %gx%g",

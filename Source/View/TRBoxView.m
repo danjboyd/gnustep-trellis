@@ -69,7 +69,7 @@ NSColor *TRColorFromCSS(NSString *css)
                @"selecteditemtext": @"alternateSelectedControlTextColor",
                @"accentcolor": @"controlAccentColor|selectedControlColor",
                @"accentcolortext": @"alternateSelectedControlTextColor",
-               @"linktext": @"linkColor|blueColor",
+               @"linktext": @"linkColor|selectedControlColor|blueColor",
                @"mark": @"findHighlightColor|yellowColor", @"marktext": @"textColor",
                /* Trellis extensions */
                @"-tr-window-background": @"windowBackgroundColor",

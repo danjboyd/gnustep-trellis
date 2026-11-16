@@ -1,0 +1,235 @@
+{
+ "id": "wpt-grid/css/css-grid/placement/grid-auto-placement-automatic-span-001/1",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/placement/grid-auto-placement-automatic-span-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "position": "relative"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "grid",
+     "boxSizing": "content-box",
+     "gridAutoFlow": "row dense",
+     "gridAutoRows": 50,
+     "gridAutoColumns": 100
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "span 2",
+       "gridRow": "auto",
+       "width": "100%",
+       "height": "100%"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "auto",
+       "gridRow": "auto",
+       "width": "100%",
+       "height": "100%"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "auto",
+       "gridRow": "auto",
+       "width": "100%",
+       "height": "100%"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "span 2",
+       "gridRow": "auto",
+       "width": "100%",
+       "height": "100%"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "width": "100%",
+       "height": "100%",
+       "gridColumn": "span 3",
+       "gridRow": "auto"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "width": "100%",
+       "height": "100%",
+       "gridColumn": "span 2",
+       "gridRow": "span 2"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "auto",
+       "gridRow": "auto",
+       "width": "100%",
+       "height": "100%"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "auto",
+       "gridRow": "auto",
+       "width": "100%",
+       "height": "100%"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "auto",
+       "gridRow": "auto",
+       "width": "100%",
+       "height": "100%"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "width": "100%",
+       "height": "100%",
+       "gridColumn": "span 2",
+       "gridRow": "span 2"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "auto",
+       "gridRow": "auto",
+       "width": "100%",
+       "height": "100%"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "width": 200,
+      "height": 50,
+      "x": 0,
+      "y": 0,
+      "relativeTo": 2
+     },
+     {
+      "width": 100,
+      "height": 50,
+      "x": 200,
+      "y": 0,
+      "relativeTo": 2
+     },
+     {
+      "width": 100,
+      "height": 50,
+      "x": 0,
+      "y": 50,
+      "relativeTo": 2
+     },
+     {
+      "width": 200,
+      "height": 50,
+      "x": 100,
+      "y": 50,
+      "relativeTo": 2
+     },
+     {
+      "width": 300,
+      "height": 50,
+      "x": 0,
+      "y": 100,
+      "relativeTo": 2
+     },
+     {
+      "width": 200,
+      "height": 100,
+      "x": 0,
+      "y": 150,
+      "relativeTo": 2
+     },
+     {
+      "width": 100,
+      "height": 50,
+      "x": 200,
+      "y": 150,
+      "relativeTo": 2
+     },
+     {
+      "width": 100,
+      "height": 50,
+      "x": 200,
+      "y": 200,
+      "relativeTo": 2
+     },
+     {
+      "width": 100,
+      "height": 50,
+      "x": 0,
+      "y": 250,
+      "relativeTo": 2
+     },
+     {
+      "width": 200,
+      "height": 100,
+      "x": 100,
+      "y": 250,
+      "relativeTo": 2
+     },
+     {
+      "width": 100,
+      "height": 50,
+      "x": 0,
+      "y": 300,
+      "relativeTo": 2
+     }
+    ]
+   }
+  ]
+ },
+ "requires": [
+  "block-layout"
+ ]
+}

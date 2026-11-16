@@ -1,0 +1,61 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-definition/grid-auto-repeat-min-max-size-001/2",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-definition/grid-auto-repeat-min-max-size-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "position": "relative",
+   "gridTemplateRows": "repeat(auto-fill, 50px)",
+   "gridTemplateColumns": "repeat(auto-fill, 100px)",
+   "gridTemplateAreas": "none",
+   "gridAutoRows": "auto",
+   "gridAutoColumns": "auto",
+   "gridAutoFlow": "row",
+   "maxWidth": 100,
+   "minWidth": 250,
+   "maxHeight": 50,
+   "minHeight": 125,
+   "width": "min-content",
+   "height": "min-content"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "-2",
+     "gridRow": "-2"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 100,
+    "height": 50,
+    "x": 100,
+    "y": 50
+   }
+  ],
+  "width": 250,
+  "height": 125
+ },
+ "requires": [
+  "intrinsic-size-keyword"
+ ]
+}

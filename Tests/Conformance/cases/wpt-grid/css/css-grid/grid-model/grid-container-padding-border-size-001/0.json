@@ -1,0 +1,34 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-model/grid-container-padding-border-size-001/0",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-model/grid-container-padding-border-size-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "gridTemplateColumns": 100,
+   "gridTemplateRows": 50,
+   "position": "absolute",
+   "paddingTop": 20,
+   "paddingRight": 10,
+   "paddingBottom": 30,
+   "paddingLeft": 50
+  }
+ },
+ "expected": {
+  "width": 160,
+  "height": 100
+ }
+}

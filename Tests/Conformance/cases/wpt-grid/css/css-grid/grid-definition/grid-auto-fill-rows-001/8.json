@@ -1,0 +1,84 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-definition/grid-auto-fill-rows-001/8",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-definition/grid-auto-fill-rows-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "height": "auto",
+   "width": 25,
+   "alignContent": "start",
+   "gridAutoRows": 157,
+   "gridAutoColumns": 25,
+   "position": "relative",
+   "marginRight": 2,
+   "gridTemplateRows": "repeat(auto-fill, 30px [autobar])",
+   "rowGap": 20,
+   "maxHeight": 90,
+   "borderTopWidth": 2,
+   "borderRightWidth": 2,
+   "borderBottomWidth": 2,
+   "borderLeftWidth": 2
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 25,
+    "height": 30,
+    "x": 2,
+    "y": 2
+   },
+   {
+    "width": 25,
+    "height": 30,
+    "x": 2,
+    "y": 52
+   },
+   {
+    "width": 25,
+    "height": 157,
+    "x": 2,
+    "y": 102
+   }
+  ],
+  "width": 29,
+  "height": 94
+ },
+ "requires": [
+  "grid-named-lines"
+ ]
+}

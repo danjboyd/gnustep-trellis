@@ -1,0 +1,79 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-model/grid-gutters-and-flex-content-001/3",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-model/grid-gutters-and-flex-content-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "width": 10,
+   "height": 60
+  },
+  "children": [
+   {
+    "style": {
+     "display": "grid",
+     "boxSizing": "content-box",
+     "gridTemplateRows": "minmax(10px, 1fr) minmax(10px, 2fr)",
+     "gridTemplateColumns": 50,
+     "gridTemplateAreas": "none",
+     "rowGap": 33,
+     "columnGap": 19,
+     "height": "100%"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "1",
+       "gridRow": "1"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "1",
+       "gridRow": "2"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "width": 50,
+      "height": 10
+     },
+     {
+      "width": 50,
+      "height": 17
+     }
+    ],
+    "width": 10,
+    "height": 60
+   }
+  ]
+ },
+ "requires": [
+  "block-layout",
+  "calc"
+ ]
+}

@@ -1,0 +1,71 @@
+{
+ "id": "wpt-grid/css/css-grid/layout-algorithm/grid-container-percentage-002/1",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/layout-algorithm/grid-container-percentage-002.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "position": "relative"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "grid",
+     "boxSizing": "content-box",
+     "width": 200,
+     "height": 200,
+     "gridTemplateRows": "100%"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "1",
+       "gridRow": "1"
+      },
+      "measure": {
+       "text": "XX X",
+       "charWidth": 10,
+       "lineHeight": 10
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "width": 200,
+      "height": 200,
+      "x": 0,
+      "y": 0,
+      "relativeTo": 2
+     }
+    ],
+    "width": 200,
+    "height": 200
+   }
+  ]
+ },
+ "requires": [
+  "block-layout",
+  "measure"
+ ]
+}

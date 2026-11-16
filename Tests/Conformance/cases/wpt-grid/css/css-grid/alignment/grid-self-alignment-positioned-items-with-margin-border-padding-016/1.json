@@ -1,0 +1,186 @@
+{
+ "id": "wpt-grid/css/css-grid/alignment/grid-self-alignment-positioned-items-with-margin-border-padding-016/1",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/alignment/grid-self-alignment-positioned-items-with-margin-border-padding-016.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "rtl",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "inline-grid",
+   "boxSizing": "content-box",
+   "position": "relative",
+   "gridTemplateColumns": "100px 150px",
+   "gridTemplateRows": "150px 100px",
+   "justifyContent": "center",
+   "marginTop": 4,
+   "marginRight": 2,
+   "marginBottom": 8,
+   "marginLeft": 3,
+   "paddingTop": 1,
+   "paddingRight": 4,
+   "paddingBottom": 2,
+   "paddingLeft": 3,
+   "width": 450,
+   "borderTopWidth": 5,
+   "borderRightWidth": 6,
+   "borderBottomWidth": 4,
+   "borderLeftWidth": 8
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridRow": "1 / 2",
+     "gridColumn": "auto / 1",
+     "alignSelf": "start",
+     "justifySelf": "right",
+     "position": "absolute",
+     "marginTop": 2,
+     "marginRight": 4,
+     "marginBottom": 6,
+     "marginLeft": 8,
+     "paddingTop": 3,
+     "paddingRight": 2,
+     "paddingBottom": 4,
+     "paddingLeft": 5,
+     "borderTopWidth": 1,
+     "borderRightWidth": 6,
+     "borderBottomWidth": 2,
+     "borderLeftWidth": 3
+    },
+    "measure": {
+     "text": "X XX X",
+     "charWidth": 10,
+     "lineHeight": 10
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridRow": "1 / 2",
+     "gridColumn": "2 / auto",
+     "alignSelf": "end",
+     "justifySelf": "center",
+     "position": "absolute",
+     "marginTop": 2,
+     "marginRight": 4,
+     "marginBottom": 6,
+     "marginLeft": 8,
+     "paddingTop": 3,
+     "paddingRight": 2,
+     "paddingBottom": 4,
+     "paddingLeft": 5,
+     "borderTopWidth": 1,
+     "borderRightWidth": 6,
+     "borderBottomWidth": 2,
+     "borderLeftWidth": 3
+    },
+    "measure": {
+     "text": "XX X X XXX X XX XXX",
+     "charWidth": 10,
+     "lineHeight": 10
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridRow": "2 / 3",
+     "gridColumn": "auto / auto",
+     "alignSelf": "center",
+     "justifySelf": "self-start",
+     "position": "absolute",
+     "marginTop": 2,
+     "marginRight": 4,
+     "marginBottom": 6,
+     "marginLeft": 8,
+     "paddingTop": 3,
+     "paddingRight": 2,
+     "paddingBottom": 4,
+     "paddingLeft": 5,
+     "borderTopWidth": 1,
+     "borderRightWidth": 6,
+     "borderBottomWidth": 2,
+     "borderLeftWidth": 3
+    },
+    "measure": {
+     "text": "X XX X",
+     "charWidth": 10,
+     "lineHeight": 10
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridRow": "2 / 3",
+     "gridColumn": "1 / 2",
+     "alignSelf": "self-end",
+     "justifySelf": "left",
+     "position": "absolute",
+     "marginTop": 2,
+     "marginRight": 4,
+     "marginBottom": 6,
+     "marginLeft": 8,
+     "paddingTop": 3,
+     "paddingRight": 2,
+     "paddingBottom": 4,
+     "paddingLeft": 5,
+     "borderTopWidth": 1,
+     "borderRightWidth": 6,
+     "borderBottomWidth": 2,
+     "borderLeftWidth": 3
+    },
+    "measure": {
+     "text": "XX X X XXX X XX XXX",
+     "charWidth": 10,
+     "lineHeight": 10
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 76,
+    "height": 20,
+    "x": 385,
+    "y": 8
+   },
+   {
+    "width": 86,
+    "height": 40,
+    "x": 94,
+    "y": 110
+   },
+   {
+    "width": 76,
+    "height": 20,
+    "x": 385,
+    "y": 194
+   },
+   {
+    "width": 76,
+    "height": 50,
+    "x": 269,
+    "y": 200
+   }
+  ]
+ },
+ "requires": [
+  "display-inline-grid",
+  "measure"
+ ]
+}

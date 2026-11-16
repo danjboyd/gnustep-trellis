@@ -54,7 +54,9 @@
      "boxSizing": "content-box",
      "rowGap": 10,
      "columnGap": 10,
-     "gridTemplate": "50px 50px / 50px 50px 50px",
+     "gridTemplateRows": "50px 50px",
+     "gridTemplateColumns": "50px 50px 50px",
+     "gridTemplateAreas": "none",
      "paddingTop": 10,
      "paddingRight": 10,
      "paddingBottom": 10,
@@ -215,9 +217,7 @@
  },
  "requires": [
   "block-layout",
-  "display-grid",
   "display-inline-block",
-  "grid",
   "logical-properties"
  ]
 }

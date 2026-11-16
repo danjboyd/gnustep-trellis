@@ -1,0 +1,29 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-model/grid-container-rows-or-columns-only-001/1",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-model/grid-container-rows-or-columns-only-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "gridTemplateRows": "50px 80px",
+   "position": "absolute"
+  }
+ },
+ "expected": {
+  "width": 0,
+  "height": 130
+ }
+}

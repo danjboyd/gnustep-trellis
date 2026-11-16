@@ -1,0 +1,91 @@
+{
+ "id": "wpt-grid/css/css-grid/subgrid/subgrid-baseline-010",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/subgrid/subgrid-baseline-010.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "inline-grid",
+   "boxSizing": "content-box",
+   "alignItems": "baseline",
+   "gridTemplateRows": 30,
+   "gridTemplateColumns": 60,
+   "gridTemplateAreas": "none"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "inline-grid",
+     "boxSizing": "content-box",
+     "alignItems": "baseline",
+     "gridTemplateRows": "subgrid",
+     "gridTemplateColumns": "repeat(2, 30px)",
+     "gridTemplateAreas": "none"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "inline-grid",
+       "boxSizing": "content-box",
+       "alignItems": "baseline",
+       "gridTemplateRows": "auto",
+       "gridTemplateColumns": "subgrid",
+       "gridTemplateAreas": "none"
+      },
+      "measure": {
+       "text": "X",
+       "charWidth": 15,
+       "lineHeight": 15
+      }
+     },
+     {
+      "style": {
+       "display": "inline-grid",
+       "boxSizing": "content-box",
+       "alignItems": "baseline",
+       "gridTemplateRows": "auto",
+       "gridTemplateColumns": "subgrid",
+       "gridTemplateAreas": "none"
+      },
+      "measure": {
+       "text": "X",
+       "charWidth": 30,
+       "lineHeight": 30
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "height": 15
+     },
+     {
+      "height": 30
+     }
+    ]
+   }
+  ]
+ },
+ "requires": [
+  "display-inline-grid",
+  "measure",
+  "subgrid"
+ ],
+ "droppedChecks": 2
+}

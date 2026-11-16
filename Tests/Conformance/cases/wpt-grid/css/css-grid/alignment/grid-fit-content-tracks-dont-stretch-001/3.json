@@ -1,0 +1,53 @@
+{
+ "id": "wpt-grid/css/css-grid/alignment/grid-fit-content-tracks-dont-stretch-001/3",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/alignment/grid-fit-content-tracks-dont-stretch-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "width": 400,
+   "height": 200,
+   "gridTemplateColumns": "fit-content(200px)",
+   "gridTemplateRows": "fit-content(100px)"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box"
+    },
+    "measure": {
+     "text": "XXXX XXX XX X",
+     "charWidth": 25,
+     "lineHeight": 25
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 200,
+    "height": 50
+   }
+  ],
+  "width": 400,
+  "height": 200
+ },
+ "requires": [
+  "measure"
+ ]
+}

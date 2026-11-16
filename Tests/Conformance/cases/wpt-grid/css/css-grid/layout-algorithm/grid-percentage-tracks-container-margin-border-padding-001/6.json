@@ -1,0 +1,101 @@
+{
+ "id": "wpt-grid/css/css-grid/layout-algorithm/grid-percentage-tracks-container-margin-border-padding-001/6",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/layout-algorithm/grid-percentage-tracks-container-margin-border-padding-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "width": 100,
+   "height": 100,
+   "gridTemplateColumns": "20% 50% 30%",
+   "gridTemplateRows": "40% 60%",
+   "paddingTop": 20,
+   "paddingRight": 20,
+   "paddingBottom": 20,
+   "paddingLeft": 20,
+   "borderTopWidth": 5,
+   "borderRightWidth": 5,
+   "borderBottomWidth": 5,
+   "borderLeftWidth": 5
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 20,
+    "height": 40
+   },
+   {
+    "width": 50,
+    "height": 40
+   },
+   {
+    "width": 30,
+    "height": 40
+   },
+   {
+    "width": 20,
+    "height": 60
+   },
+   {
+    "width": 50,
+    "height": 60
+   },
+   {
+    "width": 30,
+    "height": 60
+   }
+  ]
+ }
+}

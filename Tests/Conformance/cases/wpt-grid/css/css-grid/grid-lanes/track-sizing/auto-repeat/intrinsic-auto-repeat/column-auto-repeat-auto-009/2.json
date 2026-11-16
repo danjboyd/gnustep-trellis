@@ -1,0 +1,57 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-lanes/track-sizing/auto-repeat/intrinsic-auto-repeat/column-auto-repeat-auto-009/2",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-lanes/track-sizing/auto-repeat/intrinsic-auto-repeat/column-auto-repeat-auto-009.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid-lanes",
+   "boxSizing": "content-box",
+   "position": "relative",
+   "gridTemplateColumns": "repeat(auto-fill, auto)",
+   "minWidth": 300,
+   "minHeight": 200,
+   "width": "min-content",
+   "height": "min-content"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "-2",
+     "width": 150,
+     "height": 200
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 150,
+    "height": 200,
+    "x": 75,
+    "y": 0
+   }
+  ],
+  "width": 300,
+  "height": 200
+ },
+ "requires": [
+  "block-layout",
+  "grid-lanes",
+  "intrinsic-size-keyword"
+ ]
+}

@@ -1,0 +1,148 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-model/grid-float-002",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-model/grid-float-002.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "position": "relative"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "grid",
+     "boxSizing": "content-box",
+     "justifyContent": "start"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "1",
+       "gridRow": "1",
+       "width": 50,
+       "height": 50
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "1",
+       "gridRow": "1",
+       "width": 50,
+       "height": 50
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "2",
+       "gridRow": "1",
+       "width": 50,
+       "height": 50
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "1",
+       "gridRow": "2",
+       "width": 50,
+       "height": 50
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "1",
+       "gridRow": "2",
+       "width": 50,
+       "height": 50
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "2",
+       "gridRow": "2",
+       "width": 50,
+       "height": 50
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "width": 50,
+      "height": 50,
+      "x": 0,
+      "y": 0,
+      "relativeTo": 2
+     },
+     {
+      "width": 50,
+      "height": 50,
+      "x": 0,
+      "y": 0,
+      "relativeTo": 2
+     },
+     {
+      "width": 50,
+      "height": 50,
+      "x": 50,
+      "y": 0,
+      "relativeTo": 2
+     },
+     {
+      "width": 50,
+      "height": 50,
+      "x": 0,
+      "y": 50,
+      "relativeTo": 2
+     },
+     {
+      "width": 50,
+      "height": 50,
+      "x": 0,
+      "y": 50,
+      "relativeTo": 2
+     },
+     {
+      "width": 50,
+      "height": 50,
+      "x": 50,
+      "y": 50,
+      "relativeTo": 2
+     }
+    ]
+   }
+  ]
+ },
+ "requires": [
+  "block-layout"
+ ]
+}

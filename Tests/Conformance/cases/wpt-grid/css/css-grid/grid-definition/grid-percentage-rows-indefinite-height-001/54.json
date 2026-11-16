@@ -1,0 +1,51 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-definition/grid-percentage-rows-indefinite-height-001/54",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-definition/grid-percentage-rows-indefinite-height-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "position": "relative",
+   "marginTop": 50,
+   "marginRight": 0,
+   "marginBottom": 50,
+   "marginLeft": 0,
+   "gridTemplateRows": "100px 140%",
+   "borderTopWidth": 10,
+   "borderRightWidth": 10,
+   "borderBottomWidth": 10,
+   "borderLeftWidth": 10
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "1",
+     "gridRow": "2"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "height": 140
+   }
+  ],
+  "height": 120
+ }
+}

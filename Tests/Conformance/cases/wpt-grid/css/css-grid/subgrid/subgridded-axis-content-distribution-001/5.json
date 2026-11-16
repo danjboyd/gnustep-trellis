@@ -1,0 +1,125 @@
+{
+ "id": "wpt-grid/css/css-grid/subgrid/subgridded-axis-content-distribution-001/5",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/subgrid/subgridded-axis-content-distribution-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "position": "relative",
+   "gridTemplateColumns": "100px 100px",
+   "gridAutoRows": 20,
+   "rowGap": 10,
+   "columnGap": 10,
+   "marginBottom": 4,
+   "width": 210,
+   "height": 400,
+   "gridTemplateRows": "100px 100px 100px",
+   "alignContent": "space-between"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "1"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "1"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "1"
+    }
+   },
+   {
+    "style": {
+     "display": "grid",
+     "boxSizing": "content-box",
+     "gridTemplateRows": "subgrid",
+     "gridColumn": "2",
+     "gridRow": "1 / -1"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "height": 100,
+    "y": 0
+   },
+   {
+    "height": 100,
+    "y": 150
+   },
+   {
+    "height": 100,
+    "y": 300
+   },
+   {
+    "children": [
+     {
+      "height": 100,
+      "y": 0,
+      "relativeTo": 2
+     },
+     {
+      "height": 100,
+      "y": 150,
+      "relativeTo": 2
+     },
+     {
+      "height": 100,
+      "y": 300,
+      "relativeTo": 2
+     }
+    ],
+    "height": 400,
+    "y": 0
+   }
+  ]
+ },
+ "requires": [
+  "subgrid"
+ ]
+}

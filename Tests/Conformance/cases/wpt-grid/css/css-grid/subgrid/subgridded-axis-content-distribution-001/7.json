@@ -1,0 +1,120 @@
+{
+ "id": "wpt-grid/css/css-grid/subgrid/subgridded-axis-content-distribution-001/7",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/subgrid/subgridded-axis-content-distribution-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "position": "relative",
+   "gridTemplateColumns": "100px 100px 100px",
+   "gridAutoRows": 20,
+   "rowGap": 10,
+   "columnGap": 10,
+   "marginBottom": 4,
+   "width": 400,
+   "justifyContent": "space-between"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box"
+    }
+   },
+   {
+    "style": {
+     "display": "grid",
+     "boxSizing": "content-box",
+     "gridTemplateColumns": "subgrid",
+     "gridColumn": "1 / -1",
+     "justifyContent": "center"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 100,
+    "x": 0
+   },
+   {
+    "width": 100,
+    "x": 150
+   },
+   {
+    "width": 100,
+    "x": 300
+   },
+   {
+    "children": [
+     {
+      "width": 100,
+      "x": 0,
+      "relativeTo": 2
+     },
+     {
+      "width": 100,
+      "x": 150,
+      "relativeTo": 2
+     },
+     {
+      "width": 100,
+      "x": 300,
+      "relativeTo": 2
+     }
+    ],
+    "width": 400,
+    "x": 0
+   }
+  ]
+ },
+ "requires": [
+  "subgrid"
+ ]
+}

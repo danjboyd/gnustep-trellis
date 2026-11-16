@@ -1,0 +1,107 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-model/grid-gutters-and-tracks-001/14",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-model/grid-gutters-and-tracks-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 800,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "position": "relative"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "grid",
+     "boxSizing": "content-box",
+     "paddingTop": 3,
+     "paddingRight": 7,
+     "paddingBottom": 5,
+     "paddingLeft": 1,
+     "rowGap": 12,
+     "columnGap": 23,
+     "gridTemplateRows": "60% 40%",
+     "gridTemplateColumns": 20,
+     "gridTemplateAreas": "none",
+     "width": 220,
+     "height": 100,
+     "borderTopWidth": 1,
+     "borderRightWidth": 1,
+     "borderBottomWidth": 1,
+     "borderLeftWidth": 1
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "1",
+       "gridRow": "1"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "1",
+       "gridRow": "2"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridRow": "1 / -1",
+       "gridColumn": "1"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "width": 20,
+      "height": 60,
+      "x": 2,
+      "y": 4,
+      "relativeTo": 2
+     },
+     {
+      "width": 20,
+      "height": 40,
+      "x": 2,
+      "y": 76,
+      "relativeTo": 2
+     },
+     {
+      "width": 20,
+      "height": 112,
+      "x": 2,
+      "y": 4,
+      "relativeTo": 2
+     }
+    ],
+    "width": 230,
+    "height": 110
+   }
+  ]
+ },
+ "requires": [
+  "block-layout"
+ ]
+}

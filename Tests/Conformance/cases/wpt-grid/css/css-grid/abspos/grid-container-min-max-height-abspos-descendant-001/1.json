@@ -1,0 +1,67 @@
+{
+ "id": "wpt-grid/css/css-grid/abspos/grid-container-min-max-height-abspos-descendant-001/1",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/abspos/grid-container-min-max-height-abspos-descendant-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "gridTemplateColumns": 100,
+   "position": "relative",
+   "marginTop": 50,
+   "marginRight": 0,
+   "marginBottom": 50,
+   "marginLeft": 0,
+   "minHeight": 100,
+   "gridTemplateRows": 20
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "position": "absolute",
+       "bottom": 0,
+       "width": 10,
+       "height": 10
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "y": 90,
+      "relativeTo": 2
+     }
+    ]
+   }
+  ],
+  "height": 100
+ },
+ "requires": [
+  "block-layout"
+ ]
+}

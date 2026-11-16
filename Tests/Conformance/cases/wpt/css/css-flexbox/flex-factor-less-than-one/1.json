@@ -1,0 +1,55 @@
+{
+ "id": "wpt/css/css-flexbox/flex-factor-less-than-one/1",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/flex-factor-less-than-one.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 800,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "boxSizing": "content-box",
+   "height": 100,
+   "width": 100,
+   "borderTopWidth": 1,
+   "borderRightWidth": 1,
+   "borderBottomWidth": 1,
+   "borderLeftWidth": 1
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "flexGrow": "0.5"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "flexGrow": "0.25"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 50
+   },
+   {
+    "width": 25
+   }
+  ]
+ }
+}

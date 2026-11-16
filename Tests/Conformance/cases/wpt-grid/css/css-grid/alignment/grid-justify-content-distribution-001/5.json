@@ -1,0 +1,121 @@
+{
+ "id": "wpt-grid/css/css-grid/alignment/grid-justify-content-distribution-001/5",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/alignment/grid-justify-content-distribution-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 800,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "justifyContent": "space-around",
+   "gridAutoColumns": 20,
+   "gridAutoRows": 40,
+   "position": "relative",
+   "width": 300,
+   "height": 200
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "1",
+     "gridRow": "1"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "2",
+     "gridRow": "1"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "3",
+     "gridRow": "1"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "1",
+     "gridRow": "2"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "2",
+     "gridRow": "2"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "3",
+     "gridRow": "2"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 20,
+    "height": 40,
+    "x": 40,
+    "y": 0
+   },
+   {
+    "width": 20,
+    "height": 40,
+    "x": 140,
+    "y": 0
+   },
+   {
+    "width": 20,
+    "height": 40,
+    "x": 240,
+    "y": 0
+   },
+   {
+    "width": 20,
+    "height": 40,
+    "x": 40,
+    "y": 40
+   },
+   {
+    "width": 20,
+    "height": 40,
+    "x": 140,
+    "y": 40
+   },
+   {
+    "width": 20,
+    "height": 40,
+    "x": 240,
+    "y": 40
+   }
+  ],
+  "width": 300,
+  "height": 200
+ }
+}

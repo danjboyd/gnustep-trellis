@@ -1,0 +1,51 @@
+{
+ "id": "wpt-grid/css/css-grid/layout-algorithm/flex-and-intrinsic-sizes-001/3",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/layout-algorithm/flex-and-intrinsic-sizes-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 100,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "width": "max-content",
+   "height": "max-content",
+   "gridTemplateColumns": "1fr",
+   "gridTemplateRows": "1fr"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box"
+    },
+    "measure": {
+     "text": "XXX XXX",
+     "charWidth": 10,
+     "lineHeight": 10
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {}
+  ],
+  "width": 70,
+  "height": 10
+ },
+ "requires": [
+  "intrinsic-size-keyword",
+  "measure"
+ ]
+}

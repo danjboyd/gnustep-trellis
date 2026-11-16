@@ -1,0 +1,39 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-model/grid-gutters-and-tracks-001/1",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-model/grid-gutters-and-tracks-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 800,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "paddingTop": 3,
+   "paddingRight": 7,
+   "paddingBottom": 5,
+   "paddingLeft": 1,
+   "rowGap": "normal",
+   "columnGap": "normal",
+   "gridTemplateRows": "90px 70px min-content",
+   "width": 400,
+   "borderTopWidth": 1,
+   "borderRightWidth": 1,
+   "borderBottomWidth": 1,
+   "borderLeftWidth": 1
+  }
+ },
+ "expected": {
+  "width": 410,
+  "height": 170
+ }
+}

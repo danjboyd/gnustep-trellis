@@ -1,0 +1,163 @@
+{
+ "id": "wpt-grid/css/css-grid/alignment/grid-content-alignment-and-self-alignment-001/6",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/alignment/grid-content-alignment-and-self-alignment-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "alignItems": "center",
+   "justifyItems": "center",
+   "justifyContent": "space-between",
+   "alignContent": "space-between",
+   "gridTemplateColumns": "200px 100px",
+   "gridTemplateRows": "100px 50px",
+   "width": 500,
+   "height": 350,
+   "position": "relative",
+   "rowGap": 10,
+   "columnGap": 20
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "alignSelf": "stretch",
+     "justifySelf": "stretch",
+     "gridColumn": "1",
+     "gridRow": "1"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "alignSelf": "stretch",
+     "justifySelf": "stretch",
+     "gridColumn": "2",
+     "gridRow": "1"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "alignSelf": "stretch",
+     "justifySelf": "stretch",
+     "gridColumn": "1",
+     "gridRow": "2"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "alignSelf": "stretch",
+     "justifySelf": "stretch",
+     "gridColumn": "2",
+     "gridRow": "2"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "1",
+     "gridRow": "1"
+    },
+    "measure": {
+     "text": "X",
+     "charWidth": 10,
+     "lineHeight": 10
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "2",
+     "gridRow": "1"
+    },
+    "measure": {
+     "text": "X",
+     "charWidth": 10,
+     "lineHeight": 10
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "1",
+     "gridRow": "2"
+    },
+    "measure": {
+     "text": "X",
+     "charWidth": 10,
+     "lineHeight": 10
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "2",
+     "gridRow": "2"
+    },
+    "measure": {
+     "text": "X",
+     "charWidth": 10,
+     "lineHeight": 10
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {},
+   {},
+   {},
+   {},
+   {
+    "width": 10,
+    "height": 10,
+    "x": 95,
+    "y": 45
+   },
+   {
+    "width": 10,
+    "height": 10,
+    "x": 445,
+    "y": 45
+   },
+   {
+    "width": 10,
+    "height": 10,
+    "x": 95,
+    "y": 320
+   },
+   {
+    "width": 10,
+    "height": 10,
+    "x": 445,
+    "y": 320
+   }
+  ]
+ },
+ "requires": [
+  "measure"
+ ]
+}

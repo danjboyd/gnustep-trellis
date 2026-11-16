@@ -1,0 +1,108 @@
+{
+ "id": "wpt-grid/css/css-grid/alignment/grid-content-alignment-auto-sized-tracks-001/0",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/alignment/grid-content-alignment-auto-sized-tracks-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 800,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "alignItems": "start",
+   "justifyItems": "start",
+   "justifyContent": "stretch",
+   "alignContent": "stretch",
+   "position": "relative",
+   "width": 200,
+   "height": 300,
+   "gridTemplateRows": "auto auto",
+   "gridTemplateColumns": "auto auto",
+   "gridTemplateAreas": "none",
+   "gridAutoRows": "auto",
+   "gridAutoColumns": "auto",
+   "gridAutoFlow": "row"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "width": 40,
+     "height": 80,
+     "gridColumn": "1",
+     "gridRow": "1"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "width": 40,
+     "height": 80,
+     "gridColumn": "2",
+     "gridRow": "1"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "width": 40,
+     "height": 80,
+     "gridColumn": "1",
+     "gridRow": "2"
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "width": 40,
+     "height": 80,
+     "gridColumn": "2",
+     "gridRow": "2"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 40,
+    "height": 80,
+    "x": 0,
+    "y": 0
+   },
+   {
+    "width": 40,
+    "height": 80,
+    "x": 100,
+    "y": 0
+   },
+   {
+    "width": 40,
+    "height": 80,
+    "x": 0,
+    "y": 150
+   },
+   {
+    "width": 40,
+    "height": 80,
+    "x": 100,
+    "y": 150
+   }
+  ],
+  "width": 200,
+  "height": 300
+ }
+}

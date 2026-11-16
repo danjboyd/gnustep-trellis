@@ -88,7 +88,7 @@ the user's settings. trellis-render refuses to run without it.
 - **Grid** (`display: grid`): `grid-template-columns` and
   `grid-template-rows` take `px`, `%`, `fr`, `auto`, `min-content`,
   `max-content`, `minmax()` and `repeat(N | auto-fill | auto-fit, …)`.
-  Also `grid-template-areas`, `grid-auto-rows`, `grid-auto-columns`,
+  Also `grid-template-areas`, `grid-auto-rows` and `grid-auto-columns` (one or more sizes),
   `grid-auto-flow: row | column`, `grid-row`, `grid-column` (`2 / 4`,
   `span 2`, `1 / -1`), `grid-area` (an area name or four lines),
   `justify-items`, `justify-self`, `align-items`, `align-self`,

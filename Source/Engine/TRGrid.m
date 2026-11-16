@@ -166,7 +166,7 @@ static BOOL TRParseTrackList(NSString *v, TRTrackList *out, BOOL singleOnly)
       [buf appendBytes: &e length: sizeof e];
       n++;
     }
-  if (singleOnly && n != 1) return NO;
+  if (singleOnly && n < 1) return NO;
   out->entries = malloc(sizeof(TRTrackEntry) * (n ? n : 1));
   memcpy(out->entries, [buf bytes], sizeof(TRTrackEntry) * n);
   out->count = n;
@@ -403,16 +403,37 @@ static TRTrack *TRBuildTracks(NSString *tmpl, double avail, double gap, NSIntege
   return t;
 }
 
-static TRTrackSize TRAutoTrackSize(NSString *autoTracks)
+/* grid-auto-rows/columns: one or more sizes (no repeat()). Implicit
+   tracks cycle through them: forwards after the explicit grid, backwards
+   from the last before it. */
+typedef struct { TRTrackSize sizes[16]; int count; } TRAutoTracks;
+
+static TRAutoTracks TRAutoTrackSizes(NSString *autoTracks)
 {
-  TRTrackSize ts = { { TRBreadthAuto, 0 }, { TRBreadthAuto, 0 } };
+  TRAutoTracks at;
+  at.count = 1;
+  at.sizes[0] = (TRTrackSize){ { TRBreadthAuto, 0 }, { TRBreadthAuto, 0 } };
   if (autoTracks)
     {
       TRTrackList l;
-      if (TRParseTrackList(autoTracks, &l, YES)) ts = l.entries[0].size;
+      if (TRParseTrackList(autoTracks, &l, YES) && l.count > 0)
+        {
+          at.count = MIN(l.count, 16);
+          for (int i = 0; i < at.count; i++) at.sizes[i] = l.entries[i].size;
+        }
       free(l.entries);
     }
-  return ts;
+  return at;
+}
+
+static inline TRTrackSize TRAutoAfter(const TRAutoTracks *at, NSInteger k)    /* k-th track after */
+{
+  return at->sizes[k % at->count];
+}
+
+static inline TRTrackSize TRAutoBefore(const TRAutoTracks *at, NSInteger k)   /* k-th track before (0 = adjacent) */
+{
+  return at->sizes[at->count - 1 - (k % at->count)];
 }
 
 /* Line -> track index for one axis. Returns NO for auto. */
@@ -1003,7 +1024,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
   #undef OCC
 
   /* ---- Implicit tracks ---- */
-  TRTrackSize autoCol = TRAutoTrackSize(st->_gridAutoColumns), autoRow = TRAutoTrackSize(st->_gridAutoRows);
+  TRAutoTracks autoCols = TRAutoTrackSizes(st->_gridAutoColumns), autoRows = TRAutoTrackSizes(st->_gridAutoRows);
   for (int axis = 0; axis < 2; axis++)
     {
       NSInteger off = axis == 0 ? offR : offC;
@@ -1011,7 +1032,8 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       TRTrack **tp = axis == 0 ? &rowsT : &colsT;
       NSInteger *np = axis == 0 ? &nRows : &nCols;
       TRTrack *nt = calloc((size_t)(*np + off), sizeof(TRTrack));
-      for (NSInteger i = 0; i < off; i++) nt[i].size = axis == 0 ? autoRow : autoCol;
+      for (NSInteger i = 0; i < off; i++)
+        nt[i].size = TRAutoBefore(axis == 0 ? &autoRows : &autoCols, off - 1 - i);
       if (*np) memcpy(nt + off, *tp, sizeof(TRTrack) * (size_t)*np);
       free(*tp);
       *tp = nt;
@@ -1022,13 +1044,15 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
   if (gridCols > nCols)
     {
       colsT = realloc(colsT, sizeof(TRTrack) * gridCols);
-      for (NSInteger i = nCols; i < gridCols; i++) { memset(&colsT[i], 0, sizeof(TRTrack)); colsT[i].size = autoCol; }
+      for (NSInteger i = nCols; i < gridCols; i++)
+        { memset(&colsT[i], 0, sizeof(TRTrack)); colsT[i].size = TRAutoAfter(&autoCols, i - nCols); }
       nCols = gridCols;
     }
   if (gridRows > nRows)
     {
       rowsT = realloc(rowsT, sizeof(TRTrack) * (gridRows ? gridRows : 1));
-      for (NSInteger i = nRows; i < gridRows; i++) { memset(&rowsT[i], 0, sizeof(TRTrack)); rowsT[i].size = autoRow; }
+      for (NSInteger i = nRows; i < gridRows; i++)
+        { memset(&rowsT[i], 0, sizeof(TRTrack)); rowsT[i].size = TRAutoAfter(&autoRows, i - nRows); }
       nRows = gridRows;
     }
   /* auto-fit: empty repeated tracks collapse. */

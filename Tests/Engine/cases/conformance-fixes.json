@@ -1468,5 +1468,45 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_auto_columns_cycle",
+  "note": "grid-auto-columns with several sizes: implicit columns cycle through them",
+  "root": {
+   "style": {
+    "display": "grid",
+    "gridAutoFlow": "column",
+    "gridAutoColumns": "20px 30px",
+    "gridTemplateRows": "10px",
+    "width": 200,
+    "justifyContent": "start"
+   },
+   "children": [
+    {},
+    {},
+    {},
+    {}
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "x": 0,
+     "width": 20
+    },
+    {
+     "x": 20,
+     "width": 30
+    },
+    {
+     "x": 50,
+     "width": 20
+    },
+    {
+     "x": 70,
+     "width": 30
+    }
+   ]
+  }
  }
 ]

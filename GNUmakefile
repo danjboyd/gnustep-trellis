@@ -119,8 +119,11 @@ check-gui:: all
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/size-for-width.m -o obj/gui-tests/size-for-width $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/preview-open-file.m -o obj/gui-tests/preview-open-file $(GUI_TEST_LIBS)
 	@echo "== view checks (headless)"
-	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH timeout 60 scripts/run-headless.sh obj/gui-tests/size-for-width 2>&1 | grep -v _NET_WORKAREA | tail -1
-	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH timeout 60 scripts/run-headless.sh obj/gui-tests/preview-open-file $(CURDIR)/Examples/TrellisDemo/Settings.trellis 2>&1 | grep -v _NET_WORKAREA | tail -1
-	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH Tests/View/appearance.sh
-	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH Tests/View/scroll-container-query.sh
-
+	@export LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH; status=0; \
+	  timeout 60 scripts/run-headless.sh obj/gui-tests/size-for-width > obj/gui-tests/hook.log 2>&1 || status=1; \
+	  grep -v _NET_WORKAREA obj/gui-tests/hook.log | tail -1; \
+	  timeout 60 scripts/run-headless.sh obj/gui-tests/preview-open-file $(CURDIR)/Examples/TrellisDemo/Settings.trellis > obj/gui-tests/openfile.log 2>&1 || status=1; \
+	  grep -v _NET_WORKAREA obj/gui-tests/openfile.log | tail -1; \
+	  Tests/View/appearance.sh || status=1; \
+	  Tests/View/scroll-container-query.sh || status=1; \
+	  exit $$status

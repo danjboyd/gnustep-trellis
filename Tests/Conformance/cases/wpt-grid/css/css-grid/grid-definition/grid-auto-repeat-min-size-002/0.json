@@ -52,6 +52,7 @@
   "height": 200
  },
  "requires": [
+  "containing-block-height",
   "intrinsic-size-keyword"
  ]
 }

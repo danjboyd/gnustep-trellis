@@ -12,7 +12,7 @@
  "pixelScale": 0,
  "available": {
   "width": 600,
-  "height": 250
+  "height": null
  },
  "root": {
   "style": {
@@ -52,5 +52,8 @@
   ],
   "width": 200,
   "height": 100
- }
+ },
+ "requires": [
+  "containing-block-height"
+ ]
 }

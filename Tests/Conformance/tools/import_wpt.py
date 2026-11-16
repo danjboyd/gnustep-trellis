@@ -1019,11 +1019,16 @@ class Converter:
 
     def available_height_for_root(self, root):
         """The parent's definite content height, when the root's own height
-        constraints are percentages that resolve against it. (A given
+        is a percentage that resolves against it. (A given
         available height is laid out exactly, so it's only passed when the
         root sizes itself from it.)"""
         d = self.page.declared(root)
-        if not any("%" in d.get(k, "") for k in ("height", "min-height", "max-height")):
+        if "%" not in d.get("height", ""):
+            if any("%" in d.get(k, "") for k in ("min-height", "max-height")):
+                # A % min/max-height with auto height needs the containing
+                # block's height without fixing the root's size; the format
+                # can't express that (a given available height is exact).
+                self.requires.add("containing-block-height")
             return None
         p = root.parent
         if p is None or p.tag in ("body", "html", "#document"):

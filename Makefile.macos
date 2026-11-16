@@ -66,6 +66,12 @@ check: all
 	$(B)/trellis-case Tests/Engine/cases
 	@if [ -d Tests/Conformance/cases ]; then $(B)/trellis-case Tests/Conformance/cases | $(CONF_SUMMARY) || true; fi
 
+# Record this platform's results in docs/conformance/macos.json and
+# regenerate the README table (scripts/conformance-summary.py).
+conformance-record: all
+	python3 -I scripts/conformance-summary.py record --platform macos --runner $(B)/trellis-case
+	python3 -I scripts/conformance-summary.py table
+
 clean:
 	rm -rf $(B)
-.PHONY: all gui check clean
+.PHONY: all gui check conformance-record clean

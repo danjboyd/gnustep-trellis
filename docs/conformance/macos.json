@@ -1,0 +1,31 @@
+{
+ "commit": "f9cc591",
+ "conformance": {
+  "pass": 2337,
+  "skipped": 1079,
+  "total": 2961
+ },
+ "date": "2026-11-16",
+ "platform": "macos",
+ "suites": {
+  "engine": {
+   "pass": 93,
+   "total": 93
+  },
+  "wpt": {
+   "cases": 977,
+   "pass": 827,
+   "total": 838
+  },
+  "wpt-grid": {
+   "cases": 1977,
+   "pass": 604,
+   "total": 1217
+  },
+  "yoga": {
+   "cases": 1086,
+   "pass": 906,
+   "total": 906
+  }
+ }
+}

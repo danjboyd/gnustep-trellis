@@ -49,7 +49,7 @@ jobs:
 
       - name: Restore toolchain
         id: toolchain
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: /home/runner/opt/trellis-toolchain
           # Bump the suffix to force a rebuild against newer upstream heads.
@@ -58,6 +58,23 @@ jobs:
       - name: Build toolchain (cache miss only)
         if: steps.toolchain.outputs.cache-hit != 'true'
         run: PREFIX=$TRELLIS_TOOLCHAIN SRC=$RUNNER_TEMP/gnustep-src J=4 scripts/install-toolchain-debian.sh
+
+      # Saved right after the build, so a later failing test can't discard it.
+      - name: Save toolchain (cache miss only)
+        if: steps.toolchain.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /home/runner/opt/trellis-toolchain
+          key: ${{ steps.toolchain.outputs.cache-primary-key }}
+
+      # Tests/View/appearance.sh renders with --theme Adwaita.
+      - name: Adwaita GSTheme (pinned)
+        run: |
+          set +u; . scripts/env.sh; set -u
+          git clone -q https://github.com/danjboyd/plugins-themes-Adwaita "$RUNNER_TEMP/adwaita"
+          git -C "$RUNNER_TEMP/adwaita" checkout -q 9c25a6823c3d0af715b197e64e8ca2d9bee9b456
+          make -C "$RUNNER_TEMP/adwaita" -j4
+          make -C "$RUNNER_TEMP/adwaita" install GNUSTEP_INSTALLATION_DOMAIN=LOCAL
 
       - name: Build Trellis
         run: |

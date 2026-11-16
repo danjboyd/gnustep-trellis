@@ -79,7 +79,7 @@ static NSDictionary *TRDumpView(NSView *v, TRNode *node)
   if ([v isKindOfClass: [NSControl class]] && [(NSControl *)v cell] != nil)
     {
       NSCell *cell = [(NSControl *)v cell];
-      NSSize ic = [cell cellSize];
+      NSSize ic = TRCellSize(cell);
       d[@"intrinsic"] = @{@"width": @(ceil(ic.width)), @"height": @(ceil(ic.height))};
       if ([cell type] == NSTextCellType && ![v isKindOfClass: [NSButton class]]
           && ![v isKindOfClass: [NSPopUpButton class]])

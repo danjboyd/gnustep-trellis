@@ -13,6 +13,10 @@
    - other views: intrinsicContentSize where defined, otherwise 0. */
 TRSize TRMeasureView(NSView *view, TRSize available, TRMeasureMode wm, TRMeasureMode hm);
 
+/* A cell's intrinsic size as Trellis sees it: -cellSize with the slider
+   corrections (no intrinsic length along a Cocoa track; GNUstep thickness). */
+NSSize TRCellSize(NSCell *cell);
+
 /* First baseline from the top of the view, at the given size. */
 TRFloat TRBaselineOfView(NSView *view, TRSize size);
 

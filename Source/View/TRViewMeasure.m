@@ -49,7 +49,7 @@ static NSSize TRWrappedCellSize(NSCell *cell, CGFloat cellWidth)
    Along the track, Apple's -cellSize reports a huge length (40000) meaning
    "flexible", as -intrinsicContentSize's NSViewNoIntrinsicMetric does, so
    Trellis treats it as no intrinsic length (GNUstep reports 8). */
-static NSSize TRCellSize(NSCell *cell)
+NSSize TRCellSize(NSCell *cell)
 {
   NSSize s = [cell cellSize];
   if ([cell isKindOfClass: [NSSliderCell class]])

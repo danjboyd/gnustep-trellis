@@ -343,7 +343,7 @@ def match_selector(el, parts):
 
 # --------------------------------------------------------- values ----------
 
-LEN_RE = re.compile(r"^(-?\d*\.?\d+)(px|em|%)?$")
+LEN_RE = re.compile(r"^([-+]?\d*\.?\d+)(px|em|%)?$")
 
 
 def to_px(v, font_size):
@@ -385,8 +385,28 @@ def norm_value(v, font_size, requires):
     return re.sub(r"(-?\d*\.?\d+)em\b", repl, v)
 
 
+def split_tokens(v):
+    """Whitespace-split a CSS value, keeping (...) groups such as calc()
+    and minmax() whole."""
+    out, depth, cur = [], 0, ""
+    for ch in v.strip():
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+        if ch.isspace() and depth == 0:
+            if cur:
+                out.append(cur)
+            cur = ""
+        else:
+            cur += ch
+    if cur:
+        out.append(cur)
+    return out
+
+
 def box4(v):
-    t = v.split()
+    t = split_tokens(v)
     if len(t) == 1:
         t = t * 4
     elif len(t) == 2:
@@ -429,7 +449,7 @@ def expand(decls):
         elif k in ("grid-row-gap", "grid-column-gap"):
             out[k[len("grid-"):]] = v
         elif k in ("gap", "grid-gap"):
-            t = v.split()
+            t = split_tokens(v)
             out["row-gap"] = t[0]
             out["column-gap"] = t[1] if len(t) > 1 else t[0]
         elif k == "flex":

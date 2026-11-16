@@ -272,6 +272,15 @@ typedef struct {
   return (TRRect){ cx[c], r->top, cw[c], r->height };
 }
 
+- (NSInteger)rowForItem:(NSInteger)item column:(NSInteger *)column
+{
+  [self resolveRows];
+  if (item < 0 || item >= _count) { if (column) *column = 0; return NSNotFound; }
+  NSInteger r = [self rowOfItem: item];
+  if (column) *column = item - ((const TRVRow *)[_rows bytes])[r].first;
+  return r;
+}
+
 - (NSRange)itemsForViewportOffset:(TRFloat)offset height:(TRFloat)height overscan:(TRFloat)viewports
 {
   [self resolveRows];

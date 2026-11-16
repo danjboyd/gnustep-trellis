@@ -25,6 +25,13 @@
    - Non-layout declarations are applied as drawing: background-color,
      border-color, border-radius on boxes; color, font-size, font-weight,
      text-align on text controls. */
+/* A view whose focusable descendants are not its subviews in order
+   (TRVirtualBox): Trellis collects key views from these subtrees, in
+   this order, instead. */
+@protocol TRKeyViewProvider
+- (NSArray<NSView *> *)trellisKeyViewSubtrees;
+@end
+
 @interface TRBoxView : NSView
 
 + (instancetype)boxWithStyle:(NSString *)declarations;
@@ -56,6 +63,9 @@
 - (void)layoutTrellis;
 /* The outermost TRBoxView of this tree. */
 - (TRBoxView *)rootBox;
+/* The height this box's content needs at a width (content changes since
+   the last layout included); the layout is left as it was. */
+- (CGFloat)heightForWidth:(CGFloat)width;
 
 /* Keyboard focus order. The outermost TRBoxView links its focusable
    descendants into a nextKeyView loop after every layout: views with a
@@ -93,6 +103,20 @@ NSView *TRAccessibilityTitleView(NSView *view);
 /* "group" (a named container) or "none" (hidden from assistive apps). */
 void TRSetAccessibilityRole(NSView *view, NSString *role);
 NSString *TRAccessibilityRole(NSView *view);
+/* Collections (TRVirtualBox): role "list" or "grid" with the item count
+   (and column count; 0 for lists), and each item's index, row and
+   column. Cocoa: AXList / AXGrid, accessibilityRowCount,
+   accessibilityColumnCount, accessibilityIndex. */
+void TRSetAccessibilityCollection(NSView *view, NSString *role, NSInteger count, NSInteger columns);
+BOOL TRAccessibilityCollection(NSView *view, NSInteger *count, NSInteger *columns);
+void TRSetAccessibilityPosition(NSView *view, NSInteger index, NSInteger row, NSInteger column);
+/* NO if the view has no position (not an item of a collection). */
+BOOL TRAccessibilityPosition(NSView *view, NSInteger *index, NSInteger *row, NSInteger *column);
+
+/* Applies the text and colour declarations (color, font-*, text-align,
+   background-color, ...) to a leaf view outside any box, as a box does
+   for its subviews (template roots that are controls). */
+void TRApplyLeafStyle(NSView *view, NSString *declarations);
 
 /* CSS colour strings: #rgb, #rrggbb, #rrggbbaa, rgb(), rgba(), a few
    names, and CSS system colours (Canvas, CanvasText, ...; dynamic). */

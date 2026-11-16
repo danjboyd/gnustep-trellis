@@ -12,7 +12,7 @@
 #import <objc/runtime.h>
 #import <objc/message.h>
 
-static char kTRTabIndexKey, kTRA11yLabelKey, kTRA11yTitleKey, kTRA11yRoleKey;
+static char kTRTabIndexKey, kTRA11yLabelKey, kTRA11yTitleKey, kTRA11yRoleKey, kTRA11yCollectionKey, kTRA11yPositionKey;
 
 /* Cocoa's NSAccessibility setters, called only where they exist. */
 static void TRSendObject(NSView *v, NSString *selName, id value)
@@ -25,6 +25,12 @@ static void TRSendBool(NSView *v, NSString *selName, BOOL value)
 {
   SEL sel = NSSelectorFromString(selName);
   if ([v respondsToSelector: sel]) ((void (*)(id, SEL, BOOL))objc_msgSend)(v, sel, value);
+}
+
+static void TRSendInteger(NSView *v, NSString *selName, NSInteger value)
+{
+  SEL sel = NSSelectorFromString(selName);
+  if ([v respondsToSelector: sel]) ((void (*)(id, SEL, NSInteger))objc_msgSend)(v, sel, value);
 }
 
 void TRSetAccessibilityLabel(NSView *view, NSString *label)
@@ -69,6 +75,41 @@ void TRSetAccessibilityRole(NSView *view, NSString *role)
 NSString *TRAccessibilityRole(NSView *view)
 {
   return objc_getAssociatedObject(view, &kTRA11yRoleKey);
+}
+
+void TRSetAccessibilityCollection(NSView *view, NSString *role, NSInteger count, NSInteger columns)
+{
+  objc_setAssociatedObject(view, &kTRA11yRoleKey, [role copy], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+  objc_setAssociatedObject(view, &kTRA11yCollectionKey, @[@(count), @(columns)], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+  TRSendBool(view, @"setAccessibilityElement:", YES);
+  TRSendObject(view, @"setAccessibilityRole:", [role isEqualToString: @"grid"] ? @"AXGrid" : @"AXList");
+  TRSendInteger(view, @"setAccessibilityRowCount:", columns > 0 ? (count + columns - 1) / columns : count);
+  if (columns > 0) TRSendInteger(view, @"setAccessibilityColumnCount:", columns);
+}
+
+BOOL TRAccessibilityCollection(NSView *view, NSInteger *count, NSInteger *columns)
+{
+  NSArray *a = objc_getAssociatedObject(view, &kTRA11yCollectionKey);
+  if (a == nil) return NO;
+  if (count) *count = [a[0] integerValue];
+  if (columns) *columns = [a[1] integerValue];
+  return YES;
+}
+
+void TRSetAccessibilityPosition(NSView *view, NSInteger index, NSInteger row, NSInteger column)
+{
+  objc_setAssociatedObject(view, &kTRA11yPositionKey, @[@(index), @(row), @(column)], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+  TRSendInteger(view, @"setAccessibilityIndex:", index);
+}
+
+BOOL TRAccessibilityPosition(NSView *view, NSInteger *index, NSInteger *row, NSInteger *column)
+{
+  NSArray *a = objc_getAssociatedObject(view, &kTRA11yPositionKey);
+  if (a == nil) return NO;
+  if (index) *index = [a[0] integerValue];
+  if (row) *row = [a[1] integerValue];
+  if (column) *column = [a[2] integerValue];
+  return YES;
 }
 
 void TRSetTabIndex(NSView *view, NSInteger index)
@@ -184,6 +225,15 @@ NSColor *TRColorFromCSS(NSString *css)
 
 /* ------------------------------------------------------------------ */
 #pragma mark Text styling of leaf controls
+
+static void TRApplyTextStyle(NSView *view, NSDictionary *decls);
+
+void TRApplyLeafStyle(NSView *view, NSString *declarations)
+{
+  TRStyle *st = [TRStyle new];
+  if ([declarations length]) [st applyDeclarations: declarations error: NULL];
+  TRApplyTextStyle(view, st.otherDeclarations);
+}
 
 static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
 {
@@ -603,6 +653,16 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
     }
 }
 
+- (CGFloat)heightForWidth:(CGFloat)width
+{
+  [self refreshSignatures];
+  [_node layoutWithAvailableSize: TRSizeMake(width, NAN)];
+  CGFloat h = _node.layoutFrame.height;
+  NSSize sz = [self bounds].size;
+  [_node layoutWithAvailableSize: TRSizeMake(sz.width, sz.height)];
+  return h;
+}
+
 - (void)layoutTrellis
 {
   TRBoxView *root = [self rootBox];
@@ -650,6 +710,11 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
     {
       for (TRNode *c in ((TRBoxView *)v).node.children)
         if ([c.context isKindOfClass: [NSView class]]) TRCollectKeyViews(c.context, out);
+      return;
+    }
+  if ([v conformsToProtocol: @protocol(TRKeyViewProvider)])
+    {
+      for (NSView *sub in [(id<TRKeyViewProvider>)v trellisKeyViewSubtrees]) TRCollectKeyViews(sub, out);
       return;
     }
   if ([v isKindOfClass: [NSScrollView class]])

@@ -17,6 +17,7 @@
 #import <AppKit/AppKit.h>
 #import "TRBoxView.h"
 #import "TRLoader.h"
+#import "TRVirtualBox.h"
 #import "TRViewMeasure.h"
 #import "TRLint.h"
 #ifdef GNUSTEP
@@ -56,6 +57,7 @@ static NSView *TPViewAtPath(NSView *root, NSString *path)
     {
       NSArray *kids;
       if ([v isKindOfClass: [TRScrollBox class]]) kids = @[[(TRScrollBox *)v contentBox]];
+      else if ([v isKindOfClass: [TRVirtualBox class]]) kids = [(TRVirtualBox *)v visibleItemViews];
       else if ([v isKindOfClass: [TRBoxView class]])
         {
           NSMutableArray *k = [NSMutableArray array];
@@ -359,6 +361,18 @@ static NSDictionary *TPDump(NSView *v, TRNode *node)
       TRBoxView *cb = [(TRScrollBox *)v contentBox];
       d[@"overflow"] = @"scroll";
       [kids addObject: TPDump(cb, cb.node)];
+    }
+  else if ([v isKindOfClass: [TRVirtualBox class]])
+    {
+      TRVirtualBox *vb = (TRVirtualBox *)v;
+      CGFloat top = [[vb contentView] bounds].origin.y;
+      d[@"overflow"] = @"scroll";
+      for (NSView *iv in [vb visibleItemViews])
+        {
+          NSMutableDictionary *k = [TPDump(iv, [iv isKindOfClass: [TRBoxView class]] ? ((TRBoxView *)iv).node : nil) mutableCopy];
+          k[@"y"] = @([iv frame].origin.y - top);
+          [kids addObject: k];
+        }
     }
   else if ([v isKindOfClass: [TRBoxView class]])
     for (TRNode *c in [(TRBoxView *)v node].children)

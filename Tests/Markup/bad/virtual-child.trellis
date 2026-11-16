@@ -1,0 +1,6 @@
+<!-- expect: <virtual> may only contain <template id="..."> elements with one child each, not <label> -->
+<column>
+  <virtual>
+    <label>Not a template</label>
+  </virtual>
+</column>

@@ -5,6 +5,7 @@
 */
 
 #import "TRLoader.h"
+#import "TRVirtualBox.h"
 #import <objc/runtime.h>
 
 static NSError *TRLoadError(TRMarkupDocument *doc, TRMarkupElement *e, NSString *fmt, ...) NS_FORMAT_FUNCTION(3,4);
@@ -192,6 +193,64 @@ static BOOL TRHotReloadOn(void)
 @end
 #endif
 
+@interface TRLoader (TRSampleDepth)
++ (BOOL)applySample:(NSDictionary *)sample toView:(NSView *)root depth:(int)depth error:(NSError **)error;
+@end
+
+static NSView *TRFindView(NSString *identifier, NSView *root);
+
+/* Sample content for a <virtual>: "items" cycled up to `repeat` times
+   the count; "{i}" in a string becomes the item's number (from 1), and
+   "_template" picks the template. Used by trellis-render and Preview. */
+@interface TRVirtualSample : NSObject <TRVirtualDataSource>
+{
+@public
+  NSArray *items;
+  NSInteger repeat;
+}
+@end
+
+static char kTRVirtualSampleKey;
+
+@implementation TRVirtualSample
+- (NSInteger)numberOfItemsInVirtualBox:(TRVirtualBox *)box { return (NSInteger)[items count] * repeat; }
+- (NSDictionary *)itemAt:(NSInteger)i
+{
+  id it = items[(NSUInteger)i % [items count]];
+  return [it isKindOfClass: [NSDictionary class]] ? it : @{};
+}
+- (NSString *)virtualBox:(TRVirtualBox *)box templateForItemAtIndex:(NSInteger)i
+{
+  return [self itemAt: i][@"_template"];
+}
+static id TRSampleSubst(id v, NSInteger i)
+{
+  NSString *n = [NSString stringWithFormat: @"%ld", (long)(i + 1)];
+  if ([v isKindOfClass: [NSString class]])
+    return [(NSString *)v stringByReplacingOccurrencesOfString: @"{i}" withString: n];
+  if ([v isKindOfClass: [NSDictionary class]])
+    {
+      NSMutableDictionary *d = [NSMutableDictionary dictionary];
+      for (id k in v) d[k] = TRSampleSubst(((NSDictionary *)v)[k], i);
+      return d;
+    }
+  if ([v isKindOfClass: [NSArray class]])
+    {
+      NSMutableArray *a = [NSMutableArray array];
+      for (id x in v) [a addObject: TRSampleSubst(x, i)];
+      return a;
+    }
+  return v;
+}
+- (void)virtualBox:(TRVirtualBox *)box configureView:(NSView *)view atIndex:(NSInteger)i
+{
+  NSDictionary *it = TRSampleSubst([self itemAt: i], i);
+  NSError *err = nil;
+  if (![TRLoader applySample: it toView: view depth: 1 error: &err])
+    NSLog(@"sample item %ld: %@", (long)i, [err localizedDescription]);
+}
+@end
+
 @implementation TRLoader
 
 static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
@@ -227,6 +286,40 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
     }
   else if ([n isEqualToString: @"scroll"])
     v = [[TRScrollBox alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)];
+  else if ([n isEqualToString: @"virtual"])
+    {
+      NSString *layout = a[@"layout"] ?: @"list";
+      if (![layout isEqualToString: @"list"] && ![layout isEqualToString: @"grid"])
+        {
+          if (error) *error = TRLoadError(doc, e, @"<virtual layout=\"%@\">: use list or grid", layout);
+          return nil;
+        }
+      TRVirtualBox *vb = [[TRVirtualBox alloc] initWithMode: [layout isEqualToString: @"grid"]
+                                                          ? TRVirtualModeGrid : TRVirtualModeList];
+      for (TRMarkupElement *c in e.children)
+        {
+          if (![c.name isEqualToString: @"template"] || c.attributes[@"id"] == nil || [c.children count] != 1)
+            {
+              if (error) *error = TRLoadError(doc, c, @"<virtual> may only contain <template id=\"...\"> elements with one child each");
+              return nil;
+            }
+          [vb registerTemplateElement: c ofDocument: doc];
+        }
+      if (a[@"template"]) vb.defaultTemplate = a[@"template"];
+      else if ([e.children count]) vb.defaultTemplate = ((TRMarkupElement *)e.children[0]).attributes[@"id"];
+      if (a[@"estimated-size"]) vb.estimatedSize = [a[@"estimated-size"] doubleValue];
+      if (a[@"overscan"]) vb.overscan = [a[@"overscan"] doubleValue];
+      NSMutableArray *base = [NSMutableArray array];
+      for (TRMatchedDeclarations *m in [doc declarationsForElement: e])
+        if (m.condition == nil) [base addObject: m.declarations];
+      NSError *err = nil;
+      if (![vb setContainerDeclarations: [base componentsJoinedByString: @"; "] error: &err])
+        {
+          if (error) *error = TRLoadError(doc, e, @"%@", [err localizedDescription]);
+          return nil;
+        }
+      v = vb;
+    }
   else if ([n isEqualToString: @"label"])
     v = TRMakeLabel(a[@"text"] ?: text, TRYes(a[@"wraps"]));
   else if ([n isEqualToString: @"text"])
@@ -340,7 +433,8 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
       return nil;
     }
 
-  if (!container && ![n isEqualToString: @"popup"] && ![n isEqualToString: @"scroll"] && [e.children count])
+  if (!container && ![n isEqualToString: @"popup"] && ![n isEqualToString: @"scroll"]
+      && ![n isEqualToString: @"virtual"] && [e.children count])
     {
       if (error) *error = TRLoadError(doc, e.children[0], @"<%@> cannot contain elements", n);
       return nil;
@@ -576,32 +670,58 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
                                      doc.name, templateId]}];
       return nil;
     }
+  (void)owner;
+  return [self instantiateTemplateElement: t ofDocument: doc error: error];
+}
+
+/* A copy of a <template> element's one child (top-level, or inside a
+   <virtual>). Template instances are not outlets of the owner. */
++ (NSView *)instantiateTemplateElement:(TRMarkupElement *)t ofDocument:(TRMarkupDocument *)doc
+                                 error:(NSError **)error
+{
   TRMarkupElement *e = t.children[0];
-  /* Template instances are not outlets of the owner. */
   NSView *v = [self viewForElement: e document: doc owner: nil error: error];
   if (v == nil) return nil;
-  if ([v isKindOfClass: [TRBoxView class]]
-      && ![self applyStylesOf: e toView: v inBox: nil document: doc error: error])
-    return nil;
-  (void)owner;
+  if ([v isKindOfClass: [TRBoxView class]])
+    {
+      if (![self applyStylesOf: e toView: v inBox: nil document: doc error: error]) return nil;
+    }
+  else
+    {
+      /* A control as the template's root: no box styles it, so here. */
+      NSMutableArray *base = [NSMutableArray array];
+      for (TRMatchedDeclarations *m in [doc declarationsForElement: e])
+        if (m.condition == nil) [base addObject: m.declarations];
+      TRApplyLeafStyle(v, [base componentsJoinedByString: @"; "]);
+    }
   if (!TRResolveLabelFor(v, doc, error)) return nil;
   return v;
 }
 
 + (NSView *)viewWithIdentifier:(NSString *)identifier inView:(NSView *)root
 {
+  return TRFindView(identifier, root);
+}
+
+static NSView *TRFindView(NSString *identifier, NSView *root)
+{
   if ([[root identifier] isEqualToString: identifier]) return root;
-  NSArray *subs = [root isKindOfClass: [NSScrollView class]]
-    ? @[[(NSScrollView *)root documentView]] : [root subviews];
+  NSArray *subs = [root isKindOfClass: [TRVirtualBox class]] ? @[]
+    : ([root isKindOfClass: [NSScrollView class]] ? @[[(NSScrollView *)root documentView]] : [root subviews]);
   for (NSView *s in subs)
     {
-      NSView *f = [self viewWithIdentifier: identifier inView: s];
+      NSView *f = TRFindView(identifier, s);
       if (f) return f;
     }
   return nil;
 }
 
 + (BOOL)applySample:(NSDictionary *)sample toView:(NSView *)root error:(NSError **)error
+{
+  return [self applySample: sample toView: root depth: 0 error: error];
+}
+
++ (BOOL)applySample:(NSDictionary *)sample toView:(NSView *)root depth:(int)depth error:(NSError **)error
 {
   for (NSString *ident in sample)
     {
@@ -615,6 +735,25 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
         }
       id val = sample[ident];
       NSDictionary *d = [val isKindOfClass: [NSDictionary class]] ? val : nil;
+      if ([v isKindOfClass: [TRVirtualBox class]])
+        {
+          if (depth > 0 || ![d[@"items"] isKindOfClass: [NSArray class]])
+            {
+              if (error) *error = [NSError errorWithDomain: TRMarkupErrorDomain code: 12 userInfo: @{
+                NSLocalizedDescriptionKey: [NSString stringWithFormat:
+                  @"sample: '%@' is a <virtual>; give {\"items\": [...], \"repeat\": n}", ident]}];
+              return NO;
+            }
+          TRVirtualSample *src = [TRVirtualSample new];
+          src->items = d[@"items"];
+          src->repeat = MAX([d[@"repeat"] integerValue], 1);
+          /* The box holds its data source weakly; the sample lives with it. */
+          objc_setAssociatedObject(v, &kTRVirtualSampleKey, src, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+          [(TRVirtualBox *)v setDataSource: src];
+          if (d[@"scroll-to"]) [(TRVirtualBox *)v scrollToItemAtIndex: [d[@"scroll-to"] integerValue]
+                                                             position: TRVirtualScrollTop];
+          continue;
+        }
       NSString *str = [val isKindOfClass: [NSString class]] ? val : d[@"string"];
       if ([v isKindOfClass: [NSPopUpButton class]])
         {

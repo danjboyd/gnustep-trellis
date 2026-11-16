@@ -68,6 +68,8 @@ typedef struct {
 @property (nonatomic, readonly) TRFloat contentHeight;
 @property (nonatomic, readonly) NSInteger columnCount;
 - (TRRect)frameForItem:(NSInteger)item;
+/* The item's row (a group header's row counts) and its column in it. */
+- (NSInteger)rowForItem:(NSInteger)item column:(NSInteger *)column;
 /* The items to realize for a viewport [offset, offset + height]:
    whole rows that intersect it, extended by overscan viewports above
    and below. */

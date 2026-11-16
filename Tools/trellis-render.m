@@ -14,6 +14,7 @@
 #import "TRViewMeasure.h"
 #import "TRLint.h"
 #import "TRLoader.h"
+#import "TRVirtualBox.h"
 
 extern TRBoxView *TRSampleScreen(NSString *name);
 extern NSArray<NSString *> *TRSampleScreenNames(void);
@@ -149,6 +150,24 @@ static NSDictionary *TRDumpView(NSView *v, TRNode *node)
       TRBoxView *cb = [(TRScrollBox *)v contentBox];
       d[@"overflow"] = @"scroll";
       d[@"children"] = @[TRDumpView(cb, cb.node)];
+    }
+  if ([v isKindOfClass: [TRVirtualBox class]])
+    {
+      /* The visible items, in the box's coordinates. */
+      TRVirtualBox *vb = (TRVirtualBox *)v;
+      CGFloat top = [[vb contentView] bounds].origin.y;
+      NSMutableArray *kids = [NSMutableArray array];
+      for (NSView *iv in [vb visibleItemViews])
+        {
+          NSMutableDictionary *k = [TRDumpView(iv, [iv isKindOfClass: [TRBoxView class]] ? ((TRBoxView *)iv).node : nil) mutableCopy];
+          k[@"y"] = @([iv frame].origin.y - top);
+          k[@"item"] = @([vb indexOfItemView: iv]);
+          [kids addObject: k];
+        }
+      d[@"overflow"] = @"scroll";
+      d[@"virtual"] = @{@"count": @(vb.virtualLayout.itemCount), @"columns": @(vb.virtualLayout.columnCount),
+                        @"contentHeight": @(vb.virtualLayout.contentHeight)};
+      if ([kids count]) d[@"children"] = kids;
     }
   if ([v isKindOfClass: [TRBoxView class]])
     {

@@ -237,6 +237,29 @@ static void TRLintTrellis(NSString *path, NSString *header)
                        [m.declarations substringWithRange: [r rangeAtIndex: 2]]]);
         }
     }
+  /* <virtual>: templates only, and template= names one of them. */
+  for (TRMarkupElement *e in [doc allElements])
+    {
+      if (![e.name isEqualToString: @"virtual"]) continue;
+      NSString *where = [NSString stringWithFormat: @"%@:%lu:%lu", path, (unsigned long)e.line, (unsigned long)e.column];
+      NSMutableSet *ids = [NSMutableSet set];
+      for (TRMarkupElement *c in e.children)
+        {
+          if (![c.name isEqualToString: @"template"] || c.attributes[@"id"] == nil || [c.children count] != 1)
+            TRReport(where, @"error", @"virtual", [NSString stringWithFormat:
+              @"<virtual> may only contain <template id=\"...\"> elements with one child each, not <%@>", c.name]);
+          else
+            [ids addObject: c.attributes[@"id"]];
+        }
+      if ([ids count] == 0)
+        TRReport(where, @"error", @"virtual", @"<virtual> has no <template>");
+      NSString *t = e.attributes[@"template"];
+      if (t && ![ids containsObject: t])
+        TRReport(where, @"error", @"virtual", [NSString stringWithFormat: @"template=\"%@\" is not one of its <template>s", t]);
+      NSString *layout = e.attributes[@"layout"];
+      if (layout && ![layout isEqualToString: @"list"] && ![layout isEqualToString: @"grid"])
+        TRReport(where, @"error", @"virtual", [NSString stringWithFormat: @"layout=\"%@\": use list or grid", layout]);
+    }
   TRLintColours(doc, path);
   TRLintAccessibility(doc, path);
   if (header == nil) return;

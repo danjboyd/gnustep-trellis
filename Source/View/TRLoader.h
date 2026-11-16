@@ -12,6 +12,9 @@
 
      column, row, box     TRBoxView (column/row set flex-direction)
      scroll               NSScrollView whose document view is a column box
+     virtual              TRVirtualBox: a scroller that builds views only for
+                          the items on screen (layout="list|grid", template=,
+                          estimated-size=, overscan=; <template id> children)
      label                non-editable NSTextField (text content = string)
      text                 wrapping, non-editable NSTextField
      field                editable NSTextField (placeholder=, secure="yes")
@@ -42,6 +45,10 @@
                      ofDocument:(TRMarkupDocument *)document
                           owner:(id)owner
                           error:(NSError **)error;
+/* The same for a <template> element (top-level or inside <virtual>). */
++ (NSView *)instantiateTemplateElement:(TRMarkupElement *)element
+                            ofDocument:(TRMarkupDocument *)document
+                                 error:(NSError **)error;
 
 /* Fills views from sample content: {"id": "text" | {"string"|"title"|
    "items"|"state"|"value"|"hidden": ...}}. Unknown ids are errors. */

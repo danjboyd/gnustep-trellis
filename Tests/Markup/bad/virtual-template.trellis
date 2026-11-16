@@ -1,0 +1,6 @@
+<!-- expect: template="card" is not one of its <template>s -->
+<column>
+  <virtual template="card">
+    <template id="row"><label id="t">Row</label></template>
+  </virtual>
+</column>

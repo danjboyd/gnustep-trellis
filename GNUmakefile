@@ -45,10 +45,11 @@ libTrellisEngine_HEADER_FILES = TRTypes.h TRStyle.h TRNode.h TRLint.h TRMarkup.h
 libTrellis_OBJC_FILES = \
 	Source/View/TRBoxView.m \
 	Source/View/TRViewMeasure.m \
-	Source/View/TRLoader.m
+	Source/View/TRLoader.m \
+	Source/View/TRVirtualBox.m
 libTrellis_HEADER_FILES_DIR = Source/View
 libTrellis_HEADER_FILES_INSTALL_DIR = Trellis
-libTrellis_HEADER_FILES = TRBoxView.h TRViewMeasure.h TRLoader.h
+libTrellis_HEADER_FILES = TRBoxView.h TRViewMeasure.h TRLoader.h TRVirtualBox.h
 libTrellis_NEEDS_GUI = yes
 libTrellis_LIBRARIES_DEPEND_UPON = -lTrellisEngine $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS)
 
@@ -132,6 +133,7 @@ check-gui:: all
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/hot-reload.m -o obj/gui-tests/hot-reload $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/key-view-hang.m -o obj/gui-tests/key-view-hang $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/dealloc-pending-layout.m -o obj/gui-tests/dealloc-pending-layout $(GUI_TEST_LIBS)
+	@$(CC) $(GUI_TEST_FLAGS) Tests/View/virtual-box.m -o obj/gui-tests/virtual-box $(GUI_TEST_LIBS)
 	@echo "== view checks (headless)"
 	@export LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH; status=0; \
 	  timeout 60 scripts/run-headless.sh obj/gui-tests/size-for-width > obj/gui-tests/hook.log 2>&1 || status=1; \
@@ -150,6 +152,9 @@ check-gui:: all
 	  NSZombieEnabled=YES timeout 60 scripts/run-headless.sh obj/gui-tests/dealloc-pending-layout > obj/gui-tests/dealloc.log 2>&1 || status=1; \
 	  if grep -q "deallocated instance" obj/gui-tests/dealloc.log; then echo "DEALLOC FAIL: message sent to a freed object"; status=1; fi; \
 	  grep -v _NET_WORKAREA obj/gui-tests/dealloc.log | tail -1; \
+	  NSZombieEnabled=YES timeout 120 scripts/run-headless.sh obj/gui-tests/virtual-box > obj/gui-tests/virtual.log 2>&1 || status=1; \
+	  if grep -q "deallocated instance" obj/gui-tests/virtual.log; then echo "VIRTUALBOX FAIL: message sent to a freed object"; status=1; fi; \
+	  grep -v _NET_WORKAREA obj/gui-tests/virtual.log | tail -1; \
 	  Tests/View/appearance.sh || status=1; \
 	  Tests/View/scroll-container-query.sh || status=1; \
 	  exit $$status

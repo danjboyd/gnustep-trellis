@@ -1156,6 +1156,14 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       TRSizeTracks(rowsT, nRows, contentH, rowGap, items, n, NO, s->alignContent, minInnerH, maxInnerH);
       rowsTotal = TRPlaceTracks(rowsT, nRows, rowGap, contentH, s->alignContent, s->alignContentSafe);
     }
+  /* A percentage row-gap in an indefinite height counts as 0 while the
+     height is found, then resolves against it (the grid keeps that height,
+     so the rows may overflow). */
+  if (isnan(innerH) && s->rowGap.unit == TRUnitPercent)
+    {
+      double g = MAX(0, s->rowGap.value * contentH / 100.0);
+      rowsTotal = TRPlaceTracks(rowsT, nRows, g, contentH, s->alignContent, s->alignContentSafe);
+    }
 
   /* ---- Container size ---- */
   double W = wm == TRMeasureModeExactly ? aw : colsTotal + pbW;

@@ -1508,5 +1508,36 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_percent_row_gap_indefinite_height",
+  "note": "a percentage row-gap in an auto-height grid resolves against the height found without it",
+  "root": {
+   "style": {
+    "display": "grid",
+    "width": 100,
+    "gridTemplateRows": "10px 10px",
+    "rowGap": "20%"
+   },
+   "children": [
+    {},
+    {}
+   ]
+  },
+  "available": {
+   "width": 200,
+   "height": null
+  },
+  "expected": {
+   "height": 20,
+   "children": [
+    {
+     "y": 0
+    },
+    {
+     "y": 14
+    }
+   ]
+  }
  }
 ]

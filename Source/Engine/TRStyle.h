@@ -41,6 +41,7 @@ typedef struct {
   TRAlign justifyItems;         /* normal = stretch */
   TRAlign justifySelf;          /* auto = justify-items */
   BOOL gridAutoFlowColumn;      /* grid-auto-flow: column */
+  BOOL gridAutoFlowDense;       /* grid-auto-flow: ... dense */
   /* "safe" overflow alignment (CSS Box Alignment 4.4): when the content
      overflows, align as start. */
   BOOL justifyContentSafe, alignContentSafe;

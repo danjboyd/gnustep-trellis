@@ -628,10 +628,19 @@ static int TREdgeFromSuffix(NSString *suffix)
     }
   if ([p isEqualToString: @"grid-auto-flow"])
     {
-      NSString *lv = [v lowercaseString];
-      if ([lv hasPrefix: @"column"]) _s.gridAutoFlowColumn = YES;
-      else if ([lv hasPrefix: @"row"] || [lv isEqualToString: @"dense"]) _s.gridAutoFlowColumn = NO;
-      else return 0;
+      /* [row | column] || dense */
+      BOOL column = NO, dense = NO, sawAxis = NO;
+      for (NSString *t in [[v lowercaseString] componentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceCharacterSet]])
+        {
+          if ([t length] == 0) continue;
+          if ([t isEqualToString: @"dense"] && !dense) dense = YES;
+          else if (([t isEqualToString: @"row"] || [t isEqualToString: @"column"]) && !sawAxis)
+            { sawAxis = YES; column = [t isEqualToString: @"column"]; }
+          else return 0;
+        }
+      if (!sawAxis && !dense) return 0;
+      _s.gridAutoFlowColumn = column;
+      _s.gridAutoFlowDense = dense;
       return 1;
     }
   if ([p isEqualToString: @"grid-row-start"] || [p isEqualToString: @"grid-row-end"]
@@ -826,7 +835,9 @@ static NSString *TRKeywordString(const TRKeyword *table, int value)
   if (_s.order != 0) [out addObject: [NSString stringWithFormat: @"order: %ld", (long)_s.order]];
   KW(@"justify-items", kJustify, justifyItems)
   KW(@"justify-self", kJustify, justifySelf)
-  if (_s.gridAutoFlowColumn) [out addObject: @"grid-auto-flow: column"];
+  if (_s.gridAutoFlowColumn || _s.gridAutoFlowDense)
+    [out addObject: [NSString stringWithFormat: @"grid-auto-flow: %@%@",
+                     _s.gridAutoFlowColumn ? @"column" : @"row", _s.gridAutoFlowDense ? @" dense" : @""]];
   if (_gridTemplateColumns) [out addObject: [@"grid-template-columns: " stringByAppendingString: _gridTemplateColumns]];
   if (_gridTemplateRows) [out addObject: [@"grid-template-rows: " stringByAppendingString: _gridTemplateRows]];
   if (_gridAutoColumns) [out addObject: [@"grid-auto-columns: " stringByAppendingString: _gridAutoColumns]];

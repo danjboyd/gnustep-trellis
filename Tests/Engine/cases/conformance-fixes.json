@@ -1334,5 +1334,48 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_auto_flow_dense",
+  "note": "grid-auto-flow: dense fills earlier holes instead of continuing from the cursor",
+  "root": {
+   "style": {
+    "display": "grid",
+    "gridAutoFlow": "row dense",
+    "gridTemplateColumns": "50px 50px",
+    "gridAutoRows": "50px",
+    "width": 100,
+    "alignContent": "start"
+   },
+   "children": [
+    {
+     "style": {
+      "gridColumn": "2"
+     }
+    },
+    {
+     "style": {
+      "gridColumn": "span 2"
+     }
+    },
+    {}
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "x": 50,
+     "y": 0
+    },
+    {
+     "x": 0,
+     "y": 50
+    },
+    {
+     "x": 0,
+     "y": 0
+    }
+   ]
+  }
  }
 ]

@@ -818,6 +818,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
   if (n > 1) qsort(items, (size_t)n, sizeof(TRGridItem), TRCompareItemOrder);
 
   BOOL colFlow = s->gridAutoFlowColumn;
+  const BOOL dense = s->gridAutoFlowDense;
   NSInteger gridCols = MAX(explicitCols, 1), gridRows = MAX(explicitRows, 0);
   /* Occupancy, grown on demand: major axis = rows for row flow. */
   /* __block: the minor axis can widen below, and the blocks must see it. */
@@ -939,7 +940,8 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       if (!majDef) continue;
       NSInteger maj = colFlow ? pl[k].cs : pl[k].rs;
       NSInteger majSpan = colFlow ? pl[k].cspan : pl[k].rspan, minSpan = colFlow ? pl[k].rspan : pl[k].cspan;
-      NSInteger min = [lineCursor[@(maj)] integerValue];
+      /* dense: search from the start of the line, not past earlier items. */
+      NSInteger min = dense ? 0 : [lineCursor[@(maj)] integerValue];
       for (;;)
         {
           widen(min + minSpan);
@@ -962,6 +964,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       NSInteger majStart = colFlow ? pl[k].cs : pl[k].rs, minStart = colFlow ? pl[k].rs : pl[k].cs;
       NSInteger majSpan = colFlow ? pl[k].cspan : pl[k].rspan, minSpan = colFlow ? pl[k].rspan : pl[k].cspan;
       NSInteger maj, min;
+      if (dense) { curMaj = 0; curMin = 0; }   /* dense: every search starts at the beginning */
       if (majDef)
         {
           maj = majStart;   /* not reached: placed in step 2 */

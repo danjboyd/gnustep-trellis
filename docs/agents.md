@@ -94,7 +94,8 @@ the user's settings. trellis-render refuses to run without it.
   `justify-items`, `justify-self`, `align-items`, `align-self`,
   `justify-content` and `align-content`.
   `fit-content(N)` (px or %) caps a track at N.
-  **Not supported:** named lines (`[name]`), `subgrid` and `dense`.
+  `grid-auto-flow` takes `dense`.
+  **Not supported:** named lines (`[name]`) and `subgrid`.
 - **Drawing:** `background-color` and `border-color`/`border-radius` on
   boxes; `color`, `font-size`, `font-weight` and `text-align` on text
   controls; `white-space: nowrap`.

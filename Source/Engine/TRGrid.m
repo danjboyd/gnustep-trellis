@@ -490,6 +490,11 @@ static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
                   if (mk == TRBreadthAuto || mk == TRBreadthMinContent || mk == TRBreadthMaxContent)
                     tr[i].base += extra / intrinsic;
                 }
+            /* Limits from the bases as they are now (the step above may
+               have raised them), so the extra isn't counted twice. */
+            haveL = gap * (span - 1);
+            for (NSInteger i = a; i < b; i++)
+              haveL += (limitSet[i] && !isinf(tr[i].limit)) ? MAX(tr[i].limit, tr[i].base) : tr[i].base;
             double extraL = maxC - haveL;
             if (extraL > 0)
               for (NSInteger i = a; i < b; i++)
@@ -498,7 +503,8 @@ static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
                   if (xk == TRBreadthAuto || xk == TRBreadthMaxContent || xk == TRBreadthMinContent
                       || TRIsFitContent(xk))
                     {
-                      double cur = limitSet[i] ? tr[i].limit : tr[i].base;
+                      /* A growth limit is never below the base. */
+                      double cur = limitSet[i] ? MAX(tr[i].limit, tr[i].base) : tr[i].base;
                       tr[i].limit = cur + extraL / intrinsic;
                       limitSet[i] = YES;
                     }
@@ -524,8 +530,16 @@ static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
   for (NSInteger i = 0; i < n; i++) if (!tr[i].collapsed) visible++;
   gaps = visible > 1 ? gap * (visible - 1) : 0;
 
-  /* Maximise: grow bases toward limits with definite free space. */
-  if (!isnan(avail))
+  /* Maximise (CSS Grid 12.6). With an indefinite size (a max-content
+     measurement) the free space is infinite: every track grows to its
+     growth limit. Min-content measurements come in with a definite 0. */
+  if (isnan(avail))
+    for (NSInteger i = 0; i < n; i++)
+      {
+        if (tr[i].size.max.kind != TRBreadthFr && !isinf(tr[i].limit) && tr[i].limit > tr[i].base)
+          tr[i].base = tr[i].limit;
+      }
+  else
     for (int guard = 0; guard < 8; guard++)
       {
         double used = gaps;

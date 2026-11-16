@@ -855,5 +855,47 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_max_content_spanning_item",
+  "note": "CSS Grid 12.6: under a max-content constraint auto tracks grow to their limits; a spanning item's extra isn't counted twice",
+  "root": {
+   "style": {
+    "width": 1000
+   },
+   "children": [
+    {
+     "style": {
+      "display": "grid",
+      "justifyContent": "start"
+     },
+     "children": [
+      {
+       "style": {
+        "gridRow": "1",
+        "gridColumn": "1 / span 2"
+       },
+       "measure": {
+        "text": "XXXXX XXXXXX",
+        "charWidth": 10,
+        "lineHeight": 10
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "width": 120,
+     "children": [
+      {
+       "width": 120
+      }
+     ]
+    }
+   ]
+  }
  }
 ]

@@ -811,8 +811,10 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
      tracks in an indefinite space. */
   double mxW = TRGBox(s, s->maxWidth, ow, YES, ow), mnW = TRGBox(s, s->minWidth, ow, YES, ow);
   double mxH = TRGBox(s, s->maxHeight, oh, NO, ow), mnH = TRGBox(s, s->minHeight, oh, NO, ow);
-  const double maxInnerW = isnan(mxW) ? NAN : MAX(0, mxW - pbW), minInnerW = isnan(mnW) ? NAN : MAX(0, mnW - pbW);
-  const double maxInnerH = isnan(mxH) ? NAN : MAX(0, mxH - pbH), minInnerH = isnan(mnH) ? NAN : MAX(0, mnH - pbH);
+  const double minInnerW = isnan(mnW) ? NAN : MAX(0, mnW - pbW), minInnerH = isnan(mnH) ? NAN : MAX(0, mnH - pbH);
+  /* A min larger than the max wins (CSS 2.1 10.4/10.7). */
+  const double maxInnerW = isnan(mxW) ? NAN : MAX(MAX(0, mxW - pbW), isnan(minInnerW) ? 0 : minInnerW);
+  const double maxInnerH = isnan(mxH) ? NAN : MAX(MAX(0, mxH - pbH), isnan(minInnerH) ? 0 : minInnerH);
 
   /* ---- Explicit grid ---- */
   NSInteger nCols = 0, nRows = 0, fitStartC, fitLenC, fitStartR, fitLenR;

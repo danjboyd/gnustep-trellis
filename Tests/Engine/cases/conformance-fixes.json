@@ -1606,5 +1606,48 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_min_height_beats_max_for_fr",
+  "note": "when min-height exceeds max-height the min wins, also for fr sizing",
+  "root": {
+   "style": {
+    "width": 200,
+    "flexDirection": "column",
+    "alignItems": "flex-start"
+   },
+   "children": [
+    {
+     "style": {
+      "display": "grid",
+      "gridTemplateColumns": "50px",
+      "gridTemplateRows": "minmax(10px, 1fr) minmax(10px, 4fr)",
+      "minHeight": 70,
+      "maxHeight": 60,
+      "rowGap": 10
+     },
+     "children": [
+      {},
+      {}
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "height": 70,
+     "children": [
+      {
+       "height": 12
+      },
+      {
+       "y": 22,
+       "height": 48
+      }
+     ]
+    }
+   ]
+  }
  }
 ]

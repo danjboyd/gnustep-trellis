@@ -108,7 +108,7 @@ static TRBoxView *TRSampleSettings(void)
     @"container-type: inline-size; flex-direction: column; gap: 10px; padding: 20px"];
   [form setIdentifier: @"settings"];
   NSArray *rows = @[
-    @[ TRLabel(@"Display name", @"nameLabel"), TRField(@"the maintainer", @"name") ],
+    @[ TRLabel(@"Display name", @"nameLabel"), TRField(@"Alice", @"name") ],
     @[ TRLabel(@"Theme", @"themeLabel"), TRPopup(@[@"Adwaita", @"Gumdrop", @"GNUstep"], @"theme") ],
     @[ TRLabel(@"Density", @"densityLabel"), TRPopup(@[@"Comfortable", @"Compact"], @"density") ],
     @[ TRLabel(@"Updates", @"updatesLabel"), TRCheckbox(@"Check for updates automatically", @"updates") ],

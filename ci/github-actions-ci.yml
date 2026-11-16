@@ -1,13 +1,13 @@
 # DRAFT, not active: GitHub only runs workflows under .github/workflows/.
-# Enabling it spends GitHub Actions minutes on the maintainer's private repo, so it waits
+# Enabling it spends GitHub Actions minutes on this private repo, so it waits
 # for his go. To enable: git mv ci/github-actions-ci.yml .github/workflows/ci.yml
 # (see ci/README.md for the minutes estimate).
 #
 # Linux job (packages per docs/building.md): the GNUstep toolchain (clang + libobjc2 + libdispatch + GNUstep
 # make/base/gui/back, built by scripts/install-toolchain-debian.sh) is cached,
 # so only a cache miss pays the ~20 min source build.
-# macOS job: present but disabled (macOS runners bill at 10x); mac-02 stays the
-# macOS check until the maintainer decides.
+# macOS job: present but disabled (macOS runners bill at 10x); a project Mac stays
+# the macOS check until the maintainer decides.
 name: CI
 
 on:

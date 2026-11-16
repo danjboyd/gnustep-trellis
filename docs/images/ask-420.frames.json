@@ -6,6 +6,7 @@
         "x": 16,
         "children": [
           {
+            "textColor": "#1c71d8",
             "x": 0,
             "text": "approve",
             "needed": {
@@ -20,10 +21,11 @@
             "height": 19,
             "style": "flex-shrink: 0; padding-left: 6px; padding-top: 2px; padding-right: 6px; padding-bottom: 2px; color: #1c71d8; font-weight: bold",
             "class": "NSTextField",
-            "y": 2,
+            "y": 0,
             "id": "kind"
           },
           {
+            "textColor": "#000000",
             "x": 76,
             "text": "Tag example-cli v0.1.8 as rc2 and publish the release notes?",
             "needed": {
@@ -32,7 +34,7 @@
             },
             "intrinsic": {
               "height": 18,
-              "width": 461
+              "width": 463
             },
             "width": 235,
             "height": 36,
@@ -42,6 +44,7 @@
             "id": "title"
           },
           {
+            "textColor": "#777777",
             "x": 319,
             "text": "12 min ago",
             "needed": {
@@ -68,6 +71,7 @@
         "id": "header"
       },
       {
+        "textColor": "#000000",
         "x": 16,
         "text": "All tests pass on Linux and Windows. The macOS job is still flaky on the notarization step; I re-ran it twice and it passed the second time. This blocks the rc2 tag and the packager update that depends on it.",
         "needed": {
@@ -133,12 +137,14 @@
         "id": "options"
       }
     ],
-    "width": 420,
     "height": 239,
-    "style": "flex-direction: column; padding-left: 16px; padding-top: 16px; padding-right: 16px; padding-bottom: 16px; row-gap: 12px; column-gap: 12px; background-color: #fafafa; container-type: inline-size",
+    "width": 420,
     "class": "TRBoxView",
+    "style": "flex-direction: column; padding-left: 16px; padding-top: 16px; padding-right: 16px; padding-bottom: 16px; row-gap: 12px; column-gap: 12px; background-color: #fafafa; container-type: inline-size",
+    "id": "ask",
     "y": 0,
-    "id": "ask"
+    "background": "#fafafa",
+    "windowBackground": "#aaaaaa"
   },
   "trellis": "0.1",
   "lint": [
@@ -148,5 +154,6 @@
     "scale": 1,
     "height": 239,
     "width": 420
-  }
+  },
+  "theme": "default"
 }

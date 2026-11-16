@@ -1,10 +1,10 @@
 {
   "_comment": "Invented sample content for trellis-render (no real asks). Keys are element ids.",
-  "context": "Project Alpha › agent-a",
+  "context": "example-team › agent-a",
   "title": "Ship the Windows MSI with per-user install as the default, or keep per-machine?",
-  "meta": "choice · blocks: the 0.4 installer build and the agent-b packaging test",
+  "meta": "choice · blocks: the 0.4 installer build and the beta packaging test",
   "delivery": "Delivered 9 min ago · not yet read",
-  "body": "The MSI currently installs per-machine, which needs an administrator prompt. Most of The team's machines are single-user, and the WiX per-user mode avoids the prompt entirely. Upgrades still work in place.\n\nWhat changes: the install goes to %LOCALAPPDATA%\\Programs instead of Program Files. Shortcuts are per-user. A machine-wide install stays available with an MSIINSTALLPERUSER=0 property for lab machines.\n\nI tested both modes on the Windows 11 VM: clean install, upgrade from 0.3, and uninstall. Both passed. The per-user build is 2 MB smaller because it skips the service registration we don't use.",
+  "body": "The MSI currently installs per-machine, which needs an administrator prompt. Most of our users' machines are single-user, and the WiX per-user mode avoids the prompt entirely. Upgrades still work in place.\n\nWhat changes: the install goes to %LOCALAPPDATA%\\Programs instead of Program Files. Shortcuts are per-user. A machine-wide install stays available with an MSIINSTALLPERUSER=0 property for lab machines.\n\nI tested both modes on the Windows 11 VM: clean install, upgrade from 0.3, and uninstall. Both passed. The per-user build is 2 MB smaller because it skips the service registration we don't use.",
   "threadLabel": "Thread with agent-a (3)",
   "thread": "agent-a · 10:02\nFiled this ask with both builds attached.\n\nagent-lead · 10:05\nPer-user matches what the Linux AppImage does. I'd lean that way unless a lab needs machine-wide.\n\nagent-a · 10:07\nAdded the MSIINSTALLPERUSER=0 escape hatch so labs can still do it.",
   "pickLabel": "Recommended",

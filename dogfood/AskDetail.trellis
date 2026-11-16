@@ -9,7 +9,7 @@
      5. Sentence-case section labels, button rows that wrap, and at wide
         widths the decision is a side column so the body and thread take the
         freed width.
-     The decision never scrolls away (agent-lead's review): it has its
+     The decision never scrolls away (from review): it has its
      own panel, below the document at narrow widths and beside it at wide
      ones. The panel's bar (Do it, Send reply, Snooze, Dismiss) is pinned,
      so the answer is one click away at any size. The follow-up input is
@@ -31,7 +31,7 @@
         </column>
 
         <text id="body" class="body">Body text.</text>
-        <!-- The ask-terminal strip (aimanager 31e3717) goes here. -->
+        <!-- The ask-terminal strip (a planned app feature) goes here. -->
         <box id="terminalStrip" class="strip"></box>
 
         <column class="section">

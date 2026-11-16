@@ -6,24 +6,26 @@
         "x": 12,
         "children": [
           {
+            "textColor": "#828282",
             "x": 0,
-            "text": "Project Alpha \u203a agent-a",
+            "text": "example-team \u203a agent-a",
             "needed": {
               "height": 18,
-              "width": 248
+              "width": 178
             },
             "intrinsic": {
               "height": 18,
-              "width": 248
+              "width": 178
             },
             "width": 876,
             "height": 18,
-            "style": "flex-shrink: 0; color: #77767b",
+            "style": "flex-shrink: 0; color: GrayText",
             "class": "NSTextField",
             "y": 0,
             "id": "context"
           },
           {
+            "textColor": "#1f1f1f",
             "x": 0,
             "text": "Ship the Windows MSI with per-user install as the default, or keep per-machine?",
             "needed": {
@@ -42,24 +44,26 @@
             "id": "title"
           },
           {
+            "textColor": "#828282",
             "x": 0,
-            "text": "choice \u00b7 blocks: the 0.4 installer build and the agent-b packaging test",
+            "text": "choice \u00b7 blocks: the 0.4 installer build and the beta packaging test",
             "needed": {
               "height": 18,
-              "width": 493
+              "width": 488
             },
             "intrinsic": {
               "height": 18,
-              "width": 493
+              "width": 488
             },
             "width": 876,
             "height": 18,
-            "style": "flex-shrink: 0; color: #77767b",
+            "style": "flex-shrink: 0; color: GrayText",
             "class": "NSTextField",
             "y": 54,
             "id": "meta"
           },
           {
+            "textColor": "#828282",
             "x": 0,
             "text": "Delivered 9 min ago \u00b7 not yet read",
             "needed": {
@@ -72,7 +76,7 @@
             },
             "width": 876,
             "height": 20,
-            "style": "flex-shrink: 0; height: 20px; color: #77767b",
+            "style": "flex-shrink: 0; height: 20px; color: GrayText",
             "class": "NSTextField",
             "y": 78,
             "id": "delivery"
@@ -120,18 +124,19 @@
               {
                 "children": [
                   {
+                    "textColor": "#1f1f1f",
                     "x": 0,
-                    "text": "The MSI currently installs per-machine, which needs an administrator prompt. Most of The team's machines are single-user, and the WiX per-user mode avoids the prompt entirely. Upgrades still work in place.\n\nWhat changes: the install goes to %LOCALAPPDATA%\\Programs instead of Program Files. Shortcuts are per-user. A machine-wide install stays available with an MSIINSTALLPERUSER=0 property for lab machines.\n\nI tested both modes on the Windows 11 VM: clean install, upgrade from 0.3, and uninstall. Both passed. The per-user build is 2 MB smaller because it skips the service registration we don't use.",
+                    "text": "The MSI currently installs per-machine, which needs an administrator prompt. Most of our users' machines are single-user, and the WiX per-user mode avoids the prompt entirely. Upgrades still work in place.\n\nWhat changes: the install goes to %LOCALAPPDATA%\\Programs instead of Program Files. Shortcuts are per-user. A machine-wide install stays available with an MSIINSTALLPERUSER=0 property for lab machines.\n\nI tested both modes on the Windows 11 VM: clean install, upgrade from 0.3, and uninstall. Both passed. The per-user build is 2 MB smaller because it skips the service registration we don't use.",
                     "needed": {
                       "height": 144,
-                      "width": 873
+                      "width": 865
                     },
-                    "width": 876,
-                    "height": 144,
                     "intrinsic": {
                       "height": 90,
                       "width": 1558
                     },
+                    "width": 876,
+                    "height": 144,
                     "class": "NSTextField",
                     "y": 0,
                     "id": "body"
@@ -166,6 +171,7 @@
             "x": 0,
             "children": [
               {
+                "textColor": "#828282",
                 "x": 0,
                 "text": "RECOMMENDED",
                 "needed": {
@@ -178,12 +184,13 @@
                 },
                 "width": 876,
                 "height": 20,
-                "style": "flex-shrink: 0; height: 20px; color: #77767b; font-weight: bold",
+                "style": "flex-shrink: 0; height: 20px; color: GrayText; font-weight: bold",
                 "class": "NSTextField",
                 "y": 0,
                 "id": "pickLabel"
               },
               {
+                "textColor": "#1f1f1f",
                 "x": 0,
                 "text": "Per-user by default, machine-wide on request",
                 "needed": {
@@ -202,6 +209,7 @@
                 "id": "pickTitle"
               },
               {
+                "textColor": "#828282",
                 "x": 0,
                 "text": "No administrator prompt for normal installs; labs pass MSIINSTALLPERUSER=0.",
                 "needed": {
@@ -214,7 +222,7 @@
                 },
                 "width": 876,
                 "height": 18,
-                "style": "color: #77767b",
+                "style": "color: GrayText",
                 "class": "NSTextField",
                 "y": 46,
                 "id": "pickDetail"
@@ -254,19 +262,20 @@
             "x": 0,
             "children": [
               {
+                "textColor": "#828282",
                 "x": 0,
                 "text": "OR PICK",
                 "needed": {
                   "height": 18,
                   "width": 66
                 },
-                "width": 876,
-                "height": 20,
                 "intrinsic": {
                   "height": 18,
                   "width": 66
                 },
-                "style": "flex-shrink: 0; height: 20px; color: #77767b; font-weight: bold",
+                "width": 876,
+                "height": 20,
+                "style": "flex-shrink: 0; height: 20px; color: GrayText; font-weight: bold",
                 "class": "NSTextField",
                 "y": 0
               },
@@ -314,6 +323,7 @@
             "id": "otherOptions"
           },
           {
+            "textColor": "#828282",
             "x": 0,
             "text": "YOUR REPLY (ENTER SENDS)",
             "needed": {
@@ -326,7 +336,7 @@
             },
             "width": 876,
             "height": 20,
-            "style": "flex-shrink: 0; height: 20px; color: #77767b; font-weight: bold",
+            "style": "flex-shrink: 0; height: 20px; color: GrayText; font-weight: bold",
             "class": "NSTextField",
             "y": 380,
             "id": "replyLabel"
@@ -342,7 +352,8 @@
                         "class": "NSTextView",
                         "x": 0,
                         "id": "reply",
-                        "height": 17,
+                        "style": "min-height: 48px",
+                        "height": 48,
                         "width": 866,
                         "y": 0
                       }
@@ -365,7 +376,7 @@
             ],
             "class": "TRBoxView",
             "x": 0,
-            "style": "flex-shrink: 0; height: 64px; padding-left: 4px; border-left-width: 1px; padding-top: 4px; border-top-width: 1px; padding-right: 4px; border-right-width: 1px; padding-bottom: 4px; border-bottom-width: 1px; border-color: #c0bfbc",
+            "style": "flex-shrink: 0; height: 64px; padding-left: 4px; border-left-width: 1px; padding-top: 4px; border-top-width: 1px; padding-right: 4px; border-right-width: 1px; padding-bottom: 4px; border-bottom-width: 1px; border-color: -tr-separator",
             "height": 64,
             "width": 876,
             "y": 406
@@ -374,6 +385,7 @@
             "x": 0,
             "children": [
               {
+                "textColor": "#828282",
                 "x": 0,
                 "text": "No attachment",
                 "needed": {
@@ -386,7 +398,7 @@
                 },
                 "width": 110,
                 "height": 18,
-                "style": "flex-shrink: 0; color: #77767b",
+                "style": "flex-shrink: 0; color: GrayText",
                 "class": "NSTextField",
                 "y": 3,
                 "id": "attachmentName"
@@ -470,6 +482,7 @@
                 "id": "dismiss"
               },
               {
+                "textColor": "#828282",
                 "x": 384,
                 "text": "Waiting on you",
                 "needed": {
@@ -482,7 +495,7 @@
                 },
                 "width": 111,
                 "height": 18,
-                "style": "flex-shrink: 0; color: #77767b",
+                "style": "flex-shrink: 0; color: GrayText",
                 "class": "NSTextField",
                 "y": 8,
                 "id": "status"
@@ -546,19 +559,20 @@
             "y": 546
           },
           {
+            "textColor": "#828282",
             "x": 0,
-            "text": "THREAD WITH GNUSTEP-PACKAGER (3)",
+            "text": "THREAD WITH AGENT-A (3)",
             "needed": {
               "height": 18,
-              "width": 320
+              "width": 220
             },
             "intrinsic": {
               "height": 18,
-              "width": 320
+              "width": 220
             },
             "width": 876,
             "height": 20,
-            "style": "flex-shrink: 0; height: 20px; color: #77767b; font-weight: bold",
+            "style": "flex-shrink: 0; height: 20px; color: GrayText; font-weight: bold",
             "class": "NSTextField",
             "y": 586,
             "id": "threadLabel"
@@ -569,18 +583,19 @@
               {
                 "children": [
                   {
+                    "textColor": "#1f1f1f",
                     "x": 0,
                     "text": "agent-a \u00b7 10:02\nFiled this ask with both builds attached.\n\nagent-lead \u00b7 10:05\nPer-user matches what the Linux AppImage does. I'd lean that way unless a lab needs machine-wide.\n\nagent-a \u00b7 10:07\nAdded the MSIINSTALLPERUSER=0 escape hatch so labs can still do it.",
                     "needed": {
                       "height": 144,
                       "width": 747
                     },
-                    "width": 876,
-                    "height": 144,
                     "intrinsic": {
                       "height": 144,
                       "width": 747
                     },
+                    "width": 876,
+                    "height": 144,
                     "class": "NSTextField",
                     "y": 0,
                     "id": "thread"
@@ -622,7 +637,8 @@
             "style": "flex-grow: 1; flex-basis: 0%; min-width: 0px",
             "class": "NSTextField",
             "y": 0,
-            "id": "followUp"
+            "id": "followUp",
+            "editable": true
           },
           {
             "intrinsic": {
@@ -645,12 +661,14 @@
         "y": 634
       }
     ],
-    "width": 900,
     "height": 680,
-    "style": "flex-direction: column; padding-left: 12px; padding-top: 12px; padding-right: 12px; padding-bottom: 12px; row-gap: 6px; column-gap: 6px; background-color: #ffffff",
+    "width": 900,
     "class": "TRBoxView",
+    "style": "flex-direction: column; padding-left: 12px; padding-top: 12px; padding-right: 12px; padding-bottom: 12px; row-gap: 6px; column-gap: 6px; background-color: Canvas",
+    "id": "askDetail",
     "y": 0,
-    "id": "askDetail"
+    "background": "#ffffff",
+    "windowBackground": "#fafafb"
   },
   "trellis": "0.1",
   "lint": [

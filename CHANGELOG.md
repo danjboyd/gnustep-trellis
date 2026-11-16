@@ -14,7 +14,7 @@ version may change the API listed in docs/api.md, and says so here.
 - **Fixed:** container queries inside a `<scroll>` now test the nearest
   container outside the scroller. They used to test the scroller's
   content box, so a classic, space-taking scroller shifted the
-  breakpoint (Gumdrop at 520px; reported by aimanager).
+  breakpoint (Gumdrop at 520px; reported by a pilot app).
 
 ## 0.1.1 (2026-11-16)
 

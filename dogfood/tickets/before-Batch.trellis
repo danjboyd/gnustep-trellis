@@ -1,6 +1,6 @@
 <!-- owner: AIMTriageDeskView -->
 <!-- AIManager's Tickets desk (Batch state) as it lays out today, approximated
-     in Trellis for a before/after comparison (from agent-tickets'
+     in Trellis for a before/after comparison (from the app developer's
      description of AIMTriageDeskView -layout). Not a proposal. -->
 <column id="desk" class="desk">
   <row id="pulse" class="pulse">
@@ -19,15 +19,15 @@
         <column class="rail-list">
           <label class="section" no-outlet="yes">YOUR MOVE 9</label>
           <label class="group" no-outlet="yes">Intake · 7 in batch</label>
-          <column class="row inbatch"><label class="row-title">✓ 2401  Weekly report shows last month</label><label class="row-meta">Bob Example · 20m</label></column>
-          <column class="row inbatch"><label class="row-title">✓ 2403  VPN drops on the office Wi-Fi</label><label class="row-meta">Carol Example · 35m</label></column>
-          <column class="row inbatch"><label class="row-title">✓ 2404  New hire needs agent-b access</label><label class="row-meta">HR · 1h</label></column>
-          <column class="row inbatch"><label class="row-title">✓ 2405  Printer queue stuck in Ops</label><label class="row-meta">Alice Example · 1h</label></column>
-          <column class="row inbatch-selected"><label class="row-title">✓ 2406  Installer asks for admin</label><label class="row-meta">Dave Example · 2h</label></column>
-          <column class="row inbatch"><label class="row-title">✓ 2407  Packager build slow on CI</label><label class="row-meta">agent-a · 2h</label></column>
-          <column class="row inbatch"><label class="row-title">✓ 2408  Dashboard tiles overlap</label><label class="row-meta">Bob Example · 3h</label></column>
-          <column class="row"><label class="row-title">2410  Laptop battery swelling</label><label class="row-meta">Facilities · 3h</label></column>
-          <column class="row"><label class="row-title">2411  Request: second monitor</label><label class="row-meta">Carol Example · 4h</label></column>
+          <column class="row inbatch"><label class="row-title">✓ 1401  Weekly report shows last month</label><label class="row-meta">Alice Example · 20m</label></column>
+          <column class="row inbatch"><label class="row-title">✓ 1403  VPN drops on the guest Wi-Fi</label><label class="row-meta">Carol Example · 35m</label></column>
+          <column class="row inbatch"><label class="row-title">✓ 1404  New hire needs wiki access</label><label class="row-meta">HR · 1h</label></column>
+          <column class="row inbatch"><label class="row-title">✓ 1405  Printer queue stuck in Ops</label><label class="row-meta">Bob Example · 1h</label></column>
+          <column class="row inbatch-selected"><label class="row-title">✓ 1406  Installer asks for admin</label><label class="row-meta">Dave Example · 2h</label></column>
+          <column class="row inbatch"><label class="row-title">✓ 1407  Packager build slow on CI</label><label class="row-meta">agent-a · 2h</label></column>
+          <column class="row inbatch"><label class="row-title">✓ 1408  Dashboard tiles overlap</label><label class="row-meta">Alice Example · 3h</label></column>
+          <column class="row"><label class="row-title">1410  Laptop battery swelling</label><label class="row-meta">Facilities · 3h</label></column>
+          <column class="row"><label class="row-title">1411  Request: second monitor</label><label class="row-meta">Carol Example · 4h</label></column>
           <label class="section" no-outlet="yes">▸ WITH AGENTS 4</label>
           <label class="section" no-outlet="yes">▸ BLOCKED 1</label>
         </column>
@@ -40,8 +40,8 @@
           <text id="card" class="batch-title">Batch dispatch · 7 tickets</text>
           <text class="muted">Shift+J/K adds or removes a ticket. ⏎ sends each to its suggested agent; flagged ones are left out.</text>
           <column class="item"><text class="item-title">TKT-1401  Weekly report shows last month</text><text class="item-line">→ agent-c   ✓ enough detail</text></column>
-          <column class="item"><text class="item-title">TKT-1403  VPN drops on the office Wi-Fi</text><text class="item-line warn">→ agent-c   ✗ enough detail</text></column>
-          <column class="item"><text class="item-title">TKT-1404  New hire needs agent-b access</text><text class="item-line">→ agent-b   ✓ enough detail</text></column>
+          <column class="item"><text class="item-title">TKT-1403  VPN drops on the guest Wi-Fi</text><text class="item-line warn">→ agent-c   ✗ enough detail</text></column>
+          <column class="item"><text class="item-title">TKT-1404  New hire needs wiki access</text><text class="item-line">→ agent-b   ✓ enough detail</text></column>
           <column class="item"><text class="item-title">TKT-1405  Printer queue stuck in Ops</text><text class="item-line muted">no suggested agent: left out</text></column>
           <column class="item"><text class="item-title">TKT-1406  Installer asks for admin</text><text class="item-line">→ agent-a   ✓ enough detail</text></column>
           <column class="item"><text class="item-title">TKT-1407  Packager build slow on CI</text><text class="item-line">→ agent-a   ✓ enough detail</text></column>

@@ -90,16 +90,17 @@
             "x": 0,
             "children": [
               {
+                "x": 12,
                 "intrinsic": {
                   "height": 34,
                   "width": 20
                 },
-                "class": "NSTextField",
-                "x": 12,
-                "id": "filter",
-                "height": 34,
                 "width": 248,
-                "y": 10
+                "height": 34,
+                "class": "NSTextField",
+                "y": 10,
+                "id": "filter",
+                "editable": true
               },
               {
                 "x": 12,
@@ -149,14 +150,14 @@
                               {
                                 "textColor": "#1f1f1f",
                                 "x": 8,
-                                "text": "2396 Fuel log export missing columns",
+                                "text": "1396 Expense export missing columns",
                                 "needed": {
                                   "height": 36,
-                                  "width": 170
+                                  "width": 173
                                 },
                                 "intrinsic": {
                                   "height": 18,
-                                  "width": 312
+                                  "width": 315
                                 },
                                 "width": 232,
                                 "height": 36,
@@ -167,14 +168,14 @@
                               {
                                 "textColor": "#828282",
                                 "x": 8,
-                                "text": "Bob Example \u00b7 2h \u25cf",
+                                "text": "Alice Example \u00b7 2h \u25cf",
                                 "needed": {
                                   "height": 18,
-                                  "width": 120
+                                  "width": 154
                                 },
                                 "intrinsic": {
                                   "height": 18,
-                                  "width": 120
+                                  "width": 154
                                 },
                                 "width": 232,
                                 "height": 18,
@@ -195,7 +196,7 @@
                               {
                                 "textColor": "#1f1f1f",
                                 "x": 8,
-                                "text": "2398 Map tiles blank offline",
+                                "text": "1398 Map tiles blank offline",
                                 "needed": {
                                   "height": 18,
                                   "width": 229
@@ -216,11 +217,11 @@
                                 "text": "Carol Example \u00b7 3h",
                                 "needed": {
                                   "height": 18,
-                                  "width": 96
+                                  "width": 139
                                 },
                                 "intrinsic": {
                                   "height": 18,
-                                  "width": 96
+                                  "width": 139
                                 },
                                 "width": 232,
                                 "height": 18,
@@ -296,14 +297,14 @@
                               {
                                 "textColor": "#1f1f1f",
                                 "x": 8,
-                                "text": "2409 Field tablets can't sync after the 11/14 update",
+                                "text": "1409 Tablets can't sync after the 11/14 update",
                                 "needed": {
                                   "height": 36,
-                                  "width": 229
+                                  "width": 195
                                 },
                                 "intrinsic": {
                                   "height": 18,
-                                  "width": 429
+                                  "width": 386
                                 },
                                 "width": 232,
                                 "height": 36,
@@ -314,14 +315,14 @@
                               {
                                 "textColor": "#1f1f1f",
                                 "x": 8,
-                                "text": "Alice Example \u00b7 5h \u25f7",
+                                "text": "Bob Example \u00b7 5h \u25f7",
                                 "needed": {
                                   "height": 18,
-                                  "width": 125
+                                  "width": 147
                                 },
                                 "intrinsic": {
                                   "height": 18,
-                                  "width": 125
+                                  "width": 147
                                 },
                                 "width": 232,
                                 "height": 18,
@@ -418,14 +419,14 @@
                           {
                             "textColor": "#1f1f1f",
                             "x": 0,
-                            "text": "TKT-1409 Field tablets can't sync after the 11/14 update",
+                            "text": "TKT-1409 Tablets can't sync after the 11/14 update",
                             "needed": {
                               "height": 19,
-                              "width": 504
+                              "width": 466
                             },
                             "intrinsic": {
                               "height": 19,
-                              "width": 504
+                              "width": 466
                             },
                             "width": 598,
                             "height": 19,
@@ -437,14 +438,14 @@
                           {
                             "textColor": "#828282",
                             "x": 0,
-                            "text": "Alice Example \u00b7 Field Ops \u00b7 P2 \u00b7 opened 5h ago",
+                            "text": "Bob Example \u00b7 Sales \u00b7 P2 \u00b7 opened 5h ago",
                             "needed": {
                               "height": 18,
-                              "width": 314
+                              "width": 307
                             },
                             "intrinsic": {
                               "height": 18,
-                              "width": 314
+                              "width": 307
                             },
                             "width": 598,
                             "height": 18,
@@ -455,7 +456,7 @@
                           {
                             "textColor": "#1f1f1f",
                             "x": 0,
-                            "text": "Since the 11/14 update, tablets in the north site stop syncing after about ten minutes. A restart fixes it until the next shift. Three crews are affected.",
+                            "text": "Since the 11/14 update, tablets in the east office stop syncing after about ten minutes. A restart fixes it until the next morning. Three teams are affected.",
                             "needed": {
                               "height": 36,
                               "width": 574
@@ -464,7 +465,7 @@
                             "height": 36,
                             "intrinsic": {
                               "height": 18,
-                              "width": 1108
+                              "width": 1139
                             },
                             "class": "NSTextField",
                             "y": 53
@@ -490,16 +491,16 @@
                           {
                             "textColor": "#1f1f1f",
                             "x": 0,
-                            "text": "\u2022 TKT-1402 Monthly budget export times out (in progress)",
+                            "text": "\u2022 TKT-1402 Monthly export times out (in progress)",
                             "needed": {
                               "height": 18,
-                              "width": 400
+                              "width": 374
                             },
                             "width": 598,
                             "height": 18,
                             "intrinsic": {
                               "height": 18,
-                              "width": 400
+                              "width": 374
                             },
                             "class": "NSTextField",
                             "y": 129
@@ -546,11 +547,11 @@
                             "text": "Blocks: TKT-1415",
                             "needed": {
                               "height": 18,
-                              "width": 121
+                              "width": 127
                             },
                             "intrinsic": {
                               "height": 18,
-                              "width": 121
+                              "width": 127
                             },
                             "width": 598,
                             "height": 18,
@@ -587,7 +588,7 @@
                   {
                     "textColor": "#828282",
                     "x": 0,
-                    "text": "Ids to add, -id to remove, or a condition: 2283, -2290, Parts on order by 12/1, -c4",
+                    "text": "Ids to add, -id to remove, or a condition: 1283, -1290, Parts on order by 12/1, -c4",
                     "needed": {
                       "height": 18,
                       "width": 597
@@ -604,16 +605,17 @@
                     "id": "noteHint"
                   },
                   {
+                    "x": 0,
                     "intrinsic": {
                       "height": 34,
                       "width": 20
                     },
-                    "class": "NSTextField",
-                    "x": 0,
-                    "id": "note",
-                    "height": 34,
                     "width": 598,
-                    "y": 22
+                    "height": 34,
+                    "class": "NSTextField",
+                    "y": 22,
+                    "id": "note",
+                    "editable": true
                   }
                 ],
                 "class": "TRBoxView",
@@ -738,14 +740,14 @@
           {
             "textColor": "#828282",
             "x": 12,
-            "text": "Prerequisites changed on TKT-1409: +2283 \u00b7 goes in 10 s",
+            "text": "Prerequisites changed on TKT-1409: +1283 \u00b7 goes in 10 s",
             "needed": {
               "height": 18,
-              "width": 416
+              "width": 422
             },
             "intrinsic": {
               "height": 18,
-              "width": 416
+              "width": 422
             },
             "width": 713,
             "height": 18,

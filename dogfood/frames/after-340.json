@@ -16,14 +16,14 @@
                           {
                             "textColor": "#828282",
                             "x": 0,
-                            "text": "Project Alpha \u203a agent-a",
+                            "text": "example-team \u203a agent-a",
                             "needed": {
                               "height": 18,
-                              "width": 248
+                              "width": 178
                             },
                             "intrinsic": {
                               "height": 18,
-                              "width": 248
+                              "width": 178
                             },
                             "width": 308,
                             "height": 18,
@@ -54,14 +54,14 @@
                           {
                             "textColor": "#828282",
                             "x": 0,
-                            "text": "choice \u00b7 blocks: the 0.4 installer build and the agent-b packaging test",
+                            "text": "choice \u00b7 blocks: the 0.4 installer build and the beta packaging test",
                             "needed": {
                               "height": 36,
                               "width": 307
                             },
                             "intrinsic": {
                               "height": 18,
-                              "width": 493
+                              "width": 488
                             },
                             "width": 308,
                             "height": 36,
@@ -135,10 +135,10 @@
                       {
                         "textColor": "#1f1f1f",
                         "x": 16,
-                        "text": "The MSI currently installs per-machine, which needs an administrator prompt. Most of The team's machines are single-user, and the WiX per-user mode avoids the prompt entirely. Upgrades still work in place.\n\nWhat changes: the install goes to %LOCALAPPDATA%\\Programs instead of Program Files. Shortcuts are per-user. A machine-wide install stays available with an MSIINSTALLPERUSER=0 property for lab machines.\n\nI tested both modes on the Windows 11 VM: clean install, upgrade from 0.3, and uninstall. Both passed. The per-user build is 2 MB smaller because it skips the service registration we don't use.",
+                        "text": "The MSI currently installs per-machine, which needs an administrator prompt. Most of our users' machines are single-user, and the WiX per-user mode avoids the prompt entirely. Upgrades still work in place.\n\nWhat changes: the install goes to %LOCALAPPDATA%\\Programs instead of Program Files. Shortcuts are per-user. A machine-wide install stays available with an MSIINSTALLPERUSER=0 property for lab machines.\n\nI tested both modes on the Windows 11 VM: clean install, upgrade from 0.3, and uninstall. Both passed. The per-user build is 2 MB smaller because it skips the service registration we don't use.",
                         "needed": {
                           "height": 342,
-                          "width": 306
+                          "width": 307
                         },
                         "intrinsic": {
                           "height": 90,
@@ -169,11 +169,11 @@
                             "text": "Thread with agent-a (3)",
                             "needed": {
                               "height": 18,
-                              "width": 285
+                              "width": 197
                             },
                             "intrinsic": {
                               "height": 18,
-                              "width": 285
+                              "width": 197
                             },
                             "width": 308,
                             "height": 18,
@@ -756,7 +756,8 @@
             "style": "flex-grow: 1; flex-basis: 0%; min-width: 0px",
             "class": "NSTextField",
             "y": 10,
-            "id": "followUp"
+            "id": "followUp",
+            "editable": true
           },
           {
             "intrinsic": {

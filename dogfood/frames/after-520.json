@@ -16,14 +16,14 @@
                           {
                             "textColor": "#828282",
                             "x": 0,
-                            "text": "Project Alpha \u203a agent-a",
+                            "text": "example-team \u203a agent-a",
                             "needed": {
                               "height": 18,
-                              "width": 248
+                              "width": 178
                             },
                             "intrinsic": {
                               "height": 18,
-                              "width": 248
+                              "width": 178
                             },
                             "width": 488,
                             "height": 18,
@@ -54,17 +54,17 @@
                           {
                             "textColor": "#828282",
                             "x": 0,
-                            "text": "choice \u00b7 blocks: the 0.4 installer build and the agent-b packaging test",
+                            "text": "choice \u00b7 blocks: the 0.4 installer build and the beta packaging test",
                             "needed": {
-                              "height": 36,
-                              "width": 459
+                              "height": 18,
+                              "width": 488
                             },
                             "intrinsic": {
                               "height": 18,
-                              "width": 493
+                              "width": 488
                             },
                             "width": 488,
-                            "height": 36,
+                            "height": 18,
                             "style": "color: GrayText",
                             "class": "NSTextField",
                             "y": 64,
@@ -86,7 +86,7 @@
                             "height": 18,
                             "style": "color: GrayText",
                             "class": "NSTextField",
-                            "y": 104,
+                            "y": 86,
                             "id": "delivery"
                           },
                           {
@@ -121,24 +121,24 @@
                             "height": 34,
                             "style": "flex-wrap: wrap; align-items: center; row-gap: 8px; column-gap: 8px",
                             "class": "TRBoxView",
-                            "y": 126,
+                            "y": 108,
                             "id": "links"
                           }
                         ],
                         "class": "TRBoxView",
                         "x": 16,
                         "style": "flex-direction: column; row-gap: 4px; column-gap: 4px",
-                        "height": 160,
+                        "height": 142,
                         "width": 488,
                         "y": 16
                       },
                       {
                         "textColor": "#1f1f1f",
                         "x": 16,
-                        "text": "The MSI currently installs per-machine, which needs an administrator prompt. Most of The team's machines are single-user, and the WiX per-user mode avoids the prompt entirely. Upgrades still work in place.\n\nWhat changes: the install goes to %LOCALAPPDATA%\\Programs instead of Program Files. Shortcuts are per-user. A machine-wide install stays available with an MSIINSTALLPERUSER=0 property for lab machines.\n\nI tested both modes on the Windows 11 VM: clean install, upgrade from 0.3, and uninstall. Both passed. The per-user build is 2 MB smaller because it skips the service registration we don't use.",
+                        "text": "The MSI currently installs per-machine, which needs an administrator prompt. Most of our users' machines are single-user, and the WiX per-user mode avoids the prompt entirely. Upgrades still work in place.\n\nWhat changes: the install goes to %LOCALAPPDATA%\\Programs instead of Program Files. Shortcuts are per-user. A machine-wide install stays available with an MSIINSTALLPERUSER=0 property for lab machines.\n\nI tested both modes on the Windows 11 VM: clean install, upgrade from 0.3, and uninstall. Both passed. The per-user build is 2 MB smaller because it skips the service registration we don't use.",
                         "needed": {
                           "height": 252,
-                          "width": 483
+                          "width": 482
                         },
                         "intrinsic": {
                           "height": 90,
@@ -148,7 +148,7 @@
                         "height": 252,
                         "style": "min-height: 70px",
                         "class": "NSTextField",
-                        "y": 194,
+                        "y": 176,
                         "id": "body"
                       },
                       {
@@ -169,11 +169,11 @@
                             "text": "Thread with agent-a (3)",
                             "needed": {
                               "height": 18,
-                              "width": 285
+                              "width": 197
                             },
                             "intrinsic": {
                               "height": 18,
-                              "width": 285
+                              "width": 197
                             },
                             "width": 488,
                             "height": 18,
@@ -206,13 +206,13 @@
                         "style": "flex-direction: column; row-gap: 6px; column-gap: 6px",
                         "height": 204,
                         "width": 488,
-                        "y": 464
+                        "y": 446
                       }
                     ],
                     "class": "TRBoxView",
                     "x": 0,
                     "style": "flex-direction: column; padding-left: 16px; padding-top: 16px; padding-right: 16px; padding-bottom: 16px; row-gap: 18px; column-gap: 18px",
-                    "height": 684,
+                    "height": 666,
                     "width": 520,
                     "y": 0
                   }
@@ -220,7 +220,7 @@
                 "class": "TRBoxView",
                 "x": 0,
                 "style": "flex-direction: column",
-                "height": 684,
+                "height": 666,
                 "width": 520,
                 "y": 0
               }
@@ -733,7 +733,8 @@
             "style": "flex-grow: 1; flex-basis: 0%; min-width: 0px",
             "class": "NSTextField",
             "y": 10,
-            "id": "followUp"
+            "id": "followUp",
+            "editable": true
           },
           {
             "intrinsic": {

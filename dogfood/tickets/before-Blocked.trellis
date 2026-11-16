@@ -1,6 +1,6 @@
 <!-- owner: AIMTriageDeskView -->
 <!-- AIManager's Tickets desk (Blocked state) as it lays out today, approximated
-     in Trellis for a before/after comparison (from agent-tickets'
+     in Trellis for a before/after comparison (from the app developer's
      description of AIMTriageDeskView -layout). Not a proposal. -->
 <column id="desk" class="desk">
   <row id="pulse" class="pulse">
@@ -19,12 +19,12 @@
         <column class="rail-list">
           <label class="section" no-outlet="yes">YOUR MOVE 6</label>
           <label class="group" no-outlet="yes">Verify</label>
-          <column class="row"><label class="row-title">2396  Fuel log export missing columns</label><label class="row-meta">Bob Example · 2h ●</label></column>
-          <column class="row"><label class="row-title">2398  Map tiles blank offline</label><label class="row-meta">Carol Example · 3h</label></column>
+          <column class="row"><label class="row-title">1396  Expense export missing columns</label><label class="row-meta">Alice Example · 2h ●</label></column>
+          <column class="row"><label class="row-title">1398  Map tiles blank offline</label><label class="row-meta">Carol Example · 3h</label></column>
           <label class="section" no-outlet="yes">▸ WITH AGENTS 4</label>
           <label class="section" no-outlet="yes">▸ WITH REQUESTERS 2</label>
           <label class="section" no-outlet="yes">▾ BLOCKED 1</label>
-          <column class="row selected"><label class="row-title">2409  Field tablets can't sync after the 11/14 update</label><label class="row-meta">Alice Example · 5h ◷</label></column>
+          <column class="row selected"><label class="row-title">1409  Tablets can't sync after the 11/14 update</label><label class="row-meta">Bob Example · 5h ◷</label></column>
           <label class="section" no-outlet="yes">▸ PROJECTS 3</label>
           <label class="section" no-outlet="yes">▸ SNOOZED 1</label>
         </column>
@@ -34,11 +34,11 @@
     <column class="main">
       <scroll class="cardscroll">
         <column class="cardtext">
-          <text id="card" class="card-title">TKT-1409  Field tablets can't sync after the 11/14 update</text>
-          <text class="muted">Alice Example · Field Ops · P2 · opened 5h ago</text>
-          <text>Since the 11/14 update, tablets in the north site stop syncing after about ten minutes. A restart fixes it until the next shift. Three crews are affected.</text>
+          <text id="card" class="card-title">TKT-1409  Tablets can't sync after the 11/14 update</text>
+          <text class="muted">Bob Example · Sales · P2 · opened 5h ago</text>
+          <text>Since the 11/14 update, tablets in the east office stop syncing after about ten minutes. A restart fixes it until the next morning. Three teams are affected.</text>
           <label class="heading" no-outlet="yes">Waiting on</label>
-          <text>• TKT-1402 Monthly budget export times out (in progress)</text>
+          <text>• TKT-1402 Monthly export times out (in progress)</text>
           <text class="warn">• Vendor licence for the sync add-on · by 2026-12-01 (condition 4) · declined</text>
           <text class="muted">It goes back to plan gate when they clear. B changes them.</text>
           <text class="muted">Blocks: TKT-1415</text>
@@ -46,7 +46,7 @@
       </scroll>
 
       <column class="note">
-        <text id="noteHint" class="muted">Ids to add, -id to remove, or a condition: 2283, -2290, Parts on order by 12/1, -c4</text>
+        <text id="noteHint" class="muted">Ids to add, -id to remove, or a condition: 1283, -1290, Parts on order by 12/1, -c4</text>
         <field id="note" placeholder="Prerequisites"/>
       </column>
 
@@ -63,7 +63,7 @@
 
   <separator/>
   <row class="undo">
-    <label id="undoLabel" class="muted">Prerequisites changed on TKT-1409: +2283 · goes in 10 s</label>
+    <label id="undoLabel" class="muted">Prerequisites changed on TKT-1409: +1283 · goes in 10 s</label>
     <button id="undo" action="undo:">Undo (Ctrl+Z)</button>
   </row>
 </column>

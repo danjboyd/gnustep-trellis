@@ -2,7 +2,7 @@
 
 A Trellis spec of AIManager's ask-detail view (`AIMAskDetailView
 -layoutContent`), for review before any port. Nothing here touches the
-AIManager repo; agent-lead does the port once the maintainer approves it.
+AIManager repo; the app's developer does the port once it's approved.
 
 | File | What it is |
 |---|---|
@@ -24,7 +24,7 @@ The items are from fun-themes' Gumdrop assessment of AIManager (2026-11-13).
    - In the proposal, the header, body and thread scroll as one document,
      read at natural height. The thread no longer has its own nested
      scroller.
-   - **The decision never scrolls away** (agent-lead's review: the maintainer
+   - **The decision never scrolls away** (from review: the user
      answers asks back to back). It has its own panel: below the document
      at narrow widths, taking 2/5 of the height, and a 340 px column beside
      it at 760 px and wider.
@@ -55,14 +55,14 @@ The items are from fun-themes' Gumdrop assessment of AIManager (2026-11-13).
    - At 760 px and wider, the body and thread take all the width beside the
      decision column.
 
-A slot is left under the body for the ask-terminal strip (aimanager
-31e3717). It's `display: none` until the app has a terminal to show.
+A slot is left under the body for the ask-terminal strip (a planned
+app feature). It's `display: none` until the app has a terminal to show.
 
 ## Lint
 
 | Width | Before | After |
 |---|---|---|
-| 340 | 10 findings: the link, attachments and both action rows overflow (Dismiss, the status and two agent buttons run off the right edge); the thread label clips | 0 |
+| 340 | 9 findings: the link, attachments and both action rows overflow (Dismiss, the status and two agent buttons run off the right edge) | 0 |
 | 520 | 5: the fixed 24/26/30 pt rows are shorter than Adwaita's 34 pt buttons | 0 |
 | 900 | 5: as at 520 | 0 |
 
@@ -71,7 +71,7 @@ clipped below the window at 340 × 680. In the proposal, Do it and Send reply
 are always visible.
 
 **Caveat:**
-- `before.trellis` is reconstructed from agent-lead's description, not
+- `before.trellis` is reconstructed from the app developer's description, not
   from the source.
 - The follow-up input is pinned in both, and what doesn't fit above it in the
   before layout is clipped. The real view may clip a little differently.

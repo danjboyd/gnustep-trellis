@@ -9,8 +9,8 @@
   <column class="side">
     <label class="section" no-outlet="yes">Projects</label>
     <button class="nav" action="showProject:">Project Alpha</button>
-    <button class="nav" action="showProject:">AIManager</button>
-    <button class="nav" action="showProject:">agent-b</button>
+    <button class="nav" action="showProject:">Project Beta</button>
+    <button class="nav" action="showProject:">Project Gamma</button>
   </column>
   <box id="cards" class="cards">
     <column class="card"><label class="k" no-outlet="yes">Agents online</label><label id="online" class="v">11</label></column>

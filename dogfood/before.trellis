@@ -1,6 +1,6 @@
 <!-- owner: AIMAskDetailView -->
 <!-- AIManager's ask detail as it lays out today, approximated in Trellis
-     for a before/after comparison (from agent-lead's description of
+     for a before/after comparison (from the app developer's description of
      AIMAskDetailView -layoutContent, live d661e0d). It is not a proposal.
      One fixed column: every control has a fixed height, the body gets
      whatever height is left (minimum 70), the thread gets its own scroller

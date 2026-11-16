@@ -11,18 +11,18 @@ Status: v0.1 in progress. The engine and its test runner are in the repo
 (`Source/Engine`, `Tools/trellis-case.m`). This document describes where
 that code is going.
 
-## Decisions (from the maintainer, 2026-11-13)
+## Decisions (maintainer, 2026-11-13)
 
 | Topic | Decision |
 |---|---|
-| Name | **Trellis**: `libTrellisEngine` (Foundation) and `libTrellis` (AppKit), class prefix `TR`. Private repo `danjboyd/gnustep-trellis` until release. |
+| Name | **Trellis**: `libTrellisEngine` (Foundation) and `libTrellis` (AppKit), class prefix `TR`. Private repo until release. |
 | Licence | LGPL 2.1 or later, like the maintainer's other GNUstep libraries. |
 | Toolchain | Modern clang, libobjc2, ARC, blocks, libdispatch. GCC is not supported. |
 | Platforms | GNUstep (Linux first, then Windows/MSYS2) and native macOS AppKit, from the same source. |
 | v1 scope | Flexbox, inline style strings, a typed ObjC API, container queries, `trellis-render` (PNG + JSON), `trellis-lint`. |
 | v1.1 | CSS Grid on the same box tree and the same measuring. **An early implementation landed on 2026-11-13** (TRGrid.m; see agents.md for the supported subset). |
 | Authoring | Typed ObjC API plus inline CSS declaration strings; `.trellis` layout files (markup plus scoped CSS) approved on 2026-11-13, built on the typed API. |
-| Apple testing | Macs project Macs; trellis-conformance owns the macOS build. |
+| Apple testing | project Macs; the conformance maintainer owns the macOS build. |
 
 ## 1. Survey
 
@@ -101,7 +101,7 @@ rounding, so nothing in the view layer changes.
 - **WPT css-flexbox reftests** (3-clause BSD): only the ones expressible as
   boxes plus Ahem text.
 
-trellis-conformance imports both, keeps their attribution, and reports
+The conformance maintainer imports both, keeps their attribution, and reports
 pass rates. The format is in `docs/test-case-format.md`.
 
 ## 3. Architecture
@@ -279,7 +279,7 @@ trellis-render [--width W] [--height H] [--widths 360,560,900]
     code runs.
   - It refuses to run against `:0` or the user's own display.
 
-  This closes the gap that wrote into the maintainer's real defaults on 2026-11-11.
+  This closes the gap that wrote into a developer's real defaults on 2026-11-11.
   On macOS it uses `-[NSView cacheDisplayInRect:toBitmapImageRep:]` with
   no window on screen.
 - With `--widths`, it writes one PNG and one JSON per width
@@ -389,7 +389,7 @@ for `.trellis` files. Its rules:
 | **Departures from browser CSS.** | `display` defaults to flex, with no block or inline flow. Absolute children are placed against their parent box. Documented, and checked by conformance. |
 | **Maintainer load of a second layout system.** | Separate library, Foundation-only core, conformance suite. |
 
-## 8. Decided questions (lead, 2026-11-13; the maintainer may override)
+## 8. Decided questions (project lead, 2026-11-13; the maintainer may override)
 
 1. `display: block` is a column flex container with `align-items: stretch`.
    **Implemented.**

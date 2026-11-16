@@ -1,8 +1,8 @@
 # Dogfood: AIManager's Tickets triage desk in Trellis
 
 Layout specs for two pieces of AIManager's Tickets triage desk
-(`AIMTriageDeskView`), which agent-tickets built on 2026-11-16 (its goal
-#838). agent-tickets owns the code. These files are a layout check for
+(`AIMTriageDeskView`), as built on 2026-11-16.
+The app's developer owns the code. These files are a layout check for
 it, in the same format as the ask-detail spec in `dogfood/`. Nothing here
 touches the AIManager repo.
 
@@ -10,7 +10,7 @@ touches the AIManager repo.
 |---|---|
 | `Blocked.trellis` | Proposal: the Blocked rail section, and a card with a declined prerequisite and the B note field open. |
 | `Batch.trellis` | Proposal: Intake batch dispatch with seven tickets, plus the hold text in the undo bar. |
-| `before-Blocked.trellis`, `before-Batch.trellis` | Today's `-layout`, approximated from agent-tickets' description: fixed constants, nothing wraps, and anything that doesn't fit is clipped. |
+| `before-Blocked.trellis`, `before-Batch.trellis` | Today's `-layout`, approximated from the app developer's description: fixed constants, nothing wraps, and anything that doesn't fit is clipped. |
 | `AIMTriageDeskOutlets.h` | The owner contract (a stand-in, not AIManager's header). |
 | `frames/{blocked,batch}-before-after-{340,520,900}.png` | Before (left) and after (right), Adwaita, 680 px tall. |
 | `frames/*.json` | The frame dumps behind each render, with lint. |

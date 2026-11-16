@@ -14,7 +14,7 @@
 @property (nonatomic, strong) NSTextField *meta;        /* kind · blocks: … */
 @property (nonatomic, strong) NSTextField *delivery;
 @property (nonatomic, strong) NSView *links;            /* link buttons, added in code */
-/* Body and the ask-terminal strip (aimanager 31e3717) */
+/* Body and the ask-terminal strip (a planned app feature) */
 @property (nonatomic, strong) NSTextField *body;        /* an NSTextView in the app */
 @property (nonatomic, strong) NSView *terminalStrip;
 /* The recommended / chosen option */

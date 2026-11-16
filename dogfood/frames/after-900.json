@@ -27,14 +27,14 @@
                           {
                             "textColor": "#828282",
                             "x": 0,
-                            "text": "Project Alpha \u203a agent-a",
+                            "text": "example-team \u203a agent-a",
                             "needed": {
                               "height": 18,
-                              "width": 248
+                              "width": 178
                             },
                             "intrinsic": {
                               "height": 18,
-                              "width": 248
+                              "width": 178
                             },
                             "width": 528,
                             "height": 18,
@@ -65,14 +65,14 @@
                           {
                             "textColor": "#828282",
                             "x": 0,
-                            "text": "choice \u00b7 blocks: the 0.4 installer build and the agent-b packaging test",
+                            "text": "choice \u00b7 blocks: the 0.4 installer build and the beta packaging test",
                             "needed": {
                               "height": 18,
-                              "width": 493
+                              "width": 488
                             },
                             "intrinsic": {
                               "height": 18,
-                              "width": 493
+                              "width": 488
                             },
                             "width": 528,
                             "height": 18,
@@ -146,7 +146,7 @@
                       {
                         "textColor": "#1f1f1f",
                         "x": 16,
-                        "text": "The MSI currently installs per-machine, which needs an administrator prompt. Most of The team's machines are single-user, and the WiX per-user mode avoids the prompt entirely. Upgrades still work in place.\n\nWhat changes: the install goes to %LOCALAPPDATA%\\Programs instead of Program Files. Shortcuts are per-user. A machine-wide install stays available with an MSIINSTALLPERUSER=0 property for lab machines.\n\nI tested both modes on the Windows 11 VM: clean install, upgrade from 0.3, and uninstall. Both passed. The per-user build is 2 MB smaller because it skips the service registration we don't use.",
+                        "text": "The MSI currently installs per-machine, which needs an administrator prompt. Most of our users' machines are single-user, and the WiX per-user mode avoids the prompt entirely. Upgrades still work in place.\n\nWhat changes: the install goes to %LOCALAPPDATA%\\Programs instead of Program Files. Shortcuts are per-user. A machine-wide install stays available with an MSIINSTALLPERUSER=0 property for lab machines.\n\nI tested both modes on the Windows 11 VM: clean install, upgrade from 0.3, and uninstall. Both passed. The per-user build is 2 MB smaller because it skips the service registration we don't use.",
                         "needed": {
                           "height": 216,
                           "width": 528
@@ -180,11 +180,11 @@
                             "text": "Thread with agent-a (3)",
                             "needed": {
                               "height": 18,
-                              "width": 285
+                              "width": 197
                             },
                             "intrinsic": {
                               "height": 18,
-                              "width": 285
+                              "width": 197
                             },
                             "width": 528,
                             "height": 18,
@@ -526,12 +526,7 @@
                             "y": 260
                           },
                           {
-                            "x": 16,
-                            "container": {
-                              "matched": [
-                                "(max-width: 519px)"
-                              ]
-                            },
+                            "x": 0,
                             "children": [
                               {
                                 "intrinsic": {
@@ -540,8 +535,8 @@
                                 },
                                 "class": "NSPopUpButton",
                                 "x": 0,
-                                "height": 34,
-                                "width": 129,
+                                "height": 0,
+                                "width": 0,
                                 "title": "Snooze",
                                 "y": 0
                               },
@@ -551,18 +546,19 @@
                                   "width": 103
                                 },
                                 "class": "NSButton",
-                                "x": 137,
-                                "height": 34,
-                                "width": 103,
+                                "x": 0,
+                                "height": 0,
+                                "width": 0,
                                 "title": "Dismiss",
                                 "y": 0
                               }
                             ],
-                            "width": 308,
-                            "height": 34,
-                            "style": "flex-wrap: wrap; align-items: center; row-gap: 8px; column-gap: 8px",
+                            "hidden": true,
+                            "width": 100,
+                            "height": 100,
+                            "style": "display: none; flex-wrap: wrap; align-items: center; row-gap: 8px; column-gap: 8px",
                             "class": "TRBoxView",
-                            "y": 364
+                            "y": 0
                           },
                           {
                             "children": [
@@ -609,13 +605,13 @@
                             "style": "flex-wrap: wrap; align-items: center; row-gap: 8px; column-gap: 8px",
                             "height": 118,
                             "width": 308,
-                            "y": 412
+                            "y": 364
                           }
                         ],
                         "class": "TRBoxView",
                         "x": 0,
                         "style": "flex-direction: column; padding-left: 16px; padding-top: 12px; padding-right: 16px; padding-bottom: 8px; row-gap: 14px; column-gap: 14px",
-                        "height": 538,
+                        "height": 490,
                         "width": 340,
                         "y": 0
                       }
@@ -623,7 +619,7 @@
                     "class": "TRBoxView",
                     "x": 0,
                     "style": "flex-direction: column",
-                    "height": 538,
+                    "height": 503,
                     "width": 340,
                     "y": 0
                   }
@@ -752,7 +748,8 @@
             "style": "flex-grow: 1; flex-basis: 0%; min-width: 0px",
             "class": "NSTextField",
             "y": 10,
-            "id": "followUp"
+            "id": "followUp",
+            "editable": true
           },
           {
             "intrinsic": {

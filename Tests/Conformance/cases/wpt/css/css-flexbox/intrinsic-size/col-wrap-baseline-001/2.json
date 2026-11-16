@@ -1,0 +1,82 @@
+{
+ "id": "wpt/css/css-flexbox/intrinsic-size/col-wrap-baseline-001/2",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/intrinsic-size/col-wrap-baseline-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "boxSizing": "content-box",
+   "flexDirection": "column",
+   "flexWrap": "wrap",
+   "height": 100,
+   "width": "max-content",
+   "position": "relative"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "width": 10,
+     "minHeight": 0,
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": 40,
+     "marginLeft": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "width": 10,
+     "minHeight": 0,
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": 40,
+     "marginRight": 20
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "width": 10,
+     "minHeight": 0,
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": 100
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "x": 20
+   },
+   {
+    "x": 0
+   },
+   {
+    "x": 30
+   }
+  ],
+  "width": 40
+ },
+ "requires": [
+  "intrinsic-size-keyword"
+ ]
+}

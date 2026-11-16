@@ -1,0 +1,93 @@
+{
+ "id": "wpt/css/css-flexbox/flex-base-size-ignores-min-max-width-001/1",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/flex-base-size-ignores-min-max-width-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "maxWidth": 300
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "boxSizing": "content-box",
+     "width": "auto"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "minWidth": 0,
+       "maxWidth": 100
+      },
+      "children": [
+       {
+        "style": {
+         "display": "block",
+         "boxSizing": "content-box",
+         "width": 300,
+         "height": 10
+        }
+       }
+      ]
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "minWidth": 0
+      },
+      "children": [
+       {
+        "style": {
+         "display": "block",
+         "boxSizing": "content-box",
+         "width": 300,
+         "height": 10
+        }
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {}
+      ],
+      "width": 100
+     },
+     {
+      "children": [
+       {}
+      ],
+      "width": 200
+     }
+    ]
+   }
+  ]
+ },
+ "requires": [
+  "block-layout"
+ ]
+}

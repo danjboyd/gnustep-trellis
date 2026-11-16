@@ -1,0 +1,108 @@
+{
+ "id": "yoga/Gap/column_gap_start_index/ltr",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGGapTest.html",
+  "generated": "tests/generated/YGGapTest.cpp",
+  "test": "column_gap_start_index",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "ltr",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "row",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "position": "absolute",
+   "flexWrap": "wrap",
+   "width": 80,
+   "rowGap": 20,
+   "columnGap": 10
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "position": "absolute",
+     "width": 20,
+     "height": 20
+    }
+   },
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "position": "relative",
+     "width": 20,
+     "height": 20
+    }
+   },
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "position": "relative",
+     "width": 20,
+     "height": 20
+    }
+   },
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "position": "relative",
+     "width": 20,
+     "height": 20
+    }
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 80,
+  "height": 20,
+  "children": [
+   {
+    "x": 0,
+    "y": 0,
+    "width": 20,
+    "height": 20
+   },
+   {
+    "x": 0,
+    "y": 0,
+    "width": 20,
+    "height": 20
+   },
+   {
+    "x": 30,
+    "y": 0,
+    "width": 20,
+    "height": 20
+   },
+   {
+    "x": 60,
+    "y": 0,
+    "width": 20,
+    "height": 20
+   }
+  ]
+ },
+ "requires": [
+  "gap"
+ ]
+}

@@ -1,0 +1,68 @@
+{
+ "id": "wpt/css/css-flexbox/box-sizing-min-max-sizes-001/1",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/box-sizing-min-max-sizes-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "boxSizing": "content-box",
+   "flexDirection": "column"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "border-box",
+     "paddingTop": 5,
+     "paddingRight": 5,
+     "paddingBottom": 5,
+     "paddingLeft": 5,
+     "maxHeight": 30,
+     "height": 40,
+     "borderTopWidth": 5,
+     "borderRightWidth": 5,
+     "borderBottomWidth": 5,
+     "borderLeftWidth": 5
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "border-box",
+     "paddingTop": 5,
+     "paddingRight": 5,
+     "paddingBottom": 5,
+     "paddingLeft": 5,
+     "minHeight": 30,
+     "height": 10,
+     "borderTopWidth": 5,
+     "borderRightWidth": 5,
+     "borderBottomWidth": 5,
+     "borderLeftWidth": 5
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "height": 30
+   },
+   {
+    "height": 30
+   }
+  ]
+ }
+}

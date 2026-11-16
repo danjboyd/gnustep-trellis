@@ -1,0 +1,65 @@
+{
+ "id": "wpt/css/css-flexbox/percentage-margins-001/1",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/percentage-margins-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "boxSizing": "content-box",
+   "height": 300,
+   "width": 400
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "marginTop": "10%",
+     "marginRight": "10%",
+     "marginBottom": "10%",
+     "marginLeft": "10%",
+     "height": 5,
+     "flexGrow": "1",
+     "flexShrink": "1",
+     "flexBasis": 5
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "marginTop": "10%",
+     "marginRight": "10%",
+     "marginBottom": "10%",
+     "marginLeft": "10%",
+     "height": 5,
+     "width": 5
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 235,
+    "height": 5
+   },
+   {
+    "width": 5,
+    "height": 5
+   }
+  ]
+ }
+}

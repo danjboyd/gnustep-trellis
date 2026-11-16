@@ -1,0 +1,54 @@
+{
+ "id": "yoga/AbsolutePosition/absolute_layout_align_items_center/rtl",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGAbsolutePositionTest.html",
+  "generated": "tests/generated/YGAbsolutePositionTest.cpp",
+  "test": "absolute_layout_align_items_center",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "rtl",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "position": "absolute",
+   "height": 100,
+   "width": 110,
+   "flexGrow": 1,
+   "alignItems": "center"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "position": "absolute",
+     "width": 60,
+     "height": 40
+    }
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 110,
+  "height": 100,
+  "children": [
+   {
+    "x": 25,
+    "y": 0,
+    "width": 60,
+    "height": 40
+   }
+  ]
+ }
+}

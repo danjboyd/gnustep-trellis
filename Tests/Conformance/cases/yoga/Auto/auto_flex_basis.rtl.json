@@ -1,0 +1,86 @@
+{
+ "id": "yoga/Auto/auto_flex_basis/rtl",
+ "source": {
+  "suite": "yoga",
+  "file": "gentest/fixtures/YGAutoTest.html",
+  "generated": "tests/generated/YGAutoTest.cpp",
+  "test": "auto_flex_basis",
+  "commit": "cac7b345c06804703dc6868f740f04ad8a863f27",
+  "license": "MIT",
+  "copyright": "Meta Platforms, Inc. and affiliates"
+ },
+ "direction": "rtl",
+ "tolerance": 1.0,
+ "root": {
+  "style": {
+   "display": "flex",
+   "flexDirection": "column",
+   "alignContent": "flex-start",
+   "flexShrink": 0,
+   "position": "absolute",
+   "width": 50,
+   "flexBasis": "auto"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "position": "relative",
+     "width": 50,
+     "height": 50
+    }
+   },
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "position": "relative",
+     "width": 50,
+     "height": 50
+    }
+   },
+   {
+    "style": {
+     "display": "flex",
+     "flexDirection": "column",
+     "alignContent": "flex-start",
+     "flexShrink": 0,
+     "position": "relative",
+     "width": 50,
+     "height": 50
+    }
+   }
+  ]
+ },
+ "expected": {
+  "x": 0,
+  "y": 0,
+  "width": 50,
+  "height": 150,
+  "children": [
+   {
+    "x": 0,
+    "y": 0,
+    "width": 50,
+    "height": 50
+   },
+   {
+    "x": 0,
+    "y": 50,
+    "width": 50,
+    "height": 50
+   },
+   {
+    "x": 0,
+    "y": 100,
+    "width": 50,
+    "height": 50
+   }
+  ]
+ }
+}

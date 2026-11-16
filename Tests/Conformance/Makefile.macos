@@ -1,0 +1,65 @@
+# Trellis conformance runner: native macOS build (Apple clang, Foundation).
+# No GNUstep make involved.
+#
+#   make -f Tests/Conformance/Makefile.macos check        # Trellis engine
+#   make -f Tests/Conformance/Makefile.macos reference YOGA=/path/to/yoga
+#   make -f Tests/Conformance/Makefile.macos check-reference YOGA=...
+#
+# Run from the repository root or from Tests/Conformance.
+
+CONF_DIR := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+ROOT     := $(abspath $(CONF_DIR)/../..)
+BUILD    ?= $(ROOT)/build/macos
+CC       := clang
+CXX      := clang++
+OBJCFLAGS := -fobjc-arc -fmodules -Wall -Wno-unused-function -O2 -g
+LIBS     := -framework Foundation
+
+ENGINE_SRCS := $(wildcard $(ROOT)/Source/Engine/*.m)
+ENGINE_INCS := -I$(ROOT)/Source/Engine -I$(ROOT)/Source -I$(BUILD)/include
+
+RUNNER   := $(BUILD)/trellis-conformance
+REFRUN   := $(BUILD)/trellis-conformance-yoga
+CASES    := $(ROOT)/Tests/Conformance/cases
+
+.PHONY: all check reference check-reference clean
+
+all: $(RUNNER)
+
+# Trellis's public headers are imported as <Trellis/...>; expose
+# Source/Engine under that name without needing a framework build.
+$(BUILD)/include/Trellis:
+	@mkdir -p $(BUILD)/include
+	ln -sfn $(ROOT)/Source/Engine $@
+
+$(RUNNER): $(CONF_DIR)/TRConformance.m $(CONF_DIR)/TRConfEngineTrellis.m $(ENGINE_SRCS) | $(BUILD)/include/Trellis
+	@test -n "$(ENGINE_SRCS)" || { echo "Source/Engine/*.m not found: Trellis engine not present yet"; exit 2; }
+	@mkdir -p $(BUILD)
+	$(CC) $(OBJCFLAGS) $(ENGINE_INCS) -I$(CONF_DIR) $^ $(LIBS) -o $@
+
+check: $(RUNNER)
+	$(RUNNER) --summary $(BUILD)/conformance-summary.json --results $(BUILD)/conformance-results.json $(CASES)
+
+# --- Yoga reference engine (validates the imported cases) ----------------
+YOGA     ?=
+YOGA_SRCS = $(shell find $(YOGA)/yoga -name '*.cpp' 2>/dev/null)
+YOGA_OBJS = $(patsubst $(YOGA)/%.cpp,$(BUILD)/yoga/%.o,$(YOGA_SRCS))
+
+$(BUILD)/yoga/%.o: $(YOGA)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) -std=c++20 -O2 -I$(YOGA) -c $< -o $@
+
+$(REFRUN): $(CONF_DIR)/TRConformance.m $(CONF_DIR)/reference/TRConfEngineYoga.mm $(YOGA_OBJS)
+	@test -n "$(YOGA)" || { echo "set YOGA=/path/to/yoga checkout"; exit 2; }
+	@mkdir -p $(BUILD)
+	$(CC) $(OBJCFLAGS) -I$(CONF_DIR) -c $(CONF_DIR)/TRConformance.m -o $(BUILD)/TRConformance.o
+	$(CXX) -std=c++20 -fobjc-arc -O2 -g -I$(YOGA) -I$(CONF_DIR) -c $(CONF_DIR)/reference/TRConfEngineYoga.mm -o $(BUILD)/TRConfEngineYoga.o
+	$(CXX) $(BUILD)/TRConformance.o $(BUILD)/TRConfEngineYoga.o $(YOGA_OBJS) $(LIBS) -o $@
+
+reference: $(REFRUN)
+
+check-reference: $(REFRUN)
+	$(REFRUN) --summary $(BUILD)/reference-summary.json --results $(BUILD)/reference-results.json $(CASES)
+
+clean:
+	rm -rf $(BUILD)

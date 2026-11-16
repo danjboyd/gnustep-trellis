@@ -1,0 +1,86 @@
+{
+ "id": "wpt/css/css-flexbox/columns-height-set-via-top-bottom/0",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/columns-height-set-via-top-bottom.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "position": "relative",
+   "height": 100,
+   "width": 100,
+   "borderTopWidth": 2,
+   "borderRightWidth": 2,
+   "borderBottomWidth": 2,
+   "borderLeftWidth": 2
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "boxSizing": "content-box",
+     "flexDirection": "column",
+     "position": "absolute",
+     "top": 0,
+     "right": 0,
+     "bottom": 0,
+     "left": 0,
+     "paddingTop": 10,
+     "paddingRight": 10,
+     "paddingBottom": 10,
+     "paddingLeft": 10
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "height": 30
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "flexGrow": "1",
+       "flexShrink": "1",
+       "flexBasis": "0%"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "width": 80,
+      "height": 30
+     },
+     {
+      "width": 80,
+      "height": 50
+     }
+    ],
+    "height": 100
+   }
+  ]
+ },
+ "requires": [
+  "block-layout"
+ ]
+}

@@ -1,0 +1,66 @@
+{
+ "id": "wpt/css/css-flexbox/intrinsic-size/col-wrap-grid-item-001",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/intrinsic-size/col-wrap-grid-item-001.html",
+  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "boxSizing": "content-box",
+     "flexDirection": "column",
+     "flexWrap": "wrap",
+     "height": 100,
+     "alignItems": "baseline"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box"
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "flexGrow": "1"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {},
+     {
+      "height": 100
+     }
+    ]
+   }
+  ]
+ },
+ "requires": [
+  "block-layout",
+  "display-grid"
+ ]
+}

@@ -9,7 +9,7 @@ The supported API, which stays stable within a version, is listed in
 ## 1. The loop
 
 Always render and lint what you write. Don't trust your mental model of the
-layout.
+layout. Check `--appearance dark` as well as light.
 
 ```sh
 . scripts/env.sh
@@ -101,6 +101,19 @@ the user's settings. trellis-render refuses to run without it.
 - **Drawing:** `background-color` and `border-color`/`border-radius` on
   boxes; `color`, `font-size`, `font-weight` and `text-align` on text
   controls; `white-space: nowrap`.
+- **Colours: use system colours,** so the UI follows Light/Dark on macOS
+  and the GNUstep theme (Adwaita light or dark, Gumdrop). Use `Canvas` with
+  `CanvasText` for a content background and its text,
+  `-tr-window-background` for panels, `GrayText` for secondary text,
+  `AccentColor`, `Highlight` with `HighlightText` for selections,
+  `ButtonFace`/`ButtonText`, `Field`/`FieldText`, `LinkText`,
+  `-tr-separator` for borders and `-tr-error` for errors.
+  - A fixed colour (`#fff`) next to a system one breaks in the other
+    appearance: white text on white.
+  - trellis-lint warns (`colour-pair`) about a fixed background with text
+    that follows the system, or the reverse.
+  - `trellis-render --appearance dark --lint` reports `low-contrast` text
+    from the resolved colours.
 - **Units:** `px`, `%` and `auto`.
 - **Selectors:** `type`, `.class`, `#id`, `a b`, `a > b`, and comma
   lists. **Not supported:** `:hover` and other pseudo-classes, attribute

@@ -1,0 +1,10 @@
+<!-- A deliberately bad screen for the appearance check: a fixed white
+     background with text that follows the appearance. Under a dark
+     appearance its text turns light on white, and the render lint must
+     report low-contrast. (trellis-lint also flags it: colour-pair.) -->
+<column class="page">
+  <label no-outlet="yes">Text that vanishes in the dark</label>
+</column>
+<style>
+  .page { padding: 16px; background-color: #ffffff; }
+</style>

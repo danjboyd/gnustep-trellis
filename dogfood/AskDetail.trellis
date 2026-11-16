@@ -107,30 +107,31 @@
 </column>
 
 <style>
-  .pane     { container-type: inline-size; background-color: #ffffff; }
+  .pane     { container-type: inline-size; background-color: Canvas; }
   .area     { flex: 1; min-height: 0; flex-direction: column; }
   .doc      { flex: 3 1 0px; min-height: 0; }
   .content  { padding: 16px; gap: 18px; }
   .head     { gap: 4px; }
   .title    { font-size: 16px; font-weight: bold; }
-  .muted    { color: #77767b; }
+  .muted    { color: GrayText; }
   .body     { min-height: 70px; }
   /* Hidden until the app has a terminal to show; then display: flex. */
   .strip    { display: none; }
   .section  { gap: 6px; }
-  /* Adwaita's dim-label colour: quieter than body text, but readable
-     (6.0:1 on the panel's #f6f5f4; #77767b would be 4.1:1). */
-  .section-label { color: #5e5c64; font-weight: bold; }
+  /* System colours throughout, so the view follows the appearance (Light,
+     Dark, the GNUstep theme). GrayText is the platform's secondary label
+     colour: quieter than body text, but readable. */
+  .section-label { color: GrayText; font-weight: bold; }
   .pick-title { font-weight: bold; }
   .buttons  { flex-wrap: wrap; gap: 8px; align-items: center; }
   .grow     { flex: 1 1 100px; }
 
   /* The decision panel: below the document at narrow widths. */
-  .side     { flex: 2 1 0px; min-height: 0; background-color: #f6f5f4; }
+  .side     { flex: 2 1 0px; min-height: 0; background-color: -tr-window-background; }
   .decide   { flex: 1; min-height: 0; }
   .decide-content { padding: 12px 16px 8px 16px; gap: 14px; }
-  .replybox { border: 1px; border-color: #c0bfbc; border-radius: 6px; padding: 4px;
-              background-color: #ffffff; }
+  .replybox { border: 1px; border-color: -tr-separator; border-radius: 6px; padding: 4px;
+              background-color: Canvas; }
   .reply    { flex: 1; min-height: 56px; }
   .attachments { display: none; }
   .pair     { flex: none; gap: 8px; }
@@ -155,4 +156,7 @@
     .doc  { flex: 1 1 0px; }
     .side { flex: none; width: 340px; }
   }
+  /* The text view inside the reply scroller has no intrinsic height: give
+     it one, or it collapses to 0 (lint: collapsed). */
+  #reply    { min-height: 48px; }
 </style>

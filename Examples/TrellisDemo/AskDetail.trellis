@@ -23,11 +23,11 @@
 </column>
 
 <style>
-  .card    { container-type: inline-size; padding: 16px; gap: 10px; background-color: #ffffff; }
+  .card    { container-type: inline-size; padding: 16px; gap: 10px; background-color: Canvas; }
   .header  { gap: 8px; align-items: baseline; }
-  .badge   { flex: none; color: #1c71d8; font-weight: bold; }
+  .badge   { flex: none; color: AccentColor; font-weight: bold; }
   .title   { flex: 1; font-size: 15px; }
-  .muted   { flex: none; color: #77767b; }
+  .muted   { flex: none; color: GrayText; }
   .meta    { gap: 6px; align-items: baseline; }
   .meta #blocks { flex: 1; }
   .body    { min-height: 48px; }

@@ -67,15 +67,15 @@
 </column>
 
 <style>
-  .pane    { padding: 12px; gap: 6px; background-color: #ffffff; }
+  .pane    { padding: 12px; gap: 6px; background-color: Canvas; }
   /* Everything but the follow-up input; what doesn't fit is clipped, and
      the follow-up input stays pinned, as in the app. */
   .stack   { flex: 1; min-height: 0; gap: 6px; overflow: hidden; }
   .stack > * { flex-shrink: 0; }
   .title   { font-size: 16px; font-weight: bold; min-height: 24px; }
-  .muted   { color: #77767b; }
+  .muted   { color: GrayText; }
   .fixed20 { height: 20px; }
-  .caps    { color: #77767b; font-weight: bold; height: 20px; }
+  .caps    { color: GrayText; font-weight: bold; height: 20px; }
   .tight   { gap: 4px; }
   .pick-title { font-weight: bold; }
   .row26   { height: 26px; gap: 8px; }
@@ -88,9 +88,12 @@
   .stack > .body { flex: 1 1 0px; min-height: 70px; }
   .row26, .row30, .row24, .caps, .fixed20, .replybox, .followup { flex: none; }
   .strip   { display: none; }
-  .replybox { border: 1px; border-color: #c0bfbc; height: 64px; padding: 4px; }
+  .replybox { border: 1px; border-color: -tr-separator; height: 64px; padding: 4px; }
   .reply   { flex: 1; }
   .thread  { flex: none; height: 120px; }
   .followup { gap: 8px; height: 34px; }
   #followUp { flex: 1; min-width: 0; }
+  /* The text view inside the reply scroller has no intrinsic height: give
+     it one, or it collapses to 0 (lint: collapsed). */
+  #reply    { min-height: 48px; }
 </style>

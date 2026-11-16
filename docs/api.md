@@ -17,6 +17,15 @@ are public: element names, attributes (`id`, `class`, `action`,
 selectors and `@container` queries, and the `Screen.sample.json`
 convention. Unknown properties and bad values stay errors.
 
+Colours: hex, `rgb()`/`rgba()`, a few names, and the CSS system colours
+(`Canvas`, `CanvasText`, `Field`, `FieldText`, `ButtonFace`, `ButtonText`,
+`ButtonBorder`, `GrayText`, `Highlight`, `HighlightText`, `SelectedItem`,
+`SelectedItemText`, `AccentColor`, `AccentColorText`, `LinkText`, `Mark`,
+`MarkText`), plus `-tr-window-background`, `-tr-separator`,
+`-tr-secondary-text` and `-tr-error`. System colours resolve to AppKit's
+dynamic colours when the view draws, so they follow the appearance and
+theme (since 0.1.1).
+
 ## AppKit layer (libTrellis)
 
 | API | Header | What it is |
@@ -45,10 +54,14 @@ convention. Unknown properties and bad values stay errors.
 ## Tools
 
 `trellis-lint`, `trellis-render` (`--widths`, `--height`, `--theme`,
-`--sample`, `--png`, `--json`, `--lint`), `trellis-case` and
-TrellisPreview are supported, with their documented options. The
-frame-dump JSON keys `x`, `y`, `width`, `height`, `class`, `id`,
-`children`, `intrinsic` and `lint` are stable; others may be added.
+`--sample`, `--png`, `--json`, `--lint`, and since 0.1.1 `--appearance
+light|dark` and `-DefaultsKey value` pass-through), `trellis-case` and
+TrellisPreview are supported, with their documented options.
+
+The frame-dump JSON keys `x`, `y`, `width`, `height`, `class`, `id`,
+`children`, `intrinsic` and `lint` are stable. Since 0.1.1 the dump also
+carries the resolved colours `background`, `textColor` and
+`windowBackground`. Other keys may be added.
 
 ## Internal (not part of the API)
 

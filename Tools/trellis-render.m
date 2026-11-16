@@ -53,6 +53,20 @@ static void TRCheckIsolation(void)
 
 /* ---- Frame dump ---- */
 
+/* A colour as #rrggbb[aa], resolved now (dynamic colours under the current
+   appearance and theme). */
+static NSString *TRHexOfColor(NSColor *c)
+{
+  if (c == nil) return nil;
+  NSColor *rgb = [c colorUsingColorSpaceName: NSCalibratedRGBColorSpace];
+  if (rgb == nil) rgb = [c colorUsingColorSpaceName: NSDeviceRGBColorSpace];
+  if (rgb == nil) return nil;
+  int r = (int)lround([rgb redComponent] * 255), g = (int)lround([rgb greenComponent] * 255);
+  int b = (int)lround([rgb blueComponent] * 255), a = (int)lround([rgb alphaComponent] * 255);
+  return a == 255 ? [NSString stringWithFormat: @"#%02x%02x%02x", r, g, b]
+                  : [NSString stringWithFormat: @"#%02x%02x%02x%02x", r, g, b, a];
+}
+
 static NSDictionary *TRDumpView(NSView *v, TRNode *node)
 {
   NSMutableDictionary *d = [NSMutableDictionary dictionary];
@@ -75,6 +89,22 @@ static NSDictionary *TRDumpView(NSView *v, TRNode *node)
         d[@"overflow"] = ov == TROverflowHidden ? @"hidden" : (ov == TROverflowScroll ? @"scroll" : @"auto");
       NSArray *m = node.matchedConditions;
       if ([m count]) d[@"container"] = @{@"matched": m};
+      NSString *bg = node.style.otherDeclarations[@"background-color"] ?: node.style.otherDeclarations[@"background"];
+      NSString *hex = bg ? TRHexOfColor(TRColorFromCSS(bg)) : nil;
+      if (hex) d[@"background"] = hex;
+    }
+  /* Text drawn straight onto the parent's background (labels, check boxes,
+     radio buttons): its resolved colour, for the contrast lint. */
+  if ([v isKindOfClass: [NSTextField class]] && ![(NSTextField *)v drawsBackground]
+      && ![(NSTextField *)v isBezeled])
+    {
+      NSString *hex = TRHexOfColor([(NSTextField *)v textColor]);
+      if (hex) d[@"textColor"] = hex;
+    }
+  else if ([v isKindOfClass: [NSButton class]] && ![(NSButton *)v isBordered])
+    {
+      NSString *hex = TRHexOfColor([NSColor controlTextColor]);
+      if (hex) d[@"textColor"] = hex;
     }
   if ([v isKindOfClass: [NSControl class]] && [(NSControl *)v cell] != nil)
     {
@@ -172,6 +202,7 @@ static void TRUsage(void)
     "usage: trellis-render (Screen.trellis [--sample S.json] | --screen NAME)\n"
     "                      [--width W | --widths W1,W2,...] [--height H]\n"
     "                      [--png out.png] [--json out.json] [--outlines] [--lint] [--theme NAME]\n"
+    "                      [--appearance light|dark] [-DefaultsKey value ...]\n"
     "screens: %s\n", [[TRSampleScreenNames() componentsJoinedByString: @", "] UTF8String]);
   exit(2);
 }
@@ -184,7 +215,7 @@ int main(int argc, const char **argv)
       NSMutableArray *widths = [NSMutableArray array];
       double height = NAN;
       BOOL outlines = NO, printLint = NO;
-      NSString *theme = nil;
+      NSString *theme = nil, *appearance = nil;
       for (int i = 1; i < argc; i++)
         {
           NSString *a = [NSString stringWithUTF8String: argv[i]];
@@ -204,6 +235,10 @@ int main(int argc, const char **argv)
           else if ([a isEqualToString: @"--lint"]) printLint = YES;
           else if ([a isEqualToString: @"--theme"] && next) { theme = next; i++; }
           else if ([a isEqualToString: @"--sample"] && next) { samplePath = next; i++; }
+          else if ([a isEqualToString: @"--appearance"] && next) { appearance = next; i++; }
+          /* -Key value: an NSUserDefaults argument (GNUstep already put it
+             in the argument domain), e.g. -GnomeThemeColorScheme force-dark. */
+          else if ([a hasPrefix: @"-"] && ![a hasPrefix: @"--"] && next) i++;
           else if ([[a pathExtension] isEqualToString: @"trellis"] && file == nil) file = a;
           else TRUsage();
         }
@@ -232,13 +267,20 @@ int main(int argc, const char **argv)
       if ([widths count] == 0) [widths addObject: @480];
 
       TRCheckIsolation();
-      if (theme)
+      if (appearance && ![appearance isEqualToString: @"light"] && ![appearance isEqualToString: @"dark"])
+        TRUsage();
+      if (theme || appearance)
         {
-          /* Volatile (argument-domain) setting: nothing is written to disk. */
+          /* Volatile (argument-domain) settings: nothing is written to disk. */
           NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
           NSMutableDictionary *args = [[defs volatileDomainForName: NSArgumentDomain] mutableCopy]
             ?: [NSMutableDictionary dictionary];
-          args[@"GSTheme"] = theme;
+          if (theme) args[@"GSTheme"] = theme;
+#ifdef GNUSTEP
+          /* GNUstep has no appearance API; Adwaita reads its colour scheme. */
+          if (appearance)
+            args[@"GnomeThemeColorScheme"] = [appearance isEqualToString: @"dark"] ? @"force-dark" : @"force-light";
+#endif
           [defs removeVolatileDomainForName: NSArgumentDomain];
           [defs setVolatileDomain: args forName: NSArgumentDomain];
         }
@@ -284,10 +326,21 @@ int main(int argc, const char **argv)
           [win setReleasedWhenClosed: NO];
           [win setContentView: box];
 #endif
+#ifndef GNUSTEP
+          if (appearance)
+            {
+              NSAppearance *ap = [NSAppearance appearanceNamed:
+                [appearance isEqualToString: @"dark"] ? NSAppearanceNameDarkAqua : NSAppearanceNameAqua];
+              [box setAppearance: ap];
+              [NSAppearance setCurrentAppearance: ap];   /* dynamic colours resolve under it */
+            }
+#endif
           [box setFrame: NSMakeRect(0, 0, W, H)];
           [box layoutTrellis];
 
-          NSDictionary *tree = TRDumpView(box, box.node);
+          NSMutableDictionary *tree = [TRDumpView(box, box.node) mutableCopy];
+          NSString *winBg = TRHexOfColor([NSColor windowBackgroundColor]);
+          if (winBg) tree[@"windowBackground"] = winBg;
           NSArray *lint = TRLintFrameTree(tree, W, H);
           for (NSDictionary *f in lint)
             {

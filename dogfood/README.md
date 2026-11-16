@@ -11,6 +11,7 @@ AIManager repo; agent-lead does the port once the maintainer approves it.
 | `AIMAskDetailOutlets.h` | The owner contract: the outlets and actions the view would expose. A stand-in, not AIManager's header. |
 | `AskDetail.sample.json`, `before.sample.json` | Invented sample content (no real asks). |
 | `frames/before-after-{340,520,900}.png` | Before (left) and after (right), Adwaita, 680 px tall. |
+| `frames/light-dark-{340,520,900}.png` | The proposal under Adwaita light (left) and dark (right): all colours are system colours, so it follows the appearance. |
 | `frames/*.json` | The frame dumps behind each render, with lint. |
 
 ## What changes, by retro item
@@ -43,9 +44,10 @@ The items are from fun-themes' Gumdrop assessment of AIManager (2026-11-13).
      per-density constants.
 3. **The workspace used deliberately** (item 5).
    - Sentence-case section labels instead of ALL CAPS.
-   - Section labels use Adwaita's dim-label colour #5e5c64: 6.0:1 on the
-     panel's #f6f5f4, where the old #77767b was 4.1:1, below the 4.5:1 that
-     normal-size text needs.
+   - Section labels use `GrayText`, the platform's secondary label colour.
+     Every colour in the spec is a system colour (`Canvas`,
+     `-tr-window-background`, `GrayText`, `AccentColor`, `Highlight`), so the
+     view follows Light/Dark on macOS and the GNUstep theme.
    - All button rows wrap. Today the two action rows and the attachments
      row (fixed offsets w−172 / w−80) run off the right edge at 340.
    - The attachments row is hidden until something is attached, as in the

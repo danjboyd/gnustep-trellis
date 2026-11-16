@@ -30,19 +30,19 @@
     grid-template-columns: 180px 1fr;
     grid-template-rows: auto auto 1fr;
     grid-template-areas: "head head" "side cards" "side log";
-    gap: 12px; padding: 16px; background-color: #f6f5f4;
+    gap: 12px; padding: 16px; background-color: -tr-window-background;
   }
   .head   { grid-area: head; gap: 8px; }
   .title  { font-size: 18px; font-weight: bold; }
   #filter { width: 200px; }
   .side   { grid-area: side; gap: 6px; }
-  .section { color: #77767b; }
+  .section { color: GrayText; }
   .cards  { grid-area: cards; display: grid; gap: 10px;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-  .card   { padding: 10px; gap: 4px; background-color: #ffffff; border: 1px solid #deddda; border-radius: 6px; }
-  .k      { color: #77767b; }
+  .card   { padding: 10px; gap: 4px; background-color: Canvas; border: 1px solid -tr-separator; border-radius: 6px; }
+  .k      { color: GrayText; }
   .v      { font-size: 22px; font-weight: bold; }
-  .log    { grid-area: log; min-height: 60px; background-color: #ffffff; }
+  .log    { grid-area: log; min-height: 60px; background-color: Canvas; }
 
   /* Narrow: one column, the side list becomes a row under the header. */
   @container (max-width: 599px) {

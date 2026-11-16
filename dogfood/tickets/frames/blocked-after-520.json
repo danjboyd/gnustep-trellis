@@ -144,72 +144,76 @@
                       {
                         "children": [
                           {
+                            "textColor": "#828282",
                             "x": 0,
                             "text": "Your move 6",
                             "needed": {
                               "height": 18,
                               "width": 103
                             },
-                            "width": 0,
-                            "height": 18,
                             "intrinsic": {
                               "height": 18,
                               "width": 103
                             },
-                            "style": "margin-top: 8px; color: #5e5c64; font-weight: bold",
+                            "width": 0,
+                            "height": 18,
+                            "style": "margin-top: 8px; color: GrayText; font-weight: bold",
                             "class": "NSTextField",
                             "y": 8
                           },
                           {
+                            "textColor": "#828282",
                             "x": 0,
                             "text": "Verify",
                             "needed": {
                               "height": 18,
                               "width": 43
                             },
-                            "width": 0,
-                            "height": 18,
                             "intrinsic": {
                               "height": 18,
                               "width": 43
                             },
-                            "style": "margin-top: 2px; color: #5e5c64",
+                            "width": 0,
+                            "height": 18,
+                            "style": "margin-top: 2px; color: GrayText",
                             "class": "NSTextField",
                             "y": 32
                           },
                           {
                             "children": [
                               {
+                                "textColor": "#1f1f1f",
                                 "x": 8,
                                 "text": "2396 Fuel log export missing columns",
                                 "needed": {
                                   "height": 558,
                                   "width": 0
                                 },
-                                "width": 0,
-                                "height": 558,
                                 "intrinsic": {
                                   "height": 18,
                                   "width": 312
                                 },
+                                "width": 0,
+                                "height": 558,
                                 "style": "font-weight: bold",
                                 "class": "NSTextField",
                                 "y": 5
                               },
                               {
+                                "textColor": "#828282",
                                 "x": 8,
                                 "text": "Bob Example \u00b7 2h \u25cf",
                                 "needed": {
                                   "height": 18,
                                   "width": 120
                                 },
-                                "width": 0,
-                                "height": 18,
                                 "intrinsic": {
                                   "height": 18,
                                   "width": 120
                                 },
-                                "style": "color: #77767b",
+                                "width": 0,
+                                "height": 18,
+                                "style": "color: GrayText",
                                 "class": "NSTextField",
                                 "y": 564
                               }
@@ -224,36 +228,38 @@
                           {
                             "children": [
                               {
+                                "textColor": "#1f1f1f",
                                 "x": 8,
                                 "text": "2398 Map tiles blank offline",
                                 "needed": {
                                   "height": 396,
                                   "width": 0
                                 },
-                                "width": 0,
-                                "height": 396,
                                 "intrinsic": {
                                   "height": 18,
                                   "width": 229
                                 },
+                                "width": 0,
+                                "height": 396,
                                 "style": "font-weight: bold",
                                 "class": "NSTextField",
                                 "y": 5
                               },
                               {
+                                "textColor": "#828282",
                                 "x": 8,
                                 "text": "Carol Example \u00b7 3h",
                                 "needed": {
                                   "height": 18,
                                   "width": 96
                                 },
-                                "width": 0,
-                                "height": 18,
                                 "intrinsic": {
                                   "height": 18,
                                   "width": 96
                                 },
-                                "style": "color: #77767b",
+                                "width": 0,
+                                "height": 18,
+                                "style": "color: GrayText",
                                 "class": "NSTextField",
                                 "y": 402
                               }
@@ -266,131 +272,139 @@
                             "y": 645
                           },
                           {
+                            "textColor": "#828282",
                             "x": 0,
                             "text": "\u25b8 With agents 4",
                             "needed": {
                               "height": 18,
                               "width": 127
                             },
-                            "width": 0,
-                            "height": 18,
                             "intrinsic": {
                               "height": 18,
                               "width": 127
                             },
-                            "style": "margin-top: 8px; color: #5e5c64; font-weight: bold",
+                            "width": 0,
+                            "height": 18,
+                            "style": "margin-top: 8px; color: GrayText; font-weight: bold",
                             "class": "NSTextField",
                             "y": 1082
                           },
                           {
+                            "textColor": "#828282",
                             "x": 0,
                             "text": "\u25b8 With requesters 2",
                             "needed": {
                               "height": 18,
                               "width": 160
                             },
-                            "width": 0,
-                            "height": 18,
                             "intrinsic": {
                               "height": 18,
                               "width": 160
                             },
-                            "style": "margin-top: 8px; color: #5e5c64; font-weight: bold",
+                            "width": 0,
+                            "height": 18,
+                            "style": "margin-top: 8px; color: GrayText; font-weight: bold",
                             "class": "NSTextField",
                             "y": 1112
                           },
                           {
+                            "textColor": "#828282",
                             "x": 0,
                             "text": "\u25be Blocked 1",
                             "needed": {
                               "height": 18,
                               "width": 93
                             },
-                            "width": 0,
-                            "height": 18,
                             "intrinsic": {
                               "height": 18,
                               "width": 93
                             },
-                            "style": "margin-top: 8px; color: #5e5c64; font-weight: bold",
+                            "width": 0,
+                            "height": 18,
+                            "style": "margin-top: 8px; color: GrayText; font-weight: bold",
                             "class": "NSTextField",
                             "y": 1142
                           },
                           {
+                            "x": 0,
                             "children": [
                               {
+                                "textColor": "#1f1f1f",
                                 "x": 8,
                                 "text": "2409 Field tablets can't sync after the 11/14 update",
                                 "needed": {
                                   "height": 792,
                                   "width": 0
                                 },
-                                "width": 0,
-                                "height": 792,
                                 "intrinsic": {
                                   "height": 18,
                                   "width": 429
                                 },
-                                "style": "font-weight: bold",
+                                "width": 0,
+                                "height": 792,
+                                "style": "color: HighlightText; font-weight: bold",
                                 "class": "NSTextField",
                                 "y": 5
                               },
                               {
+                                "textColor": "#1f1f1f",
                                 "x": 8,
                                 "text": "Alice Example \u00b7 5h \u25f7",
                                 "needed": {
                                   "height": 18,
                                   "width": 125
                                 },
-                                "width": 0,
-                                "height": 18,
                                 "intrinsic": {
                                   "height": 18,
                                   "width": 125
                                 },
-                                "style": "color: #77767b",
+                                "width": 0,
+                                "height": 18,
+                                "style": "color: HighlightText",
                                 "class": "NSTextField",
                                 "y": 798
                               }
                             ],
-                            "class": "TRBoxView",
-                            "x": 0,
-                            "style": "flex-direction: column; padding-left: 8px; padding-top: 5px; padding-right: 8px; padding-bottom: 5px; row-gap: 1px; column-gap: 1px; background-color: #dbe7fa; border-radius: 6px",
-                            "height": 821,
                             "width": 16,
-                            "y": 1164
+                            "height": 821,
+                            "style": "flex-direction: column; padding-left: 8px; padding-top: 5px; padding-right: 8px; padding-bottom: 5px; row-gap: 1px; column-gap: 1px; background-color: Highlight; border-radius: 6px",
+                            "class": "TRBoxView",
+                            "y": 1164,
+                            "background": "#99c1f1"
                           },
                           {
+                            "textColor": "#828282",
                             "x": 0,
                             "text": "\u25b8 Projects 3",
                             "needed": {
                               "height": 18,
                               "width": 95
                             },
-                            "width": 0,
-                            "height": 18,
                             "intrinsic": {
                               "height": 18,
                               "width": 95
                             },
-                            "style": "margin-top: 8px; color: #5e5c64; font-weight: bold",
+                            "width": 0,
+                            "height": 18,
+                            "style": "margin-top: 8px; color: GrayText; font-weight: bold",
                             "class": "NSTextField",
                             "y": 1997
                           },
                           {
+                            "textColor": "#828282",
                             "x": 0,
                             "text": "\u25b8 Snoozed 1",
                             "needed": {
                               "height": 18,
                               "width": 98
                             },
-                            "width": 0,
-                            "height": 18,
                             "intrinsic": {
                               "height": 18,
                               "width": 98
                             },
-                            "style": "margin-top: 8px; color: #5e5c64; font-weight: bold",
+                            "width": 0,
+                            "height": 18,
+                            "style": "margin-top: 8px; color: GrayText; font-weight: bold",
                             "class": "NSTextField",
                             "y": 2027
                           }
@@ -423,9 +437,10 @@
             "hidden": true,
             "width": 100,
             "height": 100,
-            "style": "display: none; flex-direction: column; flex-shrink: 0; width: 270px; padding-left: 12px; padding-top: 10px; padding-right: 10px; row-gap: 8px; column-gap: 8px; background-color: #f6f5f4",
+            "style": "display: none; flex-direction: column; flex-shrink: 0; width: 270px; padding-left: 12px; padding-top: 10px; padding-right: 10px; row-gap: 8px; column-gap: 8px; background-color: -tr-window-background",
             "class": "TRBoxView",
-            "y": 0
+            "y": 0,
+            "background": "#fafafb"
           },
           {
             "x": 0,
@@ -443,6 +458,7 @@
                       {
                         "children": [
                           {
+                            "textColor": "#1f1f1f",
                             "x": 0,
                             "text": "TKT-1409 Field tablets can't sync after the 11/14 update",
                             "needed": {
@@ -461,23 +477,25 @@
                             "id": "card"
                           },
                           {
+                            "textColor": "#828282",
                             "x": 0,
                             "text": "Alice Example \u00b7 Field Ops \u00b7 P2 \u00b7 opened 5h ago",
                             "needed": {
                               "height": 18,
                               "width": 314
                             },
-                            "width": 496,
-                            "height": 18,
                             "intrinsic": {
                               "height": 18,
                               "width": 314
                             },
-                            "style": "color: #77767b",
+                            "width": 496,
+                            "height": 18,
+                            "style": "color: GrayText",
                             "class": "NSTextField",
                             "y": 46
                           },
                           {
+                            "textColor": "#1f1f1f",
                             "x": 0,
                             "text": "Since the 11/14 update, tablets in the north site stop syncing after about ten minutes. A restart fixes it until the next shift. Three crews are affected.",
                             "needed": {
@@ -494,23 +512,25 @@
                             "y": 72
                           },
                           {
+                            "textColor": "#1f1f1f",
                             "x": 0,
                             "text": "Waiting on",
                             "needed": {
                               "height": 18,
                               "width": 89
                             },
-                            "width": 496,
-                            "height": 18,
                             "intrinsic": {
                               "height": 18,
                               "width": 89
                             },
+                            "width": 496,
+                            "height": 18,
                             "style": "margin-top: 6px; font-weight: bold",
                             "class": "NSTextField",
                             "y": 140
                           },
                           {
+                            "textColor": "#1f1f1f",
                             "x": 0,
                             "text": "\u2022 TKT-1402 Monthly budget export times out (in progress)",
                             "needed": {
@@ -527,53 +547,56 @@
                             "y": 166
                           },
                           {
+                            "textColor": "#ff0000",
                             "x": 0,
                             "text": "\u2022 Vendor licence for the sync add-on \u00b7 by 2026-12-01 (condition 4) \u00b7 declined",
                             "needed": {
                               "height": 36,
                               "width": 488
                             },
-                            "width": 496,
-                            "height": 36,
                             "intrinsic": {
                               "height": 18,
                               "width": 564
                             },
-                            "style": "color: #c01c28",
+                            "width": 496,
+                            "height": 36,
+                            "style": "color: -tr-error",
                             "class": "NSTextField",
                             "y": 192
                           },
                           {
+                            "textColor": "#828282",
                             "x": 0,
                             "text": "It goes back to plan gate when they clear. B changes them.",
                             "needed": {
                               "height": 18,
                               "width": 441
                             },
-                            "width": 496,
-                            "height": 18,
                             "intrinsic": {
                               "height": 18,
                               "width": 441
                             },
-                            "style": "color: #77767b",
+                            "width": 496,
+                            "height": 18,
+                            "style": "color: GrayText",
                             "class": "NSTextField",
                             "y": 236
                           },
                           {
+                            "textColor": "#828282",
                             "x": 0,
                             "text": "Blocks: TKT-1415",
                             "needed": {
                               "height": 18,
                               "width": 121
                             },
-                            "width": 496,
-                            "height": 18,
                             "intrinsic": {
                               "height": 18,
                               "width": 121
                             },
-                            "style": "color: #77767b",
+                            "width": 496,
+                            "height": 18,
+                            "style": "color: GrayText",
                             "class": "NSTextField",
                             "y": 262
                           }
@@ -604,6 +627,7 @@
               {
                 "children": [
                   {
+                    "textColor": "#828282",
                     "x": 0,
                     "text": "Ids to add, -id to remove, or a condition: 2283, -2290, Parts on order by 12/1, -c4",
                     "needed": {
@@ -616,7 +640,7 @@
                     },
                     "width": 496,
                     "height": 36,
-                    "style": "color: #77767b",
+                    "style": "color: GrayText",
                     "class": "NSTextField",
                     "y": 0,
                     "id": "noteHint"
@@ -727,7 +751,7 @@
                 ],
                 "class": "TRBoxView",
                 "x": 12,
-                "style": "padding-left: 4px; border-left-width: 1px; padding-top: 4px; border-top-width: 1px; padding-right: 4px; border-right-width: 1px; padding-bottom: 4px; border-bottom-width: 1px; border-color: #c0bfbc; border-radius: 6px",
+                "style": "padding-left: 4px; border-left-width: 1px; padding-top: 4px; border-top-width: 1px; padding-right: 4px; border-right-width: 1px; padding-bottom: 4px; border-bottom-width: 1px; border-color: -tr-separator; border-radius: 6px",
                 "height": 66,
                 "width": 496,
                 "y": 476
@@ -764,6 +788,7 @@
         },
         "children": [
           {
+            "textColor": "#828282",
             "x": 12,
             "text": "Prerequisites changed on TKT-1409: +2283 \u00b7 goes in 10 s",
             "container": {
@@ -781,7 +806,7 @@
             },
             "width": 496,
             "height": 18,
-            "style": "flex-grow: 1; flex-basis: 100%; min-width: 0px; color: #77767b",
+            "style": "flex-grow: 1; flex-basis: 100%; min-width: 0px; color: GrayText",
             "class": "NSTextField",
             "y": 8,
             "id": "undoLabel"
@@ -807,12 +832,14 @@
         "y": 604
       }
     ],
-    "width": 520,
     "height": 680,
-    "style": "flex-direction: column; background-color: #ffffff; container-type: inline-size",
+    "width": 520,
     "class": "TRBoxView",
+    "style": "flex-direction: column; background-color: Canvas; container-type: inline-size",
+    "id": "desk",
     "y": 0,
-    "id": "desk"
+    "background": "#ffffff",
+    "windowBackground": "#fafafb"
   },
   "trellis": "0.1",
   "lint": [

@@ -5,6 +5,7 @@
 */
 
 #import "TRLint.h"
+#import <math.h>
 
 static const double kTol = 0.5;
 
@@ -117,9 +118,69 @@ static void TRLintNode(NSDictionary *n, NSString *path, double absX, double absY
       }
 }
 
+/* ---- Contrast of resolved colours ---- */
+
+static BOOL TRParseHex(NSString *hex, double rgba[4])
+{
+  if (![hex hasPrefix: @"#"] || ([hex length] != 7 && [hex length] != 9)) return NO;
+  unsigned v[4] = {0, 0, 0, 255};
+  for (int i = 0; i < ([hex length] == 9 ? 4 : 3); i++)
+    {
+      unsigned x = 0;
+      [[NSScanner scannerWithString: [hex substringWithRange: NSMakeRange(1 + 2 * i, 2)]] scanHexInt: &x];
+      v[i] = x;
+    }
+  for (int i = 0; i < 4; i++) rgba[i] = v[i] / 255.0;
+  return YES;
+}
+
+static double TRLuminance(const double c[3])
+{
+  double l[3];
+  for (int i = 0; i < 3; i++)
+    l[i] = c[i] <= 0.03928 ? c[i] / 12.92 : pow((c[i] + 0.055) / 1.055, 2.4);
+  return 0.2126 * l[0] + 0.7152 * l[1] + 0.0722 * l[2];
+}
+
+/* WCAG contrast of text over a background (the text's alpha blended in). */
+static double TRContrast(NSString *fg, NSString *bg)
+{
+  double f[4], b[4];
+  if (!TRParseHex(fg, f) || !TRParseHex(bg, b)) return 21;
+  double mixed[3];
+  for (int i = 0; i < 3; i++) mixed[i] = f[i] * f[3] + b[i] * (1 - f[3]);
+  double lf = TRLuminance(mixed), lb = TRLuminance(b);
+  return (MAX(lf, lb) + 0.05) / (MIN(lf, lb) + 0.05);
+}
+
+/* Text with less than 3:1 contrast against the nearest background (the
+   window background when no box sets one): typically a fixed background
+   with text that follows the appearance, or the other way round. */
+static void TRLintContrast(NSDictionary *n, NSString *path, NSString *under, NSMutableArray *out)
+{
+  if ([n[@"hidden"] boolValue]) return;
+  NSString *bg = n[@"background"];
+  double b[4];
+  if (bg && TRParseHex(bg, b) && b[3] > 0.5) under = bg;   /* translucent: keep what's below */
+  NSString *fg = n[@"textColor"];
+  NSString *text = n[@"text"] ?: n[@"title"];
+  if (fg && under && [text length] > 0)
+    {
+      double c = TRContrast(fg, under);
+      if (c < 3.0)
+        TRAdd(out, @"low-contrast", @"warning", n, path, [NSString stringWithFormat:
+          @"%@: text %@ on %@ has contrast %.1f:1 (needs 3:1); use system colours (CanvasText on Canvas, GrayText)",
+          TRNodeName(n, path), fg, under, c]);
+    }
+  NSArray *kids = n[@"children"];
+  for (NSUInteger i = 0; i < [kids count]; i++)
+    TRLintContrast(kids[i], [NSString stringWithFormat: @"%@/%lu", path, (unsigned long)i], under, out);
+}
+
 NSArray<NSDictionary *> *TRLintFrameTree(NSDictionary *root, double vw, double vh)
 {
   NSMutableArray *out = [NSMutableArray array];
   TRLintNode(root, @"root", 0, 0, vw, vh, NO, out);
+  TRLintContrast(root, @"root", root[@"windowBackground"], out);
   return out;
 }

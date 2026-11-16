@@ -52,6 +52,40 @@ NSColor *TRColorFromCSS(NSString *css)
                                        green: [parts[1] doubleValue] / 255.0
                                         blue: [parts[2] doubleValue] / 255.0 alpha: a];
     }
+  /* CSS system colours (CSS Color 4) map to AppKit's dynamic colours, so
+     they follow the appearance (Light/Dark on macOS, the theme on
+     GNUstep). Use them instead of fixed colours for backgrounds and text. */
+  {
+    static NSDictionary *sys;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+      sys = @{ @"canvas": @"textBackgroundColor", @"canvastext": @"textColor",
+               @"field": @"controlBackgroundColor", @"fieldtext": @"controlTextColor",
+               @"buttonface": @"controlColor", @"buttontext": @"controlTextColor",
+               @"buttonborder": @"gridColor",
+               @"graytext": @"secondaryLabelColor|disabledControlTextColor",
+               @"highlight": @"selectedTextBackgroundColor", @"highlighttext": @"selectedTextColor",
+               @"selecteditem": @"selectedContentBackgroundColor|selectedControlColor",
+               @"selecteditemtext": @"alternateSelectedControlTextColor",
+               @"accentcolor": @"controlAccentColor|selectedControlColor",
+               @"accentcolortext": @"alternateSelectedControlTextColor",
+               @"linktext": @"linkColor|blueColor",
+               @"mark": @"findHighlightColor|yellowColor", @"marktext": @"textColor",
+               /* Trellis extensions */
+               @"-tr-window-background": @"windowBackgroundColor",
+               @"-tr-separator": @"separatorColor|gridColor",
+               @"-tr-secondary-text": @"secondaryLabelColor|disabledControlTextColor",
+               @"-tr-error": @"systemRedColor|redColor" };
+    });
+    NSString *names = sys[c];
+    if (names != nil)
+      for (NSString *name in [names componentsSeparatedByString: @"|"])
+        {
+          SEL sel = NSSelectorFromString(name);
+          if ([NSColor respondsToSelector: sel])
+            return ((NSColor *(*)(id, SEL))[NSColor methodForSelector: sel])([NSColor class], sel);
+        }
+  }
   if ([c isEqualToString: @"transparent"]) return [NSColor clearColor];
   if ([c isEqualToString: @"black"]) return [NSColor blackColor];
   if ([c isEqualToString: @"white"]) return [NSColor whiteColor];

@@ -74,6 +74,94 @@ static BOOL TRScanHeader(NSString *path, NSString *cls, NSMutableSet *outlets, N
   return found;
 }
 
+/* ---- Colour pairing (Dark appearance / dark themes) ---- */
+
+/* The element's colour declarations, later rules winning. */
+static NSDictionary *TRColourDecls(TRMarkupDocument *doc, TRMarkupElement *e)
+{
+  NSMutableDictionary *d = [NSMutableDictionary dictionary];
+  for (TRMatchedDeclarations *m in [doc declarationsForElement: e])
+    {
+      if (m.condition != nil) continue;   /* container-query overlays: not checked */
+      for (NSString *decl in [m.declarations componentsSeparatedByString: @";"])
+        {
+          NSRange colon = [decl rangeOfString: @":"];
+          if (colon.location == NSNotFound) continue;
+          NSString *k = [[[decl substringToIndex: colon.location] stringByTrimmingCharactersInSet:
+                           [NSCharacterSet whitespaceCharacterSet]] lowercaseString];
+          NSString *v = [[[decl substringFromIndex: NSMaxRange(colon)] stringByTrimmingCharactersInSet:
+                           [NSCharacterSet whitespaceCharacterSet]] lowercaseString];
+          if ([k isEqualToString: @"background"]) k = @"background-color";
+          if ([k isEqualToString: @"background-color"] || [k isEqualToString: @"color"]) d[k] = v;
+        }
+    }
+  return d;
+}
+
+/* A colour that doesn't follow the appearance: not a system colour,
+   transparent or currentColor. */
+static BOOL TRIsFixedColour(NSString *v)
+{
+  if ([v length] == 0) return NO;
+  static NSSet *dynamic;
+  if (dynamic == nil)
+    dynamic = [NSSet setWithObjects: @"transparent", @"currentcolor", @"inherit",
+      @"canvas", @"canvastext", @"field", @"fieldtext", @"buttonface", @"buttontext", @"buttonborder",
+      @"graytext", @"highlight", @"highlighttext", @"selecteditem", @"selecteditemtext",
+      @"accentcolor", @"accentcolortext", @"linktext", @"mark", @"marktext",
+      @"-tr-window-background", @"-tr-separator", @"-tr-secondary-text", @"-tr-error", nil];
+  return ![dynamic containsObject: v];
+}
+
+/* Elements whose text draws straight onto their parent's background
+   (buttons, pop-ups and fields have their own themed backgrounds). */
+static BOOL TRDrawsTextOnParent(TRMarkupElement *e)
+{
+  NSString *n = e.name;
+  return [n isEqualToString: @"label"] || [n isEqualToString: @"text"]
+      || [n isEqualToString: @"checkbox"] || [n isEqualToString: @"radio"];
+}
+
+static void TRLintColours(TRMarkupDocument *doc, NSString *path)
+{
+  for (TRMarkupElement *e in [doc allElements])
+    {
+      NSDictionary *d = TRColourDecls(doc, e);
+      NSString *where = [NSString stringWithFormat: @"%@:%lu:%lu", path, (unsigned long)e.line, (unsigned long)e.column];
+      NSString *bg = d[@"background-color"], *fg = d[@"color"];
+      if (TRDrawsTextOnParent(e) && TRIsFixedColour(fg))
+        {
+          /* Fixed text colour: the nearest background must be fixed too. */
+          NSString *under = nil;
+          for (TRMarkupElement *p = e.parent; p != nil && under == nil; p = p.parent)
+            under = TRColourDecls(doc, p)[@"background-color"];
+          if (!TRIsFixedColour(bg) && !TRIsFixedColour(under))
+            TRReport(where, @"warning", @"colour-pair", [NSString stringWithFormat:
+              @"color %@ is fixed, but the background behind it follows the appearance; in a dark appearance it may vanish. Use a system colour (CanvasText, GrayText) or set a background", fg]);
+        }
+      if (TRIsFixedColour(bg) && ![e.name isEqualToString: @"button"] && ![e.name isEqualToString: @"popup"]
+          && ![e.name isEqualToString: @"field"])
+        {
+          /* Fixed background: text drawn on it must not follow the appearance. */
+          NSUInteger loose = 0;
+          NSMutableArray *stack = [NSMutableArray arrayWithObject: e];
+          while ([stack count])
+            {
+              TRMarkupElement *x = [stack lastObject];
+              [stack removeLastObject];
+              NSDictionary *xd = (x == e) ? d : TRColourDecls(doc, x);
+              if (x != e && xd[@"background-color"] != nil) continue;   /* covered by its own background */
+              if (TRDrawsTextOnParent(x) && xd[@"color"] == nil) loose++;
+              [stack addObjectsFromArray: x.children];
+            }
+          if (loose > 0)
+            TRReport(where, @"warning", @"colour-pair", [NSString stringWithFormat:
+              @"background %@ is fixed, but %lu text element(s) on it use the system text colour; in a dark appearance they vanish. Use system colours (Canvas, CanvasText) or set color on them",
+              bg, (unsigned long)loose]);
+        }
+    }
+}
+
 static void TRLintTrellis(NSString *path, NSString *header)
 {
   NSError *err = nil;
@@ -106,6 +194,7 @@ static void TRLintTrellis(NSString *path, NSString *header)
                        [m.declarations substringWithRange: [r rangeAtIndex: 2]]]);
         }
     }
+  TRLintColours(doc, path);
   if (header == nil) return;
   NSMutableSet *outlets = [NSMutableSet set], *actions = [NSMutableSet set];
   NSString *cls = nil;

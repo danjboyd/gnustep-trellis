@@ -76,23 +76,23 @@
      (RailWidth 270, PulseHeight 24, BarHeight 34, UndoHeight 30,
      ComposeHeight 150), the card at least 200 wide, nothing wraps. What
      doesn't fit is clipped; the undo bar stays pinned. */
-  .desk      { background-color: #ffffff; }
+  .desk      { background-color: Canvas; }
   .desk > *  { flex-shrink: 0; }
   .pulse     { height: 24px; gap: 4px; padding: 0 6px; align-items: center; }
   .pulse > * { flex-shrink: 0; }
   .narrow-only { display: none; }
   .body      { flex: 1 1 0px; min-height: 0; flex-direction: row; overflow: hidden; }
-  .railpane  { flex: none; width: 270px; gap: 6px; padding: 6px; background-color: #f6f5f4; }
+  .railpane  { flex: none; width: 270px; gap: 6px; padding: 6px; background-color: -tr-window-background; }
   .railpane > * { flex-shrink: 0; }
   #filter    { height: 24px; }
   .rail      { flex: 1 1 0px; min-height: 0; }
   .rail-list { gap: 0px; }
-  .section   { color: #77767b; font-weight: bold; height: 22px; margin-top: 6px; }
-  .group     { color: #77767b; height: 20px; }
+  .section   { color: GrayText; font-weight: bold; height: 22px; margin-top: 6px; }
+  .group     { color: GrayText; height: 20px; }
   .row       { height: 38px; padding: 2px 8px; }
   .row-title { font-weight: bold; }
-  .row-meta  { color: #77767b; }
-  .selected, .inbatch-selected { background-color: #dbe7fa; }
+  .row-meta  { color: GrayText; }
+  .selected, .inbatch-selected { background-color: Highlight; }
   .main      { flex: 1 0 200px; min-width: 200px; gap: 6px; padding: 8px; overflow: hidden; }
   .main > *  { flex-shrink: 0; }
   .main > .cardscroll { flex: 1 1 0px; min-height: 0; }
@@ -101,15 +101,15 @@
   .heading   { font-weight: bold; }
   .item-title { font-weight: bold; }
   .item-line { margin-left: 16px; }
-  .muted     { color: #77767b; }
-  .warn      { color: #c01c28; }
+  .muted     { color: GrayText; }
+  .warn      { color: -tr-error; }
   .note      { gap: 0px; }
   #noteHint  { height: 18px; }
   #note      { height: 24px; }
   .actions   { height: 34px; gap: 8px; align-items: center; }
   .actions > * { flex-shrink: 0; }
   .wide-only { display: flex; }
-  .composerbox { height: 150px; border: 1px; border-color: #c0bfbc; padding: 2px; }
+  .composerbox { height: 150px; border: 1px; border-color: -tr-separator; padding: 2px; }
   .composer  { flex: 1; }
   .batch-hidden { display: none; }
   .undo      { height: 30px; gap: 8px; padding: 0 8px; align-items: center; }
@@ -117,4 +117,8 @@
   /* The app's undo label truncates beside the fixed 150pt Undo button. */
   #undoLabel { flex: 1 1 0px; min-width: 0; }
   #undo      { width: 150px; }
+
+  /* Selected rows: text on Highlight is HighlightText. */
+  .selected .row-title, .selected .row-meta,
+  .inbatch-selected .row-title, .inbatch-selected .row-meta { color: HighlightText; }
 </style>

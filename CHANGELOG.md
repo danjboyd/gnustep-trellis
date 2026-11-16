@@ -3,6 +3,36 @@
 Trellis follows semantic versioning once 1.0 ships; before that, a minor
 version may change the API listed in docs/api.md, and says so here.
 
+## 0.1.1 (2026-11-16)
+
+Dark appearance and themes. In Dark (macOS) or a dark GNUstep theme, a
+fixed CSS background kept its light colour while unstyled text turned
+light, so text vanished.
+
+- **CSS system colours:**
+  - `Canvas`, `CanvasText`, `Field`, `FieldText`, `ButtonFace`, `ButtonText`,
+    `ButtonBorder`, `GrayText`, `Highlight`, `HighlightText`, `SelectedItem`,
+    `SelectedItemText`, `AccentColor`, `AccentColorText`, `LinkText`, `Mark`
+    and `MarkText`;
+  - plus `-tr-window-background`, `-tr-separator`, `-tr-secondary-text` and
+    `-tr-error`.
+
+  They resolve to AppKit's dynamic colours at draw time, so they follow the
+  appearance and the GNUstep theme.
+- **trellis-lint `colour-pair`:** warns about a fixed background with text
+  that follows the system, or a fixed text colour over a system background.
+- **trellis-render:** `--appearance light|dark` (DarkAqua on macOS,
+  Adwaita's colour scheme on GNUstep). It passes `-DefaultsKey value`
+  through, and dumps the resolved colours (`background`, `textColor`,
+  `windowBackground`).
+- **Render lint `low-contrast`:** text under 3:1 against its resolved
+  background.
+- **Specs:** the demos and dogfood specs now use system colours. The
+  Tickets specs' selected rows use HighlightText. The dogfood reply text
+  view no longer collapses.
+- **`make check-gui`** adds Tests/View/appearance.sh, which renders every
+  screen in light and dark and checks a bad fixture is caught.
+
 ## 0.1.0 (2026-11-16)
 
 The first versioned release (private).

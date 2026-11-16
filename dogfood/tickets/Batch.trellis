@@ -82,32 +82,32 @@
 </column>
 
 <style>
-  .desk      { container-type: inline-size; background-color: #ffffff; }
+  .desk      { container-type: inline-size; background-color: Canvas; }
   .pulse     { flex-wrap: wrap; gap: 6px; padding: 8px 12px; align-items: center; }
   .narrow-only { display: none; }
   .body      { flex: 1; min-height: 0; flex-direction: row; }
 
   .railpane  { flex: none; width: 270px; gap: 8px; padding: 10px 10px 0 12px;
-               background-color: #f6f5f4; }
+               background-color: -tr-window-background; }
   .rail      { flex: 1; min-height: 0; }
   .rail-list { gap: 4px; padding-bottom: 10px; }
-  .section   { color: #5e5c64; font-weight: bold; margin-top: 8px; }
-  .group     { color: #5e5c64; margin-top: 2px; }
+  .section   { color: GrayText; font-weight: bold; margin-top: 8px; }
+  .group     { color: GrayText; margin-top: 2px; }
   .row       { gap: 1px; padding: 5px 8px; border-radius: 6px; }
   .row-title { font-weight: bold; }
-  .row-meta  { color: #77767b; }
-  .selected  { background-color: #dbe7fa; }
+  .row-meta  { color: GrayText; }
+  .selected  { background-color: Highlight; }
 
   .main      { flex: 1; min-width: 0; gap: 10px; padding: 12px 16px 12px 16px; }
   .cardscroll { flex: 1; min-height: 120px; }
   .cardtext  { gap: 8px; }
   .card-title { font-size: 16px; font-weight: bold; }
   .heading   { font-weight: bold; margin-top: 6px; }
-  .muted     { color: #77767b; }
-  .warn      { color: #c01c28; }
+  .muted     { color: GrayText; }
+  .warn      { color: -tr-error; }
   .note      { gap: 4px; }
   .actions   { flex-wrap: wrap; gap: 8px; align-items: center; }
-  .composerbox { border: 1px; border-color: #c0bfbc; border-radius: 6px; padding: 4px; }
+  .composerbox { border: 1px; border-color: -tr-separator; border-radius: 6px; padding: 4px; }
   .composer  { flex: 1; min-height: 96px; }
 
   /* Batch mode. */
@@ -116,8 +116,8 @@
   .item      { gap: 2px; }
   .item-title { font-weight: bold; }
   .item-line { margin-left: 16px; }
-  .inbatch   { background-color: #eef3fc; }
-  .inbatch-selected { background-color: #dbe7fa; }
+  .inbatch   { background-color: ButtonFace; }
+  .inbatch-selected { background-color: Highlight; }
   .undo      { gap: 10px; padding: 8px 12px 10px 12px; align-items: center; }
   .grow      { flex: 1; min-width: 0; }
 
@@ -135,4 +135,8 @@
     .undo        { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; }
     .grow        { flex: 1 1 100%; }
   }
+
+  /* Selected rows: text on Highlight is HighlightText. */
+  .selected .row-title, .selected .row-meta,
+  .inbatch-selected .row-title, .inbatch-selected .row-meta { color: HighlightText; }
 </style>

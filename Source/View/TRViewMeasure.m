@@ -40,13 +40,34 @@ static NSSize TRWrappedCellSize(NSCell *cell, CGFloat cellWidth)
   return NSMakeSize(ceil(NSWidth(r)) + insetW, ceil(NSHeight(r)) + insetH);
 }
 
+/* libs-gui's NSSliderCell has no -cellSize of its own, so it inherits
+   NSCell's border-only {8, 4} and a slider would get a 4pt-tall frame:
+   enough for a thin track, but a theme with a real knob (Gumdrop scales its
+   art to the frame) draws nothing. Give the cross axis Cocoa's regular
+   slider thickness: 21pt, or 26 with tick marks. Apple's -cellSize is
+   already right. */
+static NSSize TRCellSize(NSCell *cell)
+{
+  NSSize s = [cell cellSize];
+#ifdef GNUSTEP
+  if ([cell isKindOfClass: [NSSliderCell class]])
+    {
+      NSSliderCell *sc = (NSSliderCell *)cell;
+      CGFloat cross = [sc numberOfTickMarks] > 0 ? 26 : 21;
+      if ([sc isVertical] == 1) s.width = MAX(s.width, cross);
+      else s.height = MAX(s.height, cross);
+    }
+#endif
+  return s;
+}
+
 TRSize TRMeasureView(NSView *view, TRSize available, TRMeasureMode wm, TRMeasureMode hm)
 {
   if (view == nil) return TRSizeMake(0, 0);
   NSCell *cell = TRCellOf(view);
   if (cell != nil)
     {
-      NSSize s = [cell cellSize];
+      NSSize s = TRCellSize(cell);
       if (TRCellWraps(cell) && wm != TRMeasureModeUndefined && available.width < s.width)
         {
           NSSize ws = TRWrappedCellSize(cell, available.width);
@@ -108,7 +129,7 @@ BOOL TRViewIsClipped(NSView *view, NSSize *needed)
       s.width = MIN(s.width, fs.width);   /* wrapped text is as wide as its box */
     }
   else
-    s = [cell cellSize];
+    s = TRCellSize(cell);
   if (needed) *needed = s;
   return s.width > fs.width + 0.5 || s.height > fs.height + 0.5;
 }

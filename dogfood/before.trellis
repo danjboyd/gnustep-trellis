@@ -5,8 +5,10 @@
      One fixed column: every control has a fixed height, the body gets
      whatever height is left (minimum 70), the thread gets its own scroller
      (at least 120 tall), the button rows never wrap, and section labels are
-     ALL CAPS. -->
+     ALL CAPS. The follow-up input is pinned; what doesn't fit above it is
+     clipped. -->
 <column id="askDetail" class="pane">
+ <column class="stack">
   <text id="context" class="muted">project › agent</text>
   <text id="title" class="title">Question title</text>
   <text id="meta" class="muted">kind · blocks: nothing</text>
@@ -57,6 +59,7 @@
   <label id="threadLabel" class="caps">THREAD</label>
   <scroll class="thread"><text id="thread">Thread.</text></scroll>
 
+ </column>
   <row class="followup">
     <field id="followUp" placeholder="Follow up with the agent…"/>
     <button action="sendFollowUp:">Send</button>
@@ -65,7 +68,10 @@
 
 <style>
   .pane    { padding: 12px; gap: 6px; background-color: #ffffff; }
-  .pane > * { flex-shrink: 0; }
+  /* Everything but the follow-up input; what doesn't fit is clipped, and
+     the follow-up input stays pinned, as in the app. */
+  .stack   { flex: 1; min-height: 0; gap: 6px; overflow: hidden; }
+  .stack > * { flex-shrink: 0; }
   .title   { font-size: 16px; font-weight: bold; min-height: 24px; }
   .muted   { color: #77767b; }
   .fixed20 { height: 20px; }
@@ -79,7 +85,7 @@
   .nowrap  { gap: 8px; align-items: center; }
   .nowrap > *, .row24 > *, .row26 > * { flex-shrink: 0; }
   /* The body takes what's left, never less than 70. */
-  .pane > .body { flex: 1 1 0px; min-height: 70px; }
+  .stack > .body { flex: 1 1 0px; min-height: 70px; }
   .row26, .row30, .row24, .caps, .fixed20, .replybox, .followup { flex: none; }
   .strip   { display: none; }
   .replybox { border: 1px; border-color: #c0bfbc; height: 64px; padding: 4px; }

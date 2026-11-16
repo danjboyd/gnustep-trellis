@@ -210,6 +210,15 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
   TRNode *n;
   if ([view isKindOfClass: [TRBoxView class]])
     n = [(TRBoxView *)view node];
+  else if ([view isKindOfClass: [NSScrollView class]])
+    {
+      /* A scroll view has no intrinsic size, so it gets no measure block:
+         it lays out as an empty box, sized by its style. (A measured node
+         is rounded to the pixel grid as text is, floor/ceil, which can
+         overlap a neighbour by a pixel.) */
+      n = [TRNode node];
+      n.context = view;
+    }
   else
     {
       n = [TRNode node];

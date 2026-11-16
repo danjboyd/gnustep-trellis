@@ -20,10 +20,17 @@ The items are from fun-themes' Gumdrop assessment of AIManager (2026-11-13).
 1. **Every label and decision readable.**
    - Today the body gets whatever height is left after about fifteen
      fixed-height controls, at least 70 px. At 340 × 680 that's three lines.
-   - In the proposal, everything above the follow-up input scrolls as one
-     document. The body and the thread are read at their natural height,
-     and the follow-up input stays pinned and reachable.
-   - The thread no longer has its own nested scroller.
+   - In the proposal, the header, body and thread scroll as one document,
+     read at natural height. The thread no longer has its own nested
+     scroller.
+   - **The decision never scrolls away** (agent-lead's review: the maintainer
+     answers asks back to back). It has its own panel: below the document
+     at narrow widths, taking 2/5 of the height, and a 340 px column beside
+     it at 760 px and wider.
+   - The panel scrolls the pick, the other options, the reply box and the
+     agent actions. Its bar is pinned (Do it, Send reply, Snooze, Dismiss,
+     status), so Do it and Send reply are visible without scrolling at
+     every size. The follow-up input stays pinned at the bottom.
 2. **Compact density coherent** (item 3).
    - No fixed control heights (today: 20, 24, 26, 30 and 32 pt rows, and
      a 64 pt reply box). Every control takes its theme's intrinsic size, and
@@ -32,12 +39,15 @@ The items are from fun-themes' Gumdrop assessment of AIManager (2026-11-13).
      per-density constants.
 3. **The workspace used deliberately** (item 5).
    - Sentence-case section labels instead of ALL CAPS.
+   - Section labels use Adwaita's dim-label colour #5e5c64: 6.0:1 on the
+     panel's #f6f5f4, where the old #77767b was 4.1:1, below the 4.5:1 that
+     normal-size text needs.
    - All button rows wrap. Today the two action rows and the attachments
      row (fixed offsets w−172 / w−80) run off the right edge at 340.
-   - At 760 px and wider, the decision (pick, options, reply, actions) moves
-     into a 300 px side column. The body and thread take the freed width.
-   - At narrow widths the order stays the app's: header, body, decision,
-     thread.
+   - The attachments row is hidden until something is attached, as in the
+     app.
+   - At 760 px and wider, the body and thread take all the width beside the
+     decision column.
 
 A slot is left under the body for the ask-terminal strip (aimanager
 31e3717). It's `display: none` until the app has a terminal to show.
@@ -46,16 +56,19 @@ A slot is left under the body for the ask-terminal strip (aimanager
 
 | Width | Before | After |
 |---|---|---|
-| 340 | 29 findings: rows overflow the right edge; actions, thread and follow-up fall below the window | 0 |
-| 520 | 11 | 0 |
-| 900 | 11 | 0 |
+| 340 | 10 findings: the link, attachments and both action rows overflow (Dismiss, the status and two agent buttons run off the right edge); the thread label clips | 0 |
+| 520 | 5: the fixed 24/26/30 pt rows are shorter than Adwaita's 34 pt buttons | 0 |
+| 900 | 5: as at 520 | 0 |
+
+In the before frames, the actions, thread and part of the reply box are
+clipped below the window at 340 × 680. In the proposal, Do it and Send reply
+are always visible.
 
 **Caveat:**
 - `before.trellis` is reconstructed from agent-lead's description, not
   from the source.
-- In particular, when the content is taller than the window, the real view
-  keeps the follow-up input pinned and clips differently. The before frames
-  instead push it off the bottom.
+- The follow-up input is pinned in both, and what doesn't fit above it in the
+  before layout is clipped. The real view may clip a little differently.
 - The point of the comparison is the squeezed body and the rows that don't
   wrap, not the exact overflow.
 
@@ -79,5 +92,7 @@ GNUSTEP_HOME). The Adwaita theme itself is unchanged.
   not in its own scroller.
 - `reply` is an NSTextView in a scroll view, at least 56 pt tall inside a
   bordered box.
+- The bar's Send reply is always shown here. The app can disable it while
+  the reply box is empty.
 - `links` and `optionButtons` hold stand-in buttons for the render. The app
   adds its own in code, and the rows wrap them.

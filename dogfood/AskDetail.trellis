@@ -1,85 +1,95 @@
 <!-- owner: AIMAskDetailView -->
 <!-- AIManager's ask detail, as a Trellis spec: the proposal.
      Retro items 1, 3 and 5 (fun-themes' Gumdrop assessment, 2026-11-13):
-     1. Everything above the follow-up input scrolls as one document, so the
-        body and the thread are read at their natural height instead of
-        being squeezed into what fixed-height controls leave over. The
-        follow-up input stays pinned and reachable.
+     1. The body and the thread scroll as one document at their natural
+        height, instead of being squeezed into what fixed-height controls
+        leave over. No nested scroller for the thread.
      3. No fixed control heights: every control takes its theme's intrinsic
         size, so Compact density and the user's text size reflow it.
-     5. Sentence-case section labels instead of dense ALL-CAPS ones, button
-        rows that wrap, and at wide widths the decision moves into a side
-        column so the body and thread take the freed width.
-     Narrow order follows the app: header, body, decision, thread. -->
+     5. Sentence-case section labels, button rows that wrap, and at wide
+        widths the decision is a side column so the body and thread take the
+        freed width.
+     The decision never scrolls away (agent-lead's review): it has its
+     own panel, below the document at narrow widths and beside it at wide
+     ones. The panel's bar (Do it, Send reply, Snooze, Dismiss) is pinned,
+     so the answer is one click away at any size. The follow-up input is
+     pinned at the bottom. -->
 <column id="askDetail" class="pane">
-  <scroll class="doc">
-    <box class="content">
-      <column class="head">
-        <text id="context" class="muted">project › agent</text>
-        <text id="title" class="title">Question title</text>
-        <text id="meta" class="muted">kind · blocks: nothing</text>
-        <label id="delivery" class="muted">Delivered</label>
-        <row id="links" class="buttons">
-          <!-- Link buttons are added in code; two stand-ins for the render. -->
-          <button action="openLink:">MSI build log</button>
-          <button action="openLink:">WiX diff</button>
-        </row>
-      </column>
+  <box class="area">
+    <scroll class="doc">
+      <column class="content">
+        <column class="head">
+          <text id="context" class="muted">project › agent</text>
+          <text id="title" class="title">Question title</text>
+          <text id="meta" class="muted">kind · blocks: nothing</text>
+          <label id="delivery" class="muted">Delivered</label>
+          <row id="links" class="buttons">
+            <!-- Link buttons are added in code; two stand-ins for the render. -->
+            <button action="openLink:">MSI build log</button>
+            <button action="openLink:">WiX diff</button>
+          </row>
+        </column>
 
-      <column class="main">
         <text id="body" class="body">Body text.</text>
         <!-- The ask-terminal strip (aimanager 31e3717) goes here. -->
         <box id="terminalStrip" class="strip"></box>
-      </column>
-
-      <column class="decide">
-        <column id="pick" class="section pick">
-          <label id="pickLabel" class="section-label">Recommended</label>
-          <text id="pickTitle" class="pick-title">Option</text>
-          <text id="pickDetail" class="muted">Why.</text>
-          <row class="buttons"><button id="doIt" action="doIt:" default="yes">Do it</button></row>
-        </column>
-
-        <column id="otherOptions" class="section">
-          <label class="section-label" no-outlet="yes">Or pick</label>
-          <row id="optionButtons" class="buttons">
-            <!-- Option buttons are added in code; stand-ins for the render. -->
-            <button action="chooseOption:">Keep per-machine</button>
-            <button action="chooseOption:">Per-user only, no escape hatch</button>
-          </row>
-        </column>
 
         <column class="section">
-          <label id="replyLabel" class="section-label">Your reply (Enter sends)</label>
-          <box class="replybox"><scroll class="reply"><view id="reply" type="NSTextView"/></scroll></box>
-          <row id="attachments" class="buttons">
-            <label id="attachmentName" class="muted grow">No attachment</label>
-            <row class="pair">
-              <button action="openAttachment:">Open…</button>
-              <button action="clearAttachment:">Clear</button>
+          <label id="threadLabel" class="section-label">Thread</label>
+          <text id="thread">Thread.</text>
+        </column>
+      </column>
+    </scroll>
+
+    <column class="side">
+      <scroll class="decide">
+        <column class="decide-content">
+          <column id="pick" class="section">
+            <label id="pickLabel" class="section-label">Recommended</label>
+            <text id="pickTitle" class="pick-title">Option</text>
+            <text id="pickDetail" class="muted">Why.</text>
+          </column>
+
+          <column id="otherOptions" class="section">
+            <label class="section-label" no-outlet="yes">Or pick</label>
+            <row id="optionButtons" class="buttons">
+              <!-- Option buttons are added in code; stand-ins for the render. -->
+              <button action="chooseOption:">Keep per-machine</button>
+              <button action="chooseOption:">Per-user only, no escape hatch</button>
             </row>
+          </column>
+
+          <column class="section">
+            <label id="replyLabel" class="section-label">Your reply (Enter sends)</label>
+            <box class="replybox"><scroll class="reply"><view id="reply" type="NSTextView"/></scroll></box>
+            <!-- Shown only once something is attached (via the reply box). -->
+            <row id="attachments" class="buttons attachments">
+              <label id="attachmentName" class="muted grow">attachment.png</label>
+              <row class="pair">
+                <button action="openAttachment:">Open…</button>
+                <button action="clearAttachment:">Clear</button>
+              </row>
+            </row>
+          </column>
+
+          <row class="buttons agent">
+            <button id="resumeAgent" action="resumeAgent:">Resume agent</button>
+            <button action="openTerminal:">Open terminal</button>
+            <button action="agentSettings:">Agent settings</button>
           </row>
         </column>
+      </scroll>
 
-        <row class="buttons actions">
-          <button id="sendReply" action="sendReply:">Send reply</button>
-          <popup id="snooze" action="snooze:" items="Snooze, 1 hour, Tomorrow, Monday"/>
-          <button id="dismiss" action="dismiss:">Dismiss</button>
-          <label id="status" class="muted grow">Waiting on you</label>
-        </row>
-        <row class="buttons">
-          <button id="resumeAgent" action="resumeAgent:">Resume agent</button>
-          <button action="openTerminal:">Open terminal</button>
-          <button action="agentSettings:">Agent settings</button>
-        </row>
-      </column>
-
-      <column class="section thread">
-        <label id="threadLabel" class="section-label">Thread</label>
-        <text id="thread">Thread.</text>
-      </column>
-    </box>
-  </scroll>
+      <!-- Pinned: the answer is always one click away. -->
+      <row class="bar">
+        <button id="doIt" action="doIt:" default="yes">Do it</button>
+        <button id="sendReply" action="sendReply:">Send reply</button>
+        <popup id="snooze" action="snooze:" items="Snooze, 1 hour, Tomorrow, Monday"/>
+        <button id="dismiss" action="dismiss:">Dismiss</button>
+        <label id="status" class="muted grow">Waiting on you</label>
+      </row>
+    </column>
+  </box>
 
   <separator/>
   <row class="followup">
@@ -90,39 +100,41 @@
 
 <style>
   .pane     { container-type: inline-size; background-color: #ffffff; }
-  .doc      { flex: 1; min-height: 0; }
-  .content  { flex-direction: column; padding: 16px; gap: 18px; }
+  .area     { flex: 1; min-height: 0; flex-direction: column; }
+  .doc      { flex: 3 1 0px; min-height: 0; }
+  .content  { padding: 16px; gap: 18px; }
   .head     { gap: 4px; }
   .title    { font-size: 16px; font-weight: bold; }
   .muted    { color: #77767b; }
-  .main     { gap: 18px; }
-  .decide   { gap: 18px; }
   .body     { min-height: 70px; }
   /* Hidden until the app has a terminal to show; then display: flex. */
   .strip    { display: none; }
   .section  { gap: 6px; }
-  .section-label { color: #77767b; font-weight: bold; }
+  /* Adwaita's dim-label colour: quieter than body text, but readable
+     (6.0:1 on the panel's #f6f5f4; #77767b would be 4.1:1). */
+  .section-label { color: #5e5c64; font-weight: bold; }
   .pick-title { font-weight: bold; }
   .buttons  { flex-wrap: wrap; gap: 8px; align-items: center; }
-  .grow     { flex: 1 1 120px; }
-  .replybox { border: 1px; border-color: #c0bfbc; border-radius: 6px; padding: 4px; }
+  .grow     { flex: 1 1 100px; }
+
+  /* The decision panel: below the document at narrow widths. */
+  .side     { flex: 2 1 0px; min-height: 0; background-color: #f6f5f4; }
+  .decide   { flex: 1; min-height: 0; }
+  .decide-content { padding: 12px 16px 8px 16px; gap: 14px; }
+  .replybox { border: 1px; border-color: #c0bfbc; border-radius: 6px; padding: 4px;
+              background-color: #ffffff; }
   .reply    { flex: 1; min-height: 56px; }
+  .attachments { display: none; }
   .pair     { flex: none; gap: 8px; }
+  .bar      { flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 16px 10px 16px; }
   .followup { gap: 8px; padding: 10px 16px 12px 16px; }
   #followUp { flex: 1; min-width: 0; }
 
-  /* Wide: the decision becomes a side column, and the body and thread take
-     the freed width. The header spans both. */
+  /* Wide: the decision panel becomes a column beside the document, which
+     takes the freed width. Each scrolls on its own. */
   @container (min-width: 760px) {
-    .content {
-      display: grid; grid-template-columns: 1fr 300px;
-      grid-template-rows: auto auto 1fr;
-      grid-template-areas: "head head" "main decide" "thread decide";
-      column-gap: 24px; row-gap: 18px;
-    }
-    .head   { grid-area: head; }
-    .main   { grid-area: main; }
-    .decide { grid-area: decide; }
-    .thread { grid-area: thread; }
+    .area { flex-direction: row; }
+    .doc  { flex: 1 1 0px; }
+    .side { flex: none; width: 340px; }
   }
 </style>

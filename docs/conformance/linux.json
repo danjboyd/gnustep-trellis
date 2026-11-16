@@ -1,7 +1,7 @@
 {
- "commit": "bad8db0",
+ "commit": "0c9c626",
  "conformance": {
-  "pass": 2780,
+  "pass": 2795,
   "skipped": 1085,
   "total": 2955
  },
@@ -9,8 +9,8 @@
  "platform": "linux",
  "suites": {
   "engine": {
-   "pass": 98,
-   "total": 98
+   "pass": 100,
+   "total": 100
   },
   "wpt": {
    "cases": 977,
@@ -19,7 +19,7 @@
   },
   "wpt-grid": {
    "cases": 1977,
-   "pass": 1047,
+   "pass": 1062,
    "total": 1211
   },
   "yoga": {

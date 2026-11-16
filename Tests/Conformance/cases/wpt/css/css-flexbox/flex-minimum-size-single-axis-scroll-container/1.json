@@ -79,6 +79,7 @@
  },
  "requires": [
   "block-layout",
-  "overflow"
+  "overflow",
+  "overflow-axis"
  ]
 }

@@ -660,8 +660,21 @@ class Converter:
             self.requires.add("display-" + disp)
         style["display"] = disp
         style["boxSizing"] = "content-box"   # Trellis defaults to border-box
+        # Per-axis overflow: Trellis has a single `overflow`, so cases whose
+        # axes differ can't be expressed faithfully.
+        ox = oy = d.get("overflow", "visible").split()[0] if d.get("overflow") else "visible"
+        if d.get("overflow") and len(d["overflow"].split()) == 2:
+            oy = d["overflow"].split()[1]
+        ox = d.get("overflow-x", ox).strip()
+        oy = d.get("overflow-y", oy).strip()
+        if ox != oy:
+            self.requires.add("overflow-axis")
         for k, v in d.items():
             v = v.strip()
+            if k == "flex-wrap" and v == "balance":
+                self.requires.add("flex-wrap-balance")   # css-flexbox-2
+                style["flexWrap"] = v
+                continue
             if k in ("clear",):
                 continue            # no effect on flex layout
             if k in ("overflow-x", "overflow-y"):

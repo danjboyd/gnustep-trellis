@@ -767,5 +767,55 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_abspos_containing_block_is_grid_area",
+  "note": "CSS Grid 9.1: an abspos child's containing block is its grid area; auto lines are the padding edge (border-box: the 300px grid's padding box is 290 wide)",
+  "root": {
+   "style": {
+    "display": "grid",
+    "width": 300,
+    "height": 200,
+    "padding": 10,
+    "border": 5,
+    "gridTemplateColumns": "100px 100px",
+    "gridTemplateRows": "50px 50px",
+    "columnGap": 20
+   },
+   "children": [
+    {
+     "style": {
+      "position": "absolute",
+      "gridColumn": "2 / 3",
+      "gridRow": "2 / 3",
+      "width": "50%",
+      "height": "100%"
+     }
+    },
+    {
+     "style": {
+      "position": "absolute",
+      "width": "100%",
+      "height": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "x": 135,
+     "y": 65,
+     "width": 50,
+     "height": 50
+    },
+    {
+     "x": 5,
+     "y": 5,
+     "width": 290,
+     "height": 10
+    }
+   ]
+  }
  }
 ]

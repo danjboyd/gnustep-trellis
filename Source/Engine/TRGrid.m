@@ -1006,14 +1006,61 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           maxX = MAX(maxX, x + w + it->margin[TREdgeRight]);
           maxY = MAX(maxY, y + h + it->margin[TREdgeBottom]);
         }
-      /* Absolutely positioned children: against the padding box. */
-      double cbW = W - border[TREdgeLeft] - border[TREdgeRight];
-      double cbH = H - border[TREdgeTop] - border[TREdgeBottom];
+      /* Absolutely positioned children (CSS Grid 9.1): the containing block
+         is the grid area named by grid-row/grid-column. An auto line, or a
+         line outside the grid, is the padding edge; a start line is the
+         start of the track after it and an end line the end of the track
+         before it, so gutters are excluded. */
       for (NSUInteger i = 0; i < nc; i++)
         {
           TRNode *c = children[i];
           const TRStyleStorage *cs = &c->_style->_s;
           if (cs->display == TRDisplayNone || cs->position != TRPositionAbsolute) continue;
+          TRStyle *cst = c->_style;
+          double cbStart[2], cbEnd[2];   /* [0] rows (y), [1] columns (x); border-box coordinates */
+          for (int axis = 0; axis < 2; axis++)
+            {
+              TRTrack *tr = axis == 0 ? rowsT : colsT;
+              NSInteger nt = axis == 0 ? nRows : nCols;
+              double origin = axis == 0 ? pad[TREdgeTop] + border[TREdgeTop]
+                                        : pad[TREdgeLeft] + border[TREdgeLeft];
+              double padStart = axis == 0 ? border[TREdgeTop] : border[TREdgeLeft];
+              double padEnd = axis == 0 ? H - border[TREdgeBottom] : W - border[TREdgeRight];
+              NSString *sv = axis == 0 ? cst->_gridRowStart : cst->_gridColumnStart;
+              NSString *ev = axis == 0 ? cst->_gridRowEnd : cst->_gridColumnEnd;
+              NSString *aName = nil, *bName = nil;
+              TRLine a, b;
+              TRParseLine(sv, &a, &aName);
+              TRParseLine(ev, &b, &bName);
+              NSInteger expl = axis == 0 ? explicitRows : explicitCols;
+              NSDictionary *names = axis == 0 ? rowLines : colLines;
+              NSInteger si = 0, ei = 0;
+              BOOL sDef = TRResolveLine(a, aName, expl, names, YES, &si);
+              BOOL eDef = TRResolveLine(b, bName, expl, names, NO, &ei);
+              if (sDef && !eDef && b.kind == TRLineSpan) { ei = si + b.n; eDef = YES; }
+              if (eDef && !sDef && a.kind == TRLineSpan) { si = ei - a.n; sDef = si >= 0; }
+              if (sDef && eDef && ei < si) { NSInteger t = si; si = ei; ei = t; }
+              if (sDef && (si < 0 || si > nt)) sDef = NO;
+              if (eDef && (ei < 0 || ei > nt)) eDef = NO;
+              /* si/ei are in 0..nt when defined (checked above). */
+              double sp = !sDef ? 0 : (si < nt ? tr[si].pos : (nt ? tr[nt - 1].pos + tr[nt - 1].base : 0));
+              double ep = !eDef ? 0 : (ei == 0 ? (nt ? tr[0].pos : 0) : tr[ei - 1].pos + tr[ei - 1].base);
+              if (axis == 1 && rtl)
+                {
+                  /* Columns run right to left: the start line is the right edge. */
+                  double inner = W - pbW;
+                  cbStart[axis] = !eDef ? padStart : origin + inner - ep;
+                  cbEnd[axis] = !sDef ? padEnd : origin + inner - sp;
+                }
+              else
+                {
+                  cbStart[axis] = !sDef ? padStart : origin + sp;
+                  cbEnd[axis] = !eDef ? padEnd : origin + ep;
+                }
+              if (cbEnd[axis] < cbStart[axis]) cbEnd[axis] = cbStart[axis];
+            }
+          double cbX = cbStart[1], cbY = cbStart[0];
+          double cbW = cbEnd[1] - cbStart[1], cbH = cbEnd[0] - cbStart[0];
           double L = TRGResolve(cs->inset[TREdgeLeft], cbW), R = TRGResolve(cs->inset[TREdgeRight], cbW);
           double T = TRGResolve(cs->inset[TREdgeTop], cbH), B = TRGResolve(cs->inset[TREdgeBottom], cbH);
           double w = TRGResolve(cs->width, cbW), h = TRGResolve(cs->height, cbH);
@@ -1028,8 +1075,8 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
               if (isnan(h)) h = sz.height;
             }
           TRLayoutNode(c, w, h, TRMeasureModeExactly, TRMeasureModeExactly, cbW, cbH, YES, dir);
-          double x = !isnan(L) ? border[TREdgeLeft] + L : (!isnan(R) ? W - border[TREdgeRight] - R - w : pad[TREdgeLeft] + border[TREdgeLeft]);
-          double y = !isnan(T) ? border[TREdgeTop] + T : (!isnan(B) ? H - border[TREdgeBottom] - B - h : pad[TREdgeTop] + border[TREdgeTop]);
+          double x = !isnan(L) ? cbX + L : (!isnan(R) ? cbX + cbW - R - w : (rtl ? cbX + cbW - w : cbX));
+          double y = !isnan(T) ? cbY + T : (!isnan(B) ? cbY + cbH - B - h : cbY);
           c->_rawFrame = TRRectMake(x, y, w, h);
           c->_lineIndex = -1;
         }

@@ -125,6 +125,41 @@ static BOOL TRYes(NSString *v)
 @implementation TRPlaceholderView
 @end
 
+NSString *const TRLoaderDidReloadNotification = @"TRLoaderDidReloadNotification";
+
+#ifndef TR_NO_HOT_RELOAD
+/* A box made from a file, watched for changes while hot reload is on. */
+@interface TRHotReloadEntry : NSObject
+{
+@public
+  NSString *path;
+  NSData *contents;
+  __weak id owner;
+}
+@end
+@implementation TRHotReloadEntry
+@end
+
+static NSMapTable *gWatched;          /* TRBoxView (weak) -> TRHotReloadEntry */
+static NSTimer *gReloadTimer;
+static int gHotReload = -1;           /* -1: not decided yet */
+
+static BOOL TRHotReloadOn(void)
+{
+  if (gHotReload < 0)
+    {
+      NSString *env = [[[NSProcessInfo processInfo] environment] objectForKey: @"TRELLIS_HOT_RELOAD"];
+      gHotReload = ([env length] && ![env isEqualToString: @"0"])
+                || [[NSUserDefaults standardUserDefaults] boolForKey: @"TRHotReload"];
+    }
+  return gHotReload == 1;
+}
+
+@interface TRLoader (HotReloadTimer)
++ (void)_hotReloadTick:(NSTimer *)timer;
+@end
+#endif
+
 @implementation TRLoader
 
 static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
@@ -379,8 +414,103 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
 {
   TRMarkupDocument *doc = [TRMarkupDocument documentWithContentsOfFile: path error: error];
   if (doc == nil) return nil;
-  return [self loadDocument: doc owner: owner error: error];
+  TRBoxView *box = [self loadDocument: doc owner: owner error: error];
+#ifndef TR_NO_HOT_RELOAD
+  if (box != nil && TRHotReloadOn())
+    {
+      if (gWatched == nil) gWatched = [NSMapTable weakToStrongObjectsMapTable];
+      TRHotReloadEntry *en = [TRHotReloadEntry new];
+      en->path = [path copy];
+      en->contents = [NSData dataWithContentsOfFile: path];
+      en->owner = owner;
+      [gWatched setObject: en forKey: box];
+      [self setHotReloadEnabled: YES];   /* starts the timer */
+    }
+#endif
+  return box;
 }
+
+#ifndef TR_NO_HOT_RELOAD
++ (void)setHotReloadEnabled:(BOOL)enabled
+{
+  gHotReload = enabled ? 1 : 0;
+  if (enabled && gReloadTimer == nil)
+    {
+      gReloadTimer = [NSTimer timerWithTimeInterval: 0.5 target: self
+                                           selector: @selector(_hotReloadTick:)
+                                           userInfo: nil repeats: YES];
+      [[NSRunLoop currentRunLoop] addTimer: gReloadTimer forMode: NSDefaultRunLoopMode];
+      [[NSRunLoop currentRunLoop] addTimer: gReloadTimer forMode: NSModalPanelRunLoopMode];
+      [[NSRunLoop currentRunLoop] addTimer: gReloadTimer forMode: NSEventTrackingRunLoopMode];
+    }
+  else if (!enabled)
+    {
+      [gReloadTimer invalidate];
+      gReloadTimer = nil;
+    }
+}
+
++ (BOOL)hotReloadEnabled { return TRHotReloadOn(); }
+
++ (void)_hotReloadTick:(NSTimer *)timer
+{
+  (void)timer;
+  [self reloadChangedFiles];
+}
+
++ (NSUInteger)reloadChangedFiles
+{
+  if (!TRHotReloadOn() || gWatched == nil) return 0;
+  NSUInteger n = 0;
+  for (TRBoxView *old in [[gWatched keyEnumerator] allObjects])
+    {
+      TRHotReloadEntry *en = [gWatched objectForKey: old];
+      NSData *now = [NSData dataWithContentsOfFile: en->path];
+      if (now == nil || [now isEqualToData: en->contents]) continue;
+      en->contents = now;
+      NSView *sv = [old superview];
+      if ([sv isKindOfClass: [TRBoxView class]])
+        {
+          fprintf(stderr, "trellis hot reload: %s: can't replace a box nested in another Trellis box\n",
+                  [en->path UTF8String]);
+          continue;
+        }
+      NSError *err = nil;
+      id owner = en->owner;
+      TRMarkupDocument *doc = [TRMarkupDocument documentWithContentsOfFile: en->path error: &err];
+      TRBoxView *box = doc ? [self loadDocument: doc owner: owner error: &err] : nil;
+      if (box == nil)
+        {
+          fprintf(stderr, "trellis hot reload: %s (keeping the old layout)\n", [[err localizedDescription] UTF8String]);
+          continue;
+        }
+      NSWindow *win = [old window];
+      if (win != nil && [win contentView] == old)
+        [win setContentView: box];
+      else if (sv != nil)
+        {
+          [box setFrame: [old frame]];
+          [box setAutoresizingMask: [old autoresizingMask]];
+          [sv replaceSubview: old with: box];
+        }
+      else
+        [box setFrame: [old frame]];
+      [box layoutTrellis];
+      [gWatched removeObjectForKey: old];
+      [gWatched setObject: en forKey: box];
+      if ([owner respondsToSelector: @selector(trellisDidReload:)]) [owner trellisDidReload: box];
+      [[NSNotificationCenter defaultCenter] postNotificationName: TRLoaderDidReloadNotification
+                                                          object: box
+                                                        userInfo: @{@"oldBox": old, @"path": en->path}];
+      n++;
+    }
+  return n;
+}
+#else
++ (void)setHotReloadEnabled:(BOOL)enabled { (void)enabled; }
++ (BOOL)hotReloadEnabled { return NO; }
++ (NSUInteger)reloadChangedFiles { return 0; }
+#endif
 
 + (TRBoxView *)loadDocument:(TRMarkupDocument *)doc owner:(id)owner error:(NSError **)error
 {

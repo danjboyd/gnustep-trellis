@@ -70,6 +70,10 @@ TrellisPreview_GUI_LIBS = -lTrellis -lTrellisEngine
 TrellisPreview_MAIN_MODEL_FILE =
 
 ADDITIONAL_OBJCFLAGS += -fobjc-arc -fblocks -Wall -Wno-unused-function
+# make hot_reload=no compiles TRLoader's dev hot-reload out (release builds).
+ifeq ($(hot_reload),no)
+ADDITIONAL_OBJCFLAGS += -DTR_NO_HOT_RELOAD
+endif
 ADDITIONAL_INCLUDE_DIRS += -ISource/Engine -ISource/View
 ADDITIONAL_LIB_DIRS += -L./obj -L./$(GNUSTEP_OBJ_DIR)
 
@@ -120,6 +124,7 @@ check-gui:: all
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/preview-open-file.m -o obj/gui-tests/preview-open-file $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/key-view-loop.m -o obj/gui-tests/key-view-loop $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/accessibility.m -o obj/gui-tests/accessibility $(GUI_TEST_LIBS)
+	@$(CC) $(GUI_TEST_FLAGS) Tests/View/hot-reload.m -o obj/gui-tests/hot-reload $(GUI_TEST_LIBS)
 	@echo "== view checks (headless)"
 	@export LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH; status=0; \
 	  timeout 60 scripts/run-headless.sh obj/gui-tests/size-for-width > obj/gui-tests/hook.log 2>&1 || status=1; \
@@ -130,6 +135,8 @@ check-gui:: all
 	  grep -v _NET_WORKAREA obj/gui-tests/keyview.log | tail -1; \
 	  timeout 60 scripts/run-headless.sh obj/gui-tests/accessibility > obj/gui-tests/a11y.log 2>&1 || status=1; \
 	  grep -v _NET_WORKAREA obj/gui-tests/a11y.log | tail -1; \
+	  timeout 60 scripts/run-headless.sh obj/gui-tests/hot-reload > obj/gui-tests/hotreload.log 2>&1 || status=1; \
+	  grep -v _NET_WORKAREA obj/gui-tests/hotreload.log | tail -1; \
 	  Tests/View/appearance.sh || status=1; \
 	  Tests/View/scroll-container-query.sh || status=1; \
 	  exit $$status

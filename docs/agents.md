@@ -218,6 +218,16 @@ Call `-[TRBoxView invalidateSubview:]` after changing a view's content
 outside Trellis, for example an image. Text and title changes on
 NSControls are noticed automatically.
 
+**Hot reload while you develop.** Run the app with `TRELLIS_HOT_RELOAD=1`
+(or the `TRHotReload` default) and edit its .trellis files: every box
+loaded with `+loadFile:owner:error:` is rebuilt within half a second of a
+save. The new box takes the old one's place, outlets and actions are
+bound again, and the owner gets `-trellisDidReload:`; refill content
+there. A file that doesn't load is reported on stderr and the old layout
+stays. It's off unless you turn it on, and release builds can compile it
+out with `make hot_reload=no`. Boxes nested inside another Trellis box
+aren't swapped.
+
 A custom view whose height depends on its width (a text view at natural
 height, say) can implement `-trellisSizeForWidth:` (the `TRSizeForWidth`
 protocol in TRViewMeasure.h). Trellis calls it with the width on offer,

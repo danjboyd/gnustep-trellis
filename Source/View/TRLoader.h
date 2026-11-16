@@ -49,7 +49,32 @@
 /* Finds a view by its identifier in a tree. */
 + (NSView *)viewWithIdentifier:(NSString *)identifier inView:(NSView *)root;
 
+/* Dev hot-reload, off by default. While it's on, a box made by
+   +loadFile:owner:error: is rebuilt whenever its file changes on disk:
+   - the new tree takes the old one's place (window content view, or the
+     same superview with the same frame and autoresizing mask);
+   - outlets and actions are bound to the owner again, and the owner gets
+     -trellisDidReload: if it implements it (refill content there);
+   - TRLoaderDidReloadNotification is posted (object: the new box);
+   - a file that no longer loads is reported on stderr and the old tree
+     stays.
+   Turn it on with TRELLIS_HOT_RELOAD=1 in the environment, the
+   TRHotReload user default, or +setHotReloadEnabled:. Building libTrellis
+   with hot_reload=no (make) or -DTR_NO_HOT_RELOAD compiles it out. */
++ (void)setHotReloadEnabled:(BOOL)enabled;
++ (BOOL)hotReloadEnabled;
+/* Checks the watched files now; a timer does this every half second while
+   hot reload is on. Returns the number of boxes rebuilt. */
++ (NSUInteger)reloadChangedFiles;
+
 @end
+
+@interface NSObject (TRHotReloadOwner)
+/* Sent to the owner after hot reload rebuilt its box. */
+- (void)trellisDidReload:(TRBoxView *)newRoot;
+@end
+
+extern NSString *const TRLoaderDidReloadNotification;
 
 /* An NSScrollView whose document view is a Trellis column. */
 @interface TRScrollBox : NSScrollView

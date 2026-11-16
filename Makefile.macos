@@ -3,6 +3,10 @@
 CC      ?= clang
 CFLAGS  ?= -O2 -g
 CFLAGS  += -fobjc-arc -fblocks -Wall -Wno-unused-function -ISource/Engine
+# make -f Makefile.macos hot_reload=no compiles TRLoader's dev hot-reload out.
+ifeq ($(hot_reload),no)
+CFLAGS  += -DTR_NO_HOT_RELOAD
+endif
 B       := build
 
 ENGINE_SRC := Source/Engine/TRStyle.m Source/Engine/TRNode.m Source/Engine/TRLayout.m Source/Engine/TRContainerQuery.m Source/Engine/TRLint.m Source/Engine/TRMarkup.m Source/Engine/TRGrid.m

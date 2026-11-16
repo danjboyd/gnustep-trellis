@@ -5,6 +5,12 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Added:** opt-in dev hot reload. With `TRELLIS_HOT_RELOAD=1`, the
+  `TRHotReload` default or `+[TRLoader setHotReloadEnabled:]`, boxes
+  loaded from files are rebuilt in place when the file changes. Outlets
+  and actions are bound again, and the owner gets `-trellisDidReload:`.
+  A broken edit keeps the old layout. `make hot_reload=no` compiles it
+  out.
 - **Fixed:** `aspect-ratio` on a root box. A definite width or height
   now gives the other size through the ratio. Sizes are floored at
   padding plus border and clamped by min/max first, and an empty root

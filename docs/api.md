@@ -35,6 +35,7 @@ theme (since 0.1.1).
 | `+[TRLoader instantiateTemplate:...]`, `+applySample:toView:error:`, `+viewWithIdentifier:inView:` | TRLoader.h | Templates, sample content, lookup by id. |
 | `TRBoxView`: `+boxWithStyle:`, `-initWithStyle:`, `style`, `-setStyleDeclarations:`, `-addSubview:style:`, `-setStyleDeclarations:forSubview:`, `-nodeForSubview:`, `-addConditionalStyle:when:`, `-invalidateSubview:`, `-layoutTrellis`, `-rootBox`, `node`; since 0.2 `managesKeyViewLoop`, `-recalculateTrellisKeyViewLoop`, `firstKeyView` | TRBoxView.h | A view whose subviews Trellis lays out. Plain `-addSubview:` works too (intrinsic size). |
 | `TRScrollBox` (`contentBox`) | TRLoader.h | The view `<scroll>` creates. |
+| Hot reload (since 0.2): `+[TRLoader setHotReloadEnabled:]`, `+hotReloadEnabled`, `+reloadChangedFiles`, `-trellisDidReload:` (owner, optional), `TRLoaderDidReloadNotification`, `TRELLIS_HOT_RELOAD` / `TRHotReload` | TRLoader.h | Development only: rebuilds boxes loaded from files when the files change. |
 | `TRSizeForWidth` protocol: `-trellisSizeForWidth:` | TRViewMeasure.h | Opt-in height-for-width measuring for custom views (CGFLOAT_MAX = max-content). |
 | `TRMeasureView`, `TRBaselineOfView` | TRViewMeasure.h | How Trellis measures a leaf view; usable from custom measure blocks. |
 | `TRColorFromCSS` | TRBoxView.h | CSS colour string to NSColor. |

@@ -1718,5 +1718,38 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_abspos_lines_need_real_tracks",
+  "note": "in a grid with no tracks, abspos lines don't exist and mean the padding edge",
+  "root": {
+   "style": {
+    "display": "grid",
+    "width": 200,
+    "height": 100,
+    "padding": 10
+   },
+   "children": [
+    {
+     "style": {
+      "position": "absolute",
+      "gridColumn": "2",
+      "gridRow": "2",
+      "width": "100%",
+      "height": "100%"
+     }
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 200,
+     "height": 100
+    }
+   ]
+  }
  }
 ]

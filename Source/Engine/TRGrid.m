@@ -1312,6 +1312,14 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
          line outside the grid, is the padding edge; a start line is the
          start of the track after it and an end line the end of the track
          before it, so gutters are excluded. */
+      /* Lines only exist for tracks that really exist: explicit ones and
+         those in-flow items occupy (placement always keeps one column). */
+      NSInteger realRows = MIN(nRows, offR + explicitRows), realCols = MIN(nCols, offC + explicitCols);
+      for (NSInteger k = 0; k < n; k++)
+        {
+          realRows = MAX(realRows, items[k].r1);
+          realCols = MAX(realCols, items[k].c1);
+        }
       for (NSUInteger i = 0; i < nc; i++)
         {
           TRNode *c = children[i];
@@ -1322,7 +1330,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           for (int axis = 0; axis < 2; axis++)
             {
               TRTrack *tr = axis == 0 ? rowsT : colsT;
-              NSInteger nt = axis == 0 ? nRows : nCols;
+              NSInteger nt = axis == 0 ? realRows : realCols;
               double origin = axis == 0 ? pad[TREdgeTop] + border[TREdgeTop]
                                         : pad[TREdgeLeft] + border[TREdgeLeft];
               double padStart = axis == 0 ? border[TREdgeTop] : border[TREdgeLeft];

@@ -1,0 +1,268 @@
+<!-- owner: AIMTriageDeskView -->
+<!-- AIManager's Tickets triage desk (G3-G7), Plan gate on a hotfix: the
+     proposal. From the approved mockup 2 (the drawer is closed here; see
+     Plan-drawer.trellis for the agent chat). All data is made up.
+     Shell (shared by Intake, Plan, Verify and Project):
+     - a dark top bar: the pulse chips (Mine first, filters, built in code)
+       and, on the right, Oldest wait and Unheard; it wraps;
+     - the rail (260px from 640px up; behind the ☰ button below that):
+       "Your move" by group with two-line rows, then the other sections
+       folded to one line with a count;
+     - the card: header (gate line, title, requester, last-heard chip),
+       body (per gate), the note field, and the action bar with a key hint
+       on every button; the bar wraps;
+     - the reply-draft card under the decision (G5);
+     - the drawer on the right is closed by default (see Plan-drawer).
+     The card column scrolls; the top bar and the rail filter stay put. -->
+<column id="desk" class="desk">
+  <!-- @shell-top -->
+  <row id="topBar" class="topbar">
+    <button id="railToggle" class="narrow-only" action="toggleRail:">☰ Rail</button>
+    <label class="brand">Helpdesk</label>
+    <row id="pulse" class="pulse">
+      <!-- Pulse chips: AIMDeskPulseParts, Mine first; added in code. -->
+      <button class="chip" action="filterPulse:">Mine 5</button>
+      <box class="hotfix"><label class="hotfix-text">1 hotfix</label></box>
+      <button class="chip wide-only" action="filterPulse:">With agents 6</button>
+      <button class="chip wide-only" action="filterPulse:">With requesters 2</button>
+      <button class="chip wide-only" action="filterPulse:">Blocked 2</button>
+    </row>
+    <spacer class="wide-only"/>
+    <row class="waits">
+      <label id="oldestWait" class="topbar-text">Oldest wait 3 h</label>
+      <label id="unheard" class="topbar-text">1 unheard over 24 h</label>
+    </row>
+  </row>
+
+  <box class="body">
+    <column class="railpane">
+      <field id="filter" placeholder="Filter by track, area, agent, requester"/>
+      <scroll id="rail" class="rail">
+        <column class="rail-list">
+          <!-- @rail -->
+          <label class="section">Your move · 5</label>
+          <label class="group hot">Hotfix</label>
+          <column class="row selected"><text class="row-title">Login page returns 500 after password reset</text><text class="row-meta">Plan · Sam Ortiz · 12 min</text></column>
+          <label class="group">Replies and stalled</label>
+          <column class="row"><text class="row-title">Invoice totals differ from the ledger</text><text class="row-meta">New reply · Priya Nair · 40 min</text></column>
+          <label class="group">Verify</label>
+          <column class="row"><text class="row-title">Dashboard chart shows the wrong fiscal quarter</text><text class="row-meta">agent-web · Dana Whitfield · 1 h</text></column>
+          <label class="group">Plan</label>
+          <column class="row"><text class="row-title">Search is slow on the contacts page</text><text class="row-meta">agent-data · Tom Becker · 2 h</text></column>
+          <label class="group">Intake</label>
+          <column class="row"><text class="row-title">CSV export drops the last row in Reports</text><text class="row-meta">Maria Lopez · 3 h · draft unsent</text></column>
+          <separator class="rail-sep"/>
+          <row class="folded"><label class="grow">With agents</label><label>6</label></row>
+          <row class="folded"><label class="grow">With requesters</label><label>2</label></row>
+          <row class="folded"><label class="grow">Blocked</label><label>2</label></row>
+          <row class="folded"><label class="grow">Projects</label><label>1</label></row>
+          <row class="folded"><label class="grow">Snoozed</label><label>0</label></row>
+          
+          <!-- @/rail -->
+        </column>
+      </scroll>
+    </column>
+
+    <scroll class="main">
+      <column class="maincol">
+        <column id="card" class="card">
+          <column id="cardHeader" class="card-header">
+            <!-- @header -->
+            <row class="gate-line">
+              <box class="hotfix-tag"><label class="hotfix-text">Hotfix</label></box>
+              <label id="gateLine" class="gate">PLAN: IS THIS THE RIGHT FIX?</label>
+              <text class="meta">#491 · Sign-in · Opened 31 min ago · agent-web</text>
+            </row>
+            <text id="cardTitle" class="card-title">Login page returns 500 after password reset</text>
+            <text id="requester" class="requester">Sam Ortiz, Operations · Unblocks 1 ticket</text>
+            <row><box class="heard calm"><text id="lastHeard" class="heard-text">Requester last heard from us: 19 min ago, acknowledgment</text></box></row>
+            <!-- @/header -->
+          </column>
+          <!-- @shell-card-top -->
+
+          <!-- @body -->
+          <column id="cardBody" class="card-body">
+            <column class="block">
+              <label class="sec">Diagnosis · confidence high</label>
+              <text class="lead">After a password reset, the sign-in handler looks up the old reset token, finds it deleted, and throws instead of continuing. Anyone who resets a password cannot sign in until their session cookie is cleared.</text>
+              <text class="small">Based on: reproduced on staging; the stack trace ends in the reset-token lookup</text>
+            </column>
+            <column class="block">
+              <label class="sec">Proposed fix</label>
+              <column id="steps" class="steps">
+                <text>1. Treat a missing reset token as already used, and continue sign-in.</text>
+                <text>2. Add a test that signs in immediately after a reset.</text>
+                <text>3. Deploy to production and watch the sign-in error rate.</text>
+              </column>
+            </column>
+            <column class="block blast">
+              <label class="sec">Blast radius</label>
+              <box class="blast-grid">
+                <column class="cell"><text class="cell-head">Affects</text><text>Sign-in service, every user signing in</text></column>
+                <column class="cell"><text class="cell-head">Reversible</text><text>Yes, by redeploying the previous build</text></column>
+                <column class="cell"><text class="cell-head">Goes live immediately</text><text>Yes, on deploy</text></column>
+              </box>
+            </column>
+            <column class="block">
+              <separator/>
+              <row class="expander"><button action="expandSection:">▸ Alternatives considered</button><spacer/><text class="small exp-note">2 · Space to expand</text></row>
+              <separator/>
+              <row class="expander"><button action="expandSection:">▸ Evidence</button><spacer/><text class="small exp-note">4 items</text></row>
+              <separator/>
+            </column>
+          </column>
+          <!-- @/body -->
+
+          <!-- @shell-card-bottom -->
+          <column class="notebox">
+            <!-- @note --><field id="note" placeholder="Note to agent-web (N), optional"/><!-- @/note -->
+          </column>
+          <row id="actions" class="actions">
+            <!-- AIMDeskAction buttons, added in code: title · key; the
+                 primary one is the default button. -->
+            <!-- @actions -->
+            <button class="wide-only" action="deskAction:" default="yes">Approve and send diagnosis update · Return</button>
+            <button class="narrow-only" action="deskAction:" default="yes">Approve and send · Return</button>
+            <button action="deskAction:">Revise · R</button>
+            <button action="deskAction:">Reassign · G</button>
+            <button action="deskAction:">Take over · O</button>
+            <button action="deskAction:">Decline · X</button>
+            <text id="actionHint" class="hint">Shift+Return approves without sending</text>
+            <!-- @/actions -->
+          </row>
+        </column>
+
+        <column id="reply" class="card reply">
+          <row class="reply-head">
+            <text id="replyMeta" class="reply-meta grow">Reply to Sam Ortiz · Draft: diagnosis update · updated after chat · visible to requester</text>
+            <label class="small">E to edit</label>
+          </row>
+          <!-- @reply -->
+          <text id="replyBody" class="reply-body">Hi Sam, we have found the cause. Signing in right after a password reset hits an error on our side. A fix is ready and we are deploying it now. In the meantime, clearing your browser cookies for the site will let you sign in.</text>
+          <!-- @/reply -->
+          <row class="actions">
+            <button id="sendOnly" action="sendOnly:">Send only · Cmd+Return</button>
+            <button id="redraft" action="redraft:">Redraft · Cmd+R</button>
+          </row>
+        </column>
+      </column>
+    </scroll>
+
+    <column id="drawer" class="drawer">
+      <!-- @drawer -->
+    </column>
+  </box>
+
+  <!-- The undo bar: shown while a held action can still be undone. -->
+  <row id="undoBar" class="undo">
+    <text id="undoLabel" class="grow undo-text">Nothing to undo</text>
+    <button id="undo" action="undo:">Undo · Cmd+Z</button>
+  </row>
+</column>
+
+<style>
+  .desk      { container-type: inline-size; background-color: -tr-window-background; }
+
+  /* Top bar: fixed dark in both appearances (a fixed pair). */
+  .topbar    { flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 8px 16px;
+               background-color: #1c1d1f; }
+  .brand     { color: #ffffff; font-weight: bold; }
+  .pulse     { flex-wrap: wrap; gap: 6px; align-items: center; }
+  .hotfix    { background-color: #f6c08a; border-radius: 4px; padding: 2px 8px; }
+  .hotfix-text { color: #3b1d03; font-weight: bold; }
+  .waits     { flex-wrap: wrap; gap: 4px 16px; }
+  .topbar-text { color: #e4e5e8; }
+  .narrow-only { display: none; }
+
+  .body      { flex: 1; min-height: 0; flex-direction: row; }
+
+  /* Rail */
+  .railpane  { flex: none; width: 260px; gap: 8px; padding: 12px 10px 0 12px; }
+  .rail      { flex: 1; min-height: 0; }
+  .rail-list { gap: 2px; padding-bottom: 12px; }
+  .section   { font-size: 11px; font-weight: bold; padding: 4px 8px; }
+  .group     { font-size: 11px; font-weight: bold; color: GrayText; padding: 6px 8px 0 8px; }
+  .hot       { color: -tr-error; }
+  .row       { gap: 1px; padding: 6px 8px; border-radius: 6px; }
+  .row-meta  { font-size: 12px; color: GrayText; }
+  .selected  { background-color: Highlight; }
+  .selected .row-title, .selected .row-meta { color: HighlightText; }
+  .rail-sep  { margin-top: 10px; margin-bottom: 4px; }
+  .folded    { padding: 4px 8px; gap: 8px; }
+  .grow      { flex: 1; min-width: 0; }
+
+  /* Card column */
+  .main      { flex: 1; min-width: 0; }
+  .maincol   { gap: 16px; padding: 20px 24px; }
+  .card      { width: 100%; max-width: 920px; margin: 0 auto; background-color: Canvas;
+               border: 1px; border-color: -tr-separator; border-radius: 8px; }
+  .card-header { gap: 6px; padding: 20px 24px 16px 24px; }
+  .gate-line { flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+  .gate      { font-size: 12px; font-weight: bold; }
+  .meta      { font-size: 12px; color: GrayText; }
+  .card-title { font-size: 22px; font-weight: bold; }
+  .heard     { background-color: Mark; border-radius: 4px; padding: 3px 8px; }
+  .heard-text { color: MarkText; font-size: 13px; }
+  .calm      { background-color: -tr-window-background; }
+  .calm .heard-text { color: CanvasText; }
+
+  .card-body { gap: 20px; padding: 16px 24px 20px 24px; }
+  .block     { gap: 6px; }
+  .sec       { font-size: 11px; font-weight: bold; color: GrayText; }
+  .lead      { font-size: 15px; }
+  .small     { font-size: 12px; color: GrayText; }
+  .checks    { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 16px; }
+  .flag      { color: -tr-error; }
+  .quote     { gap: 8px; padding: 12px 16px; border-radius: 6px; background-color: -tr-window-background; }
+  .pickers   { flex-wrap: wrap; gap: 16px 40px; }
+  .picker    { gap: 6px; }
+  .chips     { flex-wrap: wrap; gap: 6px 14px; }
+
+  .notebox   { padding: 0 24px 16px 24px; }
+  .actions   { flex-wrap: wrap; gap: 8px; align-items: center; padding: 12px 24px;
+               background-color: -tr-window-background; border-radius: 0 0 8px 8px; }
+  .hint      { font-size: 12px; color: GrayText; flex: 1 1 200px; text-align: right; }
+
+  .reply     { gap: 10px; padding: 16px 24px; }
+  .reply .actions { padding: 0; background-color: transparent; }
+  .reply-head { flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+  .reply-meta { font-size: 12px; color: GrayText; }
+  .reply-body { font-size: 14px; }
+
+  /* Drawer: closed by default (the app owner's choice). */
+  .drawer    { display: none; }
+
+  /* Undo bar: hidden until an action is held for undo. */
+  .undo      { display: none; gap: 10px; padding: 8px 16px; align-items: center;
+               border-color: -tr-separator; }
+  .undo-text { color: GrayText; }
+  /* @extra-style */
+  .hotfix-tag { background-color: #f6c08a; border-radius: 4px; padding: 1px 6px; }
+  .expander  { flex-wrap: wrap; gap: 4px 12px; align-items: center; padding: 6px 0; }
+  .exp-note  { flex: 0 1 auto; min-width: 0; text-align: right; }
+  .tint      { background-color: Mark; border-radius: 6px; }
+  .tint text, .tint label { color: MarkText; }
+  .steps     { gap: 4px; }
+  .blast     { padding: 12px 16px; border-radius: 6px; background-color: -tr-window-background; }
+  .cell-head { font-weight: bold; }
+  .blast-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  @container (max-width: 639px) { .blast-grid { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Narrow: the rail goes behind ☰; the top bar keeps Mine and the hotfix chip. */
+  @container (max-width: 639px) {
+    .narrow-only { display: flex; }
+    .wide-only   { display: none; }
+    .railpane    { display: none; }
+    .maincol     { padding: 12px; }
+    .card-header { padding: 16px; }
+    .card-body   { padding: 12px 16px 16px 16px; }
+    .notebox     { padding: 0 16px 12px 16px; }
+    .actions     { padding: 10px 16px; }
+    .reply       { padding: 12px 16px; }
+    .checks      { grid-template-columns: minmax(0, 1fr); }
+    .hint        { text-align: left; }
+    /* The undo text gets the full width; the button goes under it. */
+    .undo        { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; }
+    .undo-text   { flex: 1 1 100%; }
+  }
+</style>

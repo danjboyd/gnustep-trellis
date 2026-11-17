@@ -21,6 +21,7 @@ NSString *const TRMarkupErrorDomain = @"TRMarkupErrorDomain";
   NSMutableArray *_children;
   __weak TRMarkupElement *_parent;
   NSMutableString *_text;
+  NSMutableArray *_content;     /* NSString and TRMarkupElement, in order */
   NSUInteger _line, _column;
 }
 @end
@@ -34,9 +35,11 @@ NSString *const TRMarkupErrorDomain = @"TRMarkupErrorDomain";
       _attributeOrder = [NSMutableArray array];
       _children = [NSMutableArray array];
       _text = [NSMutableString string];
+      _content = [NSMutableArray array];
     }
   return self;
 }
+- (NSArray *)content { return _content; }
 - (NSString *)name { return _name; }
 - (NSDictionary *)attributes { return _attributes; }
 - (NSArray *)attributeOrder { return _attributeOrder; }
@@ -520,6 +523,7 @@ static NSString *TRDecodeEntities(NSString *s)
             {
               e->_parent = parent;
               [parent->_children addObject: e];
+              [parent->_content addObject: e];
             }
           else if ([n isEqualToString: @"template"])
             {
@@ -543,7 +547,11 @@ static NSString *TRDecodeEntities(NSString *s)
       NSString *t = [_src substringWithRange: NSMakeRange(ts, _pos - ts)];
       TRMarkupElement *top = [stack lastObject];
       if (top != nil && ![top->_name isEqualToString: @"trellis"])
-        [top->_text appendString: TRDecodeEntities(t)];
+        {
+          NSString *dt = TRDecodeEntities(t);
+          [top->_text appendString: dt];
+          [top->_content addObject: dt];
+        }
       else if ([[t stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]] length])
         return [self failAt: ts message: @"text outside the root element"];
     }

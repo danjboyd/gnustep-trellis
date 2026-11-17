@@ -298,6 +298,257 @@ static id TRSampleSubst(id v, NSInteger i, NSInteger n)
 }
 @end
 
+/* ------------------------------------------------------------------ */
+#pragma mark Rich text labels
+
+static NSSet *TRInlineNames(void)
+{
+  static NSSet *set;
+  static dispatch_once_t once;
+  dispatch_once(&once, ^{
+    set = [NSSet setWithObjects: @"b", @"strong", @"i", @"em", @"code", @"a", @"br", nil];
+  });
+  return set;
+}
+
+/* YES if every child (recursively) is an inline element. */
+static BOOL TRAllInline(TRMarkupElement *e)
+{
+  for (TRMarkupElement *c in e.children)
+    if (![TRInlineNames() containsObject: c.name] || !TRAllInline(c)) return NO;
+  return YES;
+}
+
+/* Flattens rich content into runs {text, b, i, code, href, action},
+   collapsing whitespace across run boundaries as HTML does. */
+static void TRCollectRuns(TRMarkupElement *e, NSDictionary *style, NSMutableArray *runs)
+{
+  for (id piece in e.content)
+    {
+      if ([piece isKindOfClass: [NSString class]])
+        {
+          NSMutableDictionary *r = [style mutableCopy];
+          r[@"text"] = piece;
+          [runs addObject: r];
+          continue;
+        }
+      TRMarkupElement *c = piece;
+      NSMutableDictionary *st = [style mutableCopy];
+      NSString *n = c.name;
+      if ([n isEqualToString: @"br"]) { [runs addObject: @{@"text": @"\n", @"br": @YES}]; continue; }
+      if ([n isEqualToString: @"b"] || [n isEqualToString: @"strong"]) st[@"b"] = @YES;
+      if ([n isEqualToString: @"i"] || [n isEqualToString: @"em"]) st[@"i"] = @YES;
+      if ([n isEqualToString: @"code"]) st[@"code"] = @YES;
+      if ([n isEqualToString: @"a"])
+        {
+          st[@"link"] = @YES;
+          if (c.attributes[@"href"]) st[@"href"] = c.attributes[@"href"];
+          if (c.attributes[@"action"]) st[@"action"] = c.attributes[@"action"];
+        }
+      TRCollectRuns(c, st, runs);
+    }
+}
+
+static NSArray *TRCollapseRuns(NSArray *runs)
+{
+  NSMutableArray *out = [NSMutableArray array];
+  BOOL lastSpace = YES;   /* trims the start */
+  NSCharacterSet *ws = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+  for (NSDictionary *r in runs)
+    {
+      if (r[@"br"]) { [out addObject: r]; lastSpace = YES; continue; }
+      NSString *t = r[@"text"];
+      NSMutableString *m = [NSMutableString string];
+      for (NSUInteger i = 0; i < [t length]; i++)
+        {
+          unichar c = [t characterAtIndex: i];
+          if ([ws characterIsMember: c]) { if (!lastSpace) [m appendString: @" "]; lastSpace = YES; }
+          else { [m appendFormat: @"%C", c]; lastSpace = NO; }
+        }
+      if ([m length] == 0) continue;
+      NSMutableDictionary *n = [r mutableCopy];
+      n[@"text"] = m;
+      [out addObject: n];
+    }
+  /* trim the end */
+  while ([out count])
+    {
+      NSMutableDictionary *last = [[out lastObject] mutableCopy];
+      NSString *t = last[@"text"];
+      if (last[@"br"] == nil && [t hasSuffix: @" "])
+        {
+          t = [t substringToIndex: [t length] - 1];
+          if ([t length] == 0) { [out removeLastObject]; continue; }
+          last[@"text"] = t;
+          [out replaceObjectAtIndex: [out count] - 1 withObject: last];
+        }
+      break;
+    }
+  return out;
+}
+
+static NSString *const TRRunAttributeName = @"TRRunIndex";
+
+@implementation TRRichLabel
+{
+  NSArray *_runs;
+}
+
+- (void)setTrellisRuns:(NSArray *)runs
+{
+  _runs = [runs copy];
+  [self trellisRebuildRichText];
+}
+
+- (NSArray *)trellisRuns { return _runs; }
+
+- (NSString *)plainText
+{
+  NSMutableString *m = [NSMutableString string];
+  for (NSDictionary *r in _runs) [m appendString: r[@"text"]];
+  return m;
+}
+
+/* Re-applies the runs over the label's current font, colour and
+   alignment (after a style change, and when set). */
+- (void)trellisRebuildRichText
+{
+  NSFont *base = [self font] ?: [NSFont systemFontOfSize: 0];
+  NSColor *color = [self textColor] ?: [NSColor controlTextColor];
+  NSMutableParagraphStyle *ps = [NSMutableParagraphStyle new];
+  [ps setAlignment: [self alignment]];
+  [ps setLineBreakMode: [[self cell] wraps] ? NSLineBreakByWordWrapping : NSLineBreakByTruncatingTail];
+  NSMutableAttributedString *out = [NSMutableAttributedString new];
+  NSFontManager *fm = [NSFontManager sharedFontManager];
+  NSUInteger idx = 0;
+  for (NSDictionary *r in _runs)
+    {
+      NSFont *f = base;
+      if (r[@"code"])
+        f = [NSFont userFixedPitchFontOfSize: [base pointSize] * 0.95] ?: base;
+      if (r[@"b"]) f = [fm convertFont: f toHaveTrait: NSBoldFontMask] ?: f;
+      BOOL slant = NO;
+      if (r[@"i"])
+        {
+          NSFont *it = [fm convertFont: f toHaveTrait: NSItalicFontMask];
+          if (it && ([fm traitsOfFont: it] & NSItalicFontMask)) f = it;
+          else slant = YES;   /* no italic face installed: a synthetic slant */
+        }
+      NSMutableDictionary *attrs = [@{ NSFontAttributeName: f, NSForegroundColorAttributeName: color,
+                                       NSParagraphStyleAttributeName: ps, TRRunAttributeName: @(idx) } mutableCopy];
+      if (slant) attrs[NSObliquenessAttributeName] = @0.2;
+      if (r[@"link"])
+        {
+          attrs[NSForegroundColorAttributeName] = TRColorFromCSS(@"LinkText") ?: [NSColor blueColor];
+          attrs[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
+          if (r[@"href"]) attrs[NSLinkAttributeName] = r[@"href"];
+        }
+      [out appendAttributedString: [[NSAttributedString alloc] initWithString: r[@"text"] attributes: attrs]];
+      idx++;
+    }
+  [self setAttributedStringValue: out];
+}
+
+/* The layout of the text as the cell draws it (for hit testing). */
+- (NSLayoutManager *)trellisLayoutWithContainer:(NSTextContainer **)tc origin:(NSPoint *)origin
+{
+  NSRect r = [[self cell] titleRectForBounds: [self bounds]];
+  NSTextStorage *ts = [[NSTextStorage alloc] initWithAttributedString: [self attributedStringValue]];
+  NSLayoutManager *lm = [NSLayoutManager new];
+  NSTextContainer *c = [[NSTextContainer alloc] initWithContainerSize: NSMakeSize(NSWidth(r), 1e7)];
+  [c setLineFragmentPadding: 2];
+  [lm addTextContainer: c];
+  [ts addLayoutManager: lm];
+  [lm glyphRangeForTextContainer: c];
+  if (tc) *tc = c;
+  if (origin) *origin = r.origin;
+  /* Keep the storage alive with the manager. */
+  objc_setAssociatedObject(lm, &kTRVirtualSampleKey, ts, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+  return lm;
+}
+
+- (NSUInteger)linkIndexAtPoint:(NSPoint)p
+{
+  NSTextContainer *c = nil;
+  NSPoint o;
+  NSLayoutManager *lm = [self trellisLayoutWithContainer: &c origin: &o];
+  NSPoint q = NSMakePoint(p.x - o.x, [self isFlipped] ? p.y - o.y : NSMaxY([[self cell] titleRectForBounds: [self bounds]]) - p.y);
+  NSRect used = [lm usedRectForTextContainer: c];
+  if (!NSPointInRect(q, NSInsetRect(used, -1, -1))) return NSNotFound;
+  CGFloat frac = 0;
+  NSUInteger g = [lm glyphIndexForPoint: q inTextContainer: c fractionOfDistanceThroughGlyph: &frac];
+  NSUInteger ci = [lm characterIndexForGlyphAtIndex: g];
+  NSAttributedString *s = [self attributedStringValue];
+  if (ci >= [s length]) return NSNotFound;
+  NSNumber *run = [s attribute: TRRunAttributeName atIndex: ci effectiveRange: NULL];
+  if (run == nil || _runs[[run unsignedIntegerValue]][@"link"] == nil) return NSNotFound;
+  return ci;
+}
+
+- (NSRect)rectForLinkAtRun:(NSUInteger)runIndex
+{
+  NSAttributedString *s = [self attributedStringValue];
+  NSRange want = NSMakeRange(NSNotFound, 0);
+  for (NSUInteger i = 0; i < [s length]; )
+    {
+      NSRange er;
+      NSNumber *run = [s attribute: TRRunAttributeName atIndex: i effectiveRange: &er];
+      if ([run unsignedIntegerValue] == runIndex) { want = er; break; }
+      i = NSMaxRange(er);
+    }
+  if (want.location == NSNotFound) return NSZeroRect;
+  NSTextContainer *c = nil;
+  NSPoint o;
+  NSLayoutManager *lm = [self trellisLayoutWithContainer: &c origin: &o];
+  NSRange gr = [lm glyphRangeForCharacterRange: want actualCharacterRange: NULL];
+  NSRect r = [lm boundingRectForGlyphRange: gr inTextContainer: c];
+  if ([self isFlipped]) return NSOffsetRect(r, o.x, o.y);
+  NSRect title = [[self cell] titleRectForBounds: [self bounds]];
+  return NSMakeRect(o.x + r.origin.x, NSMaxY(title) - NSMaxY(r), r.size.width, r.size.height);
+}
+
+- (BOOL)activateLinkAtCharacterIndex:(NSUInteger)ci
+{
+  NSAttributedString *s = [self attributedStringValue];
+  if (ci >= [s length]) return NO;
+  NSNumber *run = [s attribute: TRRunAttributeName atIndex: ci effectiveRange: NULL];
+  if (run == nil) return NO;
+  NSDictionary *r = _runs[[run unsignedIntegerValue]];
+  if (r[@"link"] == nil) return NO;
+  _clickedLink = r[@"href"];
+  if (r[@"action"])
+    {
+      SEL sel = NSSelectorFromString(r[@"action"]);
+      return [NSApp sendAction: sel to: _linkTarget from: self];
+    }
+  NSURL *url = r[@"href"] ? [NSURL URLWithString: r[@"href"]] : nil;
+  NSString *scheme = [[url scheme] lowercaseString];
+  if (url && ([scheme isEqualToString: @"https"] || [scheme isEqualToString: @"http"] || [scheme isEqualToString: @"mailto"]))
+    return [[NSWorkspace sharedWorkspace] openURL: url];
+  return NO;
+}
+
+- (void)mouseDown:(NSEvent *)event
+{
+  NSPoint p = [self convertPoint: [event locationInWindow] fromView: nil];
+  NSUInteger ci = [self linkIndexAtPoint: p];
+  if (ci == NSNotFound) { [super mouseDown: event]; return; }
+  [self activateLinkAtCharacterIndex: ci];
+}
+
+- (void)resetCursorRects
+{
+  [super resetCursorRects];
+  for (NSUInteger i = 0; i < [_runs count]; i++)
+    if (_runs[i][@"link"])
+      {
+        NSRect r = [self rectForLinkAtRun: i];
+        if (!NSIsEmptyRect(r)) [self addCursorRect: r cursor: [NSCursor pointingHandCursor]];
+      }
+}
+
+@end
+
 @implementation TRLoader
 
 static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
@@ -480,8 +731,35 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
       return nil;
     }
 
+  if (([n isEqualToString: @"label"] || [n isEqualToString: @"text"]) && [e.children count] && TRAllInline(e))
+    {
+      /* Rich text: <b>, <i>, <code>, <a action= href=>, <br>. */
+      NSMutableArray *runs = [NSMutableArray array];
+      TRCollectRuns(e, @{}, runs);
+      BOOL wraps = [n isEqualToString: @"text"] || TRYes(a[@"wraps"]);
+      TRRichLabel *rl = [[TRRichLabel alloc] initWithFrame: NSMakeRect(0, 0, 10, 10)];
+      [rl setEditable: NO];
+      [rl setSelectable: NO];
+      [rl setBezeled: NO];
+      [rl setBordered: NO];
+      [rl setDrawsBackground: NO];
+      [[rl cell] setWraps: wraps];
+      [[rl cell] setLineBreakMode: wraps ? NSLineBreakByWordWrapping : NSLineBreakByTruncatingTail];
+      rl.linkTarget = owner;
+      for (NSDictionary *r in runs)
+        if (r[@"action"] && owner != nil && ![owner respondsToSelector: NSSelectorFromString(r[@"action"])])
+          {
+            if (error) *error = TRLoadError(doc, e, @"<a action=\"%@\">: %@ does not implement -%@",
+                                            r[@"action"], NSStringFromClass([owner class]), r[@"action"]);
+            return nil;
+          }
+      [rl setTrellisRuns: TRCollapseRuns(runs)];
+      v = rl;
+      container = NO;
+    }
+
   if (!container && ![n isEqualToString: @"popup"] && ![n isEqualToString: @"scroll"]
-      && ![n isEqualToString: @"virtual"] && [e.children count])
+      && ![n isEqualToString: @"virtual"] && ![v isKindOfClass: [TRRichLabel class]] && [e.children count])
     {
       if (error) *error = TRLoadError(doc, e.children[0], @"<%@> cannot contain elements", n);
       return nil;

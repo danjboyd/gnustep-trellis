@@ -15,7 +15,8 @@
      virtual              TRVirtualBox: a scroller that builds views only for
                           the items on screen (layout="list|grid", template=,
                           estimated-size=, overscan=; <template id> children)
-     label                non-editable NSTextField (text content = string)
+     label                non-editable NSTextField (text content = string;
+                          with <b> <i> <code> <a> <br> inside, a TRRichLabel)
      text                 wrapping, non-editable NSTextField
      field                editable NSTextField (placeholder=, secure="yes")
      button               NSButton (title= or text content, action=, default="yes",
@@ -92,6 +93,27 @@ void TRUpdateThemeTokens(void);
 /* The cell of <button bordered="no">: a title-only button that draws
    its (attributed) title itself, in the colour its style sets. */
 @interface TRFlatButtonCell : NSButtonCell
+@end
+
+/* A <label> or <text> with inline markup: <b>/<strong>, <i>/<em>,
+   <code>, <br>, and links, <a action="showTicket:" href="482">#482</a>.
+   A link with action= sends it to the owner with the label as sender
+   (read -clickedLink for its href); a link with only an http(s) or
+   mailto href opens it. Links draw in LinkText, underlined. The runs
+   follow the label's font, colour and alignment from its style. */
+@interface TRRichLabel : NSTextField
+@property (nonatomic, weak) id linkTarget;
+@property (nonatomic, readonly, copy) NSString *clickedLink;
+- (void)setTrellisRuns:(NSArray<NSDictionary *> *)runs;
+- (NSArray<NSDictionary *> *)trellisRuns;
+- (NSString *)plainText;
+- (void)trellisRebuildRichText;
+/* The character index of the link under a point (view coordinates), or
+   NSNotFound; and following one (what a click does). */
+- (NSUInteger)linkIndexAtPoint:(NSPoint)point;
+- (BOOL)activateLinkAtCharacterIndex:(NSUInteger)index;
+/* Where the run with this index draws (for tests and cursor rects). */
+- (NSRect)rectForLinkAtRun:(NSUInteger)runIndex;
 @end
 
 /* An NSScrollView whose document view is a Trellis column. */

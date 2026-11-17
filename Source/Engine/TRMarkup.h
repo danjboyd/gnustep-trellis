@@ -42,6 +42,10 @@ extern NSString *const TRMarkupErrorDomain;
 @property (nonatomic, readonly, weak) TRMarkupElement *parent;
 /* Text content directly inside the element, whitespace-collapsed. */
 @property (nonatomic, readonly) NSString *text;
+/* The element's text pieces (NSString, not collapsed) and child elements
+   (TRMarkupElement) in document order: rich text like
+   `Hello <b>there</b>`. */
+@property (nonatomic, readonly) NSArray *content;
 @property (nonatomic, readonly) NSUInteger line, column;
 @property (nonatomic, readonly) NSArray<NSString *> *classes;
 - (NSString *)identifier;

@@ -99,6 +99,26 @@ the user's settings. trellis-render refuses to run without it.
 - **Sample content:** put it in `Screen.sample.json`, keyed by id. It's
   used only by trellis-render.
 
+**Rich text in labels.** A `<label>` or `<text>` may contain `<b>` (or
+`<strong>`), `<i>` (or `<em>`), `<code>`, `<br/>` and links. Whitespace
+collapses as in HTML, and the runs follow the label's `color`,
+`font-size` and `text-align`.
+
+```xml
+<text class="note">Ticket <a action="openTicket:" href="482">#482</a> is <b>blocked</b>;
+  run <code>make check</code>.<br/>See <a href="https://example.com/guide">the guide</a>.</text>
+```
+
+- `<a action="openTicket:" href="482">` sends `openTicket:` to the owner
+  with the label as sender; `[(TRRichLabel *)sender clickedLink]` is the
+  href. trellis-lint checks the action like any other.
+- `<a href="https://...">` with no action opens the URL (http, https and
+  mailto only).
+- Links draw in `LinkText`, underlined. On GNUstep the underline and the
+  slant of `<i>` (when the font has no italic face) may not draw.
+- Links are clicked, not tabbed to: put anything the keyboard must reach
+  in a button.
+
 ## 3. CSS that works
 
 - **Properties:** `display` (`flex`, `none`, `block`), `flex-direction`,

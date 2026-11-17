@@ -294,6 +294,9 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
       BOOL wrap = ![v isEqualToString: @"nowrap"] && ![v isEqualToString: @"pre"];
       [[ctl cell] setWraps: wrap];
     }
+  /* Rich labels rebuild their runs over the new font and colour. */
+  if ([ctl respondsToSelector: @selector(trellisRebuildRichText)])
+    [ctl performSelector: @selector(trellisRebuildRichText)];
 }
 
 /* ------------------------------------------------------------------ */

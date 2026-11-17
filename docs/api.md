@@ -41,6 +41,10 @@ where an entry `{"_repeat": n, "items": [...]}` is a run, `"_template"`
 picks the template, and `{i}`, `{n}` and `{n:W}` number the items;
 `"scroll-to": index` scrolls there. Ids repeat freely across templates.
 
+Since 0.5 (unreleased), rich text in `<label>` and `<text>`: `<b>`,
+`<strong>`, `<i>`, `<em>`, `<code>`, `<br>`, and `<a action= href=>`
+(see agents.md section 2).
+
 Since 0.5 (unreleased), `-tr-layout-transition: <time> [ease-out |
 linear | ease-in-out] | none` on a box (see agents.md section 3).
 
@@ -64,6 +68,8 @@ value, and the built-in `--tr-*` tokens listed in agents.md section 3
 | `TRSizeForWidth` protocol: `-trellisSizeForWidth:` | TRViewMeasure.h | Opt-in height-for-width measuring for custom views (CGFLOAT_MAX = max-content). |
 | `TRMeasureView`, `TRBaselineOfView` | TRViewMeasure.h | How Trellis measures a leaf view; usable from custom measure blocks. |
 | `TRColorFromCSS` | TRBoxView.h | CSS colour string to NSColor. |
+| `TRRichLabel` (since 0.5, unreleased): `linkTarget`, `clickedLink`, `-setTrellisRuns:`, `-trellisRuns`, `-plainText`, `-trellisRebuildRichText`, `-linkIndexAtPoint:`, `-activateLinkAtCharacterIndex:`, `-rectForLinkAtRun:` | TRLoader.h | The view a `<label>`/`<text>` with inline markup creates. |
+| `-[TRMarkupElement content]` (since 0.5, unreleased) | TRMarkup.h | Text pieces and child elements in document order. |
 | `-[TRBoxView layoutTrellisAnimated]`, `isAnimatingLayout`, `+reducesMotion`, `+setReducesMotionOverride:` (since 0.5, unreleased) | TRBoxView.h | Layout transitions: animate a layout explicitly, and the reduce-motion setting they honour. |
 | `TRUpdateThemeTokens` (since 0.4) | TRLoader.h | Sets the built-in tokens' metrics from the running theme (loading a document does it). |
 | `TRApplyLeafStyle` (since 0.4) | TRBoxView.h | Text and colour declarations on a control outside any box. |

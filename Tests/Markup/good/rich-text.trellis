@@ -1,0 +1,9 @@
+<column class="pane">
+  <text class="note">Ticket <a action="openTicket:" href="482">#482</a> is <b>blocked</b> on <i>review</i>;
+    run <code>make check</code> first.<br/>See <a href="https://example.com/guide">the guide</a>.</text>
+  <label>Status: <b>green</b></label>
+</column>
+<style>
+  .pane { padding: var(--tr-space-l); gap: var(--tr-space-s); }
+  .note { color: GrayText; }
+</style>

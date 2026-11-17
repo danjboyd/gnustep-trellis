@@ -5,6 +5,14 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Added:** rich text in `<label>` and `<text>`: `<b>`/`<strong>`,
+  `<i>`/`<em>`, `<code>`, `<br/>`, and links. `<a action="sel:"
+  href="...">` sends the action to the owner with the label as sender
+  (`clickedLink` is the href; trellis-lint checks the action); a bare
+  http(s)/mailto href opens. The runs follow the label's style, and the
+  view is a `TRRichLabel`. `-[TRMarkupElement content]` gives text and
+  children in order. Tests/View/rich-text.m (check-gui).
+
 - **Added:** layout transitions, opt-in: `-tr-layout-transition: 200ms`
   (with `linear` / `ease-in-out`, or `none`) on a box animates its
   subviews, and nested boxes', to their new frames after content or style

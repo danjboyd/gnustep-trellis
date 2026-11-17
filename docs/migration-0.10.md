@@ -1,6 +1,6 @@
 # Moving a screen from 0.9 to 0.10
 
-Several layout results change in 0.10 (unreleased), each closer to the
+Several layout results change in 0.10, each closer to the
 browser and each in a corner case. For earlier changes, see [migration-0.9.md](migration-0.9.md).
 
 | What changed | 0.9 | 0.10 |

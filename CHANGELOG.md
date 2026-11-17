@@ -5,6 +5,13 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+## 0.10.0 (2026-11-18)
+
+Layout corner cases brought closer to the browser, mostly size keywords
+and shrink-to-fit grids (see docs/migration-0.10.md). Conformance is
+3659/3659 on Linux, and the known gaps are down from 73 to 13, all of
+them syntax Trellis doesn't support.
+
 - **Changed (layout):** `min-height`/`max-height: min-content` (and
   `max-content`, `fit-content`) on a wrapping column with a definite
   `height` now break lines at that height, as Chrome does: the keyword's

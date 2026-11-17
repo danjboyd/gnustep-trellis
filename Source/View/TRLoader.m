@@ -824,6 +824,12 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
             }
           [chosen addIndex: i];
         }
+      if (mode == NSSegmentSwitchTrackingMomentary && [chosen count])
+        {
+          /* AppKit never keeps a selection on a momentary control. */
+          if (error) *error = TRLoadError(doc, e, @"<segmented tracking=\"momentary\"> has no selection; drop selected");
+          return nil;
+        }
       if (mode == NSSegmentSwitchTrackingSelectOne && [chosen count] > 1)
         {
           if (error) *error = TRLoadError(doc, e, @"<segmented tracking=\"one\"> can select only one item");

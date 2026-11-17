@@ -319,6 +319,8 @@ static void TRLintTrellis(NSString *path, NSString *header)
       if (sel && ![titles containsObject: sel])
         TRReport(where, @"error", @"segmented", [NSString stringWithFormat: @"selected=\"%@\": no item has that title", sel]);
       if (sel) chosen++;
+      if ([tracking isEqualToString: @"momentary"] && chosen > 0)
+        TRReport(where, @"error", @"segmented", @"<segmented tracking=\"momentary\"> has no selection; drop selected");
       if ([tracking isEqualToString: @"one"] && chosen > 1)
         TRReport(where, @"error", @"segmented", @"<segmented tracking=\"one\"> can select only one item");
     }

@@ -10,7 +10,7 @@ static NSString *const kSpec =
   @"<row>\n"
   @"  <segmented id=\"mode\" action=\"modeChanged:\" selected=\"Table\"><item>Tiles</item><item>Table</item></segmented>\n"
   @"  <segmented id=\"filter\" tracking=\"any\" items=\"Working, Waiting, Idle\"/>\n"
-  @"  <segmented id=\"tools\" tracking=\"momentary\"><item selected=\"yes\">Cut</item><item>Copy</item></segmented>\n"
+  @"  <segmented id=\"tools\" tracking=\"momentary\"><item>Cut</item><item>Copy</item></segmented>\n"
   @"</row>\n";
 
 @interface Owner : NSObject
@@ -66,7 +66,7 @@ int main(void)
       Expect("tracking defaults to one", [[mode cell] trackingMode] == NSSegmentSwitchTrackingSelectOne);
       Expect("tracking=any", [[filter cell] trackingMode] == NSSegmentSwitchTrackingSelectAny);
       Expect("tracking=momentary", [[tools cell] trackingMode] == NSSegmentSwitchTrackingMomentary);
-      Expect("<item selected=yes>", [tools isSelectedForSegment: 0]);
+      Expect("a momentary control holds no selection", [tools selectedSegment] == -1);
 
       /* Every segment fits its label, in bold too. */
       NSFont *bold = [[NSFontManager sharedFontManager] convertFont: [filter font] toHaveTrait: NSBoldFontMask];
@@ -101,6 +101,10 @@ int main(void)
              Load(@"<row><segmented tracking=\"many\" items=\"A, B\"/></row>", nil, &err) == nil);
       Expect("selected= naming no item is an error",
              Load(@"<row><segmented items=\"A, B\" selected=\"C\"/></row>", nil, &err) == nil);
+      Expect("selected under tracking=momentary is an error (AppKit keeps none)",
+             Load(@"<row><segmented tracking=\"momentary\"><item selected=\"yes\">A</item><item>B</item></segmented></row>", nil, &err) == nil);
+      Expect("<item selected=yes> selects it",
+             Load(@"<row><segmented id=\"s\" no-outlet=\"yes\"><item>A</item><item selected=\"yes\">B</item></segmented></row>", nil, &err) != nil);
       Expect("two selected under tracking=one is an error",
              Load(@"<row><segmented><item selected=\"yes\">A</item><item selected=\"yes\">B</item></segmented></row>", nil, &err) == nil);
     }

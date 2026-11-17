@@ -31,7 +31,8 @@ borders that paint as such.
 - `<segmented>` and `TRSegmentedControl`: a segmented control with
   `<item>` children or `items=`, `tracking=one|any|momentary`, a
   selection by title in markup, code (`selectedTitles`) and sample files,
-  sized so every label fits in the bold face too.
+  sized so every label fits in the bold face too. A selection under
+  `tracking="momentary"` is an error (AppKit keeps none).
 - `<split>` and `TRSplitView`: resizable panes, sized from each pane's
   CSS (starting size, min/max, flex-grow), with divider positions kept
   under `autosave=` and readable and settable in code.

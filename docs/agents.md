@@ -83,7 +83,8 @@ the user's settings. trellis-render refuses to run without it.
   selected="Tiles"><item>Tiles</item><item>Table</item></segmented>` (or
   `items="Tiles, Table"`). `tracking="one"` (default: a switch),
   `"any"` (toggles; mark several with `<item selected="yes">`) or
-  `"momentary"` (buttons). Segments share the width equally and the
+  `"momentary"` (buttons, which hold no selection, so `selected` is an
+  error there). Segments share the width equally and the
   control asks for room for its longest label. In code it's a
   `TRSegmentedControl`: `selectedTitles` reads and sets the selection; in
   a sample file, `{"selected": "Table"}` or a list of titles.

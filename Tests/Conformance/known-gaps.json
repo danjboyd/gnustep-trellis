@@ -9,7 +9,6 @@
   "wpt-grid/css/css-grid/alignment/grid-align-justify-overflow/7": "uses justify-items: safe end, which Trellis doesn't support",
   "wpt-grid/css/css-grid/alignment/grid-align-justify-stretch/7": "grid intrinsic sizing with size keywords on the container or items, not yet analysed",
   "wpt-grid/css/css-grid/grid-definition/grid-auto-repeat-min-size-001/10": "grid intrinsic sizing with size keywords on the container or items, not yet analysed",
-  "wpt-grid/css/css-grid/layout-algorithm/flex-sizing-columns-min-max-width-001/7": "grid intrinsic sizing with size keywords on the container or items, not yet analysed",
   "wpt-grid/css/css-grid/layout-algorithm/grid-intrinsic-width-minmax-tracks-001/22": "grid intrinsic sizing with size keywords on the container or items, not yet analysed",
   "wpt-sizing/css/css-sizing/aspect-ratio/intrinsic-contribution-transferred-min-width-001/1": "intrinsic size keyword case, not yet analysed",
   "wpt-sizing/css/css-sizing/aspect-ratio/intrinsic-contribution-transferred-min-width-001/2": "intrinsic size keyword case, not yet analysed",

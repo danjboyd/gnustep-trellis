@@ -912,8 +912,9 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
   /* ---- Explicit grid ---- */
   NSInteger nCols = 0, nRows = 0, fitStartC, fitLenC, fitStartR, fitLenR;
   /* A shrink-to-fit width is indefinite while the tracks are found: with a
-     definite max-width, auto-repeat counts against that (7.2.3.2). */
-  const double repInnerW = (wm == TRMeasureModeAtMost && !isnan(maxInnerW)) ? NAN : innerW;
+     definite max-width (or else min-width), auto-repeat counts against
+     that (7.2.3.2). */
+  const double repInnerW = (wm == TRMeasureModeAtMost && (!isnan(maxInnerW) || !isnan(minInnerW))) ? NAN : innerW;
   TRTrack *colsT = TRBuildTracks(st->_gridTemplateColumns, repInnerW, colGap, &nCols, &fitStartC, &fitLenC, minInnerW, maxInnerW);
   TRTrack *rowsT = TRBuildTracks(st->_gridTemplateRows, innerH, rowGap, &nRows, &fitStartR, &fitLenR, minInnerH, maxInnerH);
   NSArray *areas = st->_gridTemplateAreas;

@@ -227,6 +227,7 @@
         "baseline": 12,
         "class": "NSTextField",
         "height": 10,
+        "hidden": true,
         "intrinsic": {
          "height": 15,
          "width": 74

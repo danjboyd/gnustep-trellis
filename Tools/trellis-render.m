@@ -106,7 +106,9 @@ static NSDictionary *TRDumpView(NSView *v, TRNode *node)
   d[@"y"] = @(f.origin.y);
   d[@"width"] = @(f.size.width);
   d[@"height"] = @(f.size.height);
-  if ([v isHidden]) d[@"hidden"] = @YES;
+  /* Hidden by the view, or by its node (hidden, display: none) even when
+     it hasn't been laid out yet, as inside a parked split pane. */
+  if ([v isHidden] || node.hidden || node.style.display == TRDisplayNone) d[@"hidden"] = @YES;
   /* A measured leaf's first baseline, from its top edge, as the engine
      reads it for align-items: baseline (check-reference.py replays it). */
   if (node.baselineBlock != nil)

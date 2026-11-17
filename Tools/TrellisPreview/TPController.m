@@ -448,7 +448,9 @@ static NSDictionary *TPDump(NSView *v, TRNode *node)
   if ([[v identifier] length]) d[@"id"] = [v identifier];
   d[@"x"] = @(f.origin.x); d[@"y"] = @(f.origin.y);
   d[@"width"] = @(f.size.width); d[@"height"] = @(f.size.height);
-  if ([v isHidden]) d[@"hidden"] = @YES;
+  /* Hidden by the view, or by its node (hidden, display: none) even when
+     it hasn't been laid out yet, as inside a parked split pane. */
+  if ([v isHidden] || node.hidden || node.style.display == TRDisplayNone) d[@"hidden"] = @YES;
   /* A measured leaf's first baseline, as in trellis-render's dump. */
   if (node.baselineBlock != nil)
     d[@"baseline"] = @(node.baselineBlock(TRSizeMake(f.size.width, f.size.height)));

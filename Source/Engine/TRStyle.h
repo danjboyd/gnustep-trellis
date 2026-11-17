@@ -46,6 +46,7 @@ typedef struct {
   /* "safe" overflow alignment (CSS Box Alignment 4.4): when the content
      overflows, align as start. */
   BOOL justifyContentSafe, alignContentSafe;
+  BOOL justifyItemsSafe, justifySelfSafe, alignItemsSafe, alignSelfSafe;
 } TRStyleStorage;
 /* TRStyleStorage is internal (docs/api.md): its layout changes between
    versions. Use TRStyle's properties. */

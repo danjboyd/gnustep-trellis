@@ -1362,6 +1362,9 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           double mv = it->margin[TREdgeTop] + it->margin[TREdgeBottom];
           TRAlign js = cs->justifySelf == TRAlignAuto ? s->justifyItems : cs->justifySelf;
           TRAlign as = cs->alignSelf == TRAlignAuto ? s->alignItems : cs->alignSelf;
+          /* safe: an item that overflows its area aligns as start. */
+          const BOOL jsSafe = cs->justifySelf == TRAlignAuto ? s->justifyItemsSafe : cs->justifySelfSafe;
+          const BOOL asSafe = cs->alignSelf == TRAlignAuto ? s->alignItemsSafe : cs->alignSelfSafe;
           double sw = TRGBox(cs, cs->width, areaW, YES, areaW), sh = TRGBox(cs, cs->height, areaH, NO, areaW);
           double ar = cs->aspectRatio;
           if (isnan(sw) && !isnan(sh) && !isnan(ar)) sw = sh * ar;
@@ -1398,7 +1401,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           double offX = rtl ? it->margin[TREdgeRight] : it->margin[TREdgeLeft], offY = it->margin[TREdgeTop];
           if (autoL && autoR) offX += MAX(0, freeW) / 2;
           else if (autoL) offX += MAX(0, freeW);
-          else if (!autoR)
+          else if (!autoR && !(jsSafe && freeW < 0))
             {
               if (js == TRAlignCenter) offX += freeW / 2;
               /* left/right are physical: from the inline start, right is
@@ -1408,7 +1411,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
             }
           if (autoT && autoB) offY += MAX(0, freeH) / 2;
           else if (autoT) offY += MAX(0, freeH);
-          else if (!autoB)
+          else if (!autoB && !(asSafe && freeH < 0))
             {
               if (as == TRAlignCenter) offY += freeH / 2;
               else if (as == TRAlignEnd || as == TRAlignFlexEnd) offY += freeH;

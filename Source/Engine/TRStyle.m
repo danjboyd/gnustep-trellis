@@ -509,6 +509,17 @@ const TRStyleStorage *TRStyleStorageForDirection(TRStyle *st, TRDirection dir)
 
 /* Sets one kebab-case property. Returns NO on an invalid value or an
    unknown property. */
+/* Splits an optional safe/unsafe overflow-alignment prefix off v; *safe
+   is YES for safe (unsafe is the default behaviour). */
+static NSString *TRStripOverflowAlign(NSString *v, BOOL *safe)
+{
+  *safe = NO;
+  NSCharacterSet *ws = [NSCharacterSet whitespaceCharacterSet];
+  if ([v hasPrefix: @"safe "]) { *safe = YES; return [[v substringFromIndex: 5] stringByTrimmingCharactersInSet: ws]; }
+  if ([v hasPrefix: @"unsafe "]) return [[v substringFromIndex: 7] stringByTrimmingCharactersInSet: ws];
+  return v;
+}
+
 - (BOOL)_set:(NSString *)p value:(id)obj string:(NSString *)v
 {
   int k;
@@ -542,8 +553,14 @@ const TRStyleStorage *TRStyleStorageForDirection(TRStyle *st, TRDirection dir)
       else { _s.alignContent = (TRAlign)k; _s.alignContentSafe = safe; }
       return YES;
     }
-  KEYWORD(@"align-items", kAlign, alignItems, TRAlign)
-  KEYWORD(@"align-self", kAlign, alignSelf, TRAlign)
+  if ([p isEqualToString: @"align-items"] || [p isEqualToString: @"align-self"])
+    {
+      BOOL safe;
+      if (!TRLookup(TRStripOverflowAlign(v, &safe), kAlign, &k)) return NO;
+      if ([p isEqualToString: @"align-items"]) { _s.alignItems = (TRAlign)k; _s.alignItemsSafe = safe; }
+      else { _s.alignSelf = (TRAlign)k; _s.alignSelfSafe = safe; }
+      return YES;
+    }
   KEYWORD(@"overflow", kOverflow, overflow, TROverflow)
   KEYWORD(@"box-sizing", kBoxSizing, boxSizing, TRBoxSizing)
   LENGTH(@"width", width, YES, NO)
@@ -786,8 +803,10 @@ const TRStyleStorage *TRStyleStorageForDirection(TRStyle *st, TRDirection dir)
   int k;
   if ([p isEqualToString: @"justify-items"] || [p isEqualToString: @"justify-self"])
     {
-      if (!TRLookup(v, kJustify, &k)) return 0;
-      if ([p isEqualToString: @"justify-items"]) _s.justifyItems = (TRAlign)k; else _s.justifySelf = (TRAlign)k;
+      BOOL safe;
+      if (!TRLookup(TRStripOverflowAlign(v, &safe), kJustify, &k)) return 0;
+      if ([p isEqualToString: @"justify-items"]) { _s.justifyItems = (TRAlign)k; _s.justifyItemsSafe = safe; }
+      else { _s.justifySelf = (TRAlign)k; _s.justifySelfSafe = safe; }
       return 1;
     }
   if ([p isEqualToString: @"grid-template-columns"] || [p isEqualToString: @"grid-template-rows"]
@@ -993,8 +1012,10 @@ static NSString *TRKeywordString(const TRKeyword *table, int value)
   if (_s.justifyContent != d.justifyContent || _s.justifyContentSafe)
     [out addObject: [NSString stringWithFormat: @"justify-content: %@%@", _s.justifyContentSafe ? @"safe " : @"",
                      TRKeywordString(kJustify, _s.justifyContent)]];
-  KW(@"align-items", kAlign, alignItems)
-  KW(@"align-self", kAlign, alignSelf)
+  if (_s.alignItems != d.alignItems || _s.alignItemsSafe)
+    [out addObject: [NSString stringWithFormat: @"align-items: %@%@", _s.alignItemsSafe ? @"safe " : @"", TRKeywordString(kAlign, _s.alignItems)]];
+  if (_s.alignSelf != d.alignSelf || _s.alignSelfSafe)
+    [out addObject: [NSString stringWithFormat: @"align-self: %@%@", _s.alignSelfSafe ? @"safe " : @"", TRKeywordString(kAlign, _s.alignSelf)]];
   if (_s.alignContent != d.alignContent || _s.alignContentSafe)
     [out addObject: [NSString stringWithFormat: @"align-content: %@%@", _s.alignContentSafe ? @"safe " : @"",
                      TRKeywordString(kAlign, _s.alignContent)]];
@@ -1041,8 +1062,10 @@ static NSString *TRKeywordString(const TRKeyword *table, int value)
   LEN(@"row-gap", rowGap)
   LEN(@"column-gap", columnGap)
   if (_s.order != 0) [out addObject: [NSString stringWithFormat: @"order: %ld", (long)_s.order]];
-  KW(@"justify-items", kJustify, justifyItems)
-  KW(@"justify-self", kJustify, justifySelf)
+  if (_s.justifyItems != d.justifyItems || _s.justifyItemsSafe)
+    [out addObject: [NSString stringWithFormat: @"justify-items: %@%@", _s.justifyItemsSafe ? @"safe " : @"", TRKeywordString(kJustify, _s.justifyItems)]];
+  if (_s.justifySelf != d.justifySelf || _s.justifySelfSafe)
+    [out addObject: [NSString stringWithFormat: @"justify-self: %@%@", _s.justifySelfSafe ? @"safe " : @"", TRKeywordString(kJustify, _s.justifySelf)]];
   if (_s.gridAutoFlowColumn || _s.gridAutoFlowDense)
     [out addObject: [NSString stringWithFormat: @"grid-auto-flow: %@%@",
                      _s.gridAutoFlowColumn ? @"column" : @"row", _s.gridAutoFlowDense ? @" dense" : @""]];

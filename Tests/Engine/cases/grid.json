@@ -899,5 +899,53 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_safe_center_overflow_starts",
+  "note": "justify-items/align-items: safe center put an item that overflows its area at the area's start; one that fits is centred; unsafe center centres even when it overflows (WPT grid-align-justify-overflow)",
+  "root": {
+   "style": "display: grid; justify-items: safe center; align-items: safe center; grid-template-columns: 100px 100px; grid-template-rows: 50px",
+   "children": [
+    {
+     "style": "width: 140px; height: 70px"
+    },
+    {
+     "style": "width: 40px; height: 20px"
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 140,
+     "height": 70
+    },
+    {
+     "x": 130,
+     "y": 15
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/grid_unsafe_center_overflow_centres",
+  "note": "unsafe (the default) centres an overflowing item: it sticks out on both sides of its area",
+  "root": {
+   "style": "display: grid; justify-items: unsafe center; grid-template-columns: 100px; grid-template-rows: 50px; padding-left: 50px",
+   "children": [
+    {
+     "style": "width: 140px; height: 10px"
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "x": 30
+    }
+   ]
+  }
  }
 ]

@@ -166,7 +166,7 @@ collapses as in HTML, and the runs follow the label's `color`,
 - **Properties:** `display` (`flex`, `none`, `block`), `flex-direction`,
   `flex-wrap`, `flex-flow`, `flex`, `flex-grow`, `flex-shrink`,
   `flex-basis`, `justify-content`, `align-items`, `align-self`,
-  `align-content` (`justify-*` also take physical `left`/`right`; `justify-content` and `align-content` take a `safe`/`unsafe` prefix), `place-*`, `gap`, `row-gap`, `column-gap`, `order`,
+  `align-content` (`justify-*` also take physical `left`/`right`; `justify-content` and `align-content` take a `safe`/`unsafe` prefix; on `align-items`/`align-self` a flex container accepts it and ignores it), `place-*`, `gap`, `row-gap`, `column-gap`, `order`,
   `width`, `height`, `min-*`, `max-*`, `aspect-ratio`, `margin` (with
   `auto`), `padding`, `border` (width only for layout), `position`
   (`relative`, `absolute`, `static`), `top`, `right`, `bottom`, `left`, `inset`,
@@ -183,7 +183,9 @@ collapses as in HTML, and the runs follow the label's `color`,
   Also `grid-template-areas`, `grid-auto-rows` and `grid-auto-columns` (one or more sizes),
   `grid-auto-flow: row | column`, `grid-row`, `grid-column` (`2 / 4`,
   `span 2`, `1 / -1`), `grid-area` (an area name or four lines),
-  `justify-items`, `justify-self`, `align-items`, `align-self`,
+  `justify-items`, `justify-self`, `align-items`, `align-self` (each
+  with an optional `safe`/`unsafe` prefix: `safe` puts an item that
+  overflows its area at the area's start; unsafe is the default),
   `justify-content` and `align-content`.
   `fit-content(N)` (px or %) caps a track at N.
   `grid-auto-flow` takes `dense`.

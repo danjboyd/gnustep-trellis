@@ -139,6 +139,8 @@ jobs:
         run: make -f Makefile.macos check-importers
       - name: View tests under NSZombieEnabled (window-free)
         run: make -f Makefile.macos check-view
+      - name: Preview snapshot and export (LSUIElement copy, never ordered front)
+        run: make -f Makefile.macos check-preview
       - name: Frame replay of the golden dumps, with self-test
         run: make -f Makefile.macos check-reference
       - name: 0.5 -> 0.7 migration frames

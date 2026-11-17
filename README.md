@@ -72,6 +72,9 @@ make -f Makefile.macos check   # engine, trellis-case, engine + conformance case
 make -f Makefile.macos gui     # libTrellis (views), trellis-lint/-render/-bench, TrellisPreview.app
 ```
 
+The view, preview, frame-replay and migration checks are listed in
+[docs/building.md](docs/building.md#macos).
+
 On macOS `trellis-render` draws the view tree straight into a bitmap,
 with no window or `NSApplication`, so it runs headless over ssh.
 

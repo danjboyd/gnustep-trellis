@@ -135,6 +135,15 @@ static NSView *LogicalFocus(NSWindow *w)
   return [r isKindOfClass: [NSView class]] ? (NSView *)r : nil;
 }
 
+/* Spin until focus has left a sentinel: the box moves focus on from the
+   run loop, which can take more than one Spin() once the list scrolls. */
+static void SpinFocus(NSWindow *w)
+{
+  Spin();
+  for (int i = 0; i < 100 && [[w firstResponder] isKindOfClass: NSClassFromString(@"TRVirtualSentinel")]; i++)
+    Spin();
+}
+
 int main(void)
 {
   @autoreleasepool
@@ -232,7 +241,7 @@ int main(void)
       for (int i = 0; i < 40; i++)
         {
           [win selectKeyViewFollowingView: LogicalFocus(win)];
-          Spin();
+          SpinFocus(win);
           NSInteger k = [box indexOfItemView: LogicalFocus(win)];
           if (getenv("VB_DEBUG")) printf("     tab %d: %s item %ld off %.0f\n", i, [NSStringFromClass([LogicalFocus(win) class]) UTF8String], (long)k, Offset(box));
           if (k != NSNotFound && k > reached) reached = k;
@@ -250,7 +259,7 @@ int main(void)
       for (int i = 0; i < 6; i++)
         {
           [win selectKeyViewPrecedingView: LogicalFocus(win)];
-          Spin();
+          SpinFocus(win);
           NSInteger k = [box indexOfItemView: LogicalFocus(win)];
           if (k != NSNotFound && k < minIdx) minIdx = k;
         }
@@ -292,7 +301,7 @@ int main(void)
         for (int i = 0; i < 12; i++)
           {
             [nwin selectKeyViewFollowingView: LogicalFocus(nwin)];
-            Spin();
+            SpinFocus(nwin);
             NSInteger k = [nbox indexOfItemView: LogicalFocus(nwin)];
             [seq appendFormat: @" %ld", (long)k];
             if (k != prev + 1) stepwise = NO;
@@ -305,7 +314,7 @@ int main(void)
         for (int i = 0; i < 5; i++)
           {
             [nwin selectKeyViewPrecedingView: LogicalFocus(nwin)];
-            Spin();
+            SpinFocus(nwin);
             NSInteger k = [nbox indexOfItemView: LogicalFocus(nwin)];
             [seq appendFormat: @" %ld", (long)k];
             if (k != prev - 1) back = NO;

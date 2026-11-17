@@ -5,6 +5,18 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **TrellisPreview:** View > Light / Dark Appearance (GNUstep: the
+  Adwaita colour scheme, set for the process before the theme loads, so
+  switching relaunches Preview with the same file and size; macOS: the
+  window's appearance), and File > Export PNG… / Export Frames JSON…
+  (trellis-render's `--json` document, with lint). Headless flags
+  `--export-json` and `--appearance`. Tests/View/preview-export.sh in
+  check-gui.
+- **Tests:** virtual-box.m waits for focus to leave a sentinel before
+  the next Tab (the hand-off is deferred; on Cocoa it could take more than
+  one run-loop pass once the list scrolls). Found and fixed by the macOS
+  check.
+
 - **Docs:** docs/tutorial.md, "Build your first Trellis app": a small app
   with a layout, an owner, lint, renders at two widths, a container query
   and a smoke test. `scripts/check-tutorial.sh` extracts its files and

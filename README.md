@@ -44,7 +44,12 @@ touches real user defaults.
 file (or its `.sample.json`) changes. Resize the window to watch the
 layout respond, or use View > Width presets. View > Inspector draws box
 outlines and lint findings in place, and the Theme menu switches the
-GSTheme (light or dark on macOS).
+GSTheme (light or dark on macOS). View > Light / Dark Appearance flips the
+colour scheme (on GNUstep, Adwaita's; Preview relaunches with the same
+file and size), and File > Export PNG… / Export Frames JSON… save what's
+on screen (the JSON is trellis-render's `--json` document, lint
+included). Headless: `TrellisPreview Screen.trellis --snapshot out.png
+--export-json out.json --appearance dark`.
 
 ![Preview inspector: lint findings drawn in place](docs/images/preview-inspector.png)
 

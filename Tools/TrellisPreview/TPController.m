@@ -4,6 +4,12 @@
    - Resize the window to see the layout respond; View > Width presets.
    - View > Inspector draws box outlines and lint findings over the screen.
    - Theme menu (GNUstep: any installed GSTheme; macOS: light/dark).
+   - View > Light / Dark Appearance (GNUstep: the Adwaita colour scheme,
+     set for this process only, by relaunching; macOS: the window's
+     appearance, in place).
+   - File > Export PNG… and Export Frames JSON… (the JSON trellis-render
+     --json writes, with lint). Headless: --snapshot out.png
+     [--export-json out.json] [--appearance light|dark].
    - Unknown custom view classes show as labelled placeholders.
    - Load errors (with file:line:col) replace the screen until fixed.
 
@@ -120,10 +126,15 @@ static NSView *TPViewAtPath(NSView *root, NSString *path)
   NSString *_snapshot;
   NSSize _initialSize;
   NSArray *_findings;
+  NSString *_appearance;   /* nil (theme default), "light" or "dark" */
+  NSString *_exportJSON;   /* headless: write the frames JSON here */
 }
 @end
 
 @implementation TPController
+
+- (void)setExportJSON:(NSString *)path { _exportJSON = [path copy]; }
+- (void)setInitialAppearance:(NSString *)a { _appearance = [a copy]; }
 
 - (instancetype)initWithPath:(NSString *)path snapshot:(NSString *)snapshot size:(NSSize)size inspector:(BOOL)insp
 {
@@ -153,6 +164,8 @@ static NSDate *TPModDate(NSString *path)
   NSMenu *file = [[NSMenu alloc] initWithTitle: @"File"];
   [file addItemWithTitle: @"Open…" action: @selector(openDocument:) keyEquivalent: @"o"];
   [file addItemWithTitle: @"Reload" action: @selector(reload:) keyEquivalent: @"r"];
+  [file addItemWithTitle: @"Export PNG…" action: @selector(exportPNG:) keyEquivalent: @"e"];
+  [file addItemWithTitle: @"Export Frames JSON…" action: @selector(exportJSON:) keyEquivalent: @"E"];
   [file addItemWithTitle: @"Quit" action: @selector(terminate:) keyEquivalent: @"q"];
   [[main addItemWithTitle: @"File" action: NULL keyEquivalent: @""] setSubmenu: file];
 
@@ -164,6 +177,11 @@ static NSDate *TPModDate(NSString *path)
                                        action: @selector(setWidthPreset:) keyEquivalent: @""];
       [it setTag: [w integerValue]];
     }
+  [view addItem: [NSMenuItem separatorItem]];
+  [[view addItemWithTitle: @"Light Appearance" action: @selector(chooseAppearance:) keyEquivalent: @""]
+    setRepresentedObject: @"light"];
+  [[view addItemWithTitle: @"Dark Appearance" action: @selector(chooseAppearance:) keyEquivalent: @"d"]
+    setRepresentedObject: @"dark"];
   [[main addItemWithTitle: @"View" action: NULL keyEquivalent: @""] setSubmenu: view];
 
   NSMenu *theme = [[NSMenu alloc] initWithTitle: @"Theme"];
@@ -212,6 +230,7 @@ static NSDate *TPModDate(NSString *path)
   [[_errorLabel cell] setWraps: YES];
   [_errorLabel setAutoresizingMask: NSViewWidthSizable | NSViewHeightSizable];
 
+  if (_appearance) [self applyAppearance: _appearance];
   if (_path) [self reload: nil];
   else [self openDocument: nil];
 
@@ -422,14 +441,129 @@ static NSDictionary *TPDump(NSView *v, TRNode *node)
   [self reload: nil];   /* controls re-measure under the new theme */
 }
 
-- (void)snapshotTo:(NSString *)path
+/* Light or dark. GNUstep has no appearance API: the Adwaita theme reads
+   its colour scheme from a default when it loads, and activating a theme
+   twice in one process isn't safe (Adwaita's method swizzling recurses).
+   So the scheme is set in the volatile argument domain before the theme
+   loads (main, for --appearance; nothing is written to the user's
+   defaults), and switching later relaunches Preview with the same file,
+   size and theme. Cocoa sets the window's appearance in place. */
+static void TPSetSchemeDefault(NSString *appearance)
+{
+#ifdef GNUSTEP
+  NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+  NSMutableDictionary *args = [[defs volatileDomainForName: NSArgumentDomain] mutableCopy]
+    ?: [NSMutableDictionary dictionary];
+  args[@"GnomeThemeColorScheme"] = [appearance isEqualToString: @"dark"] ? @"force-dark" : @"force-light";
+  [defs removeVolatileDomainForName: NSArgumentDomain];
+  [defs setVolatileDomain: args forName: NSArgumentDomain];
+#else
+  (void)appearance;
+#endif
+}
+
+- (void)applyAppearance:(NSString *)appearance
+{
+  _appearance = [appearance copy];
+#ifndef GNUSTEP
+  if (@available(macOS 10.14, *))
+    [_window setAppearance: appearance ? [NSAppearance appearanceNamed:
+      [appearance isEqualToString: @"dark"] ? NSAppearanceNameDarkAqua : NSAppearanceNameAqua] : nil];
+#endif
+}
+
+#ifdef GNUSTEP
+- (void)relaunchWithAppearance:(NSString *)appearance
+{
+  NSSize s = [_content bounds].size;
+  NSMutableArray *args = [NSMutableArray array];
+  if (_path) [args addObject: _path];
+  [args addObjectsFromArray: @[@"--appearance", appearance,
+                               @"--width", [NSString stringWithFormat: @"%.0f", s.width],
+                               @"--height", [NSString stringWithFormat: @"%.0f", s.height]]];
+  if (_inspector) [args addObject: @"--inspector"];
+  NSString *theme = [[GSTheme theme] name];
+  if ([theme length]) [args addObjectsFromArray: @[@"-GSTheme", theme]];
+  NSTask *t = [NSTask new];
+  [t setLaunchPath: [[NSBundle mainBundle] executablePath]];
+  [t setArguments: args];
+  @try { [t launch]; }
+  @catch (NSException *e) { [self showError: [NSString stringWithFormat: @"Could not relaunch: %@", [e reason]]]; return; }
+  [NSApp terminate: nil];
+}
+#endif
+
+- (void)chooseAppearance:(id)sender
+{
+  NSString *a = [sender representedObject];
+  if ([a isEqualToString: _appearance]) return;
+#ifdef GNUSTEP
+  [self relaunchWithAppearance: a];
+#else
+  [self applyAppearance: a];
+  [self reload: nil];   /* controls re-measure under the new colours */
+#endif
+}
+
+- (NSData *)pngData
 {
   [self relayoutAndLint];
   NSRect b = [_content bounds];
   [_content display];
   NSBitmapImageRep *rep = [_content bitmapImageRepForCachingDisplayInRect: b];
   [_content cacheDisplayInRect: b toBitmapImageRep: rep];
-  [[rep representationUsingType: NSPNGFileType properties: @{}] writeToFile: path atomically: YES];
+  return [rep representationUsingType: NSPNGFileType properties: @{}];
+}
+
+static NSString *TPThemeName(void)
+{
+#ifdef GNUSTEP
+  NSString *n = [[GSTheme theme] name];
+  return [n length] ? n : @"default";
+#else
+  return @"default";
+#endif
+}
+
+/* The same document trellis-render --json writes. */
+- (NSData *)framesJSON
+{
+  if (_screen == nil) return nil;
+  [self relayoutAndLint];
+  NSSize s = [_content bounds].size;
+  NSMutableDictionary *tree = [TPDump(_screen, _screen.node) mutableCopy];
+  NSColor *wb = [[NSColor windowBackgroundColor] colorUsingColorSpaceName: NSCalibratedRGBColorSpace];
+  if (wb)
+    tree[@"windowBackground"] = [NSString stringWithFormat: @"#%02x%02x%02x", (int)lround([wb redComponent] * 255),
+                                  (int)lround([wb greenComponent] * 255), (int)lround([wb blueComponent] * 255)];
+  NSDictionary *doc = @{
+    @"trellis": @"0.1", @"source": _path ?: @"",
+    @"theme": TPThemeName(),
+    @"appearance": _appearance ?: @"default",
+    @"viewport": @{@"width": @(s.width), @"height": @(s.height), @"scale": @1},
+    @"root": tree, @"lint": TRLintFrameTree(tree, s.width, s.height) };
+  return [NSJSONSerialization dataWithJSONObject: doc options: NSJSONWritingPrettyPrinted error: NULL];
+}
+
+- (void)exportWithType:(NSString *)ext
+{
+  NSSavePanel *panel = [NSSavePanel savePanel];
+  NSString *base = [[[_path lastPathComponent] stringByDeletingPathExtension] ?: @"screen"
+    stringByAppendingFormat: @"-%.0f", [_content bounds].size.width];
+  [panel setNameFieldStringValue: [base stringByAppendingPathExtension: ext]];
+  if ([panel runModal] != NSModalResponseOK) return;
+  NSData *d = [ext isEqualToString: @"png"] ? [self pngData] : [self framesJSON];
+  if (![d writeToURL: [panel URL] atomically: YES])
+    [self showError: [NSString stringWithFormat: @"Could not write %@", [[panel URL] path]]];
+}
+
+- (void)exportPNG:(id)sender { [self exportWithType: @"png"]; }
+- (void)exportJSON:(id)sender { [self exportWithType: @"json"]; }
+
+- (void)snapshotTo:(NSString *)path
+{
+  [[self pngData] writeToFile: path atomically: YES];
+  if (_exportJSON) [[self framesJSON] writeToFile: _exportJSON atomically: YES];
   printf("%s\n", [[_window title] UTF8String]);
 }
 
@@ -442,6 +576,7 @@ int main(int argc, const char **argv)
       NSString *path = nil, *snapshot = nil;
       NSSize size = NSMakeSize(640, 480);
       BOOL inspector = NO;
+      NSString *exportJSON = nil, *appearance = nil;
       for (int i = 1; i < argc; i++)
         {
           NSString *a = [NSString stringWithUTF8String: argv[i]];
@@ -450,11 +585,16 @@ int main(int argc, const char **argv)
           else if ([a isEqualToString: @"--width"] && next) { size.width = [next doubleValue]; i++; }
           else if ([a isEqualToString: @"--height"] && next) { size.height = [next doubleValue]; i++; }
           else if ([a isEqualToString: @"--inspector"]) inspector = YES;
+          else if ([a isEqualToString: @"--export-json"] && next) { exportJSON = next; i++; }
+          else if ([a isEqualToString: @"--appearance"] && next) { appearance = next; i++; }
           else if ([[a pathExtension] isEqualToString: @"trellis"]) path = [a stringByStandardizingPath];
           else if ([a hasPrefix: @"-"] && next && ![next hasPrefix: @"-"]) i++;   /* NSUserDefaults args, e.g. -GSTheme X */
         }
+      if (appearance) TPSetSchemeDefault(appearance);   /* before the theme loads */
       [NSApplication sharedApplication];
       TPController *c = [[TPController alloc] initWithPath: path snapshot: snapshot size: size inspector: inspector];
+      [c setExportJSON: exportJSON];
+      if (appearance) [c setInitialAppearance: appearance];
       if (snapshot)
         {
           /* Headless check: no run loop, no services (pasteboard etc.). */

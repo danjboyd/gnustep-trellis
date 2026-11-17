@@ -172,4 +172,5 @@ check-gui:: all
 	  grep -v _NET_WORKAREA obj/gui-tests/vbench.log | tail -3; \
 	  Tests/View/appearance.sh || status=1; \
 	  Tests/View/scroll-container-query.sh || status=1; \
+	  Tests/View/preview-export.sh || status=1; \
 	  exit $$status

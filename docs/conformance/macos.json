@@ -1,16 +1,16 @@
 {
- "commit": "bf3f39c",
+ "commit": "8bab129",
  "conformance": {
-  "pass": 3583,
-  "skipped": 600,
-  "total": 3583
+  "pass": 3584,
+  "skipped": 599,
+  "total": 3584
  },
  "date": "2026-11-17",
  "platform": "macos",
  "suites": {
   "engine": {
-   "pass": 172,
-   "total": 172
+   "pass": 175,
+   "total": 175
   },
   "wpt": {
    "cases": 995,
@@ -19,8 +19,8 @@
   },
   "wpt-grid": {
    "cases": 1977,
-   "pass": 1560,
-   "total": 1560
+   "pass": 1561,
+   "total": 1561
   },
   "wpt-sizing": {
    "cases": 125,

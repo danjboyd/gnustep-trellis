@@ -760,5 +760,46 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_shrink_to_fit_overflows",
+  "note": "a shrink-to-fit grid in less space than its min-content keeps its track bases and overflows (width 40), not collapsing to the 0px space (WPT grid-intrinsic-width-minmax-tracks-001)",
+  "root": {
+   "style": "flex-direction: column; align-items: flex-start; width: 0px",
+   "children": [
+    {
+     "style": "display: grid; grid-template-columns: minmax(min-content, 40px) minmax(min-content, 40px); grid-template-rows: 10px",
+     "children": [
+      {
+       "style": "width: 20px"
+      },
+      {
+       "style": "width: 20px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "width": 0,
+   "height": 10,
+   "children": [
+    {
+     "x": 0,
+     "width": 40,
+     "height": 10,
+     "children": [
+      {
+       "x": 0,
+       "width": 20
+      },
+      {
+       "x": 20,
+       "width": 20
+      }
+     ]
+    }
+   ]
+  }
  }
 ]

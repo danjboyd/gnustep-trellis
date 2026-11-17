@@ -9,7 +9,13 @@ version may change the API listed in docs/api.md, and says so here.
   `max-content`, `fit-content`) on a wrapping column with a definite
   `height` now break lines at that height, as Chrome does: the keyword's
   size is the longest line, not every item in one line. `height:
-  min-content` is unchanged (one line). Known gaps 73 to 71.
+  min-content` is unchanged (one line).
+- **Changed (layout):** a shrink-to-fit grid (a bounded width, such as in
+  an `align-items: flex-start` column, or `width: min-content`) with less
+  space than its min-content keeps its tracks' minimum sizes and
+  overflows, instead of being squeezed to the space. `width: min-content`
+  on a grid no longer gives 0.
+- Both are in docs/migration-0.10.md. Known gaps 73 to 47.
 
 ## 0.9.0 (2026-11-17)
 

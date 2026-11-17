@@ -1317,7 +1317,10 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
 
   /* ---- Container size ---- */
   double W = wm == TRMeasureModeExactly ? aw : colsTotal + pbW;
-  if (wm == TRMeasureModeAtMost) W = MIN(aw, W);
+  /* Shrink-to-fit: the tracks never shrink below their bases, so a grid
+     narrower than its min-content overflows its space rather than
+     collapsing (css-sizing-3 fit-content). */
+  if (wm == TRMeasureModeAtMost) W = MIN(MAX(aw, colsTotal + pbW), W);
   double H = hm == TRMeasureModeExactly ? ah : contentH + pbH;
   if (hm == TRMeasureModeAtMost) H = MIN(ah, H);
   W = MAX(W, pbW);

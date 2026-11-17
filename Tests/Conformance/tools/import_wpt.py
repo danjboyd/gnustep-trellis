@@ -1429,6 +1429,10 @@ def convert_file(path, rel, commit):
             case["available"] = {"width": None, "height": None}
         if rs.get("position") in ("absolute", "fixed"):
             cb = conv.root_containing_block(root)
+            if rs.get("position") == "fixed" and cb is not None:
+                # At the root, fixed is absolute against the viewport, which
+                # is what the available size below says.
+                rs["position"] = "absolute"
             if cb is not None:
                 # trellis-case lays an abspos root out against the available
                 # size as its containing block: it fills it less the insets

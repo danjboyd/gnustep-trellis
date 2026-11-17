@@ -194,6 +194,11 @@ class RootContainingBlock(unittest.TestCase):
         (icb,) = self.cases(st, '<div><div class="t" style="left:0;right:0"'
                             ' data-expected-width="790"></div></div>', ".t")
         self.assertEqual(icb["available"]["width"], 800)
+        # A fixed root is absolute against the viewport.
+        (fx,) = self.cases(st, '<div class="t" style="position:fixed;width:10px"'
+                           ' data-expected-width="10"></div>', ".t")
+        self.assertEqual(fx["root"]["style"]["position"], "absolute")
+        self.assertEqual(fx["available"], {"width": 800, "height": 600})
 
     def test_stretch_root_gets_parent_height(self):
         (c,) = self.cases("", '<div style="height:100px;border-top:solid;border-bottom:solid"><div class="r" style="height:stretch"'

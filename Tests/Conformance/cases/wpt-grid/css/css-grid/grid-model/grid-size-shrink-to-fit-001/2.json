@@ -20,7 +20,7 @@
    "boxSizing": "content-box",
    "gridTemplateColumns": "200px 200px",
    "gridTemplateRows": "200px 200px",
-   "position": "fixed"
+   "position": "absolute"
   },
   "children": [
    {

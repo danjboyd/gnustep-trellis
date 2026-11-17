@@ -5,6 +5,11 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Conformance:** the WPT importer passes an abspos root's containing
+  block whatever its insets (trellis-case now shrinks such a root to fit),
+  and writes a `position: fixed` root as `absolute` against the 800×600
+  viewport. grid-size-shrink-to-fit-001/2 passes; known gaps 89 → 88.
+
 - **Changed (layout):** an abspos root shrinks to fit the space it's given,
   as in CSS 2: without both left and right its auto width is fit-content,
   and without both top and bottom its auto height is its content height.

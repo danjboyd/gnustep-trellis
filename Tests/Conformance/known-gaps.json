@@ -26,7 +26,6 @@
   "wpt-grid/css/css-grid/grid-model/grid-container-sizing-constraints-001/6": "grid intrinsic sizing with size keywords on the container or items, not yet analysed",
   "wpt-grid/css/css-grid/grid-model/grid-min-max-width-001/0": "grid intrinsic sizing with size keywords on the container or items, not yet analysed",
   "wpt-grid/css/css-grid/grid-model/grid-min-max-width-001/1": "grid intrinsic sizing with size keywords on the container or items, not yet analysed",
-  "wpt-grid/css/css-grid/grid-model/grid-size-shrink-to-fit-001/2": "uses position: fixed, which Trellis doesn't support",
   "wpt-grid/css/css-grid/layout-algorithm/flex-and-intrinsic-sizes-001/1": "grid intrinsic sizing with size keywords on the container or items, not yet analysed",
   "wpt-grid/css/css-grid/layout-algorithm/flex-sizing-columns-min-max-width-001/7": "grid intrinsic sizing with size keywords on the container or items, not yet analysed",
   "wpt-grid/css/css-grid/layout-algorithm/grid-container-percentage-001/14": "grid intrinsic sizing with size keywords on the container or items, not yet analysed",

@@ -16,6 +16,7 @@
 #import "TRLoader.h"
 #import "TRVirtualBox.h"
 #import "TRSplitView.h"
+#import "TRAppKitCompat.h"
 
 extern TRBoxView *TRSampleScreen(NSString *name);
 extern NSArray<NSString *> *TRSampleScreenNames(void);
@@ -268,7 +269,7 @@ static NSData *TRRenderPNG(TRBoxView *box, BOOL outlines)
       for (NSView *c in [box subviews]) TROutline(c, NSZeroPoint);
       [NSGraphicsContext restoreGraphicsState];
     }
-  return [rep representationUsingType: NSPNGFileType properties: @{}];
+  return [rep representationUsingType: NSBitmapImageFileTypePNG properties: @{}];
 }
 
 static NSString *TRWithSuffix(NSString *path, NSString *suffix)

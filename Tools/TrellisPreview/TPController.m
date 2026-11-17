@@ -29,8 +29,11 @@
 #import "TRSplitView.h"
 #import "TRViewMeasure.h"
 #import "TRLint.h"
+#import "TRAppKitCompat.h"
 #ifdef GNUSTEP
 #import <GNUstepGUI/GSTheme.h>
+#else
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #endif
 
 /* ---- Overlay ---- */
@@ -278,8 +281,8 @@ static NSDate *TPModDate(NSString *path)
   if (_snapshot == nil) [self buildMenu];
   NSRect frame = NSMakeRect(80, 80, _initialSize.width, _initialSize.height);
   _window = [[NSWindow alloc] initWithContentRect: frame
-                                        styleMask: (NSTitledWindowMask | NSClosableWindowMask
-                                                    | NSResizableWindowMask | NSMiniaturizableWindowMask)
+                                        styleMask: (NSWindowStyleMaskTitled | NSWindowStyleMaskClosable
+                                                    | NSWindowStyleMaskResizable | NSWindowStyleMaskMiniaturizable)
                                           backing: NSBackingStoreBuffered defer: NO];
   [_window setReleasedWhenClosed: NO];
   [_window setDelegate: self];
@@ -341,7 +344,12 @@ static NSDate *TPModDate(NSString *path)
 - (void)openDocument:(id)sender
 {
   NSOpenPanel *p = [NSOpenPanel openPanel];
+#ifdef GNUSTEP
   [p setAllowedFileTypes: @[@"trellis"]];
+#else
+  UTType *t = [UTType typeWithFilenameExtension: @"trellis"];
+  if (t) [p setAllowedContentTypes: @[t]];
+#endif
   if ([p runModal] == NSModalResponseOK)
     {
       _path = [[[p URLs] firstObject] path];
@@ -634,7 +642,7 @@ static void TPSetSchemeDefault(NSString *appearance)
     [NSGraphicsContext restoreGraphicsState];
   }];
 #endif
-  return [rep representationUsingType: NSPNGFileType properties: @{}];
+  return [rep representationUsingType: NSBitmapImageFileTypePNG properties: @{}];
 }
 
 static NSString *TPThemeName(void)
@@ -731,7 +739,8 @@ int main(int argc, const char **argv)
       if (snapshot)
         {
           /* Headless check: no run loop, no services (pasteboard etc.). */
-          [c applicationDidFinishLaunching: nil];
+          [c applicationDidFinishLaunching:
+               [NSNotification notificationWithName: NSApplicationDidFinishLaunchingNotification object: NSApp]];
           return 0;
         }
       [NSApp setDelegate: c];

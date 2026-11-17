@@ -300,7 +300,7 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
       if (col)
         {
           NSMutableParagraphStyle *ps = [NSMutableParagraphStyle new];
-          [ps setAlignment: NSCenterTextAlignment];
+          [ps setAlignment: NSTextAlignmentCenter];
           NSDictionary *attrs = @{ NSForegroundColorAttributeName: col,
                                    NSFontAttributeName: [b font] ?: [NSFont systemFontOfSize: 0],
                                    NSParagraphStyleAttributeName: ps };
@@ -309,9 +309,9 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
     }
   if ((v = decls[@"text-align"]) != nil)
     {
-      NSTextAlignment a = NSLeftTextAlignment;
-      if ([v isEqualToString: @"center"]) a = NSCenterTextAlignment;
-      else if ([v isEqualToString: @"right"] || [v isEqualToString: @"end"]) a = NSRightTextAlignment;
+      NSTextAlignment a = NSTextAlignmentLeft;
+      if ([v isEqualToString: @"center"]) a = NSTextAlignmentCenter;
+      else if ([v isEqualToString: @"right"] || [v isEqualToString: @"end"]) a = NSTextAlignmentRight;
       [ctl setAlignment: a];
     }
   if ((v = decls[@"white-space"]) != nil)
@@ -1279,7 +1279,7 @@ static void TRStrokeEdge(NSRect r, TREdge e, CGFloat bw, NSString *style)
         {
           CGFloat dash[2] = { 0, 2 * bw };
           [p setLineDash: dash count: 2 phase: 0];
-          [p setLineCapStyle: NSRoundLineCapStyle];
+          [p setLineCapStyle: NSLineCapStyleRound];
         }
       [p stroke];
       return;
@@ -1324,14 +1324,14 @@ static void TRStrokeBorder(NSRect r, CGFloat bw, CGFloat radius, NSString *style
     {
       CGFloat dash[2] = { 3 * bw, 2 * bw };
       [p setLineDash: dash count: 2 phase: 0];
-      [p setLineCapStyle: NSButtLineCapStyle];
+      [p setLineCapStyle: NSLineCapStyleButt];
     }
   else if ([style isEqualToString: @"dotted"])
     {
       /* Zero-length dashes with round caps draw as dots of diameter bw. */
       CGFloat dash[2] = { 0, 2 * bw };
       [p setLineDash: dash count: 2 phase: 0];
-      [p setLineCapStyle: NSRoundLineCapStyle];
+      [p setLineCapStyle: NSLineCapStyleRound];
     }
   [p stroke];
 }

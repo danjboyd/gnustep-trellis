@@ -63,7 +63,8 @@ $(B)/trellis-render: Tools/trellis-render.m Tools/TRSamples.m $(B)/libTrellis.dy
 
 $(B)/TrellisPreview.app: Tools/TrellisPreview/TPController.m $(B)/libTrellis.dylib
 	rm -rf $@ && mkdir -p $@/Contents/MacOS $@/Contents/Frameworks
-	$(CC) $(CFLAGS) -ISource/View -framework AppKit -L$(B) -lTrellis -lTrellisEngine \
+	$(CC) $(CFLAGS) -ISource/View -framework AppKit -framework UniformTypeIdentifiers \
+	  -L$(B) -lTrellis -lTrellisEngine \
 	  -Wl,-rpath,@executable_path/../Frameworks Tools/TrellisPreview/TPController.m \
 	  -o $@/Contents/MacOS/TrellisPreview
 	cp $(B)/libTrellis.dylib $(B)/libTrellisEngine.dylib $@/Contents/Frameworks/

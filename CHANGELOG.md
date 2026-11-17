@@ -11,7 +11,10 @@ version may change the API listed in docs/api.md, and says so here.
   shrink. The largest desired flex fraction then decides each item's share.
   `width: min-content` (and fit-content in a narrow space) on a flex row
   gives the browser's width.
-
+- **Conformance:** the WPT importer passes an abspos root's containing
+  block whatever its insets (trellis-case now shrinks such a root to fit),
+  and writes a `position: fixed` root as `absolute` against the 800×600
+  viewport. grid-size-shrink-to-fit-001/2 passes; known gaps 89 → 88.
 - **Changed (layout):** an abspos root shrinks to fit the space it's given,
   as in CSS 2: without both left and right its auto width is fit-content,
   and without both top and bottom its auto height is its content height.
@@ -22,13 +25,11 @@ version may change the API listed in docs/api.md, and says so here.
   sizes its auto columns to their content. Auto tracks stretch only into
   definite free space (CSS Grid 12.8), so an empty implicit column no
   longer takes the whole space.
-
 - **Changed (layout):** a root with `aspect-ratio` whose auto width fills
   the available width now takes its height from the ratio, but never less
   than its content height (min-height: auto). Before, it took its content
   height. Fixes WPT stretch/aspect-ratio-1/2 and /3; known gaps are down
   to 89.
-
 - **Fixed:** an abspos box inside static boxes whose containing block is
   a grid now takes its grid placement from that grid: its grid-row and
   grid-column name the area, as for a direct child. A grid's own

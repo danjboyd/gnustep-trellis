@@ -11,8 +11,8 @@
  "tolerance": 0.999,
  "pixelScale": 0,
  "available": {
-  "width": null,
-  "height": null
+  "width": 800,
+  "height": 600
  },
  "root": {
   "style": {
@@ -20,7 +20,7 @@
    "boxSizing": "content-box",
    "gridTemplateColumns": "200px 200px",
    "gridTemplateRows": "200px 200px",
-   "position": "fixed"
+   "position": "absolute"
   },
   "children": [
    {

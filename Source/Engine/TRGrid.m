@@ -336,6 +336,14 @@ static double TRGBox(const TRStyleStorage *s, TRValue v, double ref, BOOL horizo
   return MAX(r, pb);
 }
 
+/* An item's justify-self: auto takes the container's justify-items, whose
+   own auto computes to normal (no legacy keyword is inherited). */
+static inline TRAlign TRGJustifySelf(const TRStyleStorage *item, const TRStyleStorage *grid)
+{
+  TRAlign js = item->justifySelf == TRAlignAuto ? grid->justifyItems : item->justifySelf;
+  return js == TRAlignAuto ? TRAlignNormal : js;
+}
+
 static inline BOOL TRIsFitContent(TRBreadthKind k)
 {
   return k == TRBreadthFitContent || k == TRBreadthFitContentPercent;
@@ -1277,7 +1285,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       double mv = it->margin[TREdgeTop] + it->margin[TREdgeBottom];
       double sh = TRGBox(cs, cs->height, NAN, NO, NAN);
       if (!isnan(sh)) { it->h = sh + mv; continue; }
-      TRAlign js = cs->justifySelf == TRAlignAuto ? s->justifyItems : cs->justifySelf;
+      TRAlign js = TRGJustifySelf(cs, s);
       double sw = TRGBox(cs, cs->width, areaW, YES, areaW);
       BOOL stretchW = isnan(sw) && (js == TRAlignNormal || js == TRAlignStretch)
                       && !it->marginAuto[TREdgeLeft] && !it->marginAuto[TREdgeRight];
@@ -1360,7 +1368,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           const TRStyleStorage *cs = it->os ? TRResolveSizeKeywords(it->node, it->os, &kwArea, areaW, areaH, areaW, areaH, YES, dir) : it->s;
           double mh = it->margin[TREdgeLeft] + it->margin[TREdgeRight];
           double mv = it->margin[TREdgeTop] + it->margin[TREdgeBottom];
-          TRAlign js = cs->justifySelf == TRAlignAuto ? s->justifyItems : cs->justifySelf;
+          TRAlign js = TRGJustifySelf(cs, s);
           TRAlign as = cs->alignSelf == TRAlignAuto ? s->alignItems : cs->alignSelf;
           double sw = TRGBox(cs, cs->width, areaW, YES, areaW), sh = TRGBox(cs, cs->height, areaH, NO, areaW);
           double ar = cs->aspectRatio;
@@ -1519,7 +1527,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
              align-self (or the container's -items) aligns the margin box
              in the grid area. A set inset positions the box as in CSS 2,
              and so does normal. */
-          TRAlign js = cs->justifySelf == TRAlignAuto ? s->justifyItems : cs->justifySelf;
+          TRAlign js = TRGJustifySelf(cs, s);
           TRAlign as = cs->alignSelf == TRAlignAuto ? s->alignItems : cs->alignSelf;
           if (js == TRAlignAuto || !isnan(L) || !isnan(R)) js = TRAlignNormal;
           if (as == TRAlignAuto || !isnan(T) || !isnan(B)) as = TRAlignNormal;

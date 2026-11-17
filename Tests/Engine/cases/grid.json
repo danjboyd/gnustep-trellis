@@ -899,5 +899,34 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_justify_items_auto_stretches",
+  "note": "justify-items: auto on a grid computes to normal, so an auto-width item stretches across its column (WPT grid-align-justify-stretch/7)",
+  "root": {
+   "style": "display: grid; width: 200px; justify-items: auto; grid-template-columns: 100px 100px; grid-template-rows: 10px",
+   "children": [
+    {
+     "style": ""
+    },
+    {
+     "style": "width: 20px"
+    }
+   ]
+  },
+  "expected": {
+   "width": 200,
+   "height": 10,
+   "children": [
+    {
+     "x": 0,
+     "width": 100
+    },
+    {
+     "x": 100,
+     "width": 20
+    }
+   ]
+  }
  }
 ]

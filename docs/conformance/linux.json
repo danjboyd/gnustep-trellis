@@ -1,7 +1,7 @@
 {
- "commit": "cfdddca",
+ "commit": "6c565e7",
  "conformance": {
-  "pass": 2966,
+  "pass": 2977,
   "skipped": 1188,
   "total": 2977
  },
@@ -9,12 +9,12 @@
  "platform": "linux",
  "suites": {
   "engine": {
-   "pass": 141,
-   "total": 141
+   "pass": 146,
+   "total": 146
   },
   "wpt": {
    "cases": 977,
-   "pass": 833,
+   "pass": 844,
    "total": 844
   },
   "wpt-grid": {

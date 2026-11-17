@@ -6,6 +6,7 @@
 */
 
 #import "TRBoxView.h"
+#import "TRAppKitCompat.h"
 
 static NSTextField *TRLabel(NSString *text, NSString *ident)
 {
@@ -41,7 +42,7 @@ static NSButton *TRButton(NSString *title, NSString *ident)
 {
   NSButton *b = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 10, 10)];
   [b setTitle: title];
-  [b setBezelStyle: NSRoundedBezelStyle];
+  [b setBezelStyle: NSBezelStyleRounded];
   if (ident) [b setIdentifier: ident];
   return b;
 }
@@ -49,7 +50,7 @@ static NSButton *TRButton(NSString *title, NSString *ident)
 static NSButton *TRCheckbox(NSString *title, NSString *ident)
 {
   NSButton *b = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 10, 10)];
-  [b setButtonType: NSSwitchButton];
+  [b setButtonType: NSButtonTypeSwitch];
   [b setTitle: title];
   [b setIdentifier: ident];
   return b;

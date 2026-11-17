@@ -8,6 +8,7 @@
 #import "TRSplitView.h"
 #import "TRVirtualBox.h"
 #import "TRViewMeasure.h"
+#import "TRAppKitCompat.h"
 #import <objc/runtime.h>
 
 static NSError *TRLoadError(TRMarkupDocument *doc, TRMarkupElement *e, NSString *fmt, ...) NS_FORMAT_FUNCTION(3,4);
@@ -769,12 +770,12 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
          draws the title itself, so a color: set on it shows even under
          themes that draw push-button titles in their own colour. */
       if (flat) [b setCell: [[TRFlatButtonCell alloc] initTextCell: @""]];
-      if ([n isEqualToString: @"checkbox"]) [b setButtonType: NSSwitchButton];
-      else if ([n isEqualToString: @"radio"]) [b setButtonType: NSRadioButton];
-      else if (!flat) [b setBezelStyle: NSRoundedBezelStyle];
+      if ([n isEqualToString: @"checkbox"]) [b setButtonType: NSButtonTypeSwitch];
+      else if ([n isEqualToString: @"radio"]) [b setButtonType: NSButtonTypeRadio];
+      else if (!flat) [b setBezelStyle: NSBezelStyleRounded];
       if (flat) [b setBordered: NO];
       [b setTitle: a[@"title"] ?: text ?: @""];
-      if (a[@"state"]) [b setState: TRYes(a[@"state"]) ? NSOnState : NSOffState];
+      if (a[@"state"]) [b setState: TRYes(a[@"state"]) ? NSControlStateValueOn : NSControlStateValueOff];
       if (TRYes(a[@"default"])) [b setKeyEquivalent: @"\r"];
       v = b;
     }
@@ -1204,7 +1205,7 @@ void TRUpdateThemeTokens(void)
   t[@"--tr-label-font-size"] = TRPxString([NSFont labelFontSize]);
   t[@"--tr-title-font-size"] = TRPxString(round([NSFont systemFontSize] * 1.3));
   NSButton *b = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 80, 20)];
-  [b setBezelStyle: NSRoundedBezelStyle];
+  [b setBezelStyle: NSBezelStyleRounded];
   [b setTitle: @"Ag"];
   t[@"--tr-control-height"] = TRPxString(ceil(TRCellSize([b cell]).height));
   NSTextField *f = [[NSTextField alloc] initWithFrame: NSMakeRect(0, 0, 80, 20)];
@@ -1348,7 +1349,7 @@ static NSView *TRFindView(NSString *identifier, NSView *root)
         {
           NSString *title = d[@"title"] ?: str;
           if (title) [(NSButton *)v setTitle: title];
-          if (d[@"state"]) [(NSButton *)v setState: [d[@"state"] boolValue] ? NSOnState : NSOffState];
+          if (d[@"state"]) [(NSButton *)v setState: [d[@"state"] boolValue] ? NSControlStateValueOn : NSControlStateValueOff];
         }
       else if ([v isKindOfClass: [NSControl class]])
         {

@@ -135,6 +135,42 @@ class GridAreas(unittest.TestCase):
         self.assertNotIn("grid-named-lines", tags(g2.element_children()[1]))
 
 
+class AbsposContainingBlock(unittest.TestCase):
+    PAGE = ('<!DOCTYPE html><script src="/resources/check-layout-th.js"></script>'
+            '<style>.c{position:relative;width:200px;height:100px}'
+            '.g{display:grid;margin-top:20px}.a{position:absolute;width:10px;height:10px}'
+            '</style><body onload="checkLayout(\'.c, .r\')">%s</body>')
+
+    def cases(self, body):
+        d = tempfile.mkdtemp()
+        with open(os.path.join(d, "t.html"), "w") as f:
+            f.write(self.PAGE % body)
+        return W.convert_file(os.path.join(d, "t.html"), "t.html", "0" * 40)
+
+    def test_static_ancestors_written(self):
+        (c,) = self.cases('<div class="c" data-expected-width="200">'
+                          '<div><div><div class="a" data-expected-width="10"></div></div></div></div>')
+        mid = c["root"]["children"][0]
+        self.assertEqual(mid["style"]["position"], "static")
+        self.assertEqual(mid["children"][0]["style"]["position"], "static")
+        self.assertNotIn("abspos-ancestor-cb", c.get("requires", []))
+
+    def test_grid_beyond_parent_tagged(self):
+        (c,) = self.cases('<div class="c g" data-expected-width="200">'
+                          '<div><div class="a" data-expected-width="10"></div></div></div>')
+        self.assertIn("abspos-grid-descendant", c["requires"])
+
+    def test_margin_through_root_only_when_checked(self):
+        body = ('<div class="r" style="width:300px"%s><div class="g">'
+                '<div class="a" data-offset-y="0" data-expected-width="10"></div></div></div>')
+        (plain,) = self.cases(body % ' data-expected-width="300"')
+        self.assertNotIn("margin-collapse", plain.get("requires", []))
+        body = ('<div class="c" data-expected-width="200"><div class="g">'
+                '<div class="a" data-offset-y="0" data-expected-width="10"></div></div></div>')
+        (c,) = self.cases(body)
+        self.assertIn("margin-collapse", c["requires"])
+
+
 class AttributeSelectors(unittest.TestCase):
     def test_presence_and_value(self):
         d = tempfile.mkdtemp()

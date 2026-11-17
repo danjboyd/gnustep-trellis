@@ -31,7 +31,8 @@
    {
     "style": {
      "display": "block",
-     "boxSizing": "content-box"
+     "boxSizing": "content-box",
+     "position": "static"
     },
     "children": [
      {
@@ -62,7 +63,7 @@
   "height": 100
  },
  "requires": [
-  "abspos-ancestor-cb",
+  "abspos-grid-descendant",
   "block-layout"
  ]
 }

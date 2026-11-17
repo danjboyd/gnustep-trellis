@@ -23,6 +23,15 @@ version may change the API listed in docs/api.md, and says so here.
   static position in the real parent. Boxes default to `position: relative`,
   so layouts that never say `static` don't change. The 128 Yoga
   `position: static` cases now run by default: conformance is 3280/3280. See docs/migration-0.8.md.
+- **Conformance:** the WPT importer writes `position: static` on static
+  elements that have an abspos descendant, so the case's containing block
+  is the CSS one. Of the six `abspos-ancestor-cb` cases, three are now
+  tagged `abspos-grid-descendant` (a grid container beyond the parent is
+  the containing block: its grid placement and post-min-height size don't
+  reach the box yet) and three `margin-collapse` (the importer now notices
+  a child's top margin collapsing through a plain-block case root when a
+  y offset is measured from the root, or its bottom margin out of a checked
+  auto height).
 - **Fixed:** in grid row sizing, an item with `aspect-ratio`, a stretched
   or definite width and a percentage height now gets its height from the
   aspect ratio, as CSS does: the percentage counts as `auto` while the rows

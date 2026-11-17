@@ -734,6 +734,7 @@ class Converter:
         self.sized_by_ancestor = False
         self.page_offsets = []          # (expected dict, page x, page y)
         self.outside_positioned = False # a positioned ancestor above the root
+        self.y_from_root = False        # a y offset measured from the case root
         self.checked = set()
         self.checks = 0
         self.dropped = 0
@@ -841,7 +842,20 @@ class Converter:
             if k == "box-sizing" and val == "border-box":
                 pass
             style[camel(k)] = val
+        if "position" not in style and self.position(el) == "static" \
+                and self.has_abspos_descendant(el):
+            # Trellis boxes default to relative; say static so an abspos
+            # descendant's containing block is found further up, as in CSS.
+            # (With no insets, static and relative lay out the same.)
+            style["position"] = "static"
         return style
+
+    def has_abspos_descendant(self, el):
+        for c in el.children:
+            if isinstance(c, El) and c.tag not in IGNORED_TAGS:
+                if self.position(c) in ("absolute", "fixed") or self.has_abspos_descendant(c):
+                    return True
+        return False
 
     PLACEMENT = ("grid-row", "grid-column", "grid-row-start", "grid-row-end",
                  "grid-column-start", "grid-column-end", "grid-area")
@@ -955,10 +969,24 @@ class Converter:
                     if c.tag in IGNORED_TAGS:
                         continue
                     flush()
-                    if self.position(c) in ("absolute", "fixed") and self.position(el) == "static":
-                        # CSS: the containing block is a positioned ancestor
-                        # further up; Trellis always uses the parent's padding box.
+                    if self.position(el) == "static" and (
+                            self.position(c) == "fixed" or
+                            (self.position(c) == "absolute" and
+                             all(self.position(a) == "static" for a in ancestors + [el]))):
+                        # Static ancestors are written as position: static, so
+                        # Trellis finds a positioned ancestor further up as CSS
+                        # does. Not expressible: fixed (the viewport), or no
+                        # positioned ancestor inside the case (the initial
+                        # containing block, or one above the case root; Trellis
+                        # would use the layout root's padding box).
                         self.requires.add("abspos-ancestor-cb")
+                    if self.position(c) == "absolute" and self.position(el) == "static":
+                        cb = next((a for a in reversed(ancestors + [el])
+                                   if self.position(a) != "static"), None)
+                        if cb is not None and "grid" in self.display(cb):
+                            # A grid container two or more levels up: its grid
+                            # placement and post-min/max size apply to the box.
+                            self.requires.add("abspos-grid-descendant")
                     n, e = self.build(c, disp, ancestors + [el])
                     child_nodes.append(n)
                     child_exp.append(e)
@@ -1024,6 +1052,33 @@ class Converter:
             self.checks += 1
         if k != 1:
             exp["relativeTo"] = k
+        if op is ancestors[0] and "data-offset-y" in el.attrs:
+            self.y_from_root = True
+
+    def root_margin_collapses(self, root, tree, exp):
+        """The case root is a block in the page, so unless something makes it
+        a formatting-context root, its first child's top margin collapses
+        through its top edge (moving the child to the root's top) and its
+        last child's bottom margin through its bottom edge (out of an auto
+        height). Trellis keeps both inside, so this matters only to a y
+        offset measured from the root, or a checked auto height."""
+        st = tree["style"]
+        if st.get("display") != "block" or st.get("overflow", "visible") != "visible" \
+                or self.position(root) in ("absolute", "fixed") or self.root_sizing \
+                or (root.parent is not None and self.display(root.parent) in CONTAINERS):
+            return False
+        flow = [c for c in tree.get("children", [])
+                if c["style"].get("position") not in ("absolute", "fixed")
+                and c["style"].get("display") != "none"]
+        if not flow:
+            return False
+        def through(side, child):
+            return not st.get("padding" + side) and not st.get("border%sWidth" % side) \
+                and _margin(child["style"], side) > 0
+        if self.y_from_root and through("Top", flow[0]):
+            return True
+        return "height" in exp and st.get("height", "auto") == "auto" \
+            and through("Bottom", flow[-1])
 
     def resolve_page_offsets(self, exp_root):
         """Turn page offsets (offsetParent = body) into dx/dy relative to an
@@ -1285,6 +1340,8 @@ def convert_file(path, rel, commit):
             case["available"] = {"width": None, "height": None}
         if anchor_path is not None:
             case["anchor"] = anchor_path
+        if conv.root_margin_collapses(root, tree, exp):
+            conv.requires.add("margin-collapse")
         if conv.requires or case.get("requires"):
             case["requires"] = sorted(set(case.get("requires", [])) | conv.requires)
         if conv.dropped:

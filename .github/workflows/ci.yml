@@ -125,6 +125,8 @@ jobs:
         run: python3 -I scripts/conformance-summary.py check --platform macos --runner build/trellis-case
       - name: Importer unit tests
         run: make -f Makefile.macos check-importers
+      - name: View tests under NSZombieEnabled (window-free)
+        run: make -f Makefile.macos check-view
       - name: Window-free render smoke test
         run: |
           for s in Dashboard Settings AskDetail; do

@@ -63,6 +63,21 @@
 - (void)layoutTrellis;
 /* The outermost TRBoxView of this tree. */
 - (TRBoxView *)rootBox;
+/* Layout transitions (opt-in). A box whose style has
+   `-tr-layout-transition: 200ms [ease-out | linear | ease-in-out]`
+   animates its subviews (and, unless they say `none`, nested boxes'
+   subviews) from their old frames to their new ones when a layout comes
+   from a content or style change: a view shown or hidden, a class or style
+   swapped, text that grew. Resizing the window never animates, views
+   appearing for the first time just appear, and a new change mid-way
+   starts from where the views are. Off when the user asks for reduced
+   motion: the system setting on Cocoa, the TRReduceMotion default or
+   TRELLIS_REDUCE_MOTION=1 on GNUstep, or +setReducesMotionOverride:. */
+- (void)layoutTrellisAnimated;          /* this layout animates (if the style says) */
+@property (nonatomic, readonly) BOOL isAnimatingLayout;
++ (BOOL)reducesMotion;
++ (void)setReducesMotionOverride:(NSNumber *)reduce;   /* nil: follow the system */
+
 /* The height this box's content needs at a width (content changes since
    the last layout included); the layout is left as it was. */
 - (CGFloat)heightForWidth:(CGFloat)width;

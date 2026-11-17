@@ -123,6 +123,14 @@ the user's settings. trellis-render refuses to run without it.
 - **Drawing:** `background-color` and `border-color`/`border-radius` on
   boxes; `color`, `font-size`, `font-weight` and `text-align` on text
   controls; `white-space: nowrap`.
+- **Layout transitions (opt-in):** `-tr-layout-transition: 200ms` on a box
+  (optionally `linear` or `ease-in-out`; the default is ease-out) makes its
+  subviews, and nested boxes' unless they say `none`, glide to their new
+  frames when the layout changes because content or style changed: a
+  panel shown or hidden, an expander opened, a class swapped. Window
+  resizes never animate, and nothing animates when the user asks for
+  reduced motion. Use it on the root of a screen with expanders or
+  dismissable banners; keep it at 150-250 ms.
 - **Colours: use system colours,** so the UI follows Light/Dark on macOS
   and the GNUstep theme (Adwaita light or dark, Gumdrop). Use `Canvas` with
   `CanvasText` for a content background and its text,

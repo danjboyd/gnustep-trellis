@@ -139,6 +139,7 @@ check-gui:: all
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/dealloc-pending-layout.m -o obj/gui-tests/dealloc-pending-layout $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/virtual-box.m -o obj/gui-tests/virtual-box $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/virtual-bench.m -o obj/gui-tests/virtual-bench $(GUI_TEST_LIBS)
+	@$(CC) $(GUI_TEST_FLAGS) Tests/View/layout-transition.m -o obj/gui-tests/layout-transition $(GUI_TEST_LIBS)
 	@echo "== view checks (headless)"
 	@export LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH; status=0; \
 	  timeout 60 scripts/run-headless.sh obj/gui-tests/size-for-width > obj/gui-tests/hook.log 2>&1 || status=1; \
@@ -160,6 +161,9 @@ check-gui:: all
 	  NSZombieEnabled=YES timeout 120 scripts/run-headless.sh obj/gui-tests/virtual-box > obj/gui-tests/virtual.log 2>&1 || status=1; \
 	  if grep -q "deallocated instance" obj/gui-tests/virtual.log; then echo "VIRTUALBOX FAIL: message sent to a freed object"; status=1; fi; \
 	  grep -v _NET_WORKAREA obj/gui-tests/virtual.log | tail -1; \
+	  NSZombieEnabled=YES timeout 60 scripts/run-headless.sh obj/gui-tests/layout-transition > obj/gui-tests/transition.log 2>&1 || status=1; \
+	  if grep -q "deallocated instance" obj/gui-tests/transition.log; then echo "TRANSITION FAIL: message sent to a freed object"; status=1; fi; \
+	  grep -v _NET_WORKAREA obj/gui-tests/transition.log | tail -1; \
 	  timeout 300 scripts/run-headless.sh obj/gui-tests/virtual-bench > obj/gui-tests/vbench.log 2>&1 || status=1; \
 	  grep -v _NET_WORKAREA obj/gui-tests/vbench.log | tail -3; \
 	  Tests/View/appearance.sh || status=1; \

@@ -378,6 +378,72 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
 }
 @end
 
+/* The target of a box's animation timer, holding the box weakly (an
+   NSTimer retains its target). */
+@interface TRAnimationTicker : NSObject
+{
+@public
+  __weak TRBoxView *box;
+}
+- (void)tick:(NSTimer *)timer;
+@end
+
+@interface TRBoxView ()
+- (void)animationTick;
+@end
+
+@implementation TRAnimationTicker
+- (void)tick:(NSTimer *)timer
+{
+  TRBoxView *b = box;
+  if (b == nil) { [timer invalidate]; return; }
+  [b animationTick];
+}
+@end
+
+/* One view moving from one frame to another. */
+@interface TRFrameAnimation : NSObject
+{
+@public
+  __weak NSView *view;
+  NSRect from, to;
+}
+@end
+@implementation TRFrameAnimation
+@end
+
+/* Set by the root while it applies frames for an animated layout. */
+static NSMutableArray<TRFrameAnimation *> *gTRCollecting;
+
+static NSNumber *gTRReduceMotionOverride;
+
+/* -tr-layout-transition: <time> [easing] | none. Returns the duration in
+   seconds (0 = none), or -1 when the style doesn't say. */
+static double TRTransitionOf(TRStyle *st, int *easing)
+{
+  NSString *v = st.otherDeclarations[@"-tr-layout-transition"];
+  if (v == nil) return -1;
+  double d = 0;
+  int e = 0;   /* 0 ease-out, 1 linear, 2 ease-in-out */
+  for (NSString *tok in [v componentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceCharacterSet]])
+    {
+      if ([tok hasSuffix: @"ms"]) d = [tok doubleValue] / 1000.0;
+      else if ([tok hasSuffix: @"s"]) d = [tok doubleValue];
+      else if ([tok isEqualToString: @"linear"]) e = 1;
+      else if ([tok isEqualToString: @"ease-in-out"] || [tok isEqualToString: @"ease"]) e = 2;
+    }
+  if (easing) *easing = e;
+  return MAX(d, 0);
+}
+
+static double TREase(double t, int easing)
+{
+  t = MAX(0, MIN(1, t));
+  if (easing == 1) return t;
+  if (easing == 2) return t < 0.5 ? 4 * t * t * t : 1 - pow(-2 * t + 2, 3) / 2;
+  return 1 - pow(1 - t, 3);
+}
+
 /* ------------------------------------------------------------------ */
 
 @implementation TRBoxView
@@ -397,6 +463,77 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
 #ifdef GNUSTEP
   TRKeyLoopSentinel *_keyLoopSentinel;
 #endif
+  /* Layout transitions (on the root). */
+  BOOL _animateNextLayout;
+  NSMutableArray<TRFrameAnimation *> *_animations;
+  NSTimer *_animationTimer;
+  NSTimeInterval _animationStart, _animationDuration;
+  int _animationEasing;
+  double _collectedDuration;
+  int _collectedEasing;
+  NSHashTable *_placed;           /* subviews laid out at least once */
+}
+
++ (BOOL)reducesMotion
+{
+  if (gTRReduceMotionOverride) return [gTRReduceMotionOverride boolValue];
+  const char *env = getenv("TRELLIS_REDUCE_MOTION");
+  if (env && *env && strcmp(env, "0") != 0) return YES;
+  if ([[NSUserDefaults standardUserDefaults] boolForKey: @"TRReduceMotion"]) return YES;
+#ifndef GNUSTEP
+  NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+  if ([ws respondsToSelector: @selector(accessibilityDisplayShouldReduceMotion)])
+    return [ws accessibilityDisplayShouldReduceMotion];
+#endif
+  return NO;
+}
+
++ (void)setReducesMotionOverride:(NSNumber *)reduce
+{
+  gTRReduceMotionOverride = reduce;
+}
+
+- (BOOL)isAnimatingLayout
+{
+  return _animationTimer != nil;
+}
+
+- (void)layoutTrellisAnimated
+{
+  TRBoxView *root = [self rootBox];
+  root->_animateNextLayout = YES;
+  [root layoutTrellis];
+}
+
+- (void)finishLayoutAnimation
+{
+  [_animationTimer invalidate];
+  _animationTimer = nil;
+  for (TRFrameAnimation *a in _animations)
+    {
+      NSView *v = a->view;
+      if (v) [v setFrame: a->to];
+    }
+  _animations = nil;
+}
+
+- (void)animationTick
+{
+  NSTimeInterval t = _animationDuration > 0
+    ? ([NSDate timeIntervalSinceReferenceDate] - _animationStart) / _animationDuration : 1;
+  if (t >= 1) { [self finishLayoutAnimation]; return; }
+  double k = TREase(t, _animationEasing);
+  for (TRFrameAnimation *a in _animations)
+    {
+      NSView *v = a->view;
+      if (v == nil) continue;
+      NSRect f = NSMakeRect(a->from.origin.x + (a->to.origin.x - a->from.origin.x) * k,
+                            a->from.origin.y + (a->to.origin.y - a->from.origin.y) * k,
+                            a->from.size.width + (a->to.size.width - a->from.size.width) * k,
+                            a->from.size.height + (a->to.size.height - a->from.size.height) * k);
+      [v setFrame: f];
+    }
+  [self setNeedsDisplay: YES];
 }
 
 + (instancetype)boxWithStyle:(NSString *)declarations
@@ -420,6 +557,7 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
       _node = [TRNode node];
       _node.context = self;
       _signatures = [NSMapTable weakToStrongObjectsMapTable];
+      _placed = [NSHashTable weakObjectsHashTable];
       _appliedStyles = [NSMapTable weakToWeakObjectsMapTable];
       _managesKeyViewLoop = YES;
       [self setAutoresizesSubviews: NO];
@@ -437,6 +575,8 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
       [NSObject cancelPreviousPerformRequestsWithTarget: _trigger];
       _trigger->box = nil;
     }
+  [_animationTimer invalidate];
+  _animationTimer = nil;
 }
 
 - (BOOL)isFlipped
@@ -629,7 +769,8 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
 
 - (void)runScheduledLayout
 {
-  if (_layoutScheduled) [self layoutTrellis];
+  /* Content and style changes animate (if the style asks); resizes don't. */
+  if (_layoutScheduled) { _animateNextLayout = YES; [self layoutTrellis]; }
 }
 
 /* Remeasure leaves whose content changed since the last layout. */
@@ -668,10 +809,66 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
   TRBoxView *root = [self rootBox];
   if (root != self) { [root layoutTrellis]; return; }
   _layoutScheduled = NO;
+  BOOL animate = _animateNextLayout && ![[self class] reducesMotion] && [self window] != nil
+                 && ![self inLiveResize];
+  _animateNextLayout = NO;
   [self refreshSignatures];
   NSSize sz = [self bounds].size;
   [_node layoutWithAvailableSize: TRSizeMake(sz.width, sz.height)];
-  [self applyFrames];
+  /* A running animation ends where it was heading before the new frames
+     go in; an animated layout then starts from the views' current frames. */
+  NSMutableDictionary *current = nil;
+  if (_animationTimer != nil)
+    {
+      if (animate)
+        {
+          current = [NSMutableDictionary dictionary];
+          for (TRFrameAnimation *a in _animations)
+            {
+              NSView *v = a->view;
+              if (v) current[[NSValue valueWithNonretainedObject: v]] = [NSValue valueWithRect: [v frame]];
+            }
+        }
+      [self finishLayoutAnimation];
+    }
+  NSMutableArray *collected = nil;
+  _collectedDuration = 0;
+  _collectedEasing = 0;
+  if (animate)
+    {
+      collected = [NSMutableArray array];
+      gTRCollecting = collected;
+    }
+  [self applyFramesInheriting: -1 easing: 0];
+  gTRCollecting = nil;
+  if ([collected count])
+    {
+      double duration;
+      int easing;
+      for (TRFrameAnimation *a in collected)
+        {
+          NSValue *cur = current[[NSValue valueWithNonretainedObject: a->view]];
+          if (cur) a->from = [cur rectValue];
+        }
+      /* The longest duration among the moving views' boxes. */
+      duration = _collectedDuration;
+      easing = _collectedEasing;
+      _animations = collected;
+      _animationDuration = duration;
+      _animationEasing = easing;
+      _animationStart = [NSDate timeIntervalSinceReferenceDate];
+      for (TRFrameAnimation *a in collected)
+        {
+          NSView *v = a->view;
+          if (v) [v setFrame: a->from];
+        }
+      TRAnimationTicker *tk = [TRAnimationTicker new];
+      tk->box = self;
+      _animationTimer = [NSTimer timerWithTimeInterval: 1.0 / 60 target: tk selector: @selector(tick:)
+                                              userInfo: nil repeats: YES];
+      [[NSRunLoop currentRunLoop] addTimer: _animationTimer forMode: NSDefaultRunLoopMode];
+      [[NSRunLoop currentRunLoop] addTimer: _animationTimer forMode: NSModalPanelRunLoopMode];
+    }
   [self recalculateTrellisKeyViewLoop];
 }
 
@@ -795,6 +992,18 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
 
 - (void)applyFrames
 {
+  [self applyFramesInheriting: -1 easing: 0];
+}
+
+/* `inherited` is the layout transition in effect from the boxes above
+   (-1: none said). While the root collects an animated layout, views
+   that move under a transition are recorded instead of jumping. */
+- (void)applyFramesInheriting:(double)inherited easing:(int)inheritedEasing
+{
+  int easing = inheritedEasing;
+  double own = TRTransitionOf(_node.style, &easing);
+  double transition = own >= 0 ? own : inherited;
+  if (own < 0) easing = inheritedEasing;
   _applyingFrames = YES;
   for (TRNode *c in _node.children)
     {
@@ -810,9 +1019,31 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
           if ([v isKindOfClass: [TRBoxView class]]) [v setNeedsDisplay: YES];
         }
       BOOL hidden = (st.display == TRDisplayNone);
+      BOOL wasShown = ![v isHidden] && [_placed containsObject: v];
       [v setHidden: hidden];
-      if (!hidden) [v setFrame: NSMakeRect(f.x, f.y, f.width, f.height)];
-      if ([v isKindOfClass: [TRBoxView class]]) [(TRBoxView *)v applyFrames];
+      NSRect nf = NSMakeRect(f.x, f.y, f.width, f.height);
+      if (!hidden)
+        {
+          NSRect old = [v frame];
+          if (gTRCollecting && transition > 0 && wasShown && !NSEqualRects(old, nf))
+            {
+              TRFrameAnimation *a = [TRFrameAnimation new];
+              a->view = v;
+              a->from = old;
+              a->to = nf;
+              [gTRCollecting addObject: a];
+              TRBoxView *root = [self rootBox];
+              if (transition > root->_collectedDuration)
+                {
+                  root->_collectedDuration = transition;
+                  root->_collectedEasing = easing;
+                }
+            }
+          [v setFrame: nf];
+          [_placed addObject: v];
+        }
+      if ([v isKindOfClass: [TRBoxView class]])
+        [(TRBoxView *)v applyFramesInheriting: transition easing: easing];
     }
   _applyingFrames = NO;
   [self setNeedsDisplay: YES];

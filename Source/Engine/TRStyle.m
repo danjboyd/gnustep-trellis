@@ -219,7 +219,8 @@ static NSSet *TRVisualProperties(void)
       @"border-color", @"border-style", @"border-radius",
       @"border-top-color", @"border-right-color", @"border-bottom-color",
       @"border-left-color", @"box-shadow", @"visibility", @"z-index",
-      @"cursor", @"content", @"container-type", @"container-name", nil];
+      @"cursor", @"content", @"container-type", @"container-name",
+      @"-tr-layout-transition", nil];
   });
   return set;
 }

@@ -5,6 +5,16 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Added:** layout transitions, opt-in: `-tr-layout-transition: 200ms`
+  (with `linear` / `ease-in-out`, or `none`) on a box animates its
+  subviews, and nested boxes', to their new frames after content or style
+  changes. Resizes don't animate, first appearances don't, a change
+  mid-way starts from the current frames, and reduced motion (Cocoa's
+  setting, `TRReduceMotion` / `TRELLIS_REDUCE_MOTION=1` on GNUstep, or
+  `+[TRBoxView setReducesMotionOverride:]`) turns it off.
+  `-layoutTrellisAnimated` and `isAnimatingLayout` on TRBoxView.
+  Tests/View/layout-transition.m (check-gui, zombies on).
+
 ## 0.4.0 (2026-11-17)
 
 Adds API (listed in docs/api.md, nothing removed): virtualized lists and

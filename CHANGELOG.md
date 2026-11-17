@@ -5,6 +5,19 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+## 0.7.0 (2026-11-17)
+
+Changes grid layout behavior (a minor version, so pins on 0.6.x don't
+move): space from items spanning several tracks follows CSSWG #3648. No
+API changes. Conformance 3152/3152 on Linux and macOS (WPT 34bdce1).
+
+- The macOS build uses current AppKit names (no deprecation warnings);
+  GNUstep is unchanged.
+- Tooling: `make check-reference` (GNUmakefile and Makefile.macos)
+  replays golden frame dumps from both platforms through the engine and
+  checks that a changed geometry value is caught; trellis-render and
+  TrellisPreview dumps record `measured` sizes; WPT refreshes are
+  reviewed with Tests/Conformance/tools/snapshot_diff.py.
 - **Behavior change (grid):** a spanning item's extra space now goes to
   the spanned tracks that can still take it before any track grows past
   its growth limit (CSSWG #3648, CSS Grid 2 12.5.1 "distribute space to

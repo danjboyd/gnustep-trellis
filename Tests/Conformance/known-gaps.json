@@ -23,8 +23,6 @@
   "wpt-sizing/css/css-sizing/keyword-sizes-on-flex-item-002/3": "intrinsic size keyword case, not yet analysed",
   "wpt-sizing/css/css-sizing/stretch/auto-margins-2/4": "stretch on a descendant in a non-root context, not yet analysed",
   "wpt-sizing/css/css-sizing/stretch/auto-margins-2/5": "stretch on a descendant in a non-root context, not yet analysed",
-  "wpt-sizing/css/css-sizing/stretch/block-height-004/7": "uses display: flow-root, which Trellis doesn't support",
-  "wpt-sizing/css/css-sizing/stretch/flex-line-003/1": "stretch on a descendant in a non-root context, not yet analysed",
-  "wpt-sizing/css/css-sizing/stretch/flex-line-004/1": "flex container intrinsic sizes (css-flexbox 9.9.1): a wrapping column container at width: min-content, so the stretch item's line width comes from the 150px sibling"
+  "wpt-sizing/css/css-sizing/stretch/block-height-004/7": "uses display: flow-root, which Trellis doesn't support"
  }
 }

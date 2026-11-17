@@ -182,6 +182,7 @@ typedef struct {
   TRFloat cross;               /* cross size (border box) */
   TRAlign align;
   BOOL stretched;
+  BOOL kwStretchCross;         /* width/height: stretch on the cross axis fills its flex line */
   TRFloat baseline;            /* from the item's cross-start margin edge */
   BOOL colBaseline;            /* baseline in a column: synthesized from the border-box start edge */
   BOOL colLastBaseline;        /* last baseline in a column: from the end edge */
@@ -821,6 +822,7 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
       TRItem *it = &items[n++];
       it->node = child;
       it->s = cs;
+      it->kwStretchCross = (isRow ? cs->height.unit : cs->width.unit) == TRUnitStretch;
       if (TRStorageHasSizeKeyword(cs))
         {
           if (kwBufs == NULL) kwBufs = malloc((nChildren ? nChildren : 1) * sizeof(TRStyleStorage));
@@ -1263,7 +1265,9 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
     {
       TRItem *it = &items[i];
       TRLine *ln = &lines[it->line];
-      if (it->align == TRAlignStretch && isnan(it->styleCross)
+      /* A stretch keyword on the cross size fills the flex line, which in
+         a multi-line container may be wider than the container. */
+      if (((it->align == TRAlignStretch && isnan(it->styleCross)) || it->kwStretchCross)
           && !it->crossLeadAuto && !it->crossTrailAuto)
         {
           TRFloat c = ln->crossSize - it->crossLead - it->crossTrail;

@@ -11,6 +11,9 @@
    needed, overflow, position, hidden, children). Returns findings:
    {rule, severity ("error"|"warning"), id, path, message}.
 
-   Rules: clipped-text, undersized, stretched, collapsed, overlap, overflow, offscreen. */
+   Rules: clipped-text, undersized, stretched, collapsed, overlap, overflow,
+   offscreen, low-contrast (with resolved colours), and touch-target: a
+   node marked "interactive" smaller than 24x24 px whose 24 px circle
+   reaches another target (WCAG 2.2, 2.5.8, with its spacing exception). */
 NSArray<NSDictionary *> *TRLintFrameTree(NSDictionary *root, double viewportWidth,
                                          double viewportHeight);

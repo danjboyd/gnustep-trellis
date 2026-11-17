@@ -105,7 +105,8 @@ The frame-dump JSON keys `x`, `y`, `width`, `height`, `class`, `id`,
 carries the resolved colours `background`, `textColor` and
 `windowBackground`, and since 0.4 a virtual box's `virtual` (count,
 columns, content height) with its visible items as `children` (each with
-its `item` index, `y` relative to the viewport). Other keys may be added.
+its `item` index, `y` relative to the viewport), and `interactive` on
+controls (for the `touch-target` lint). Other keys may be added.
 
 ## Internal (not part of the API)
 

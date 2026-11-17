@@ -184,10 +184,76 @@ static void TRLintContrast(NSDictionary *n, NSString *path, NSString *under, NSM
     TRLintContrast(kids[i], [NSString stringWithFormat: @"%@/%lu", path, (unsigned long)i], under, out);
 }
 
+/* ---- Target size (WCAG 2.2, 2.5.8 minimum) ---- */
+
+static const double kTarget = 24;
+
+/* Targets with absolute frames, each tagged with its scope: the nearest
+   scrolling or clipping ancestor (content inside a scroller only meets
+   other content of that scroller; its off-screen part isn't over what's
+   outside it). */
+static void TRCollectTargets(NSDictionary *n, NSString *path, double ax, double ay, NSString *scope,
+                             NSMutableArray *out)
+{
+  if ([n[@"hidden"] boolValue]) return;
+  double x = ax + [n[@"x"] doubleValue], y = ay + [n[@"y"] doubleValue];
+  if ([n[@"interactive"] boolValue])
+    [out addObject: @{@"node": n, @"path": path, @"scope": scope,
+                      @"x": @(x), @"y": @(y), @"w": n[@"width"] ?: @0, @"h": n[@"height"] ?: @0}];
+  NSString *ov = n[@"overflow"];
+  NSString *inner = ([ov isEqualToString: @"scroll"] || [ov isEqualToString: @"hidden"] || [ov isEqualToString: @"auto"])
+    ? path : scope;
+  NSArray *kids = n[@"children"];
+  for (NSUInteger i = 0; i < [kids count]; i++)
+    TRCollectTargets(kids[i], [NSString stringWithFormat: @"%@/%lu", path, (unsigned long)i], x, y, inner, out);
+}
+
+/* Distance from a point to a rectangle (0 inside). */
+static double TRDistToRect(double px, double py, double x, double y, double w, double h)
+{
+  double dx = MAX(MAX(x - px, 0), px - (x + w)), dy = MAX(MAX(y - py, 0), py - (y + h));
+  return sqrt(dx * dx + dy * dy);
+}
+
+/* A control smaller than 24x24 passes if a 24 px circle on its centre
+   touches no other target, nor another small target's circle (the
+   spacing exception). */
+static void TRLintTargets(NSDictionary *root, NSMutableArray *out)
+{
+  NSMutableArray *t = [NSMutableArray array];
+  TRCollectTargets(root, @"root", 0, 0, @"", t);
+  for (NSUInteger i = 0; i < [t count]; i++)
+    {
+      NSDictionary *a = t[i];
+      double aw = [a[@"w"] doubleValue], ah = [a[@"h"] doubleValue];
+      if (aw <= 0 || ah <= 0 || (aw >= kTarget - kTol && ah >= kTarget - kTol)) continue;
+      double cx = [a[@"x"] doubleValue] + aw / 2, cy = [a[@"y"] doubleValue] + ah / 2;
+      NSDictionary *hit = nil;
+      for (NSUInteger j = 0; j < [t count] && hit == nil; j++)
+        {
+          if (j == i) continue;
+          NSDictionary *b = t[j];
+          if (![b[@"scope"] isEqualToString: a[@"scope"]]) continue;
+          double bw = [b[@"w"] doubleValue], bh = [b[@"h"] doubleValue];
+          if (bw <= 0 || bh <= 0) continue;
+          BOOL bSmall = bw < kTarget - kTol || bh < kTarget - kTol;
+          double d = bSmall
+            ? hypot(cx - ([b[@"x"] doubleValue] + bw / 2), cy - ([b[@"y"] doubleValue] + bh / 2))
+            : TRDistToRect(cx, cy, [b[@"x"] doubleValue], [b[@"y"] doubleValue], bw, bh);
+          if (d < (bSmall ? kTarget : kTarget / 2) - kTol) hit = b;
+        }
+      if (hit)
+        TRAdd(out, @"touch-target", @"warning", a[@"node"], a[@"path"], [NSString stringWithFormat:
+          @"%@ is %gx%g, under the 24x24 minimum, and too close to %@ (WCAG 2.5.8): make it at least 24 px, or space it out",
+          TRNodeName(a[@"node"], a[@"path"]), aw, ah, TRNodeName(hit[@"node"], hit[@"path"])]);
+    }
+}
+
 NSArray<NSDictionary *> *TRLintFrameTree(NSDictionary *root, double vw, double vh)
 {
   NSMutableArray *out = [NSMutableArray array];
   TRLintNode(root, @"root", 0, 0, vw, vh, NO, out);
   TRLintContrast(root, @"root", root[@"windowBackground"], out);
+  TRLintTargets(root, out);
   return out;
 }

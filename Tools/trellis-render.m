@@ -80,12 +80,25 @@ static NSString *TRHexOfColor(NSColor *c)
                   : [NSString stringWithFormat: @"#%02x%02x%02x%02x", r, g, b, a];
 }
 
+/* Controls a pointer or finger acts on (for the touch-target lint). */
+static BOOL TRIsInteractive(NSView *v)
+{
+  if ([v isHidden]) return NO;
+  if ([v isKindOfClass: [NSTextField class]]) return [(NSTextField *)v isEditable];
+  if ([v isKindOfClass: [NSButton class]] || [v isKindOfClass: [NSSlider class]]
+      || [v isKindOfClass: [NSStepper class]] || [v isKindOfClass: [NSSegmentedControl class]]
+      || [v isKindOfClass: [NSColorWell class]])
+    return [(NSControl *)v isEnabled];
+  return NO;
+}
+
 static NSDictionary *TRDumpView(NSView *v, TRNode *node)
 {
   NSMutableDictionary *d = [NSMutableDictionary dictionary];
   NSString *ident = [v respondsToSelector: @selector(identifier)] ? [(id)v identifier] : nil;
   if ([ident length]) d[@"id"] = ident;
   d[@"class"] = NSStringFromClass([v class]);
+  if (TRIsInteractive(v)) d[@"interactive"] = @YES;
   NSRect f = [v frame];
   d[@"x"] = @(f.origin.x);
   d[@"y"] = @(f.origin.y);

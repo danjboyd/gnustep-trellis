@@ -169,6 +169,11 @@ collapses as in HTML, and the runs follow the label's `color`,
     that follows the system, or the reverse.
   - `trellis-render --appearance dark --lint` reports `low-contrast` text
     from the resolved colours.
+- **Target size:** `trellis-render --lint` (and Preview's inspector) warn
+  with `touch-target` when a control is under 24x24 px and its 24 px
+  circle reaches another control (WCAG 2.2, 2.5.8). Desktop controls about
+  22 px tall pass with a normal gap; tight rows of small icon buttons
+  don't. Give them `min-width`/`min-height: 24px` or a `gap`.
 - **Units:** `px`, `%` and `auto`.
 - **Selectors:** `type`, `.class`, `#id`, `a b`, `a > b`, and comma
   lists. **Not supported:** `:hover` and other pseudo-classes, attribute

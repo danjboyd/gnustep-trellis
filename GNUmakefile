@@ -106,6 +106,10 @@ check:: all
 	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ISource/Engine Tests/Engine/custom-properties.m \
 	  -o obj/custom-properties -L./obj -lTrellisEngine $(shell gnustep-config --base-libs)
 	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH ./obj/custom-properties
+	@echo "== touch-target lint"
+	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ISource/Engine Tests/Engine/lint-targets.m \
+	  -o obj/lint-targets -L./obj -lTrellisEngine $(shell gnustep-config --base-libs)
+	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH ./obj/lint-targets
 	@echo "== .trellis files (syntax, styles, bindings)"
 	@$(LINT) Examples/TrellisDemo/AskDetail.trellis --owner Examples/TrellisDemo/AskDetailController.h
 	@$(LINT) Examples/TrellisDemo/Settings.trellis --owner Examples/TrellisDemo/SettingsController.h

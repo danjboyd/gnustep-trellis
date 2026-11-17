@@ -350,11 +350,24 @@ static NSDate *TPModDate(NSString *path)
   [_overlay setNeedsDisplay: YES];
 }
 
+/* Controls a pointer or finger acts on (for the touch-target lint). */
+static BOOL TRIsInteractive(NSView *v)
+{
+  if ([v isHidden]) return NO;
+  if ([v isKindOfClass: [NSTextField class]]) return [(NSTextField *)v isEditable];
+  if ([v isKindOfClass: [NSButton class]] || [v isKindOfClass: [NSSlider class]]
+      || [v isKindOfClass: [NSStepper class]] || [v isKindOfClass: [NSSegmentedControl class]]
+      || [v isKindOfClass: [NSColorWell class]])
+    return [(NSControl *)v isEnabled];
+  return NO;
+}
+
 static NSDictionary *TPDump(NSView *v, TRNode *node)
 {
   NSMutableDictionary *d = [NSMutableDictionary dictionary];
   NSRect f = [v frame];
   d[@"class"] = NSStringFromClass([v class]);
+  if (TRIsInteractive(v)) d[@"interactive"] = @YES;
   if ([[v identifier] length]) d[@"id"] = [v identifier];
   d[@"x"] = @(f.origin.x); d[@"y"] = @(f.origin.y);
   d[@"width"] = @(f.size.width); d[@"height"] = @(f.size.height);

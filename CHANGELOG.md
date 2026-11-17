@@ -5,6 +5,12 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Added:** the `touch-target` lint (WCAG 2.2, 2.5.8): a control under
+  24x24 px whose 24 px circle reaches another control in the same
+  scroller is a warning. Frame dumps mark controls `interactive`.
+  Tests/Engine/lint-targets.m in `make check`; no finding in any example
+  or dogfood screen at 340 and 900 px.
+
 - **TrellisPreview:** View > Light / Dark Appearance (GNUstep: the
   Adwaita colour scheme, set for the process before the theme loads, so
   switching relaunches Preview with the same file and size; macOS: the

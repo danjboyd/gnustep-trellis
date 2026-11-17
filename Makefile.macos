@@ -140,6 +140,7 @@ check-reference: all
 # Unit tests for the conformance importers (Python, no build needed).
 check-importers:
 	python3 -I Tests/Conformance/tools/test_import_wpt.py
+	python3 -I Tests/Conformance/tools/test_snapshot_diff.py
 
 clean:
 	rm -rf $(B)

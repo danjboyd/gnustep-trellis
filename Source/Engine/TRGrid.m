@@ -1409,6 +1409,8 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           TRNode *c = children[i];
           const TRStyleStorage *cs = TRChildStyle(c, dir);
           if (TRNodeIsNone(c) || cs->position != TRPositionAbsolute) continue;
+          /* A static grid isn't a containing block: an ancestor places it. */
+          if (s->position == TRPositionStatic && !node->_isLayoutRoot) continue;
           TRStyle *cst = c->_style;
           double cbStart[2], cbEnd[2];   /* [0] rows (y), [1] columns (x); border-box coordinates */
           for (int axis = 0; axis < 2; axis++)
@@ -1520,6 +1522,11 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           c->_rawFrame = TRRectMake(x, y, w, h);
           c->_lineIndex = -1;
         }
+      /* Abspos boxes in static descendants: the grid's padding box. */
+      if (s->position != TRPositionStatic || node->_isLayoutRoot)
+        TRLayoutStaticDescendants(node, dir, 0, 0, border[TREdgeLeft], border[TREdgeTop],
+                                  W - border[TREdgeLeft] - border[TREdgeRight],
+                                  H - border[TREdgeTop] - border[TREdgeBottom]);
       node->_contentSize = TRSizeMake(MAX(W, maxX + pad[TREdgeRight] + border[TREdgeRight]),
                                       MAX(H, maxY + pad[TREdgeBottom] + border[TREdgeBottom]));
     }

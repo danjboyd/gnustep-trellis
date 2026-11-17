@@ -188,7 +188,6 @@ static BOOL gRunAll;
 static NSSet *TRDefaultUnsupported(void)
 {
   return [NSSet setWithObjects:
-    @"position-static",          /* abspos is relative to the parent */
     @"display-inline", @"display-inline-block", @"display-contents",
     @"display--webkit-box",
     @"display-table",            /* display: table and its parts */

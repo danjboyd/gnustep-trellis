@@ -57,8 +57,8 @@
 - **Baselines of buttons and pop-ups** are computed by centring the font line box in the bezel (fixed 2026-11-13; it was about 3 px off under Adwaita).
 - `display: block` is a column whose children don't flex, not CSS block
   flow: margins don't collapse (see design.md section 4a).
-- Absolute positioning is relative to the parent box, not the nearest
-  positioned ancestor.
+- An abspos box whose containing block is beyond a `position: static`
+  parent can lie outside that parent's view, which may clip it.
 - Split panes aren't mirrored in rtl: the first pane stays on the left.
 - Logical properties assume horizontal writing (`writing-mode` isn't
   supported): inline is left/right, block is top/bottom.

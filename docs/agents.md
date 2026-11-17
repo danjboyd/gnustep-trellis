@@ -169,7 +169,7 @@ collapses as in HTML, and the runs follow the label's `color`,
   `align-content` (`justify-*` also take physical `left`/`right`; `justify-content` and `align-content` take a `safe`/`unsafe` prefix), `place-*`, `gap`, `row-gap`, `column-gap`, `order`,
   `width`, `height`, `min-*`, `max-*`, `aspect-ratio`, `margin` (with
   `auto`), `padding`, `border` (width only for layout), `position`
-  (`relative`, `absolute`), `top`, `right`, `bottom`, `left`, `inset`,
+  (`relative`, `absolute`, `static`), `top`, `right`, `bottom`, `left`, `inset`,
   `overflow`, `box-sizing`, `direction`.
 - **Logical properties** follow each box's `direction` (horizontal writing
   only): `margin-inline-start`/`-end`, `padding-inline-*`,
@@ -275,7 +275,7 @@ collapses as in HTML, and the runs follow the label's `color`,
 | `<column>` | n/a | `flex-direction: column` (items stretch to full width) |
 | `display: block` | block flow | a column whose children don't flex (since 0.6) |
 | `box-sizing` | `content-box` | **`border-box`**: `width` includes padding and border |
-| `position: absolute` | relative to the nearest positioned ancestor | relative to the **parent** |
+| `position: absolute` | relative to the nearest positioned ancestor | the same, but boxes default to `position: relative`, so that's the **parent** unless it is `position: static` |
 | `last baseline` | aligns last baselines | aligns as `end` (its fallback) |
 | No block or inline flow, floats or tables | | use rows and columns |
 

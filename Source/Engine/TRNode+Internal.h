@@ -32,6 +32,9 @@ typedef struct {
      9.8), so its children's percentage heights act as auto even when it
      is laid out at an exact height. */
   BOOL _pctIndefH;
+  /* The node -layoutWithAvailableSize: was called on: a containing block
+     for abspos descendants even when it is position: static. */
+  BOOL _isLayoutRoot;
 
   /* Results. _rawFrame is unrounded; _frame is what clients see. */
   TRRect _rawFrame;
@@ -72,6 +75,12 @@ static inline const TRStyleStorage *TRChildStyle(TRNode *c, TRDirection parentDi
   if (d == TRDirectionInherit) d = parentDir;
   return TRStyleStorageForDirection(c->_style, d);
 }
+
+/* Places the abspos boxes inside cur's static descendants against a
+   containing block's padding box (cbX, cbY, cbW, cbH); (ox, oy) is cur's
+   origin in the containing block's border-box coordinates (TRLayout.m). */
+void TRLayoutStaticDescendants(TRNode *cur, TRDirection cbDir, TRFloat ox, TRFloat oy,
+                               TRFloat cbX, TRFloat cbY, TRFloat cbW, TRFloat cbH);
 
 /* The layout algorithm (TRLayout.m). Returns the node's border-box size.
    aw/ah: border-box constraint, read according to wm/hm.

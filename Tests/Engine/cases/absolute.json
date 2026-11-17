@@ -134,5 +134,288 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/abspos_default_parent_is_cb",
+  "note": "regression for a consumer: boxes default to position: relative, so an abspos toolbar in a plain row stays against that row, not the root",
+  "root": {
+   "style": "display: flex; flex-direction: column; width: 300px; padding: 10px",
+   "children": [
+    {
+     "style": "height: 20px"
+    },
+    {
+     "style": "height: 40px; padding: 5px",
+     "children": [
+      {
+       "style": "position: absolute; right: 14px; top: 5px; width: 50px; height: 10px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 300,
+   "height": 80,
+   "children": [
+    {
+     "x": 10,
+     "y": 10,
+     "width": 280,
+     "height": 20
+    },
+    {
+     "x": 10,
+     "y": 30,
+     "width": 280,
+     "height": 40,
+     "children": [
+      {
+       "x": 216,
+       "y": 5,
+       "width": 50,
+       "height": 10
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/abspos_static_parent_uses_ancestor",
+  "note": "a static parent isn't a containing block: insets and % sizes use the nearest positioned ancestor's padding box; the frame stays parent-relative",
+  "root": {
+   "style": "width: 200px; height: 100px; padding: 10px; border-width: 5px",
+   "children": [
+    {
+     "style": "position: static; width: 80px; height: 40px; margin-left: 20px; margin-top: 30px",
+     "children": [
+      {
+       "style": "position: absolute; right: 0; bottom: 0; width: 50%; height: 10px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 200,
+   "height": 100,
+   "children": [
+    {
+     "x": 35,
+     "y": 45,
+     "width": 80,
+     "height": 40,
+     "children": [
+      {
+       "x": 65,
+       "y": 40,
+       "width": 95,
+       "height": 10
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/abspos_static_parent_auto_insets_static_position",
+  "note": "with auto insets the box keeps its static position in its own (static) parent",
+  "root": {
+   "style": "width: 200px; height: 100px",
+   "children": [
+    {
+     "style": "position: static; width: 100px; height: 60px; margin-left: 20px; justify-content: center; align-items: flex-end",
+     "children": [
+      {
+       "style": "position: absolute; width: 20px; height: 10px; left: 0"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 200,
+   "height": 100,
+   "children": [
+    {
+     "x": 20,
+     "y": 0,
+     "width": 100,
+     "height": 60,
+     "children": [
+      {
+       "x": -20,
+       "y": 50,
+       "width": 20,
+       "height": 10
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/abspos_static_chain_deep",
+  "note": "through two static boxes to the positioned grandparent",
+  "root": {
+   "style": "flex-direction: column; width: 200px; height: 200px",
+   "children": [
+    {
+     "style": "flex-direction: column; position: static; padding: 10px",
+     "children": [
+      {
+       "style": "position: static; height: 50px; margin-top: 7px",
+       "children": [
+        {
+         "style": "position: absolute; left: 3px; top: 4px; width: 10px; height: 10px"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 200,
+   "height": 200,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 200,
+     "height": 77,
+     "children": [
+      {
+       "x": 10,
+       "y": 17,
+       "width": 180,
+       "height": 50,
+       "children": [
+        {
+         "x": -7,
+         "y": -13,
+         "width": 10,
+         "height": 10
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/abspos_static_root_is_cb",
+  "note": "the layout root is a containing block even when static",
+  "root": {
+   "style": "position: static; width: 100px; height: 100px; padding: 5px",
+   "children": [
+    {
+     "style": "position: absolute; right: 0; top: 0; width: 10px; height: 10px"
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 100,
+   "children": [
+    {
+     "x": 90,
+     "y": 0,
+     "width": 10,
+     "height": 10
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/abspos_static_parent_rtl",
+  "note": "rtl: a static parent's abspos child with only left/right uses the ancestor's padding box",
+  "root": {
+   "style": "width: 200px; height: 100px",
+   "children": [
+    {
+     "style": "position: static; width: 100px; height: 50px",
+     "children": [
+      {
+       "style": "position: absolute; right: 10px; top: 0; width: 20px; height: 10px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 200,
+   "height": 100,
+   "children": [
+    {
+     "x": 100,
+     "y": 0,
+     "width": 100,
+     "height": 50,
+     "children": [
+      {
+       "x": 70,
+       "y": 0,
+       "width": 20,
+       "height": 10
+      }
+     ]
+    }
+   ]
+  },
+  "direction": "rtl"
+ },
+ {
+  "id": "engine/abspos_static_grid_parent",
+  "note": "a static grid parent: the abspos child uses the ancestor, not a grid area",
+  "root": {
+   "style": "width: 200px; height: 100px",
+   "children": [
+    {
+     "style": "display: grid; position: static; grid-template-columns: 50px 50px; width: 100px; height: 40px; margin-left: 30px",
+     "children": [
+      {
+       "style": "position: absolute; grid-column: 2; left: 0; top: 0; width: 10px; height: 10px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 200,
+   "height": 100,
+   "children": [
+    {
+     "x": 30,
+     "y": 0,
+     "width": 100,
+     "height": 40,
+     "children": [
+      {
+       "x": -30,
+       "y": 0,
+       "width": 10,
+       "height": 10
+      }
+     ]
+    }
+   ]
+  }
  }
 ]

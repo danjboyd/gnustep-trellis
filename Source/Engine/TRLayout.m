@@ -294,6 +294,178 @@ static TRSize TRLayoutLeaf(TRNode *node, const TRStyleStorage *s, const TREdges 
 }
 
 /* ------------------------------------------------------------------ */
+#pragma mark Absolute positioning
+
+/* justify-content as flex-start / flex-end / center / space-*: normal and
+   stretch are flex-start, and left/right/start/end are resolved for the
+   writing mode (start/end follow it, not the flex direction). */
+static TRAlign TRFlexJustify(TRAlign jc, BOOL isRow, BOOL rtl, BOOL mainRev)
+{
+  if (jc == TRAlignNormal || jc == TRAlignStretch) jc = TRAlignFlexStart;
+  if (jc == TRAlignLeft || jc == TRAlignRight)
+    {
+      /* Physical: in a column (main axis not the inline axis) they act as
+         'start'; in a row, left is the start only in ltr. */
+      if (!isRow) jc = TRAlignStart;
+      else jc = ((jc == TRAlignLeft) == !rtl) ? TRAlignStart : TRAlignEnd;
+    }
+  BOOL startIsFlexStart = isRow ? (rtl == mainRev) : !mainRev;
+  if (jc == TRAlignStart || jc == TRAlignEnd)
+    {
+      BOOL wantStart = (jc == TRAlignStart);
+      jc = (wantStart == startIsFlexStart) ? TRAlignFlexStart : TRAlignFlexEnd;
+    }
+  return jc;
+}
+
+/* The static position of an abspos box with auto insets: where it would
+   sit as the sole flex item of its parent's content box (css-flexbox 4.1);
+   in a grid parent, the content box's start corner. Gives the border-box
+   origin in the parent's border-box coordinates. */
+static void TRStaticPosition(const TRStyleStorage *ps, TRDirection pdir, TRFloat W, TRFloat H,
+                             const TRFloat pad[4], const TRFloat border[4],
+                             const TRStyleStorage *cs, TRFloat outerW, TRFloat outerH, const TRFloat m[4],
+                             TRFloat *sx, TRFloat *sy)
+{
+  const BOOL rtl = (pdir == TRDirectionRTL);
+  TRFloat contentW = W - pad[TREdgeLeft] - pad[TREdgeRight] - border[TREdgeLeft] - border[TREdgeRight];
+  TRFloat contentH = H - pad[TREdgeTop] - pad[TREdgeBottom] - border[TREdgeTop] - border[TREdgeBottom];
+  TRFloat originX = pad[TREdgeLeft] + border[TREdgeLeft], originY = pad[TREdgeTop] + border[TREdgeTop];
+  if (ps->display == TRDisplayGrid)
+    {
+      *sx = originX + (rtl ? contentW - outerW : 0) + m[TREdgeLeft];
+      *sy = originY + m[TREdgeTop];
+      return;
+    }
+  const TRFlexDirection fd = (ps->display == TRDisplayBlock) ? TRFlexDirectionColumn : ps->flexDirection;
+  const BOOL isRow = (fd == TRFlexDirectionRow || fd == TRFlexDirectionRowReverse);
+  const BOOL dirReverse = (fd == TRFlexDirectionRowReverse || fd == TRFlexDirectionColumnReverse);
+  const BOOL wrapReverse = (ps->flexWrap == TRFlexWrapWrapReverse);
+  const BOOL mainRev = isRow ? (dirReverse != rtl) : dirReverse;
+  const BOOL crossRev = isRow ? wrapReverse : (rtl != wrapReverse);
+  TRAlign jc = TRFlexJustify(ps->justifyContent, isRow, rtl, mainRev);
+  TRFloat freeMain = (isRow ? contentW - outerW : contentH - outerH);
+  TRFloat freeCross = (isRow ? contentH - outerH : contentW - outerW);
+  TRFloat offMain = 0, offCross = 0;
+  switch (jc)
+    {
+      case TRAlignFlexEnd: offMain = freeMain; break;
+      case TRAlignCenter: case TRAlignSpaceAround: case TRAlignSpaceEvenly:
+        offMain = freeMain / 2; break;
+      default: break;
+    }
+  TRAlign a = TRResolveAlignSelf(cs, ps);
+  /* An abspos box has no baseline set to join: CSS Align falls back to
+     'start' (not 'flex-start'), which ignores wrap-reverse. */
+  if (a == TRAlignBaseline) a = TRAlignStart;
+  if (a == TRAlignStart) a = wrapReverse ? TRAlignFlexEnd : TRAlignFlexStart;
+  else if (a == TRAlignEnd) a = wrapReverse ? TRAlignFlexStart : TRAlignFlexEnd;
+  if (a == TRAlignFlexEnd) offCross = freeCross;
+  else if (a == TRAlignCenter) offCross = freeCross / 2;
+  TRFloat mainSize = isRow ? outerW : outerH, crossSize = isRow ? outerH : outerW;
+  TRFloat mainPhys = mainRev ? (isRow ? contentW : contentH) - offMain - mainSize : offMain;
+  TRFloat crossPhys = crossRev ? (isRow ? contentH : contentW) - offCross - crossSize : offCross;
+  *sx = originX + (isRow ? mainPhys : crossPhys) + m[TREdgeLeft];
+  *sy = originY + (isRow ? crossPhys : mainPhys) + m[TREdgeTop];
+}
+
+/* Lays out abspos child c of a flex/block parent. Its containing block is
+   the padding box (cbX, cbY, cbW, cbH), in the parent's border-box
+   coordinates: the parent's own, or a positioned ancestor's further up.
+   Insets and percentages use the containing block; auto insets use the
+   static position in the parent. */
+static void TRLayoutAbsChild(TRNode *c, TRDirection cbDir, TRFloat cbX, TRFloat cbY, TRFloat cbW, TRFloat cbH,
+                             const TRStyleStorage *ps, TRDirection pdir, TRFloat pW, TRFloat pH,
+                             const TRFloat ppad[4], const TRFloat pborder[4])
+{
+  const TRStyleStorage *cs = TRChildStyle(c, pdir);
+  c->_pctIndefH = NO;
+  TREdges ce = TRResolveEdges(cs, cbW);
+  TRFloat cpbW = TRPBHorizontal(&ce), cpbH = TRPBVertical(&ce);
+  TRFloat m[4];
+  for (int k = 0; k < 4; k++) m[k] = TRDefault(TRResolve(cs->margin[k], cbW), 0);
+  TRFloat L = TRResolve(cs->inset[TREdgeLeft], cbW), R = TRResolve(cs->inset[TREdgeRight], cbW);
+  TRFloat T = TRResolve(cs->inset[TREdgeTop], cbH), B = TRResolve(cs->inset[TREdgeBottom], cbH);
+  TRFloat w = TRBoxSize(cs, cs->width, cbW, cpbW);
+  TRFloat h = TRBoxSize(cs, cs->height, cbH, cpbH);
+  if (isnan(w) && !isnan(L) && !isnan(R))
+    w = TRMax(cpbW, cbW - L - R - m[TREdgeLeft] - m[TREdgeRight]);
+  if (isnan(h) && !isnan(T) && !isnan(B))
+    h = TRMax(cpbH, cbH - T - B - m[TREdgeTop] - m[TREdgeBottom]);
+  TRFloat ar = cs->aspectRatio;
+  if (!isnan(ar))
+    {
+      if (isnan(w) && !isnan(h)) w = h * ar;
+      else if (isnan(h) && !isnan(w)) h = w / ar;
+    }
+  if (isnan(w) || isnan(h))
+    {
+      TRFloat availW = cbW - TRDefault(L, 0) - TRDefault(R, 0) - m[TREdgeLeft] - m[TREdgeRight];
+      TRSize sz = TRLayoutNode(c, isnan(w) ? TRMax(0, availW) : w, TRDefault(h, TRUndefined),
+                               isnan(w) ? TRMeasureModeAtMost : TRMeasureModeExactly,
+                               isnan(h) ? TRMeasureModeUndefined : TRMeasureModeExactly,
+                               cbW, cbH, NO, pdir);
+      if (isnan(w)) w = sz.width;
+      if (isnan(h)) h = sz.height;
+    }
+  w = TRMax(TRClamp(w, TRBoxSize(cs, cs->minWidth, cbW, cpbW), TRBoxSize(cs, cs->maxWidth, cbW, cpbW)), cpbW);
+  h = TRMax(TRClamp(h, TRBoxSize(cs, cs->minHeight, cbH, cpbH), TRBoxSize(cs, cs->maxHeight, cbH, cpbH)), cpbH);
+  TRLayoutNode(c, w, h, TRMeasureModeExactly, TRMeasureModeExactly, cbW, cbH, YES, pdir);
+
+  TRFloat x, y;
+  BOOL needX = isnan(L) && isnan(R), needY = isnan(T) && isnan(B);
+  TRFloat staticX = 0, staticY = 0;
+  if (needX || needY)
+    TRStaticPosition(ps, pdir, pW, pH, ppad, pborder, cs,
+                     w + m[TREdgeLeft] + m[TREdgeRight], h + m[TREdgeTop] + m[TREdgeBottom], m,
+                     &staticX, &staticY);
+  /* Over-constrained (left, right and width): an rtl containing block
+     honours right. */
+  if (!isnan(L) && !(cbDir == TRDirectionRTL && !isnan(R))) x = cbX + L + m[TREdgeLeft];
+  else if (!isnan(R)) x = cbX + cbW - R - m[TREdgeRight] - w;
+  else x = staticX;
+  if (!isnan(T)) y = cbY + T + m[TREdgeTop];
+  else if (!isnan(B)) y = cbY + cbH - B - m[TREdgeBottom] - h;
+  else y = staticY;
+  c->_rawFrame = TRRectMake(x, y, w, h);
+  for (int k = 0; k < 4; k++) c->_lmargin[k] = m[k];
+  c->_lineIndex = -1;
+}
+
+/* Abspos boxes inside static descendants (any depth, through static
+   boxes only) whose containing block is this one. (ox, oy) is cur's
+   border-box origin in the containing block's border-box coordinates. */
+void TRLayoutStaticDescendants(TRNode *cur, TRDirection cbDir, TRFloat ox, TRFloat oy,
+                                      TRFloat cbX, TRFloat cbY, TRFloat cbW, TRFloat cbH)
+{
+  for (TRNode *sc in cur->_children)
+    {
+      if (TRNodeIsNone(sc) || sc->_style->_s.position != TRPositionStatic) continue;
+      TRFloat sx = ox + sc->_rawFrame.x, sy = oy + sc->_rawFrame.y;
+      const TRStyleStorage *ss = TRStyleStorageForDirection(sc->_style, sc->_ldir);
+      for (TRNode *a in sc->_children)
+        if (!TRNodeIsNone(a) && a->_style->_s.position == TRPositionAbsolute)
+          TRLayoutAbsChild(a, cbDir, cbX - sx, cbY - sy, cbW, cbH, ss, sc->_ldir,
+                           sc->_rawFrame.width, sc->_rawFrame.height, sc->_lpad, sc->_lborder);
+      TRLayoutStaticDescendants(sc, cbDir, sx, sy, cbX, cbY, cbW, cbH);
+    }
+}
+
+/* A containing block (a positioned flex/block box, or the layout root)
+   places its own abspos children and those of its static descendants. */
+static void TRLayoutAbsDescendants(TRNode *node, const TRStyleStorage *s, TRDirection dir,
+                                   TRFloat W, TRFloat H, const TRFloat pad[4], const TRFloat border[4])
+{
+  TRFloat cbX = border[TREdgeLeft], cbY = border[TREdgeTop];
+  TRFloat cbW = W - border[TREdgeLeft] - border[TREdgeRight];
+  TRFloat cbH = H - border[TREdgeTop] - border[TREdgeBottom];
+  for (TRNode *c in node->_children)
+    if (!TRNodeIsNone(c) && c->_style->_s.position == TRPositionAbsolute)
+      TRLayoutAbsChild(c, dir, cbX, cbY, cbW, cbH, s, dir, W, H, pad, border);
+  TRLayoutStaticDescendants(node, dir, 0, 0, cbX, cbY, cbW, cbH);
+}
+
+/* ------------------------------------------------------------------ */
 #pragma mark The flex algorithm
 
 /* A flex base size ignores the item's own min/max main size (CSS Flexbox
@@ -819,22 +991,9 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
     }
 
   /* ---- Main-axis alignment (9.5) ---- */
-  TRAlign jc = s->justifyContent;
-  if (jc == TRAlignNormal || jc == TRAlignStretch) jc = TRAlignFlexStart;
-  if (jc == TRAlignLeft || jc == TRAlignRight)
-    {
-      /* Physical: in a column (main axis not the inline axis) they act as
-         'start'; in a row, left is the start only in ltr. */
-      if (!isRow) jc = TRAlignStart;
-      else jc = ((jc == TRAlignLeft) == !rtl) ? TRAlignStart : TRAlignEnd;
-    }
+  TRAlign jc = TRFlexJustify(s->justifyContent, isRow, rtl, mainRev);
   /* start/end follow the writing mode, not the flex direction. */
-  BOOL startIsFlexStart = isRow ? (rtl == mainRev) : !mainRev;
-  if (jc == TRAlignStart || jc == TRAlignEnd)
-    {
-      BOOL wantStart = (jc == TRAlignStart);
-      jc = (wantStart == startIsFlexStart) ? TRAlignFlexStart : TRAlignFlexEnd;
-    }
+  const BOOL startIsFlexStart = isRow ? (rtl == mainRev) : !mainRev;
   for (NSInteger l = 0; l < nLines; l++)
     {
       TRLine *ln = &lines[l];
@@ -971,88 +1130,10 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
         }
 
       /* ---- Absolutely positioned children ---- */
-      TRFloat cbW = W - e->border[TREdgeLeft] - e->border[TREdgeRight];
-      TRFloat cbH = H - e->border[TREdgeTop] - e->border[TREdgeBottom];
-      for (NSUInteger ci = 0; ci < nChildren; ci++)
-        {
-          TRNode *c = children[ci];
-          const TRStyleStorage *cs = TRChildStyle(c, dir);
-          if (TRNodeIsNone(c) || cs->position != TRPositionAbsolute) continue;
-          c->_pctIndefH = NO;
-          TREdges ce = TRResolveEdges(cs, cbW);
-          TRFloat cpbW = TRPBHorizontal(&ce), cpbH = TRPBVertical(&ce);
-          TRFloat m[4];
-          for (int k = 0; k < 4; k++) m[k] = TRDefault(TRResolve(cs->margin[k], cbW), 0);
-          TRFloat L = TRResolve(cs->inset[TREdgeLeft], cbW), R = TRResolve(cs->inset[TREdgeRight], cbW);
-          TRFloat T = TRResolve(cs->inset[TREdgeTop], cbH), B = TRResolve(cs->inset[TREdgeBottom], cbH);
-          TRFloat w = TRBoxSize(cs, cs->width, cbW, cpbW);
-          TRFloat h = TRBoxSize(cs, cs->height, cbH, cpbH);
-          if (isnan(w) && !isnan(L) && !isnan(R))
-            w = TRMax(cpbW, cbW - L - R - m[TREdgeLeft] - m[TREdgeRight]);
-          if (isnan(h) && !isnan(T) && !isnan(B))
-            h = TRMax(cpbH, cbH - T - B - m[TREdgeTop] - m[TREdgeBottom]);
-          TRFloat ar = cs->aspectRatio;
-          if (!isnan(ar))
-            {
-              if (isnan(w) && !isnan(h)) w = h * ar;
-              else if (isnan(h) && !isnan(w)) h = w / ar;
-            }
-          if (isnan(w) || isnan(h))
-            {
-              TRFloat availW = cbW - TRDefault(L, 0) - TRDefault(R, 0) - m[TREdgeLeft] - m[TREdgeRight];
-              TRSize sz = TRLayoutNode(c, isnan(w) ? TRMax(0, availW) : w, TRDefault(h, TRUndefined),
-                                       isnan(w) ? TRMeasureModeAtMost : TRMeasureModeExactly,
-                                       isnan(h) ? TRMeasureModeUndefined : TRMeasureModeExactly,
-                                       cbW, cbH, NO, dir);
-              if (isnan(w)) w = sz.width;
-              if (isnan(h)) h = sz.height;
-            }
-          w = TRMax(TRClamp(w, TRBoxSize(cs, cs->minWidth, cbW, cpbW), TRBoxSize(cs, cs->maxWidth, cbW, cpbW)), cpbW);
-          h = TRMax(TRClamp(h, TRBoxSize(cs, cs->minHeight, cbH, cpbH), TRBoxSize(cs, cs->maxHeight, cbH, cpbH)), cpbH);
-          TRLayoutNode(c, w, h, TRMeasureModeExactly, TRMeasureModeExactly, cbW, cbH, YES, dir);
-
-          /* Static position: as if the sole flex item in the content box. */
-          TRFloat outerW = w + m[TREdgeLeft] + m[TREdgeRight];
-          TRFloat outerH = h + m[TREdgeTop] + m[TREdgeBottom];
-          TRFloat contentW = W - pbW, contentH = H - pbH;
-          TRFloat staticX, staticY;
-          {
-            TRFloat freeMain = (isRow ? contentW - outerW : contentH - outerH);
-            TRFloat freeCross = (isRow ? contentH - outerH : contentW - outerW);
-            TRFloat offMain = 0, offCross = 0;
-            switch (jc)
-              {
-                case TRAlignFlexEnd: offMain = freeMain; break;
-                case TRAlignCenter: case TRAlignSpaceAround: case TRAlignSpaceEvenly:
-                  offMain = freeMain / 2; break;
-                default: break;
-              }
-            TRAlign a = TRResolveAlignSelf(cs, s);
-            /* An abspos box has no baseline set to join: CSS Align falls
-               back to 'start' (not 'flex-start'), which ignores wrap-reverse. */
-            if (a == TRAlignBaseline) a = TRAlignStart;
-            if (a == TRAlignStart) a = wrapReverse ? TRAlignFlexEnd : TRAlignFlexStart;
-            else if (a == TRAlignEnd) a = wrapReverse ? TRAlignFlexStart : TRAlignFlexEnd;
-            if (a == TRAlignFlexEnd) offCross = freeCross;
-            else if (a == TRAlignCenter) offCross = freeCross / 2;
-            TRFloat mainSize = isRow ? outerW : outerH, crossSize = isRow ? outerH : outerW;
-            TRFloat mainPhys = mainRev ? (isRow ? contentW : contentH) - offMain - mainSize : offMain;
-            TRFloat crossPhys = crossRev ? (isRow ? contentH : contentW) - offCross - crossSize : offCross;
-            staticX = e->pad[TREdgeLeft] + e->border[TREdgeLeft] + (isRow ? mainPhys : crossPhys) + m[TREdgeLeft];
-            staticY = e->pad[TREdgeTop] + e->border[TREdgeTop] + (isRow ? crossPhys : mainPhys) + m[TREdgeTop];
-          }
-          TRFloat x, y;
-          /* Over-constrained (left, right and width): rtl honours right. */
-          if (!isnan(L) && !(rtl && !isnan(R))) x = e->border[TREdgeLeft] + L + m[TREdgeLeft];
-          else if (!isnan(R)) x = W - e->border[TREdgeRight] - R - m[TREdgeRight] - w;
-          else x = staticX;
-          if (!isnan(T)) y = e->border[TREdgeTop] + T + m[TREdgeTop];
-          else if (!isnan(B)) y = H - e->border[TREdgeBottom] - B - m[TREdgeBottom] - h;
-          else y = staticY;
-          c->_rawFrame = TRRectMake(x, y, w, h);
-          for (int k = 0; k < 4; k++) c->_lmargin[k] = m[k];
-          c->_lineIndex = -1;
-        }
+      /* A static box isn't a containing block: its abspos children are
+         placed by the nearest positioned ancestor (or the layout root). */
+      if (s->position != TRPositionStatic || node->_isLayoutRoot)
+        TRLayoutAbsDescendants(node, s, dir, W, H, e->pad, e->border);
 
       node->_contentSize = TRSizeMake(TRMax(W, maxX + e->pad[TREdgeRight] + e->border[TREdgeRight]),
                                       TRMax(H, maxY + e->pad[TREdgeBottom] + e->border[TREdgeBottom]));
@@ -1087,7 +1168,9 @@ TRSize TRLayoutNode(TRNode *node, TRFloat aw, TRFloat ah,
     ;   /* an unclamped basis measure: neither read nor stored in the cache */
   else if (perform)
     {
-      if (node->_hasPerformEntry
+      /* A static root places its abspos descendants itself; as anyone's
+         child it left them to an ancestor. Always redo it. */
+      if (node->_hasPerformEntry && !(node->_isLayoutRoot && s->position == TRPositionStatic)
           && TRCacheMatch(&node->_performEntry, aw, ah, wm, hm, ow, oh, dir, node->_pctIndefH, ownerMatters))
         return node->_performEntry.result;
     }

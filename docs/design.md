@@ -249,8 +249,8 @@ Agents must not assume browser behaviour in these cases:
 | `display: block` | block flow | a **column** (`align-items: stretch`) whose children never grow or shrink (since 0.6) |
 | `box-sizing` | `content-box` | **`border-box`** |
 | Block and inline flow, floats, tables | yes | no; boxes are flex (v1) or grid (v1.1) containers |
-| `position: absolute` | relative to the nearest *positioned* ancestor | relative to the **parent's** padding box |
-| Default `position` | `static` | `relative` (insets offset the box) |
+| `position: absolute` | relative to the nearest *positioned* ancestor | the same, but every box is positioned by default, so in practice it's the **parent's** padding box unless the parent is `position: static` (since 0.8) |
+| Default `position` | `static` | `relative` (insets offset the box); `static` ignores insets and isn't a containing block |
 | Unitless lengths | invalid, except 0 | accepted as px; `trellis-lint` warns |
 | Unknown property names | ignored | **an error** |
 | Selectors and cascade | yes | inline styles have none; `.trellis` files have file-scoped type, class and id selectors only |

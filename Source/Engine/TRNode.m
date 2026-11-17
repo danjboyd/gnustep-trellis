@@ -315,7 +315,9 @@ static void TRClearDirty(TRNode *n)
       aw = sz.width;
       wm = TRMeasureModeExactly;
     }
+  _isLayoutRoot = YES;
   TRLayoutNode(self, aw, ah, wm, hm, available.width, available.height, YES, direction);
+  _isLayoutRoot = NO;
 
   TRFloat x = s->margin[TREdgeLeft].unit == TRUnitPoint ? s->margin[TREdgeLeft].value : 0;
   TRFloat y = s->margin[TREdgeTop].unit == TRUnitPoint ? s->margin[TREdgeTop].value : 0;

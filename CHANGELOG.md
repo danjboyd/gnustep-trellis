@@ -11,7 +11,7 @@ version may change the API listed in docs/api.md, and says so here.
   Yoga 3. Insets and percentages use that box, and auto insets keep the
   static position in the real parent. Boxes default to `position: relative`,
   so layouts that never say `static` don't change. The 128 Yoga
-  `position: static` cases now run by default: conformance is 3280/3280.
+  `position: static` cases now run by default: conformance is 3280/3280. See docs/migration-0.8.md.
 - **Fixed:** in grid row sizing, an item with `aspect-ratio`, a stretched
   or definite width and a percentage height now gets its height from the
   aspect ratio, as CSS does: the percentage counts as `auto` while the rows

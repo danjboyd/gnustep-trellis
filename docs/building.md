@@ -57,6 +57,7 @@ make -f Makefile.macos check-view       # every Tests/View test under NSZombieEn
 make -f Makefile.macos check-preview    # TrellisPreview snapshot and frames export, light and dark
 make -f Makefile.macos check-reference  # frame replay of the golden dumps, with self-test
 make -f Makefile.macos check-migration  # the frames that changed from 0.5.x to 0.7
+# 0.7 to 0.8: docs/migration-0.8.md (position: static only)
 make -f Makefile.macos check-importers  # conformance importer unit tests (Python only)
 python3 -I scripts/conformance-summary.py check --platform macos --runner build/trellis-case
 ```

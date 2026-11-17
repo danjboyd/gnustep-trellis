@@ -1430,22 +1430,10 @@ def convert_file(path, rel, commit):
         if rs.get("position") in ("absolute", "fixed"):
             cb = conv.root_containing_block(root)
             if cb is not None:
-                # trellis-case lays a given available size out exactly, so
-                # pass the containing block only on an axis whose size comes
-                # from it: insets on both sides, or a %, stretch or
-                # fit-content size. Otherwise the root shrinks to fit.
-                def needs(axis, a, b):
-                    if rs.get(a) is not None and rs.get(b) is not None:
-                        return True
-                    for k in (axis, "min" + axis.title(), "max" + axis.title()):
-                        v = rs.get(k)
-                        if isinstance(v, str) and ("%" in v or STRETCH_RE.search(v)
-                                                   or "fit-content" in v):
-                            return True
-                    return False
-                case["available"] = {
-                    "width": cb["width"] if needs("width", "left", "right") else None,
-                    "height": cb["height"] if needs("height", "top", "bottom") else None}
+                # trellis-case lays an abspos root out against the available
+                # size as its containing block: it fills it less the insets
+                # when both are set, and shrinks to fit otherwise.
+                case["available"] = cb
         if anchor_path is not None:
             case["anchor"] = anchor_path
         if conv.root_margin_collapses(root, tree, exp):

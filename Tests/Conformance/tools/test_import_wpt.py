@@ -185,10 +185,11 @@ class RootContainingBlock(unittest.TestCase):
         (inset,) = self.cases(st, '<div class="cb"><div class="t" style="inset:0;width:stretch"'
                               ' data-expected-width="100"></div></div>', ".t")
         self.assertEqual(inset["available"], {"width": 110, "height": 90})
-        # No insets or keyword: it shrinks to fit, so nothing is passed.
+        # No insets: still the containing block (trellis-case shrinks the
+        # root to fit within it).
         (plain,) = self.cases(st, '<div class="cb"><div class="t" data-expected-width="0">'
                               '</div></div>', ".t")
-        self.assertEqual(plain["available"], {"width": None, "height": None})
+        self.assertEqual(plain["available"], {"width": 110, "height": 90})
         # No positioned ancestor: the initial containing block.
         (icb,) = self.cases(st, '<div><div class="t" style="left:0;right:0"'
                             ' data-expected-width="790"></div></div>', ".t")

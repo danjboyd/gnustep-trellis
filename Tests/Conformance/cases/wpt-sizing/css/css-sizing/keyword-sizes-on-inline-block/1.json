@@ -531,6 +531,7 @@
   "block-layout",
   "display-inline-block",
   "intrinsic-size-keyword",
+  "margin-collapse",
   "measure"
  ]
 }

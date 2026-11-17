@@ -207,8 +207,14 @@ def parse_decls(text):
     return out
 
 
+AHEM_IMPORT_RE = re.compile(r"""@import\s+(?:url\()?\s*["']?/fonts/ahem\.css["']?\s*\)?\s*;""", re.I)
+
+
 def parse_stylesheet(css):
     css = strip_comments(css)
+    # Cases assume Ahem already, so importing its stylesheet changes nothing.
+    # Any other @import still skips the file.
+    css = AHEM_IMPORT_RE.sub("", css)
     rules = []
     pos = 0
     while True:
@@ -956,6 +962,8 @@ class Converter:
             flush()
             if disp not in CONTAINERS + ("none",) and child_nodes:
                 self.requires.add("block-layout")
+                if margins_collapse(node["style"], child_nodes, is_root or parent_display in CONTAINERS):
+                    self.requires.add("margin-collapse")
         if child_nodes:
             node["children"] = child_nodes
             exp["children"] = child_exp
@@ -1113,6 +1121,34 @@ class Converter:
                     w -= px
             return {"width": fmt(w), "height": None}
         return {"width": VIEWPORT_CONTENT_WIDTH, "height": None}
+
+
+def _margin(style, side):
+    v = style.get("margin" + side)
+    return v if isinstance(v, (int, float)) else 0
+
+
+def margins_collapse(style, children, own_bfc):
+    """True when CSS 2 margin collapsing would change this block's layout.
+    Trellis lays a block out as a flex column, whose margins never collapse.
+    Adjacent margins of the same sign collapse to the larger (not the sum);
+    with opposite signs collapsing is the sum anyway, so those don't count."""
+    flow = [c for c in children
+            if c["style"].get("position") not in ("absolute", "fixed")
+            and c["style"].get("display") != "none"]
+    for a, b in zip(flow, flow[1:]):
+        x, y = _margin(a["style"], "Bottom"), _margin(b["style"], "Top")
+        if x * y > 0:
+            return True
+    # A first/last child's margin collapses through a parent with no padding
+    # or border on that side, unless the parent is a formatting-context root
+    # (the case root, a flex or grid item, or overflow other than visible).
+    if flow and not own_bfc and style.get("overflow", "visible") == "visible":
+        for side, child in (("Top", flow[0]), ("Bottom", flow[-1])):
+            if not style.get("padding" + side) and not style.get("border%sWidth" % side) \
+                    and _margin(child["style"], side):
+                return True
+    return False
 
 
 def float_or_skip(v):

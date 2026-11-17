@@ -80,6 +80,7 @@
  "requires": [
   "block-layout",
   "display-inline-block",
-  "intrinsic-size-keyword"
+  "intrinsic-size-keyword",
+  "margin-collapse"
  ]
 }

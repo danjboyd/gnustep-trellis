@@ -165,6 +165,26 @@ class AspectRatio(unittest.TestCase):
         self.assertEqual(self.ratio("auto"), "auto")
 
 
+class AhemImportAndMarginCollapse(unittest.TestCase):
+    def test_ahem_import_is_ignored_other_imports_skip(self):
+        self.assertEqual(W.parse_stylesheet('@import "/fonts/ahem.css"; .a { width: 1px }'),
+                         [(".a", [("width", "1px", False)])])
+        with self.assertRaises(W.Skip):
+            W.parse_stylesheet('@import "other.css"; .a { width: 1px }')
+
+    def test_margin_collapse(self):
+        kid = lambda **m: {"style": {"margin" + k: v for k, v in m.items()}}
+        # Same-sign adjacent sibling margins collapse; opposite signs sum anyway.
+        self.assertTrue(W.margins_collapse({}, [kid(Bottom=5), kid(Top=5)], True))
+        self.assertFalse(W.margins_collapse({}, [kid(Bottom=5), kid(Top=-5)], True))
+        self.assertFalse(W.margins_collapse({}, [kid(Bottom=5), kid(Top=0)], True))
+        # A first child's margin collapses through a parent without padding,
+        # unless the parent is a formatting-context root.
+        self.assertTrue(W.margins_collapse({}, [kid(Top=5)], False))
+        self.assertFalse(W.margins_collapse({"paddingTop": 1}, [kid(Top=5)], False))
+        self.assertFalse(W.margins_collapse({}, [kid(Top=5)], True))
+
+
 class Validation(unittest.TestCase):
     def test_left_right_not_valid_for_align(self):
         self.assertNotIn("right", W.VALID_KEYWORDS["align-content"])

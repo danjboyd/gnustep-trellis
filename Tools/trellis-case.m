@@ -201,6 +201,7 @@ static NSSet *TRDefaultUnsupported(void)
     @"abspos-ancestor-cb",       /* abspos whose containing block is an ancestor beyond the parent */
     @"containing-block-height",  /* % min/max-height on a root: no way to give a CB height without fixing it */
     @"css-calc",                 /* calc(), min(), max(), clamp() values */
+    @"margin-collapse",          /* CSS 2 collapsing margins (a block is a flex column here) */
     nil];
 }
 

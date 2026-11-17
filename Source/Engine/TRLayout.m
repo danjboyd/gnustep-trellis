@@ -325,6 +325,9 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
     }
   const BOOL rtl = (dir == TRDirectionRTL);
   const TRFlexDirection fd = (s->display == TRDisplayBlock) ? TRFlexDirectionColumn : s->flexDirection;
+  /* A block container's children are not flex items: they never grow or
+     shrink, and flex-basis doesn't apply (CSS 2 block layout). */
+  const BOOL inBlock = (s->display == TRDisplayBlock);
   const BOOL isRow = (fd == TRFlexDirectionRow || fd == TRFlexDirectionRowReverse);
   const BOOL dirReverse = (fd == TRFlexDirectionRowReverse || fd == TRFlexDirectionColumnReverse);
   const BOOL wrapReverse = (s->flexWrap == TRFlexWrapWrapReverse);
@@ -443,7 +446,7 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
 
       /* flex-basis */
       TRFloat basis = TRUndefined;
-      if (cs->flexBasis.unit == TRUnitPoint || cs->flexBasis.unit == TRUnitPercent)
+      if (!inBlock && (cs->flexBasis.unit == TRUnitPoint || cs->flexBasis.unit == TRUnitPercent))
         basis = TRBoxSize(cs, cs->flexBasis, refMain, it->pbMain);
       if (isnan(basis) && !isnan(it->styleMain))
         basis = it->styleMain;
@@ -578,7 +581,7 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
           TRItem *it = &li[j];
           it->target = it->hypo;
           TRFloat factor = growing ? it->s->flexGrow : it->s->flexShrink;
-          it->frozen = (factor == 0)
+          it->frozen = inBlock || (factor == 0)
             || (growing && it->base > it->hypo)
             || (!growing && it->base < it->hypo)
             || TRFloatsEqual(sumHypo, space);

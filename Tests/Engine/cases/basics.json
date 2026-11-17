@@ -640,5 +640,51 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/block_children_do_not_shrink",
+  "root": {
+   "style": {
+    "display": "block",
+    "width": 50,
+    "height": 25,
+    "overflow": "hidden"
+   },
+   "children": [
+    {
+     "style": {
+      "width": 50,
+      "height": 50
+     }
+    },
+    {
+     "style": {
+      "height": 10,
+      "flex-grow": 1,
+      "flex-basis": "100px"
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 50,
+   "height": 25,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 50,
+     "height": 50
+    },
+    {
+     "x": 0,
+     "y": 50,
+     "width": 50,
+     "height": 10
+    }
+   ]
+  }
  }
 ]

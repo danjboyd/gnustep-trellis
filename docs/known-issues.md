@@ -59,9 +59,6 @@
   flow: margins don't collapse (see design.md section 4a).
 - An abspos box whose containing block is beyond a `position: static`
   parent can lie outside that parent's view, which may clip it.
-- Size keywords (`min-content`, `max-content`, `fit-content`, `stretch`)
-  on a **grid item** act as `auto`. They work on flex items, abspos boxes
-  and the root.
 - Split panes aren't mirrored in rtl: the first pane stays on the left.
 - Logical properties assume horizontal writing (`writing-mode` isn't
   supported): inline is left/right, block is top/bottom.

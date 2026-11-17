@@ -292,6 +292,8 @@ typedef struct {
 typedef struct {
   __unsafe_unretained TRNode *node;
   const TRStyleStorage *s;
+  const TRStyleStorage *os;   /* the style with its size keywords, or NULL */
+  TRStyleStorage kw;          /* s when os is set: keywords measured without an area */
   NSInteger r0, r1, c0, c1;   /* [start, end) track indices */
   double margin[4];
   BOOL marginAuto[4];
@@ -941,6 +943,15 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       n++;
     }
   if (n > 1) qsort(items, (size_t)n, sizeof(TRGridItem), TRCompareItemOrder);
+  /* Size keywords: measured without a grid area for the track sizing
+     (fit-content is max-content, stretch auto); measured again in the
+     area once it is known. */
+  for (NSInteger k = 0; k < n; k++)
+    {
+      TRGridItem *it = &items[k];
+      const TRStyleStorage *r = TRResolveSizeKeywords(it->node, it->s, &it->kw, NAN, NAN, NAN, NAN, YES, dir);
+      if (r != it->s) { it->os = it->s; it->s = r; }
+    }
 
   BOOL colFlow = s->gridAutoFlowColumn;
   const BOOL dense = s->gridAutoFlowDense;
@@ -1250,8 +1261,9 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
   for (NSInteger k = 0; k < n; k++)
     {
       TRGridItem *it = &items[k];
-      const TRStyleStorage *cs = it->s;
       double areaW = TRSpanSize(colsT, it->c0, it->c1);
+      TRStyleStorage kwArea;
+      const TRStyleStorage *cs = it->os ? TRResolveSizeKeywords(it->node, it->os, &kwArea, areaW, NAN, areaW, NAN, YES, dir) : it->s;
       double mh = it->margin[TREdgeLeft] + it->margin[TREdgeRight];
       double mv = it->margin[TREdgeTop] + it->margin[TREdgeBottom];
       double sh = TRGBox(cs, cs->height, NAN, NO, NAN);
@@ -1314,9 +1326,10 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       for (NSInteger k = 0; k < n; k++)
         {
           TRGridItem *it = &items[k];
-          const TRStyleStorage *cs = it->s;
           double ax = colsT[it->c0].pos, ay = rowsT[it->r0].pos;
           double areaW = TRSpanSize(colsT, it->c0, it->c1), areaH = TRSpanSize(rowsT, it->r0, it->r1);
+          TRStyleStorage kwArea;
+          const TRStyleStorage *cs = it->os ? TRResolveSizeKeywords(it->node, it->os, &kwArea, areaW, areaH, areaW, areaH, YES, dir) : it->s;
           double mh = it->margin[TREdgeLeft] + it->margin[TREdgeRight];
           double mv = it->margin[TREdgeTop] + it->margin[TREdgeBottom];
           TRAlign js = cs->justifySelf == TRAlignAuto ? s->justifyItems : cs->justifySelf;

@@ -351,5 +351,84 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/kw_grid_item_fit_content",
+  "note": "a grid item's fit-content width is max-content clamped to its area, and justify-self doesn't stretch it",
+  "root": {
+   "style": "display: grid; grid-template-columns: 60px 200px; width: 260px",
+   "children": [
+    {
+     "style": "width: fit-content; flex-wrap: wrap",
+     "children": [
+      {
+       "style": "width: 30px; height: 10px"
+      },
+      {
+       "style": "width: 50px; height: 10px"
+      }
+     ]
+    },
+    {
+     "style": "width: fit-content; flex-wrap: wrap",
+     "children": [
+      {
+       "style": "width: 30px; height: 10px"
+      },
+      {
+       "style": "width: 50px; height: 10px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 260,
+   "height": 20,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 60,
+     "height": 20,
+     "children": [
+      {
+       "x": 0,
+       "y": 0,
+       "width": 30,
+       "height": 10
+      },
+      {
+       "x": 0,
+       "y": 10,
+       "width": 50,
+       "height": 10
+      }
+     ]
+    },
+    {
+     "x": 60,
+     "y": 0,
+     "width": 80,
+     "height": 20,
+     "children": [
+      {
+       "x": 0,
+       "y": 0,
+       "width": 30,
+       "height": 10
+      },
+      {
+       "x": 30,
+       "y": 0,
+       "width": 50,
+       "height": 10
+      }
+     ]
+    }
+   ]
+  }
  }
 ]

@@ -8,9 +8,10 @@ version may change the API listed in docs/api.md, and says so here.
 - **Added:** the size keywords `min-content`, `max-content`, `fit-content`
   and `stretch` (also `-webkit-fill-available`) for `width`, `height`, their
   `min-`/`max-` forms and `flex-basis`. They are measured where the box is
-  laid out: as a flex item, an abspos box or the root. Heights take the
+  laid out: as a flex item, a grid item (in its area, once the tracks are
+  sized), an abspos box or the root. Heights take the
   content height at the box's width. The intrinsic-size-keyword skip is
-  removed, and conformance is 3553/3553. The 130 cases that still fail are
+  removed, and conformance is 3556/3556. The 127 cases that still fail are
   listed with reasons in Tests/Conformance/known-gaps.json, a new skip list
   (`known-gap`; `--all` runs them). Most are roots sized against a
   containing block the imported case doesn't carry, flex container

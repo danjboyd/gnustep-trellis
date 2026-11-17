@@ -372,7 +372,7 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
   for (NSUInteger ci = 0; ci < nChildren; ci++)
     {
       TRNode *child = children[ci];
-      const TRStyleStorage *cs = &child->_style->_s;
+      const TRStyleStorage *cs = TRChildStyle(child, dir);
       if (TRNodeIsNone(child))
         {
           if (perform) TRZeroLayout(child);
@@ -936,7 +936,9 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
             {
               TRFloat l = TRResolve(cs->inset[TREdgeLeft], refW), r = TRResolve(cs->inset[TREdgeRight], refW);
               TRFloat t = TRResolve(cs->inset[TREdgeTop], refH), b = TRResolve(cs->inset[TREdgeBottom], refH);
-              x += !isnan(l) ? l : (!isnan(r) ? -r : 0);
+              /* With both left and right, the container's direction picks. */
+              if (!isnan(l) && !(rtl && !isnan(r))) x += l;
+              else if (!isnan(r)) x -= r;
               y += !isnan(t) ? t : (!isnan(b) ? -b : 0);
             }
           TRNode *c = it->node;
@@ -955,7 +957,7 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
       for (NSUInteger ci = 0; ci < nChildren; ci++)
         {
           TRNode *c = children[ci];
-          const TRStyleStorage *cs = &c->_style->_s;
+          const TRStyleStorage *cs = TRChildStyle(c, dir);
           if (TRNodeIsNone(c) || cs->position != TRPositionAbsolute) continue;
           TREdges ce = TRResolveEdges(cs, cbW);
           TRFloat cpbW = TRPBHorizontal(&ce), cpbH = TRPBVertical(&ce);
@@ -1052,6 +1054,7 @@ TRSize TRLayoutNode(TRNode *node, TRFloat aw, TRFloat ah,
   const TRStyleStorage *s = &node->_style->_s;
   TRDirection dir = s->direction == TRDirectionInherit ? parentDirection : s->direction;
   if (dir == TRDirectionInherit) dir = TRDirectionLTR;
+  s = TRStyleStorageForDirection(node->_style, dir);
   if (wm == TRMeasureModeUndefined) aw = TRUndefined;
   if (hm == TRMeasureModeUndefined) ah = TRUndefined;
 

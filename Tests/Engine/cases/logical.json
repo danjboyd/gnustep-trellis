@@ -1,0 +1,389 @@
+[
+ {
+  "id": "engine/logical_margin_ltr",
+  "root": {
+   "style": "width: 100px; height: 50px",
+   "children": [
+    {
+     "style": "width: 20px; margin-inline-start: 10px"
+    },
+    {
+     "style": "width: 20px"
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 50,
+   "children": [
+    {
+     "x": 10,
+     "y": 0,
+     "width": 20,
+     "height": 50
+    },
+    {
+     "x": 30,
+     "y": 0,
+     "width": 20,
+     "height": 50
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/logical_margin_rtl",
+  "note": "margin-inline-start is the right margin in an rtl box",
+  "root": {
+   "style": "width: 100px; height: 50px; direction: rtl",
+   "children": [
+    {
+     "style": "width: 20px; margin-inline-start: 10px"
+    },
+    {
+     "style": "width: 20px; margin-inline-end: 5px"
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 50,
+   "children": [
+    {
+     "x": 70,
+     "y": 0,
+     "width": 20,
+     "height": 50
+    },
+    {
+     "x": 50,
+     "y": 0,
+     "width": 20,
+     "height": 50
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/logical_padding_border_rtl",
+  "root": {
+   "style": "width: 100px; height: 50px; direction: rtl; padding-inline-start: 15px; border-inline-end-width: 4px",
+   "children": [
+    {
+     "style": "width: 20px"
+    },
+    {
+     "style": "flex-grow: 1"
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 50,
+   "children": [
+    {
+     "x": 65,
+     "y": 0,
+     "width": 20,
+     "height": 50
+    },
+    {
+     "x": 4,
+     "y": 0,
+     "width": 61,
+     "height": 50
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/logical_after_physical_wins",
+  "root": {
+   "style": "width: 100px; height: 50px; direction: rtl",
+   "children": [
+    {
+     "style": "width: 20px; margin-right: 5px; margin-inline-start: 10px"
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 50,
+   "children": [
+    {
+     "x": 70,
+     "y": 0,
+     "width": 20,
+     "height": 50
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/physical_after_logical_wins",
+  "root": {
+   "style": "width: 100px; height: 50px; direction: rtl",
+   "children": [
+    {
+     "style": "width: 20px; margin-inline-start: 10px; margin-right: 5px"
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 50,
+   "children": [
+    {
+     "x": 75,
+     "y": 0,
+     "width": 20,
+     "height": 50
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/shorthand_after_logical_wins",
+  "root": {
+   "style": "width: 100px; height: 50px; direction: rtl",
+   "children": [
+    {
+     "style": "width: 20px; margin-inline-start: 10px; margin: 0 2px"
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 50,
+   "children": [
+    {
+     "x": 78,
+     "y": 0,
+     "width": 20,
+     "height": 50
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/logical_uses_own_direction",
+  "note": "an ltr child of an rtl row: its margin-inline-start is its left margin, on the far side",
+  "root": {
+   "style": "width: 100px; height: 50px; direction: rtl",
+   "children": [
+    {
+     "style": "width: 20px; direction: ltr; margin-inline-start: 10px"
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 50,
+   "children": [
+    {
+     "x": 80,
+     "y": 0,
+     "width": 20,
+     "height": 50
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/logical_inherits_direction",
+  "root": {
+   "style": "width: 100px; height: 50px; direction: rtl",
+   "children": [
+    {
+     "style": "width: 60px; flex-direction: row",
+     "children": [
+      {
+       "style": "width: 20px; margin-inline-start: 10px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 50,
+   "children": [
+    {
+     "x": 40,
+     "y": 0,
+     "width": 60,
+     "height": 50,
+     "children": [
+      {
+       "x": 30,
+       "y": 0,
+       "width": 20,
+       "height": 50
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/logical_inset_rtl",
+  "root": {
+   "style": "width: 100px; height: 50px; direction: rtl",
+   "children": [
+    {
+     "style": "position: absolute; width: 20px; height: 10px; inset-inline-start: 10px; top: 0"
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 50,
+   "children": [
+    {
+     "x": 70,
+     "y": 0,
+     "width": 20,
+     "height": 10
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/logical_grid_rtl",
+  "root": {
+   "style": "width: 100px; height: 50px; direction: rtl; display: grid; grid-template-columns: 50px 50px",
+   "children": [
+    {
+     "style": "margin-inline-start: 5px"
+    },
+    {
+     "style": "margin-inline-end: 5px"
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 50,
+   "children": [
+    {
+     "x": 50,
+     "y": 0,
+     "width": 45,
+     "height": 50
+    },
+    {
+     "x": 5,
+     "y": 0,
+     "width": 45,
+     "height": 50
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/logical_rtl_from_layout_call",
+  "note": "direction passed to layout, not set on the root",
+  "root": {
+   "style": "width: 100px; height: 50px",
+   "children": [
+    {
+     "style": "width: 20px; margin-inline-start: 10px"
+    }
+   ]
+  },
+  "direction": "rtl",
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 50,
+   "children": [
+    {
+     "x": 70,
+     "y": 0,
+     "width": 20,
+     "height": 50
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/margin_inline_shorthand_rtl",
+  "root": {
+   "style": "width: 100px; height: 50px; direction: rtl",
+   "children": [
+    {
+     "style": "width: 20px; margin-inline: 10px 3px"
+    },
+    {
+     "style": "width: 20px; padding-inline: 4px; margin-block: 6px 2px"
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 50,
+   "children": [
+    {
+     "x": 70,
+     "y": 0,
+     "width": 20,
+     "height": 50
+    },
+    {
+     "x": 47,
+     "y": 6,
+     "width": 20,
+     "height": 42
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/inset_inline_shorthand_ltr",
+  "root": {
+   "style": "width: 100px; height: 50px",
+   "children": [
+    {
+     "style": "position: absolute; height: 10px; inset-inline: 10px 30px; top: 0"
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 50,
+   "children": [
+    {
+     "x": 10,
+     "y": 0,
+     "width": 60,
+     "height": 10
+    }
+   ]
+  }
+ }
+]

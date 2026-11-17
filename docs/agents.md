@@ -162,6 +162,12 @@ collapses as in HTML, and the runs follow the label's `color`,
   `auto`), `padding`, `border` (width only for layout), `position`
   (`relative`, `absolute`), `top`, `right`, `bottom`, `left`, `inset`,
   `overflow`, `box-sizing`, `direction`.
+- **Logical properties** follow each box's `direction` (horizontal writing
+  only): `margin-inline-start`/`-end`, `padding-inline-*`,
+  `border-inline-*`, `inset-inline-*`, the `-block-*` forms (top and
+  bottom), the shorthands `margin-inline`, `padding-inline`,
+  `inset-inline` (and `-block`), and `inline-size`/`block-size` with
+  `min-`/`max-`. Prefer them for start/end spacing so rtl works.
 - **Grid** (`display: grid`): `grid-template-columns` and
   `grid-template-rows` take `px`, `%`, `fr`, `auto`, `min-content`,
   `max-content`, `minmax()` and `repeat(N | auto-fill | auto-fit, …)`.

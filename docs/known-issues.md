@@ -59,5 +59,5 @@
   design.md section 4a).
 - Absolute positioning is relative to the parent box, not the nearest
   positioned ancestor.
-- Logical properties (`margin-inline-start` and so on) are mapped as if
-  left-to-right.
+- Logical properties assume horizontal writing (`writing-mode` isn't
+  supported): inline is left/right, block is top/bottom.

@@ -55,6 +55,19 @@ static inline BOOL TRNodeIsNone(TRNode *n)
   return n->_hidden || n->_style->_s.display == TRDisplayNone;
 }
 
+/* A style's storage with its logical sides (margin-inline-start and so
+   on) mapped for the box's direction (TRStyle.m). */
+const TRStyleStorage *TRStyleStorageForDirection(TRStyle *st, TRDirection dir);
+
+/* A child's storage, mapped for its own direction (its direction
+   property, or its parent's when that's inherit). */
+static inline const TRStyleStorage *TRChildStyle(TRNode *c, TRDirection parentDir)
+{
+  TRDirection d = c->_style->_s.direction;
+  if (d == TRDirectionInherit) d = parentDir;
+  return TRStyleStorageForDirection(c->_style, d);
+}
+
 /* The layout algorithm (TRLayout.m). Returns the node's border-box size.
    aw/ah: border-box constraint, read according to wm/hm.
    ow/oh: the containing block's inner size, for percentages.

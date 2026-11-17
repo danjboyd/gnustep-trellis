@@ -47,9 +47,13 @@ static TRSize TRAhemMeasure(NSString *text, TRFloat cw, TRFloat lh, BOOL nowrap,
 
 static TRNode *TRBuildNode(NSDictionary *d, NSString **err)
 {
-  NSDictionary *style = d[@"style"] ?: @{};
+  /* A dictionary, or a declaration string where order matters
+     ("margin-right: 5px; margin-inline-start: 10px"). */
+  id style = d[@"style"] ?: @{};
   NSError *e = nil;
-  TRStyle *st = [TRStyle styleWithDictionary: style error: &e];
+  TRStyle *st = [style isKindOfClass: [NSString class]]
+    ? [TRStyle styleWithDeclarations: style error: &e]
+    : [TRStyle styleWithDictionary: style error: &e];
   if (st == nil)
     {
       *err = [e localizedDescription];
@@ -185,7 +189,6 @@ static NSSet *TRDefaultUnsupported(void)
     @"display-inline", @"display-inline-block", @"display-contents",
     @"display--webkit-box",
     @"display-table",            /* display: table and its parts */
-    @"logical-properties",       /* inline-size, margin-inline-start, ... */
     @"intrinsic-size-keyword",   /* width: min-content / max-content / fit-content */
     @"overflow-axis",            /* overflow-x differs from overflow-y */
     @"flex-wrap-balance",        /* css-flexbox-2 flex-wrap: balance */

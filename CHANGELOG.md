@@ -5,6 +5,23 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Fixed:** logical properties follow `direction`: in a right-to-left box
+  `margin-inline-start`, `padding-inline-start`, `border-inline-start`
+  and `inset-inline-start` are the right edge (they were always the left).
+  Each box maps them by its own direction, inherited when unset, and
+  declaration order decides between a logical and a physical side
+  (`margin-right: 5px; margin-inline-start: 10px`), as in CSS.
+- **Added:** the shorthands `margin-inline`, `margin-block`,
+  `padding-inline`, `padding-block`, `inset-inline` and `inset-block`,
+  and the logical sizes `inline-size`, `block-size` and their `min-`/`max-`
+  forms (horizontal writing only, so inline is the width).
+- **Fixed:** `position: relative` offsets (`left`, `top`, ...) on grid
+  items were ignored; they now move the item, against its grid area. With
+  both `left` and `right` set, an rtl container uses `right`, in flex too.
+- `trellis-case` accepts a declaration string as a node's `style`, and
+  no longer skips conformance cases that need logical properties
+  (WPT: 4 more pass).
+
 ## 0.5.1 (2026-11-17)
 
 Adds API (listed in docs/api.md, nothing removed): split panes that can

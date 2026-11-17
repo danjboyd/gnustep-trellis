@@ -244,15 +244,17 @@ static BOOL TRParseBox(NSString *value, TRValue out[4], BOOL allowAuto)
   return YES;
 }
 
-static int TREdgeFromSuffix(NSString *suffix)
+/* rtl: map the inline logical sides for a right-to-left box (inline-start
+   is the right edge). Block sides are top and bottom either way
+   (horizontal-tb only). */
+static int TREdgeFromSuffix(NSString *suffix, BOOL rtl)
 {
   if ([suffix isEqualToString: @"left"]) return TREdgeLeft;
   if ([suffix isEqualToString: @"top"]) return TREdgeTop;
   if ([suffix isEqualToString: @"right"]) return TREdgeRight;
   if ([suffix isEqualToString: @"bottom"]) return TREdgeBottom;
-  /* Logical properties, horizontal-tb + ltr only for now. */
-  if ([suffix isEqualToString: @"inline-start"]) return TREdgeLeft;
-  if ([suffix isEqualToString: @"inline-end"]) return TREdgeRight;
+  if ([suffix isEqualToString: @"inline-start"]) return rtl ? TREdgeRight : TREdgeLeft;
+  if ([suffix isEqualToString: @"inline-end"]) return rtl ? TREdgeLeft : TREdgeRight;
   if ([suffix isEqualToString: @"block-start"]) return TREdgeTop;
   if ([suffix isEqualToString: @"block-end"]) return TREdgeBottom;
   return -1;
@@ -263,6 +265,14 @@ static int TREdgeFromSuffix(NSString *suffix)
 @implementation TRStyle
 {
   NSMutableDictionary<NSString *, NSString *> *_other;
+  /* Logical sides (margin-inline-start and so on) map to different
+     physical edges in a right-to-left box. _s holds the edges as mapped
+     for ltr; once a logical side is set, _rtlEdges holds them as mapped
+     for rtl, kept in step with every later declaration, so declaration
+     order decides between a logical and a physical side as in CSS. */
+  BOOL _hasLogical, _mapRTL, _rtlValid;
+  TRValue _rtlEdges[4][4];      /* margin, padding, border, inset */
+  TRStyleStorage _rtlS;         /* _s with _rtlEdges; built on demand */
 }
 
 @synthesize owner = _owner;
@@ -315,6 +325,8 @@ static int TREdgeFromSuffix(NSString *suffix)
   c->_gridRowEnd = _gridRowEnd;
   c->_gridColumnStart = _gridColumnStart;
   c->_gridColumnEnd = _gridColumnEnd;
+  c->_hasLogical = _hasLogical;
+  memcpy(c->_rtlEdges, _rtlEdges, sizeof _rtlEdges);
   return c;
 }
 
@@ -325,7 +337,44 @@ static int TREdgeFromSuffix(NSString *suffix)
 
 - (void)changed
 {
+  _rtlValid = NO;
   [_owner markDirty];
+}
+
+static void TRGetEdges(const TRStyleStorage *s, TRValue out[4][4])
+{
+  memcpy(out[0], s->margin, sizeof s->margin);
+  memcpy(out[1], s->padding, sizeof s->padding);
+  memcpy(out[2], s->border, sizeof s->border);
+  memcpy(out[3], s->inset, sizeof s->inset);
+}
+
+static void TRPutEdges(TRStyleStorage *s, TRValue in[4][4])
+{
+  memcpy(s->margin, in[0], sizeof s->margin);
+  memcpy(s->padding, in[1], sizeof s->padding);
+  memcpy(s->border, in[2], sizeof s->border);
+  memcpy(s->inset, in[3], sizeof s->inset);
+}
+
+static BOOL TRIsEdgeProperty(NSString *p)
+{
+  return [p hasPrefix: @"margin"] || [p hasPrefix: @"padding"]
+    || [p hasPrefix: @"border"] || [p hasPrefix: @"inset"]
+    || [p isEqualToString: @"left"] || [p isEqualToString: @"right"]
+    || [p isEqualToString: @"top"] || [p isEqualToString: @"bottom"];
+}
+
+const TRStyleStorage *TRStyleStorageForDirection(TRStyle *st, TRDirection dir)
+{
+  if (dir != TRDirectionRTL || !st->_hasLogical) return &st->_s;
+  if (!st->_rtlValid)
+    {
+      st->_rtlS = st->_s;
+      TRPutEdges(&st->_rtlS, st->_rtlEdges);
+      st->_rtlValid = YES;
+    }
+  return &st->_rtlS;
 }
 
 - (BOOL)applyDeclarations:(NSString *)declarations error:(NSError **)error
@@ -366,11 +415,43 @@ static int TREdgeFromSuffix(NSString *suffix)
      set from code accepts and ignores them. */
   if ([property hasPrefix: @"--"]) return YES;
   NSString *p = TRKebab(property);
+  /* Logical sizes; horizontal-tb only, so inline is width either way. */
+  static NSDictionary *logicalSizes;
+  static dispatch_once_t sizesOnce;
+  dispatch_once(&sizesOnce, ^{
+    logicalSizes = @{ @"inline-size": @"width", @"block-size": @"height",
+      @"min-inline-size": @"min-width", @"min-block-size": @"min-height",
+      @"max-inline-size": @"max-width", @"max-block-size": @"max-height" };
+  });
+  if (logicalSizes[p]) p = logicalSizes[p];
   NSString *sv = [value isKindOfClass: [NSString class]]
     ? [(NSString *)value stringByTrimmingCharactersInSet:
         [NSCharacterSet whitespaceCharacterSet]]
     : [value description];
-  BOOL ok = [self _set: p value: value string: sv];
+  BOOL edges = TRIsEdgeProperty(p);
+  if (edges && !_hasLogical && [p rangeOfString: @"inline"].location != NSNotFound)
+    {
+      TRGetEdges(&_s, _rtlEdges);
+      _hasLogical = YES;
+    }
+  BOOL ok = YES;
+  if (edges && _hasLogical)
+    {
+      /* The same declaration as mapped for rtl, into _rtlEdges. Side
+         styles and colours (border-inline-start: 1px solid red) are kept
+         for ltr only, so -otherDeclarations comes from the ltr pass. */
+      TRValue ltr[4][4];
+      TRGetEdges(&_s, ltr);
+      TRPutEdges(&_s, _rtlEdges);
+      NSMutableDictionary *other = [_other mutableCopy];
+      _mapRTL = YES;
+      ok = [self _set: p value: value string: sv];
+      _mapRTL = NO;
+      if (ok) TRGetEdges(&_s, _rtlEdges);
+      TRPutEdges(&_s, ltr);
+      _other = other;
+    }
+  if (ok) ok = [self _set: p value: value string: sv];
   if (!ok)
     {
       if (error)
@@ -559,14 +640,38 @@ static int TREdgeFromSuffix(NSString *suffix)
       || [p isEqualToString: @"right"] || [p isEqualToString: @"bottom"])
     {
       if (!TRValueFromObject(obj, &len, YES, NO)) return NO;
-      _s.inset[TREdgeFromSuffix(p)] = len;
+      _s.inset[TREdgeFromSuffix(p, NO)] = len;
+      return YES;
+    }
+  if ([p hasSuffix: @"-inline"] || [p hasSuffix: @"-block"])
+    {
+      /* margin-inline: <start> [<end>], and -block, padding-, inset-. */
+      BOOL inl = [p hasSuffix: @"-inline"];
+      NSString *base = [p substringToIndex: [p length] - (inl ? 7 : 6)];
+      TRValue *box = [base isEqualToString: @"margin"] ? _s.margin
+        : [base isEqualToString: @"padding"] ? _s.padding
+        : [base isEqualToString: @"inset"] ? _s.inset : NULL;
+      if (box == NULL) return NO;
+      BOOL allowAuto = box != _s.padding;
+      NSArray *t = TRTokens(v);
+      TRValue a, b;
+      if ([t count] < 1 || [t count] > 2) return NO;
+      if (!TRParseLength(t[0], &a, allowAuto, NO)) return NO;
+      b = a;
+      if ([t count] == 2 && !TRParseLength(t[1], &b, allowAuto, NO)) return NO;
+      if (inl)
+        {
+          box[TREdgeFromSuffix(@"inline-start", _mapRTL)] = a;
+          box[TREdgeFromSuffix(@"inline-end", _mapRTL)] = b;
+        }
+      else { box[TREdgeTop] = a; box[TREdgeBottom] = b; }
       return YES;
     }
   if ([p hasPrefix: @"margin-"] || [p hasPrefix: @"padding-"] || [p hasPrefix: @"inset-"])
     {
       NSRange dash = [p rangeOfString: @"-"];
       NSString *base = [p substringToIndex: dash.location];
-      int e = TREdgeFromSuffix([p substringFromIndex: NSMaxRange(dash)]);
+      int e = TREdgeFromSuffix([p substringFromIndex: NSMaxRange(dash)], _mapRTL);
       if (e < 0) return NO;
       BOOL allowAuto = ![base isEqualToString: @"padding"];
       if (!TRValueFromObject(obj, &len, allowAuto, NO)) return NO;
@@ -578,7 +683,7 @@ static int TREdgeFromSuffix(NSString *suffix)
   if ([p hasPrefix: @"border-"] && [p hasSuffix: @"-width"])
     {
       NSString *mid = [p substringWithRange: NSMakeRange(7, [p length] - 13)];
-      int e = TREdgeFromSuffix(mid);
+      int e = TREdgeFromSuffix(mid, _mapRTL);
       if (e < 0) return NO;
       if (!TRValueFromObject(obj, &len, NO, NO)) return NO;
       _s.border[e] = len;
@@ -587,7 +692,7 @@ static int TREdgeFromSuffix(NSString *suffix)
   int borderEdge = -1;
   if ([p hasPrefix: @"border-"] && [p rangeOfString: @"-" options: 0
         range: NSMakeRange(7, [p length] - 7)].location == NSNotFound)
-    borderEdge = TREdgeFromSuffix([p substringFromIndex: 7]);
+    borderEdge = TREdgeFromSuffix([p substringFromIndex: 7], _mapRTL);
   if ([p isEqualToString: @"border"] || borderEdge >= 0
       || ([p hasPrefix: @"border-"] && [p hasPrefix: @"border-inline-"])
       || ([p hasPrefix: @"border-"] && [p hasPrefix: @"border-block-"]))
@@ -597,7 +702,7 @@ static int TREdgeFromSuffix(NSString *suffix)
          -color; the all-sides shorthand clears those. */
       if (borderEdge < 0 && ![p isEqualToString: @"border"])
         {
-          borderEdge = TREdgeFromSuffix([p substringFromIndex: 7]);
+          borderEdge = TREdgeFromSuffix([p substringFromIndex: 7], _mapRTL);
           if (borderEdge < 0) return NO;
         }
       static NSSet *styles;
@@ -817,15 +922,15 @@ ACCESSOR(NSInteger, order, setOrder, order)
 #undef ACCESSOR
 
 - (TRValue)marginForEdge:(TREdge)e { return _s.margin[e]; }
-- (void)setMargin:(TRValue)v forEdge:(TREdge)e { _s.margin[e] = v; [self changed]; }
+- (void)setMargin:(TRValue)v forEdge:(TREdge)e { _s.margin[e] = v; _rtlEdges[0][e] = v; [self changed]; }
 - (TRValue)paddingForEdge:(TREdge)e { return _s.padding[e]; }
-- (void)setPadding:(TRValue)v forEdge:(TREdge)e { _s.padding[e] = v; [self changed]; }
+- (void)setPadding:(TRValue)v forEdge:(TREdge)e { _s.padding[e] = v; _rtlEdges[1][e] = v; [self changed]; }
 - (TRValue)borderWidthForEdge:(TREdge)e { return _s.border[e]; }
-- (void)setBorderWidth:(TRValue)v forEdge:(TREdge)e { _s.border[e] = v; [self changed]; }
+- (void)setBorderWidth:(TRValue)v forEdge:(TREdge)e { _s.border[e] = v; _rtlEdges[2][e] = v; [self changed]; }
 - (TRValue)insetForEdge:(TREdge)e { return _s.inset[e]; }
-- (void)setInset:(TRValue)v forEdge:(TREdge)e { _s.inset[e] = v; [self changed]; }
-- (void)setMargin:(TRValue)v { for (int i = 0; i < 4; i++) _s.margin[i] = v; [self changed]; }
-- (void)setPadding:(TRValue)v { for (int i = 0; i < 4; i++) _s.padding[i] = v; [self changed]; }
+- (void)setInset:(TRValue)v forEdge:(TREdge)e { _s.inset[e] = v; _rtlEdges[3][e] = v; [self changed]; }
+- (void)setMargin:(TRValue)v { for (int i = 0; i < 4; i++) _s.margin[i] = _rtlEdges[0][i] = v; [self changed]; }
+- (void)setPadding:(TRValue)v { for (int i = 0; i < 4; i++) _s.padding[i] = _rtlEdges[1][i] = v; [self changed]; }
 - (void)setGap:(TRValue)v { _s.rowGap = _s.columnGap = v; [self changed]; }
 
 /* ------------------------------------------------------------------ */

@@ -867,7 +867,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
   for (NSUInteger i = 0; i < nc; i++)
     {
       TRNode *c = children[i];
-      const TRStyleStorage *cs = &c->_style->_s;
+      const TRStyleStorage *cs = TRChildStyle(c, dir);
       if (TRNodeIsNone(c)) continue;
       if (cs->position == TRPositionAbsolute) continue;
       items[n].node = c; items[n].s = cs; items[n].docOrder = (NSInteger)i;
@@ -1302,6 +1302,16 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           if (rtl) x = innerFinalW - x - w;
           x += pad[TREdgeLeft] + border[TREdgeLeft];
           y += pad[TREdgeTop] + border[TREdgeTop];
+          if (it->s->position == TRPositionRelative)
+            {
+              /* Relative offsets, against the grid area (CSS Grid 9). With
+                 both left and right, the grid's direction picks. */
+              double l = TRGResolve(it->s->inset[TREdgeLeft], areaW), r = TRGResolve(it->s->inset[TREdgeRight], areaW);
+              double t = TRGResolve(it->s->inset[TREdgeTop], areaH), b = TRGResolve(it->s->inset[TREdgeBottom], areaH);
+              if (!isnan(l) && !(rtl && !isnan(r))) x += l;
+              else if (!isnan(r)) x -= r;
+              y += !isnan(t) ? t : (!isnan(b) ? -b : 0);
+            }
           TRLayoutNode(it->node, w, h, TRMeasureModeExactly, TRMeasureModeExactly, areaW, areaH, YES, dir);
           TRNode *c = it->node;
           c->_rawFrame = TRRectMake(x, y, w, h);
@@ -1326,7 +1336,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       for (NSUInteger i = 0; i < nc; i++)
         {
           TRNode *c = children[i];
-          const TRStyleStorage *cs = &c->_style->_s;
+          const TRStyleStorage *cs = TRChildStyle(c, dir);
           if (TRNodeIsNone(c) || cs->position != TRPositionAbsolute) continue;
           TRStyle *cst = c->_style;
           double cbStart[2], cbEnd[2];   /* [0] rows (y), [1] columns (x); border-box coordinates */

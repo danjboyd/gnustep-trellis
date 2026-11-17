@@ -5,7 +5,7 @@ model: Flexbox now, Grid next. Trellis uses exact CSS property names and
 semantics, so anyone who knows CSS (people and coding agents alike) can
 write Trellis layouts.
 
-Status: **pre-alpha, private.** Licence: LGPL 2.1 or later (COPYING.LIB).
+Status: **pre-alpha.** Licence: LGPL 2.1 or later (COPYING.LIB).
 
 ## Layers
 

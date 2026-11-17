@@ -51,7 +51,6 @@
   "width": 50
  },
  "requires": [
-  "block-layout",
-  "display-inline-grid"
+  "block-layout"
  ]
 }

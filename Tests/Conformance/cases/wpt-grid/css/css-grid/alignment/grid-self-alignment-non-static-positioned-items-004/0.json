@@ -139,7 +139,6 @@
   ]
  },
  "requires": [
-  "display-inline-grid",
   "measure"
  ]
 }

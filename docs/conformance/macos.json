@@ -1,9 +1,9 @@
 {
- "commit": "fe40f9a",
+ "commit": "931cb39",
  "conformance": {
-  "pass": 2977,
-  "skipped": 1206,
-  "total": 2977
+  "pass": 3154,
+  "skipped": 1029,
+  "total": 3154
  },
  "date": "2026-11-17",
  "platform": "macos",
@@ -19,8 +19,8 @@
   },
   "wpt-grid": {
    "cases": 1977,
-   "pass": 1206,
-   "total": 1206
+   "pass": 1383,
+   "total": 1383
   },
   "wpt-sizing": {
    "cases": 125,

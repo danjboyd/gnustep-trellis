@@ -76,7 +76,6 @@
   ]
  },
  "requires": [
-  "display-inline-grid",
   "measure",
   "subgrid"
  ],

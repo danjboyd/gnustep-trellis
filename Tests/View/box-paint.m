@@ -111,6 +111,31 @@ int main(void)
                  c != nil && MAX(r, MAX(g, bl)) - MIN(r, MIN(g, bl)) >= 0.15);
         }
 
+      /* A consumer's path: `border: 2px solid accentcolor` (lowercase) set
+         with -setStyleDeclarations:forSubview: after the first layout. */
+      {
+        TRBoxView *outer = [[TRBoxView alloc] initWithStyle: @"background-color: #ffffff"];
+        TRBoxView *row = [[TRBoxView alloc] initWithStyle: nil];
+        [outer addSubview: row style: @"width: 120px; height: 40px"];
+        NSWindow *w = [[NSWindow alloc] initWithContentRect: NSMakeRect(0, 0, 120, 40)
+                                                  styleMask: NSWindowStyleMaskBorderless
+                                                    backing: NSBackingStoreBuffered defer: NO];
+        [w setReleasedWhenClosed: NO];
+        [w setContentView: outer];
+        [outer setFrame: NSMakeRect(0, 0, 120, 40)];
+        [outer layoutTrellis];
+        [outer display];
+        [outer setStyleDeclarations: @"border: 2px solid accentcolor" forSubview: row];
+        [outer layoutTrellis];
+        [outer display];
+        NSBitmapImageRep *rep = [outer bitmapImageRepForCachingDisplayInRect: [outer bounds]];
+        [outer cacheDisplayInRect: [outer bounds] toBitmapImageRep: rep];
+        NSColor *c = [[rep colorAtX: [rep pixelsWide] / 2 y: 0] colorUsingColorSpaceName: NSCalibratedRGBColorSpace];
+        printf("     accent border pixel: %.2f %.2f %.2f\n", [c redComponent], [c greenComponent], [c blueComponent]);
+        Expect("border: 2px solid accentcolor set after layout paints a blue edge",
+               [c blueComponent] > 0.6 && [c redComponent] < 0.5);
+      }
+
       /* Hiding. */
       NSString *spec =
         @"<row id=\"bar\">\n"

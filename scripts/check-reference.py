@@ -126,13 +126,23 @@ def build(n, docs, path):
                 node["measure"] = {"width": cw, "height": ch}
             elif cw < intr["width"] - 0.5:
                 node["measure"] = {"width": cw, "height": m["height"]}
+            elif "text" in n and ch > m["height"] + 0.5:
+                # Text that wrapped at its frame's width although the dump's
+                # single-line sizes say it fits (on GNUstep a wrapping
+                # cell's cellSize follows its frame): the frame is the
+                # measure the engine got.
+                node["measure"] = {"width": cw, "height": ch}
             else:
                 node["measure"] = {"width": m["width"], "height": m["height"]}
             if "baseline" in n:
                 node["measure"]["baseline"] = n["baseline"]
         if n.get("class") in SCROLL_CLASSES:
             for i, d in enumerate(n.get("children") or []):
-                docs.append((f"{path}/scroll[{i}]", d, n.get("width", 0), n.get("height", 0)))
+                # The document is as wide as the clip view: the scroll view
+                # less a legacy scroller (GNUstep's is 19pt; macOS overlay
+                # scrollers take none). Its own frame records that width.
+                docs.append((f"{path}/scroll[{i}]", d, d.get("width", n.get("width", 0)),
+                             n.get("height", 0)))
         elif "split" in n:
             # NSSplitView places the panes; each pane lays out at its size.
             for i, d in enumerate(n.get("children") or []):
@@ -241,8 +251,12 @@ def structure(dumps, render, appearance, geometry_limit):
             ap = ref.get("appearance") or appearance
             if ap:
                 cmd += ["--appearance", ap]
+            if os.path.exists(out):
+                os.remove(out)
             r = subprocess.run(cmd, capture_output=True, text=True)
-            if r.returncode != 0 or not os.path.exists(out):
+            # Non-zero on lint findings (the before-* specs); the dump is
+            # still written, as in render mode.
+            if not os.path.exists(out):
                 print(f"FAIL structure {p}: render failed: {(r.stderr or r.stdout).strip()[-200:]}")
                 bad += 1
                 continue
@@ -324,8 +338,10 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("mode", choices=["replay", "structure", "render", "all"])
     ap.add_argument("dumps", nargs="*")
-    ap.add_argument("--runner", default=os.environ.get("CASE", "build/trellis-case"))
-    ap.add_argument("--render", default=os.environ.get("RENDER", "build/trellis-render"))
+    # Makefile.macos builds into build/, GNUmakefile into obj/.
+    built = lambda t: f"build/{t}" if os.path.exists(f"build/{t}") else f"obj/{t}"
+    ap.add_argument("--runner", default=os.environ.get("CASE", built("trellis-case")))
+    ap.add_argument("--render", default=os.environ.get("RENDER", built("trellis-render")))
     ap.add_argument("--appearance", default=None,
                     help="appearance for renders when the dump doesn't name one")
     ap.add_argument("--geometry", type=int, default=5,

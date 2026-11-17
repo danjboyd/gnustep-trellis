@@ -451,16 +451,30 @@ const TRStyleStorage *TRResolveSizeKeywords(TRNode *c, const TRStyleStorage *cs,
   TRFloat ownH = TRBoxSize(cs, cs->height, refH, pbH);
   #define TR_MAXC (isnan(maxC) ? (maxC = TRLayoutNode(c, TRUndefined, ownH, TRMeasureModeUndefined, \
                                  isnan(ownH) ? TRMeasureModeUndefined : TRMeasureModeExactly, refW, refH, NO, dir).width) : maxC)
+  /* With an aspect ratio, a definite min-height transfers a minimum width
+     that the content sizes include (css-sizing-4 5.1). */
+  TRFloat arMinW = TRUndefined;
+  if (!isnan(cs->aspectRatio) && cs->aspectRatio > 0)
+    {
+      TRFloat mnH = TRBoxSize(cs, cs->minHeight, refH, pbH);
+      if (!isnan(mnH))
+        {
+          BOOL rcb = cs->boxSizing == TRBoxSizingContentBox || cs->aspectRatioAuto;
+          TRFloat w = (rcb ? TRMax(0, mnH - pbH) : mnH) * cs->aspectRatio;
+          arMinW = rcb ? w + pbW : TRMax(w, pbW);
+        }
+    }
   TRFloat (^widthFor)(TRUnit) = ^TRFloat(TRUnit u) {
     switch (u)
       {
-        case TRUnitMinContent: return TR_MINC;
+        case TRUnitMinContent: return isnan(arMinW) ? TR_MINC : TRMax(TR_MINC, arMinW);
         /* max-content is never below min-content (a flex row's min-content
            follows 9.9.1, while its max-content is measured by layout). */
         case TRUnitMaxContent:
         case TRUnitFitContent:
           {
             TRFloat mn = TR_MINC;
+            if (!isnan(arMinW)) mn = TRMax(mn, arMinW);
             TRFloat mx = TRMax(TR_MAXC, mn);
             if (u == TRUnitMaxContent || isnan(availW)) return mx;
             return TRMin(mx, TRMax(mn, availW - mh));

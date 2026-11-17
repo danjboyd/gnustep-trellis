@@ -171,6 +171,59 @@ class AbsposContainingBlock(unittest.TestCase):
         self.assertIn("margin-collapse", c["requires"])
 
 
+class RootContainingBlock(unittest.TestCase):
+    def cases(self, style, body, sel):
+        d = tempfile.mkdtemp()
+        with open(os.path.join(d, "t.html"), "w") as f:
+            f.write('<!DOCTYPE html><script src="/resources/check-layout-th.js"></script>'
+                    '<style>%s</style><body onload="checkLayout(\'%s\')">%s</body>' % (style, sel, body))
+        return W.convert_file(os.path.join(d, "t.html"), "t.html", "0" * 40)
+
+    def test_abspos_root_gets_its_containing_block(self):
+        st = (".cb{position:relative;width:100px;height:80px;padding:5px}"
+              ".t{position:absolute;margin:5px}")
+        (inset,) = self.cases(st, '<div class="cb"><div class="t" style="inset:0;width:stretch"'
+                              ' data-expected-width="100"></div></div>', ".t")
+        self.assertEqual(inset["available"], {"width": 110, "height": 90})
+        # No insets or keyword: it shrinks to fit, so nothing is passed.
+        (plain,) = self.cases(st, '<div class="cb"><div class="t" data-expected-width="0">'
+                              '</div></div>', ".t")
+        self.assertEqual(plain["available"], {"width": None, "height": None})
+        # No positioned ancestor: the initial containing block.
+        (icb,) = self.cases(st, '<div><div class="t" style="left:0;right:0"'
+                            ' data-expected-width="790"></div></div>', ".t")
+        self.assertEqual(icb["available"]["width"], 800)
+
+    def test_stretch_root_gets_parent_height(self):
+        (c,) = self.cases("", '<div style="height:100px;border-top:solid;border-bottom:solid"><div class="r" style="height:stretch"'
+                          ' data-expected-height="100"></div></div>', ".r")
+        self.assertEqual(c["available"]["height"], 100)
+        self.assertNotIn("margin-collapse", c.get("requires", []))
+
+    def test_stretch_margins_zeroed_in_non_bfc(self):
+        # CSSWG #11044: in a parent that isn't a BFC, a stretch box's margin
+        # on a side without border/padding counts as 0.
+        body = ('<div class="o"%s><div class="i" style="height:stretch;margin:10px"'
+                ' data-expected-height="100"></div></div>')
+        (c,) = self.cases(".o{width:100px;height:100px;position:relative}", body % "", ".i")
+        self.assertIn("margin-collapse", c["requires"])
+        (bfc,) = self.cases(".o{width:100px;height:100px;position:relative}",
+                            body % ' style="overflow:hidden;padding:1px 0"', ".i")
+        self.assertNotIn("margin-collapse", bfc.get("requires", []))
+        # The root itself stretched in a plain parent.
+        (r,) = self.cases("", '<div style="height:200px"><div class="r" style="height:stretch;'
+                          'margin:10px" data-expected-height="200"></div></div>', ".r")
+        self.assertIn("margin-collapse", r["requires"])
+
+    def test_stretch_min_height_needs_cb_height(self):
+        (c,) = self.cases("", '<div style="height:100px"><div class="r" style="min-height:stretch"'
+                          ' data-expected-height="100"></div></div>', ".r")
+        self.assertIn("containing-block-height", c["requires"])
+        (auto,) = self.cases("", '<div><div class="r" style="min-height:stretch"'
+                             ' data-expected-height="0"></div></div>', ".r")
+        self.assertNotIn("containing-block-height", auto.get("requires", []))
+
+
 class AttributeSelectors(unittest.TestCase):
     def test_presence_and_value(self):
         d = tempfile.mkdtemp()

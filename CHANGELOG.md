@@ -5,6 +5,16 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Conformance:** the WPT importer gives an abspos root its containing
+  block (the positioned ancestor's padding box, or the 800×600 viewport)
+  on an axis whose size depends on it, and a `height: stretch` root its
+  parent's definite height. 22 known gaps now pass: conformance is
+  3578/3578. CSSWG #11044 cases, where a stretch box's margins count as 0
+  in a parent that isn't a BFC, are tagged `margin-collapse`, and
+  `min-height`/`max-height: stretch` against a definite parent is tagged
+  `containing-block-height`. Known gaps are down from 127 to 91; the
+  remaining stretch entries have specific reasons.
+
 ## 0.8.0 (2026-11-17)
 
 One behavior change: a `position: static` box is no longer a containing

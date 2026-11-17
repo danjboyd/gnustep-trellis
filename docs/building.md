@@ -32,6 +32,10 @@ runtime are not supported.
    make check-gui  # view checks, headless under Xvfb
    ```
 
+Then [tutorial.md](tutorial.md) builds a first app against the installed
+Trellis (`make install`). `scripts/check-tutorial.sh` runs the tutorial
+end to end, as CI does.
+
 GUI runs (`trellis-render`, `make check-gui`) go through
 `scripts/run-headless.sh`, which uses a private Xvfb display and a private
 `GNUSTEP_HOME`, so they never touch your real defaults or display.

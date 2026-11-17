@@ -7,12 +7,14 @@
 # run on a project Mac.
 name: CI
 
+# Docs-only changes skip CI, except the tutorial, which the tutorial step
+# follows literally (later patterns win).
 on:
   push:
     branches: [main]
-    paths-ignore: ['docs/**', '**.md']
+    paths: ['**', '!docs/**', '!**.md', 'docs/tutorial.md']
   pull_request:
-    paths-ignore: ['docs/**', '**.md']
+    paths: ['**', '!docs/**', '!**.md', 'docs/tutorial.md']
   workflow_dispatch:
     inputs:
       macos:
@@ -102,6 +104,12 @@ jobs:
           set +u; . scripts/env.sh; set -u
           # Exits non-zero if any view check fails (HOOK, OPENFILE, APPEARANCE, SCROLLQUERY).
           make check-gui
+
+      # Last: it installs Trellis into the (already saved) toolchain.
+      - name: Tutorial (docs/tutorial.md, followed literally)
+        run: |
+          set +u; . scripts/env.sh; set -u
+          scripts/check-tutorial.sh "$RUNNER_TEMP/tutorial"
 
   macos:
     # Disabled until the maintainer approves macOS runner minutes (10x). Runs only on a

@@ -104,6 +104,7 @@ re-records a platform and regenerates the table.
 
 ## Documents
 
+- [docs/tutorial.md](docs/tutorial.md): build your first Trellis app (CI follows it)
 - [docs/design.md](docs/design.md): architecture, API, tools, risks
 - [docs/agents.md](docs/agents.md): writing Trellis UI (for coding agents)
 - [docs/test-case-format.md](docs/test-case-format.md): JSON layout test cases

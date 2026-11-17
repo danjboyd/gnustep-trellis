@@ -5,6 +5,12 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Docs:** docs/tutorial.md, "Build your first Trellis app": a small app
+  with a layout, an owner, lint, renders at two widths, a container query
+  and a smoke test. `scripts/check-tutorial.sh` extracts its files and
+  steps and runs them; CI runs it on every push (including tutorial-only
+  edits).
+
 - **Added:** rich text in `<label>` and `<text>`: `<b>`/`<strong>`,
   `<i>`/`<em>`, `<code>`, `<br/>`, and links. `<a action="sel:"
   href="...">` sends the action to the owner with the label as sender

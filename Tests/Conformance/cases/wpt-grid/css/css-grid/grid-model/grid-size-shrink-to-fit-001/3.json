@@ -11,7 +11,7 @@
  "tolerance": 0.999,
  "pixelScale": 0,
  "available": {
-  "width": null,
+  "width": 600,
   "height": null
  },
  "root": {
@@ -19,7 +19,8 @@
    "display": "grid",
    "boxSizing": "content-box",
    "gridTemplateColumns": "200px 200px",
-   "gridTemplateRows": "200px 200px"
+   "gridTemplateRows": "200px 200px",
+   "width": "fit-content"
   },
   "children": [
    {
@@ -65,8 +66,5 @@
   ],
   "width": 400,
   "height": 400
- },
- "requires": [
-  "intrinsic-size-keyword"
- ]
+ }
 }

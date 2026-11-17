@@ -11,14 +11,15 @@
  "tolerance": 0.999,
  "pixelScale": 0,
  "available": {
-  "width": null,
+  "width": 0,
   "height": null
  },
  "root": {
   "style": {
    "display": "flex",
    "boxSizing": "content-box",
-   "height": 100
+   "height": 100,
+   "width": "fit-content"
   },
   "children": [
    {
@@ -60,8 +61,5 @@
    {}
   ],
   "width": 600
- },
- "requires": [
-  "intrinsic-size-keyword"
- ]
+ }
 }

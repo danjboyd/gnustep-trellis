@@ -1420,10 +1420,15 @@ def convert_file(path, rel, commit):
             # to the container: a given available width would be laid out
             # exactly, so leave it unconstrained.
             case["available"] = dict(case["available"], width=None)
-        if conv.root_sizing == "fit-content" and conv.sized_by_ancestor:
-            # Shrink-to-fit in a narrow container: may size at min-content.
-            case.setdefault("requires", []).append("intrinsic-size-keyword")
-        if conv.root_sizing == "fit-content":
+        if conv.root_sizing == "fit-content" and conv.sized_by_ancestor \
+                and rs.get("width", "auto") == "auto" \
+                and rs.get("position") not in ("absolute", "fixed"):
+            # Shrink-to-fit in an explicitly sized (often narrow) ancestor:
+            # say so, and keep that width as the available width, so a
+            # width: 0 container gives min-content as in the browser.
+            rs["width"] = "fit-content"
+            case["available"] = {"width": case["available"]["width"], "height": None}
+        elif conv.root_sizing == "fit-content":
             # Shrink-to-fit root: trellis-case lays a given available width
             # out exactly, so leave it unconstrained (content size).
             case["available"] = {"width": None, "height": None}

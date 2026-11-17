@@ -52,7 +52,6 @@
  "requires": [
   "block-layout",
   "containing-block-height",
-  "grid-lanes",
-  "intrinsic-size-keyword"
+  "grid-lanes"
  ]
 }

@@ -11,7 +11,7 @@
  "tolerance": 0.999,
  "pixelScale": 0,
  "available": {
-  "width": null,
+  "width": 0,
   "height": null
  },
  "root": {
@@ -19,7 +19,8 @@
    "display": "flex",
    "boxSizing": "content-box",
    "flexWrap": "wrap",
-   "height": 100
+   "height": 100,
+   "width": "fit-content"
   },
   "children": [
    {
@@ -65,7 +66,6 @@
   "width": 100
  },
  "requires": [
-  "block-layout",
-  "intrinsic-size-keyword"
+  "block-layout"
  ]
 }

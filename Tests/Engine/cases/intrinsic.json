@@ -430,5 +430,157 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/kw_min_content_flex_shrinkable",
+  "note": "css-flexbox 9.9.1: shrinkable items contribute max(min-content, width) = 100 each (WPT row-005/0); the items then flex normally inside that width",
+  "root": {
+   "style": "flex-direction: column; align-items: flex-start; width: 0px",
+   "children": [
+    {
+     "style": "width: min-content; height: 10px",
+     "children": [
+      {
+       "style": "flex: 1 1 200px; width: 50px; min-width: 0",
+       "children": [
+        {
+         "style": "width: 100px; height: 10px"
+        }
+       ]
+      },
+      {
+       "style": "flex: 1 1 400px; width: 50px",
+       "children": [
+        {
+         "style": "width: 100px; height: 10px"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 0,
+   "height": 10,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 200,
+     "height": 10,
+     "children": [
+      {},
+      {}
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/kw_min_content_flex_unshrinkable",
+  "note": "an item that can't shrink keeps its flex base size (WPT row-005/3)",
+  "root": {
+   "style": "flex-direction: column; align-items: flex-start; width: 0px",
+   "children": [
+    {
+     "style": "width: min-content; height: 10px",
+     "children": [
+      {
+       "style": "flex: 1 0 200px; width: 50px",
+       "children": [
+        {
+         "style": "width: 100px; height: 10px"
+        }
+       ]
+      },
+      {
+       "style": "flex: 1 1 400px; width: 50px",
+       "children": [
+        {
+         "style": "width: 100px; height: 10px"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 0,
+   "height": 10,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 300,
+     "height": 10,
+     "children": [
+      {
+       "width": 200
+      },
+      {
+       "width": 100
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/kw_min_content_flex_growing",
+  "note": "a positive chosen fraction grows every item by its grow factor (WPT row-005/5)",
+  "root": {
+   "style": "flex-direction: column; align-items: flex-start; width: 0px",
+   "children": [
+    {
+     "style": "width: min-content; height: 10px",
+     "children": [
+      {
+       "style": "flex: 1 0 50px; width: 200px",
+       "children": [
+        {
+         "style": "width: 100px; height: 10px"
+        }
+       ]
+      },
+      {
+       "style": "flex: 2 0 100px; width: 200px",
+       "children": [
+        {
+         "style": "width: 100px; height: 10px"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 0,
+   "height": 10,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 600,
+     "height": 10,
+     "children": [
+      {
+       "width": 200
+      },
+      {
+       "width": 400
+      }
+     ]
+    }
+   ]
+  }
  }
 ]

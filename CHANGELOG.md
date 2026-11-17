@@ -5,6 +5,13 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Fixed:** the min-content width of a single-line flex row follows
+  css-flexbox 9.9.1. Each item contributes the larger of its min-content
+  size and its width, bounded by its flex base size when it can't grow or
+  shrink. The largest desired flex fraction then decides each item's share.
+  `width: min-content` (and fit-content in a narrow space) on a flex row
+  gives the browser's width.
+
 - **Changed (layout):** an abspos root shrinks to fit the space it's given,
   as in CSS 2: without both left and right its auto width is fit-content,
   and without both top and bottom its auto height is its content height.

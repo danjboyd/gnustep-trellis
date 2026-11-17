@@ -331,24 +331,91 @@ static TRFloat TRMinContentWidth(TRNode *node, const TRStyleStorage *s, TRFloat 
   TRFloat gap = TRMax(0, TRDefault(TRResolve(s->columnGap, TRUndefined), 0));
   TRFloat total = 0;
   NSInteger count = 0;
+  /* A single-line row: css-flexbox 9.9.1. Each item's min-content
+     contribution is the larger of its min-content size and its preferred
+     width, capped by its flex base size if it can't grow and floored by it
+     if it can't shrink, then clamped by min/max (min-width: auto is the
+     automatic minimum). The largest desired flex fraction is chosen: an
+     item that can shrink contributes its contribution when that fraction
+     and its own are <= 0; otherwise its base size flexed by the fraction. */
+  NSInteger nItems = 0;
+  for (TRNode *c in node->_children)
+    if (!TRNodeIsNone(c) && c->_style->_s.position != TRPositionAbsolute) nItems++;
+  TRFloat *cb = sum ? calloc(nItems ? nItems : 1, 4 * sizeof(TRFloat)) : NULL;   /* c, b, d, m per item */
+  NSInteger k = 0;
+  TRFloat chosen = -INFINITY;
   for (TRNode *c in node->_children)
     {
       if (TRNodeIsNone(c) || c->_style->_s.position == TRPositionAbsolute) continue;
       const TRStyleStorage *cs = TRChildStyle(c, dir);
       TREdges ce = TRResolveEdges(cs, TRUndefined);
       TRFloat cpb = TRPBHorizontal(&ce);
-      TRFloat w = TRBoxSize(cs, cs->width, TRUndefined, cpb);
-      if (isnan(w))
+      TRDirection cd = cs->direction == TRDirectionInherit ? dir : cs->direction;
+      TRFloat pref = TRBoxSize(cs, cs->width, TRUndefined, cpb);
+      TRFloat mnw = TRBoxSize(cs, cs->minWidth, TRUndefined, cpb), mxw = TRBoxSize(cs, cs->maxWidth, TRUndefined, cpb);
+      TRFloat margins = TRDefault(TRResolve(cs->margin[TREdgeLeft], TRUndefined), 0) + TRDefault(TRResolve(cs->margin[TREdgeRight], TRUndefined), 0);
+      TRFloat w;
+      if (!sum)
         {
-          TRDirection cd = cs->direction == TRDirectionInherit ? dir : cs->direction;
-          w = TRMinContentWidth(c, cs, TRUndefined, TRUndefined, cd);
+          w = isnan(pref) ? TRMinContentWidth(c, cs, TRUndefined, TRUndefined, cd) : pref;
+          w = TRMax(TRClamp(w, mnw, mxw), cpb);
+          total = TRMax(total, w + margins);
+          count++;
+          continue;
         }
-      w = TRMax(TRClamp(w, TRBoxSize(cs, cs->minWidth, TRUndefined, cpb), TRBoxSize(cs, cs->maxWidth, TRUndefined, cpb)), cpb);
-      w += TRDefault(TRResolve(cs->margin[TREdgeLeft], TRUndefined), 0) + TRDefault(TRResolve(cs->margin[TREdgeRight], TRUndefined), 0);
-      total = sum ? total + w : TRMax(total, w);
-      count++;
+      TRFloat minC = TRMinContentWidth(c, cs, TRUndefined, TRUndefined, cd);
+      if (cs->minWidth.unit == TRUnitAuto && cs->overflow == TROverflowVisible && s->display != TRDisplayBlock)
+        mnw = isnan(pref) ? minC : TRMin(pref, minC);
+      TRFloat b = TRBoxSize(cs, cs->flexBasis, TRUndefined, cpb);
+      if (isnan(b)) b = pref;
+      if (isnan(b)) b = TRLayoutNode(c, TRUndefined, TRUndefined, TRMeasureModeUndefined, TRMeasureModeUndefined,
+                                     TRUndefined, TRUndefined, NO, cd).width;
+      TRFloat con = isnan(pref) ? minC : TRMax(minC, pref);
+      if (cs->flexGrow <= 0) con = TRMin(con, b);
+      if (cs->flexShrink <= 0) con = TRMax(con, b);
+      con = TRMax(TRClamp(con, mnw, mxw), cpb);
+      TRFloat d = con - b;
+      if (d > 0) d = cs->flexGrow >= 1 ? d / cs->flexGrow : d * cs->flexGrow;
+      else if (d < 0)
+        {
+          TRFloat sc = cs->flexShrink * b;
+          d = sc >= 1 ? d / sc : d * sc;
+        }
+      chosen = TRMax(chosen, d);
+      cb[4 * k] = con; cb[4 * k + 1] = b; cb[4 * k + 2] = d; cb[4 * k + 3] = margins;
+      k++;
     }
-  if (sum && count > 1) total += gap * (count - 1);
+  if (sum)
+    {
+      if (k == 0) chosen = 0;
+      k = 0;
+      for (TRNode *c in node->_children)
+        {
+          if (TRNodeIsNone(c) || c->_style->_s.position == TRPositionAbsolute) continue;
+          const TRStyleStorage *cs = TRChildStyle(c, dir);
+          TREdges ce = TRResolveEdges(cs, TRUndefined);
+          TRFloat cpb = TRPBHorizontal(&ce);
+          TRFloat con = cb[4 * k], b = cb[4 * k + 1], d = cb[4 * k + 2];
+          TRFloat w;
+          if (chosen <= 0 && d <= 0 && cs->flexShrink > 0) w = con;
+          else if (chosen > 0) w = b + chosen * cs->flexGrow;
+          else w = b + chosen * cs->flexShrink * b;
+          TRFloat mnw = TRBoxSize(cs, cs->minWidth, TRUndefined, cpb), mxw = TRBoxSize(cs, cs->maxWidth, TRUndefined, cpb);
+          if (cs->minWidth.unit == TRUnitAuto && cs->overflow == TROverflowVisible)
+            {
+              TRFloat pref = TRBoxSize(cs, cs->width, TRUndefined, cpb);
+              TRDirection cd = cs->direction == TRDirectionInherit ? dir : cs->direction;
+              TRFloat minC = TRMinContentWidth(c, cs, TRUndefined, TRUndefined, cd);
+              mnw = isnan(pref) ? minC : TRMin(pref, minC);
+            }
+          w = TRMax(TRClamp(w, mnw, mxw), cpb);
+          total += w + cb[4 * k + 3];
+          k++;
+        }
+      count = k;
+      free(cb);
+      if (count > 1) total += gap * (count - 1);
+    }
   return TRMax(total, 0) + pbW;
 }
 

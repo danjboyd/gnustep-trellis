@@ -437,6 +437,9 @@ static NSDictionary *TPDump(NSView *v, TRNode *node)
   d[@"x"] = @(f.origin.x); d[@"y"] = @(f.origin.y);
   d[@"width"] = @(f.size.width); d[@"height"] = @(f.size.height);
   if ([v isHidden]) d[@"hidden"] = @YES;
+  /* A measured leaf's first baseline, as in trellis-render's dump. */
+  if (node.baselineBlock != nil)
+    d[@"baseline"] = @(node.baselineBlock(TRSizeMake(f.size.width, f.size.height)));
   if (node.style.position == TRPositionAbsolute) d[@"position"] = @"absolute";
   if ([v isKindOfClass: [NSControl class]] && [(NSControl *)v cell])
     {

@@ -106,6 +106,10 @@ static NSDictionary *TRDumpView(NSView *v, TRNode *node)
   d[@"width"] = @(f.size.width);
   d[@"height"] = @(f.size.height);
   if ([v isHidden]) d[@"hidden"] = @YES;
+  /* A measured leaf's first baseline, from its top edge, as the engine
+     reads it for align-items: baseline (check-reference.py replays it). */
+  if (node.baselineBlock != nil)
+    d[@"baseline"] = @(node.baselineBlock(TRSizeMake(f.size.width, f.size.height)));
   if (node)
     {
       NSString *decl = [node.style declarationString];

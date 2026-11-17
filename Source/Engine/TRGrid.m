@@ -1237,7 +1237,9 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       NSInteger vis = 0;
       for (NSInteger i = 0; i < nCols; i++) if (!colsT[i].collapsed) { used += colsT[i].base; vis++; }
       used += vis > 1 ? colGap * (vis - 1) : 0;
-      contentW = isnan(innerW) ? used : MIN(innerW, used);
+      /* The tracks never shrink below their bases: the width they give
+         holds even past a bounded space (shrink-to-fit overflows). */
+      contentW = used;
       if (!isnan(minInnerW)) contentW = MAX(contentW, minInnerW);
       if (!isnan(maxInnerW)) contentW = MIN(contentW, maxInnerW);
       for (NSInteger i = 0; i < nCols; i++) colsT[i].size = savedCols[i];

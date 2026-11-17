@@ -801,5 +801,39 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_percent_column_shrink_to_fit",
+  "note": "a % column in a shrink-to-fit grid is sized as auto to find the width (30, past the 0px space), then resolves against it: 25% of 30 (WPT grid-percentage-of-indefinite-track-size-001)",
+  "root": {
+   "style": "flex-direction: column; align-items: flex-start; width: 0px",
+   "children": [
+    {
+     "style": "display: grid; grid-template-columns: 25%; grid-template-rows: 10px",
+     "children": [
+      {
+       "style": "width: 30px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "width": 0,
+   "height": 10,
+   "children": [
+    {
+     "x": 0,
+     "width": 30,
+     "height": 10,
+     "children": [
+      {
+       "x": 0,
+       "width": 30
+      }
+     ]
+    }
+   ]
+  }
  }
 ]

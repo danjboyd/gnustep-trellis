@@ -14,8 +14,9 @@ version may change the API listed in docs/api.md, and says so here.
   an `align-items: flex-start` column, or `width: min-content`) with less
   space than its min-content keeps its tracks' minimum sizes and
   overflows, instead of being squeezed to the space. `width: min-content`
-  on a grid no longer gives 0.
-- Both are in docs/migration-0.10.md. Known gaps 73 to 47.
+  on a grid no longer gives 0. The same holds for the width a grid finds
+  for its percentage columns before resolving them.
+- Both are in docs/migration-0.10.md. Known gaps 73 to 31.
 
 ## 0.9.0 (2026-11-17)
 

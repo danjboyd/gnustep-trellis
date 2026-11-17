@@ -680,5 +680,36 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/kw_aspect_ratio_transferred_min_width",
+  "note": "max-width: min-content on a box with aspect-ratio 1 and min-height 80 includes the transferred 80px minimum width, so the max doesn't cut it to the 20px content (WPT intrinsic-contribution-transferred-min-width-001/2)",
+  "available": {
+   "width": null,
+   "height": null
+  },
+  "root": {
+   "style": "flex-direction: column; align-items: flex-start",
+   "children": [
+    {
+     "style": "aspect-ratio: 1; min-height: 80px; max-width: min-content",
+     "children": [
+      {
+       "style": "width: 20px; height: 1px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "width": 80,
+   "children": [
+    {
+     "x": 0,
+     "width": 80,
+     "height": 80
+    }
+   ]
+  }
  }
 ]

@@ -7,8 +7,6 @@
   "wpt-grid/css/css-grid/alignment/grid-align-justify-overflow/5": "uses justify-items: unsafe end, which Trellis doesn't support",
   "wpt-grid/css/css-grid/alignment/grid-align-justify-overflow/6": "uses justify-items: safe end, which Trellis doesn't support",
   "wpt-grid/css/css-grid/alignment/grid-align-justify-overflow/7": "uses justify-items: safe end, which Trellis doesn't support",
-  "wpt-sizing/css/css-sizing/aspect-ratio/intrinsic-contribution-transferred-min-width-001/1": "intrinsic size keyword case, not yet analysed",
-  "wpt-sizing/css/css-sizing/aspect-ratio/intrinsic-contribution-transferred-min-width-001/2": "intrinsic size keyword case, not yet analysed",
   "wpt-sizing/css/css-sizing/keyword-sizes-on-abspos/0": "uses width: initial, which Trellis doesn't support",
   "wpt-sizing/css/css-sizing/keyword-sizes-on-abspos/10": "uses max-width: initial, which Trellis doesn't support",
   "wpt-sizing/css/css-sizing/keyword-sizes-on-abspos/30": "uses height: initial, which Trellis doesn't support",

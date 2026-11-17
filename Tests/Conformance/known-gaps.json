@@ -1,12 +1,6 @@
 {
  "about": "Cases of a supported feature that still fail. trellis-case skips them by default (counted as known-gap); --all runs them. Remove an entry when the engine passes it.",
  "cases": {
-  "wpt-sizing/css/css-sizing/keyword-sizes-on-abspos/0": "uses width: initial, which Trellis doesn't support",
-  "wpt-sizing/css/css-sizing/keyword-sizes-on-abspos/10": "uses max-width: initial, which Trellis doesn't support",
-  "wpt-sizing/css/css-sizing/keyword-sizes-on-abspos/30": "uses height: initial, which Trellis doesn't support",
-  "wpt-sizing/css/css-sizing/keyword-sizes-on-abspos/35": "uses min-height: initial, which Trellis doesn't support",
-  "wpt-sizing/css/css-sizing/keyword-sizes-on-abspos/40": "uses max-height: initial, which Trellis doesn't support",
-  "wpt-sizing/css/css-sizing/keyword-sizes-on-abspos/5": "uses min-width: initial, which Trellis doesn't support",
   "wpt-sizing/css/css-sizing/stretch/block-height-004/7": "uses display: flow-root, which Trellis doesn't support"
  }
 }

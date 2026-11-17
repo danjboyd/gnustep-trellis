@@ -530,9 +530,12 @@ static NSString *TRStripOverflowAlign(NSString *v, BOOL *safe)
   if ([p isEqualToString: NAME]) { \
     if (!TRLookup(v, TABLE, &k)) return NO; \
     _s.FIELD = (TYPE)k; return YES; }
+/* initial is the property's initial value: auto, none (max-*) or 0. */
 #define LENGTH(NAME, FIELD, AUTO, NONE) \
   if ([p isEqualToString: NAME]) { \
-    if (!TRSizeKeyword(obj, &len) && !TRValueFromObject(obj, &len, AUTO, NONE)) return NO; \
+    if ([obj isKindOfClass: [NSString class]] && [[obj lowercaseString] isEqualToString: @"initial"]) \
+      len = (AUTO) ? TRAuto : ((NONE) ? TRNone : TRPx(0)); \
+    else if (!TRSizeKeyword(obj, &len) && !TRValueFromObject(obj, &len, AUTO, NONE)) return NO; \
     _s.FIELD = len; return YES; }
 
   KEYWORD(@"display", kDisplay, display, TRDisplay)

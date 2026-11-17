@@ -549,5 +549,27 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/size_initial_keyword",
+  "note": "initial is a size property's initial value: width/height auto (an abspos box with both insets fills between them), max-height none, min-width auto (WPT keyword-sizes-on-abspos)",
+  "root": {
+   "style": "width: 200px; height: 100px",
+   "children": [
+    {
+     "style": "position: absolute; left: 10px; right: 20px; top: 0px; bottom: 0px; width: initial; height: initial; min-width: initial; max-height: initial"
+    }
+   ]
+  },
+  "expected": {
+   "children": [
+    {
+     "x": 10,
+     "y": 0,
+     "width": 170,
+     "height": 100
+    }
+   ]
+  }
  }
 ]

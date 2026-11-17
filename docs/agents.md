@@ -359,7 +359,13 @@ it a row. Lint reports this as `stretched`.
   - In code: `-dividerPositions`, `-setDividerPositions:` (clamped to the
     limits, saved under `autosave`), and `target`/`action`, sent after
     the user drags a divider.
-  - Panes can't be hidden or collapsed yet.
+  - A pane can be hidden: `hidden` on it in markup, or
+    `[split setHidden: YES forPane: pane]` in code (`-isPaneHidden:`).
+    The pane and its divider leave and the other panes take its space;
+    shown again, it comes back in its place at the size it had. Focus in
+    a pane being hidden moves to the next view. Use it for a sidebar or
+    inspector the user toggles. (`-setHidden:forSubview:` is for box
+    children; a pane belongs to the split.)
 
 ## 6. From code
 

@@ -1,7 +1,9 @@
 /* <split> (headless): panes sized from their CSS (starting size, limits,
    flex-grow on resize), divider positions set in code and clamped, kept
    across loads with autosave=, stacked panes, the Tab loop through the
-   panes, and load errors. Prints SPLIT OK. */
+   panes, hidden panes (markup and code: their space goes to the others,
+   they come back at their size, focus moves out), and load errors.
+   Prints SPLIT OK. */
 #import <AppKit/AppKit.h>
 #import "TRBoxView.h"
 #import "TRLoader.h"
@@ -24,6 +26,23 @@ static NSString *const kSpec =
   @"  .body { flex-grow: 1; }\n"
   @"  .top { height: 100px; min-height: 60px; }\n"
   @"</style>\n";
+
+static NSString *const kHideSpec =
+  @"<column>\n"
+  @"  <split id=\"hs\">\n"
+  @"    <column id=\"nav\" class=\"nav\"><field id=\"navf\" a11y-label=\"Search\"/></column>\n"
+  @"    <column id=\"content\" class=\"content\"><field id=\"cf\" a11y-label=\"Body\"/></column>\n"
+  @"    <column id=\"insp\" class=\"insp\" hidden><field id=\"inf\" a11y-label=\"Inspector\"/></column>\n"
+  @"  </split>\n"
+  @"</column>\n"
+  @"<style> .nav { width: 200px; } .content { flex-grow: 1; } .insp { width: 180px; } </style>\n";
+
+static NSView *Focused(NSWindow *win)
+{
+  id fr = [win firstResponder];
+  if ([fr isKindOfClass: [NSText class]] && [(NSText *)fr isFieldEditor]) fr = [(NSText *)fr delegate];
+  return [fr isKindOfClass: [NSView class]] ? fr : nil;
+}
 
 @interface Owner : NSObject
 {
@@ -156,6 +175,69 @@ int main(void)
       [root2 layoutTrellis];
       NSView *side2 = [TRLoader viewWithIdentifier: @"side" inView: root2];
       Expect("autosave restores the pane sizes on the next load", NSWidth([side2 frame]) == 250);
+
+      /* Hidden panes. */
+      {
+        TRBoxView *hr = Load(kHideSpec, &err);
+        if (hr == nil) { printf("hide spec: %s\n", [[err localizedDescription] UTF8String]); return 2; }
+        NSWindow *hw = [[NSWindow alloc] initWithContentRect: NSMakeRect(0, 0, 800, 300)
+                                                   styleMask: NSWindowStyleMaskTitled
+                                                     backing: NSBackingStoreBuffered defer: NO];
+        [hw setReleasedWhenClosed: NO];
+        [hr setFrame: NSMakeRect(0, 0, 800, 300)];
+        [hw setContentView: hr];
+        [hr layoutTrellis];
+        TRSplitView *hs = (TRSplitView *)[TRLoader viewWithIdentifier: @"hs" inView: hr];
+        NSView *nav = [TRLoader viewWithIdentifier: @"nav" inView: hr];
+        NSView *content = [TRLoader viewWithIdentifier: @"content" inView: hr];
+        NSView *insp = [[hs panes] lastObject];
+        CGFloat thick = [hs dividerThickness];
+        Expect("hidden pane: three panes, two on screen", [[hs panes] count] == 3 && [[hs subviews] count] == 2);
+        Expect("isPaneHidden", [hs isPaneHidden: insp] && ![hs isPaneHidden: nav]);
+        Expect("hidden pane: one divider", [[hs dividerPositions] count] == 1);
+        printf("     nav %.0f, content %.0f\n", NSWidth([nav frame]), NSWidth([content frame]));
+        Expect("hidden pane: the others fill the split",
+               NSWidth([nav frame]) == 200 && NSWidth([content frame]) == 800 - 200 - thick);
+        [hr recalculateTrellisKeyViewLoop];
+        NSView *navf = [TRLoader viewWithIdentifier: @"navf" inView: hr];
+        NSView *cf = [TRLoader viewWithIdentifier: @"cf" inView: hr];
+        Expect("hidden pane: out of the key loop", hr.firstKeyView == navf && [cf nextKeyView] != [insp subviews].firstObject);
+
+        [hs setHidden: NO forPane: insp];
+        [hr layoutTrellis];
+        printf("     shown: nav %.0f, content %.0f, insp %.0f at %.0f\n", NSWidth([nav frame]),
+               NSWidth([content frame]), NSWidth([insp frame]), NSMinX([insp frame]));
+        Expect("shown: last again, at its starting size",
+               [[hs subviews] lastObject] == insp && NSWidth([insp frame]) == 180 && NSWidth([nav frame]) == 200
+               && NSMaxX([insp frame]) == 800);
+        NSView *inf = [TRLoader viewWithIdentifier: @"inf" inView: hr];
+        Expect("shown: back in the key loop", [cf nextKeyView] == inf);
+
+        [hs setDividerPositions: @[ @150, @600 ]];
+        CGFloat inspW = NSWidth([insp frame]);
+        [hs setHidden: YES forPane: insp];
+        printf("     hidden after sizing: nav %.0f, content %.0f\n", NSWidth([nav frame]), NSWidth([content frame]));
+        Expect("hiding gives its space to the others", NSWidth([nav frame]) == 150
+               && NSWidth([content frame]) == 800 - 150 - thick);
+        [hs setHidden: NO forPane: insp];
+        printf("     shown after sizing: nav %.0f, content %.0f, insp %.0f (was %.0f)\n", NSWidth([nav frame]),
+               NSWidth([content frame]), NSWidth([insp frame]), inspW);
+        Expect("shown again at the size it had", NSWidth([insp frame]) == inspW && NSWidth([nav frame]) == 150);
+
+        /* Focus in a pane being hidden moves out of it. */
+        [hw makeFirstResponder: navf];
+        Expect("nav field has focus", Focused(hw) == navf);
+        [hs setHidden: YES forPane: nav];
+        [hr layoutTrellis];
+        printf("     focus after hiding nav: %s\n", [[Focused(hw) identifier] ?: @"(none)" UTF8String]);
+        Expect("focus moved to the next pane", Focused(hw) == cf);
+        Expect("first pane hidden: content starts at 0", NSMinX([content frame]) == 0);
+        [hs setHidden: NO forPane: nav];
+        Expect("first pane shown: first again", [[hs subviews] firstObject] == nav && NSWidth([nav frame]) == 150);
+        [hw close];
+      }
+      Expect("hidden=\"maybe\" on a pane is an error",
+             Load(@"<column><split><box hidden=\"maybe\"/><box/></split></column>", &err) == nil);
 
       /* Errors. */
       Expect("direction=\"diagonal\" is an error",

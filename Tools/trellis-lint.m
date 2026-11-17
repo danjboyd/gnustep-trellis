@@ -310,7 +310,7 @@ static void TRLintTrellis(NSString *path, NSString *header)
       if (layout && ![layout isEqualToString: @"list"] && ![layout isEqualToString: @"grid"])
         TRReport(where, @"error", @"virtual", [NSString stringWithFormat: @"layout=\"%@\": use list or grid", layout]);
     }
-  /* <split>: direction and divider values, at least one pane, no hidden panes. */
+  /* <split>: direction and divider values, at least one pane. */
   for (TRMarkupElement *e in [doc allElements])
     {
       if (![e.name isEqualToString: @"split"]) continue;
@@ -323,9 +323,6 @@ static void TRLintTrellis(NSString *path, NSString *header)
         TRReport(where, @"error", @"split", [NSString stringWithFormat: @"divider=\"%@\": use thin, thick or pane", div]);
       if ([e.children count] == 0)
         TRReport(where, @"error", @"split", @"<split> has no panes");
-      for (TRMarkupElement *c in e.children)
-        if (c.attributes[@"hidden"])
-          TRReport(where, @"error", @"split", @"a <split> pane can't be hidden (not supported yet)");
     }
   /* <segmented>: items, tracking, selection. */
   for (TRMarkupElement *e in [doc allElements])

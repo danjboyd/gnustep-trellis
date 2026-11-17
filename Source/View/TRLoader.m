@@ -689,10 +689,18 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
           NSView *pv = [self viewForElement: c document: doc owner: owner error: error];
           if (pv == nil) return nil;
           [sv addPane: pv];
-          if (c.attributes[@"hidden"])
+          NSString *h = c.attributes[@"hidden"];
+          BOOL hidePane = NO;
+          if (h)
             {
-              if (error) *error = TRLoadError(doc, c, @"a <split> pane can't be hidden (not supported yet)");
-              return nil;
+              BOOL no = [h isEqualToString: @"no"] || [h isEqualToString: @"false"]
+                || [h isEqualToString: @"off"] || [h isEqualToString: @"0"];
+              if (!no && !TRYes(h) && [h length] && ![h isEqualToString: @"hidden"])
+                {
+                  if (error) *error = TRLoadError(doc, c, @"hidden=\"%@\": use yes or no", h);
+                  return nil;
+                }
+              hidePane = !no;
             }
           /* The pane's sizing declarations go to the split; the rest style
              the pane itself, which the split sizes. */
@@ -728,6 +736,7 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
             }
           else
             TRApplyLeafStyle(pv, joined);
+          if (hidePane) [sv setHidden: YES forPane: pv];
         }
       if (a[@"autosave"]) sv.autosave = a[@"autosave"];
       v = sv;
@@ -1335,6 +1344,8 @@ static NSView *TRFindView(NSString *identifier, NSView *root)
         {
           if ([[v superview] isKindOfClass: [TRBoxView class]])
             [(TRBoxView *)[v superview] setHidden: [d[@"hidden"] boolValue] forSubview: v];
+          else if ([[v superview] isKindOfClass: [TRSplitView class]])
+            [(TRSplitView *)[v superview] setHidden: [d[@"hidden"] boolValue] forPane: v];
           else
             [v setHidden: [d[@"hidden"] boolValue]];
         }

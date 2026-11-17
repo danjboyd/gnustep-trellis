@@ -13,14 +13,28 @@
   CGFloat initial;     /* NAN: unset */
   CGFloat min, max;    /* 0 / CGFLOAT_MAX: unset */
   CGFloat grow;        /* flex-grow; -1: unset */
-  CGFloat size;        /* current size along the split */
+  CGFloat size;        /* current size along the split (kept while hidden) */
+  BOOL hidden;         /* out of the split's subviews until shown */
+  NSView *parked;      /* holds the view while it's out */
 }
 @end
 @implementation TRSplitPane
 @end
 
 @interface TRSplitView ()
+- (void)distribute:(CGFloat)delta among:(NSArray<TRSplitPane *> *)panes;
+- (CGFloat)available;
+- (void)applySizes;
+- (void)save;
 @end
+
+static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
+{
+  if (s > p->max) s = p->max;
+  if (s < p->min) s = p->min;
+  return s;
+}
+
 
 @implementation TRSplitView
 {
@@ -29,6 +43,7 @@
   BOOL _sized;          /* sizes chosen by a drag or in code: kept from now on */
   BOOL _applying;       /* setting pane frames ourselves */
   BOOL _tracking;       /* the user is dragging a divider */
+  BOOL _parking;        /* taking a hidden pane out of the subviews */
 }
 
 - (instancetype)initWithDirection:(TRSplitDirection)direction
@@ -86,11 +101,79 @@
   return a;
 }
 
+/* The panes on screen, in order (NSSplitView's subviews). */
+- (NSArray<TRSplitPane *> *)shown
+{
+  NSMutableArray *a = [NSMutableArray array];
+  for (TRSplitPane *p in _panes)
+    if (!p->hidden && p->view) [a addObject: p];
+  return a;
+}
+
 - (void)willRemoveSubview:(NSView *)subview
 {
-  TRSplitPane *p = [self infoForPane: subview];
+  TRSplitPane *p = _parking ? nil : [self infoForPane: subview];
   if (p) [_panes removeObject: p];
   [super willRemoveSubview: subview];
+}
+
+- (BOOL)isPaneHidden:(NSView *)pane
+{
+  TRSplitPane *p = [self infoForPane: pane];
+  return p != nil && p->hidden;
+}
+
+- (void)setHidden:(BOOL)hidden forPane:(NSView *)pane
+{
+  TRSplitPane *p = [self infoForPane: pane];
+  if (p == nil || p->hidden == hidden) return;
+  if (hidden)
+    {
+      /* Focus inside the pane moves to the next view outside it first. */
+      NSWindow *w = [self window];
+      id fr = [w firstResponder];
+      if ([fr isKindOfClass: [NSText class]] && [(NSText *)fr isFieldEditor]) fr = [(NSText *)fr delegate];
+      if ([fr isKindOfClass: [NSView class]] && [fr isDescendantOf: pane])
+        {
+          NSView *target = nil, *v = [fr nextKeyView];
+          for (int i = 0; v != nil && v != fr && i < 256; i++, v = [v nextKeyView])
+            if (![v isDescendantOf: pane] && [v window] == w && [v canBecomeKeyView]) { target = v; break; }
+          [w makeFirstResponder: target];
+        }
+      p->hidden = YES;
+      p->parked = pane;
+      _parking = YES;
+      [pane removeFromSuperview];
+      _parking = NO;
+      /* Its space goes to the panes left. */
+      [self applySizes];
+    }
+  else
+    {
+      p->hidden = NO;
+      NSView *before = nil;   /* the next shown pane after it */
+      NSUInteger i = [_panes indexOfObject: p];
+      for (NSUInteger j = i + 1; j < [_panes count] && before == nil; j++)
+        if (!_panes[j]->hidden) before = _panes[j]->view;
+      if (before) [self addSubview: pane positioned: NSWindowBelow relativeTo: before];
+      else [self addSubview: pane];
+      p->parked = nil;
+      /* It comes back at its old size, taken from the others. */
+      if (_sized)
+        {
+          NSMutableArray *others = [[self shown] mutableCopy];
+          [others removeObject: p];
+          p->size = TRClampPane(p, p->size);
+          CGFloat sum = 0;
+          for (TRSplitPane *q in [self shown]) sum += q->size;
+          [self distribute: [self available] - sum among: others];
+        }
+      [self applySizes];
+    }
+  [self save];
+  /* The parent box remeasures the split and rebuilds the key-view loop. */
+  NSView *sv = [self superview];
+  if ([sv isKindOfClass: [TRBoxView class]]) [(TRBoxView *)sv invalidateSubview: self];
 }
 
 - (void)setInitialSize:(CGFloat)size forPane:(NSView *)pane
@@ -147,31 +230,30 @@ static CGFloat TRPoints(TRValue v, CGFloat unset)
 
 - (CGFloat)available
 {
-  NSUInteger n = [_panes count];
+  NSUInteger n = [[self shown] count];
   CGFloat d = n > 1 ? [self dividerThickness] * (n - 1) : 0;
   return MAX(0, [self length] - d);
 }
 
-static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
-{
-  if (s > p->max) s = p->max;
-  if (s < p->min) s = p->min;
-  return s;
-}
 
 /* Gives `delta` (positive or negative) to the panes, by grow weight
    (the last pane when none has one), within their limits; what a pane
    can't take goes to the others. */
 - (void)distribute:(CGFloat)delta
 {
-  NSUInteger n = [_panes count];
+  [self distribute: delta among: [self shown]];
+}
+
+- (void)distribute:(CGFloat)delta among:(NSArray<TRSplitPane *> *)panes
+{
+  NSUInteger n = [panes count];
   if (n == 0) return;
   BOOL anyGrow = NO;
-  for (TRSplitPane *p in _panes) if (p->grow > 0) anyGrow = YES;
+  for (TRSplitPane *p in panes) if (p->grow > 0) anyGrow = YES;
   NSMutableArray *open = [NSMutableArray array];
   for (NSUInteger i = 0; i < n; i++)
     {
-      TRSplitPane *p = _panes[i];
+      TRSplitPane *p = panes[i];
       if (anyGrow ? p->grow > 0 : i == n - 1) [open addObject: p];
     }
   for (int pass = 0; pass < 3 && fabs(delta) >= 0.5; pass++)
@@ -179,7 +261,7 @@ static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
       if ([open count] == 0)
         {
           /* The preferred panes are at their limits: the rest, last first. */
-          for (NSInteger i = (NSInteger)n - 1; i >= 0; i--) [open addObject: _panes[i]];
+          for (NSInteger i = (NSInteger)n - 1; i >= 0; i--) [open addObject: panes[i]];
         }
       CGFloat total = 0;
       for (TRSplitPane *p in open) total += anyGrow && p->grow > 0 ? p->grow : 1;
@@ -212,6 +294,7 @@ static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
   if ([_autosave length])
     saved = [[NSUserDefaults standardUserDefaults] arrayForKey:
               [@"TRSplitView Panes " stringByAppendingString: _autosave]];
+  NSArray *shown = [self shown];
   if ([saved count] == n)
     {
       for (NSUInteger i = 0; i < n; i++)
@@ -223,31 +306,32 @@ static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
       NSUInteger open = 0;
       for (TRSplitPane *p in _panes)
         {
-          if (!isnan(p->initial)) { p->size = TRClampPane(p, p->initial); used += p->size; }
-          else { p->size = 0; open++; }
+          if (!isnan(p->initial)) { p->size = TRClampPane(p, p->initial); if (!p->hidden) used += p->size; }
+          else { p->size = 0; if (!p->hidden) open++; }
         }
       if (open)
         {
           CGFloat share = MAX(0, avail - used) / open;
-          for (TRSplitPane *p in _panes)
+          for (TRSplitPane *p in shown)
             if (isnan(p->initial)) p->size = TRClampPane(p, share);
         }
     }
   CGFloat sum = 0;
-  for (TRSplitPane *p in _panes) sum += p->size;
+  for (TRSplitPane *p in shown) sum += p->size;
   [self distribute: avail - sum];
 }
 
 /* Sets the pane frames from the sizes (fitting them to the split first). */
 - (void)applySizes
 {
-  NSUInteger n = [_panes count];
-  if (n == 0 || [self length] <= 0) return;
+  NSArray<TRSplitPane *> *shown = [self shown];
+  NSUInteger n = [shown count];
+  if ([_panes count] == 0 || [self length] <= 0) return;
   if (!_sized) [self assignInitialSizes];
   else
     {
       CGFloat sum = 0;
-      for (TRSplitPane *p in _panes) sum += p->size;
+      for (TRSplitPane *p in shown) sum += p->size;
       [self distribute: [self available] - sum];
     }
   /* Container queries in a pane test the container outside the split. */
@@ -260,7 +344,7 @@ static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
   _applying = YES;
   for (NSUInteger i = 0; i < n; i++)
     {
-      TRSplitPane *p = _panes[i];
+      TRSplitPane *p = shown[i];
       CGFloat sz = round(p->size);
       if (i == n - 1) sz = MAX(0, [self length] - pos);   /* absorb rounding */
       NSRect f = _direction == TRSplitDirectionRow ? NSMakeRect(pos, 0, sz, s.height)
@@ -275,7 +359,7 @@ static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
 /* Reads the sizes back from the pane frames (after AppKit moved a divider). */
 - (void)syncSizesFromFrames
 {
-  for (TRSplitPane *p in _panes)
+  for (TRSplitPane *p in [self shown])
     {
       NSRect f = [p->view frame];
       p->size = _direction == TRSplitDirectionRow ? NSWidth(f) : NSHeight(f);
@@ -294,10 +378,11 @@ static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
 - (NSArray<NSNumber *> *)dividerPositions
 {
   NSMutableArray *a = [NSMutableArray array];
+  NSArray<TRSplitPane *> *shown = [self shown];
   CGFloat pos = 0, thick = [self dividerThickness];
-  for (NSUInteger i = 0; i + 1 < [_panes count]; i++)
+  for (NSUInteger i = 0; i + 1 < [shown count]; i++)
     {
-      pos += _panes[i]->size;
+      pos += shown[i]->size;
       [a addObject: @(round(pos))];
       pos += thick;
     }
@@ -306,20 +391,21 @@ static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
 
 - (void)setDividerPositions:(NSArray<NSNumber *> *)positions
 {
-  NSUInteger n = [_panes count];
+  NSArray<TRSplitPane *> *shown = [self shown];
+  NSUInteger n = [shown count];
   if (n < 2) return;
   if (!_sized && [self length] > 0) [self assignInitialSizes];
   CGFloat thick = [self dividerThickness], start = 0;
   for (NSUInteger i = 0; i + 1 < n && i < [positions count]; i++)
     {
       CGFloat want = [positions[i] doubleValue] - start;
-      _panes[i]->size = TRClampPane(_panes[i], want);
-      start += _panes[i]->size + thick;
+      shown[i]->size = TRClampPane(shown[i], want);
+      start += shown[i]->size + thick;
     }
   /* The last pane takes the rest, within its limits (applySizes fits). */
   CGFloat used = 0;
-  for (NSUInteger i = 0; i + 1 < n; i++) used += _panes[i]->size;
-  _panes[n - 1]->size = MAX(0, [self available] - used);
+  for (NSUInteger i = 0; i + 1 < n; i++) used += shown[i]->size;
+  shown[n - 1]->size = MAX(0, [self available] - used);
   _sized = YES;
   [self applySizes];
   [self save];
@@ -373,7 +459,8 @@ static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
 /* The leading edge of pane i and the trailing edge of pane i + 1. */
 - (void)edgesAround:(NSInteger)i start:(CGFloat *)start end:(CGFloat *)end
 {
-  NSRect a = [_panes[i]->view frame], b = [_panes[i + 1]->view frame];
+  NSArray<TRSplitPane *> *shown = [self shown];
+  NSRect a = [shown[i]->view frame], b = [shown[i + 1]->view frame];
   BOOL row = (_direction == TRSplitDirectionRow);
   *start = row ? NSMinX(a) : NSMinY(a);
   *end = row ? NSMaxX(b) : NSMaxY(b);
@@ -382,22 +469,24 @@ static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
 - (CGFloat)splitView:(NSSplitView *)sender constrainMinCoordinate:(CGFloat)proposed
          ofSubviewAt:(NSInteger)i
 {
-  if (i < 0 || i + 1 >= (NSInteger)[_panes count]) return proposed;
+  NSArray<TRSplitPane *> *shown = [self shown];
+  if (i < 0 || i + 1 >= (NSInteger)[shown count]) return proposed;
   CGFloat start, end, thick = [self dividerThickness];
   [self edgesAround: i start: &start end: &end];
-  CGFloat lo = start + _panes[i]->min;
-  if (_panes[i + 1]->max < CGFLOAT_MAX) lo = MAX(lo, end - _panes[i + 1]->max - thick);
+  CGFloat lo = start + shown[i]->min;
+  if (shown[i + 1]->max < CGFLOAT_MAX) lo = MAX(lo, end - shown[i + 1]->max - thick);
   return MAX(proposed, lo);
 }
 
 - (CGFloat)splitView:(NSSplitView *)sender constrainMaxCoordinate:(CGFloat)proposed
          ofSubviewAt:(NSInteger)i
 {
-  if (i < 0 || i + 1 >= (NSInteger)[_panes count]) return proposed;
+  NSArray<TRSplitPane *> *shown = [self shown];
+  if (i < 0 || i + 1 >= (NSInteger)[shown count]) return proposed;
   CGFloat start, end, thick = [self dividerThickness];
   [self edgesAround: i start: &start end: &end];
-  CGFloat hi = end - _panes[i + 1]->min - thick;
-  if (_panes[i]->max < CGFLOAT_MAX) hi = MIN(hi, start + _panes[i]->max);
+  CGFloat hi = end - shown[i + 1]->min - thick;
+  if (shown[i]->max < CGFLOAT_MAX) hi = MIN(hi, start + shown[i]->max);
   return MIN(proposed, hi);
 }
 
@@ -436,7 +525,9 @@ static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
 
 - (NSArray<NSView *> *)trellisKeyViewSubtrees
 {
-  return [self panes];
+  NSMutableArray *a = [NSMutableArray array];
+  for (TRSplitPane *p in [self shown]) [a addObject: p->view];
+  return a;
 }
 
 static NSSize TRPaneNaturalSize(NSView *v, CGFloat width)
@@ -467,11 +558,12 @@ static NSSize TRPaneNaturalSize(NSView *v, CGFloat width)
    the tallest (widest) pane. */
 - (NSSize)trellisSizeForWidth:(CGFloat)width
 {
-  NSUInteger n = [_panes count];
+  NSArray<TRSplitPane *> *shown = [self shown];
+  NSUInteger n = [shown count];
   CGFloat thick = n > 1 ? [self dividerThickness] * (n - 1) : 0;
   BOOL row = (_direction == TRSplitDirectionRow);
   CGFloat along = thick, across = 0;
-  for (TRSplitPane *p in _panes)
+  for (TRSplitPane *p in shown)
     {
       CGFloat sz = !isnan(p->initial) ? p->initial : p->min;
       if (row)

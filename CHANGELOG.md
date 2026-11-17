@@ -5,6 +5,12 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Added:** split panes can be hidden: `hidden` on a `<split>` pane, or
+  `-[TRSplitView setHidden:forPane:]` and `-isPaneHidden:`. The pane and
+  its divider leave, the others take its space, and it comes back at the
+  size it had; focus inside moves out. (Before, `hidden` on a pane was a
+  load error.) A sample file's `"hidden"` works on panes too.
+
 - **trellis-lint:** `unlabeled` now covers `<segmented>` (the group needs
   a name) and segmented items with no text; a `label-for` whose target is
   hidden while the label isn't is a warning. Markup tests gain

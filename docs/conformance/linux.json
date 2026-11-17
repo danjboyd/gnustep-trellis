@@ -1,36 +1,36 @@
 {
- "commit": "a084c90",
+ "commit": "93cd841",
  "conformance": {
-  "pass": 3152,
-  "skipped": 1031,
-  "total": 3152
+  "pass": 3553,
+  "skipped": 630,
+  "total": 3553
  },
  "date": "2026-11-17",
  "platform": "linux",
  "suites": {
   "engine": {
-   "pass": 148,
-   "total": 148
+   "pass": 165,
+   "total": 165
   },
   "wpt": {
    "cases": 995,
-   "pass": 844,
-   "total": 844
+   "pass": 897,
+   "total": 897
   },
   "wpt-grid": {
    "cases": 1977,
-   "pass": 1381,
-   "total": 1381
+   "pass": 1554,
+   "total": 1554
   },
   "wpt-sizing": {
    "cases": 125,
-   "pass": 21,
-   "total": 21
+   "pass": 58,
+   "total": 58
   },
   "yoga": {
    "cases": 1086,
-   "pass": 906,
-   "total": 906
+   "pass": 1044,
+   "total": 1044
   }
  }
 }

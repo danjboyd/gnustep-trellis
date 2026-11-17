@@ -21,6 +21,14 @@
 - The two reproducers are written to build with GCC (no ARC, no blocks)
   but haven't been compiled with it yet: this VM's gcc has no Objective-C
   front end (gobjc). Both build and fail as expected with clang.
+- **Activating a theme twice in one process can crash** (infinite
+  recursion in the Adwaita theme's method overrides). The cause is in
+  libs-gui's GSTheme, which records a theme's original methods when the
+  bundle loads rather than when it's activated; the theme itself needs no
+  change. Patched libs-gui builds that carry the fix don't crash, and a
+  fix is being prepared for upstream (link to follow). On libs-gui without
+  the fix, TrellisPreview's light/dark switch relaunches the app instead
+  of activating the theme again; the relaunch is only needed there.
 - `_NET_WORKAREA` warnings on stderr under bare Xvfb (no window manager)
   are harmless.
 

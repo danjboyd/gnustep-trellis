@@ -139,6 +139,12 @@ check-reference: all
 	LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH python3 -I scripts/check-reference.py replay --runner ./obj/trellis-case
 	LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH python3 -I scripts/check-reference.py selftest --runner ./obj/trellis-case
 
+# The 0.5.x to 0.7 migration fixture (scripts/check-migration.py): renders
+# Tests/Reference/migration.trellis headless and checks the frames that
+# moved. Needs Xvfb (scripts/run-headless.sh).
+check-migration: all
+	scripts/run-headless.sh env LD_LIBRARY_PATH=$(CURDIR)/obj:$$LD_LIBRARY_PATH python3 -I scripts/check-migration.py --render $(CURDIR)/obj/trellis-render
+
 conformance-record: all
 	LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH python3 -I scripts/conformance-summary.py record --platform linux --runner ./obj/trellis-case
 	python3 -I scripts/conformance-summary.py table

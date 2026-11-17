@@ -1,9 +1,11 @@
 # Moving a screen from 0.5.x to 0.7
 
-Three layout results changed between 0.5.1 and 0.7. Each is closer to the
-browser. `Tests/Reference/migration.trellis` shows all three with made-up
+Four layout results changed between 0.5.1 and 0.7. Each is closer to the
+browser. `Tests/Reference/migration.trellis` shows all four with made-up
 content, and `scripts/check-migration.py` checks the frames (0.7 values;
-`--was --render <0.5.1 trellis-render>` checks the old ones).
+`--was --render <0.5.1 trellis-render>` checks the old ones). `make
+check-migration` runs it on Linux (headless) and `make -f Makefile.macos
+check-migration` on macOS.
 
 | Since | What changed | 0.5.1 | 0.7 |
 |---|---|---|---|

@@ -5,6 +5,10 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- docs/migration-0.7.md: what changed for a screen from 0.5.x to 0.7 and
+  what to check, with a fixture (Tests/Reference/migration.trellis) and
+  `make check-migration`.
+
 ## 0.7.0 (2026-11-17)
 
 Changes grid layout behavior (a minor version, so pins on 0.6.x don't

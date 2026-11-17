@@ -5,6 +5,15 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Fixed:** in grid row sizing, an item with `aspect-ratio`, a stretched
+  or definite width and a percentage height now gets its height from the
+  aspect ratio, as CSS does: the percentage counts as `auto` while the rows
+  are sized. Before, the row stayed at the grid's height
+  (WPT grid-item-aspect-ratio-justify-self-001).
+- **Fixed:** `trellis-render` and TrellisPreview dumps mark a view hidden
+  when its node is (`hidden` or `display: none`), including a parked split
+  pane's subtree.
+
 ## 0.7.1 (2026-11-17)
 
 Fixes, no API or layout-rule changes: split panes honour `display: none`,

@@ -1261,6 +1261,10 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       BOOL stretchW = isnan(sw) && (js == TRAlignNormal || js == TRAlignStretch)
                       && !it->marginAuto[TREdgeLeft] && !it->marginAuto[TREdgeRight];
       double w = !isnan(sw) ? sw : MAX(0, areaW - mh);
+      /* A definite width transfers through the aspect ratio. This includes
+         a percentage height, which counts as auto while the rows are sized. */
+      if (!isnan(cs->aspectRatio) && (stretchW || !isnan(sw)))
+        { it->h = w / cs->aspectRatio + mv; continue; }
       TRSize sz = TRLayoutNode(it->node, w, NAN, (stretchW || !isnan(sw)) ? TRMeasureModeExactly : TRMeasureModeAtMost,
                                TRMeasureModeUndefined, areaW, NAN, NO, dir);
       it->h = sz.height + mv;

@@ -2,7 +2,9 @@
    document order, skipping tabindex="-1" and views hidden by a container
    query; scrolled content joins the loop. Views hidden with the hidden
    attribute or -setHidden:forSubview: leave the loop and come back when
-   shown, and hiding the focused view moves focus on. Prints KEYVIEW OK. */
+   shown, and hiding the focused view moves focus on. Tab and Shift-Tab,
+   sent as key events, walk through <split> panes and a <segmented>
+   control in order. Prints KEYVIEW OK. */
 #import <AppKit/AppKit.h>
 #import "TRBoxView.h"
 #import "TRLoader.h"
@@ -22,6 +24,35 @@ static NSString *const kSpec =
   @"  .sc { flex: none; height: 40px; }\n"
   @"  @container (min-width: 400px) { .narrow { display: none; } }\n"
   @"</style>\n";
+
+static NSString *const kTabSpec =
+  @"<column>\n"
+  @"  <field id=\"t1\" a11y-label=\"One\"/>\n"
+  @"  <split class=\"sp\">\n"
+  @"    <column class=\"left\"><field id=\"t2\" a11y-label=\"Two\"/></column>\n"
+  @"    <column><segmented id=\"seg\" a11y-label=\"View\" items=\"A, B\"/><field id=\"t3\" a11y-label=\"Three\"/></column>\n"
+  @"  </split>\n"
+  @"  <field id=\"t4\" a11y-label=\"Four\"/>\n"
+  @"</column>\n"
+  @"<style> .sp { height: 120px; flex: none; } .left { width: 120px; } </style>\n";
+
+static NSView *Focused(NSWindow *win)
+{
+  id fr = [win firstResponder];
+  if ([fr isKindOfClass: [NSText class]] && [(NSText *)fr isFieldEditor]) fr = [(NSText *)fr delegate];
+  return [fr isKindOfClass: [NSView class]] ? fr : nil;
+}
+
+static void SendTab(NSWindow *win, BOOL back)
+{
+  NSString *ch = back ? [NSString stringWithFormat: @"%C", (unichar)0x19] : @"\t";
+  NSEvent *e = [NSEvent keyEventWithType: NSEventTypeKeyDown location: NSZeroPoint
+                           modifierFlags: back ? NSEventModifierFlagShift : 0
+                               timestamp: 0 windowNumber: [win windowNumber] context: nil
+                              characters: ch charactersIgnoringModifiers: ch
+                               isARepeat: NO keyCode: 48];
+  [win sendEvent: e];
+}
 
 static NSString *Loop(TRBoxView *box)
 {
@@ -111,6 +142,44 @@ int main(void)
       CHECK("scrolled f is back", [Loop(box) isEqualToString: @"d,a,b,c,f"]);
       (void)c;
       [win close];
+
+      /* Tab through a split and a segmented control, with key events. */
+      {
+        TRMarkupDocument *td = [TRMarkupDocument documentWithString: kTabSpec name: @"tab.trellis" error: &err];
+        TRBoxView *tb = td ? [TRLoader loadDocument: td owner: nil error: &err] : nil;
+        if (tb == nil) { printf("tab spec failed: %s\n", [[err localizedDescription] UTF8String]); return 2; }
+        NSWindow *tw = [[NSWindow alloc] initWithContentRect: NSMakeRect(0, 0, 360, 260)
+                                                   styleMask: NSWindowStyleMaskTitled
+                                                     backing: NSBackingStoreBuffered defer: NO];
+        [tw setReleasedWhenClosed: NO];
+        [tb setFrame: NSMakeRect(0, 0, 360, 260)];
+        [tw setContentView: tb];
+        [tw orderFront: nil];
+        [tb layoutTrellis];
+        /* Whether a segmented control takes focus is a system setting on
+           macOS (keyboard navigation); expect what it says. */
+        NSMutableArray *want = [NSMutableArray array];
+        for (NSString *i in @[ @"t1", @"t2", @"seg", @"t3", @"t4" ])
+          if ([[TRLoader viewWithIdentifier: i inView: tb] canBecomeKeyView]) [want addObject: i];
+        NSString *fwd = [[want arrayByAddingObject: want[0]] componentsJoinedByString: @","];
+        NSString *back = [[[[want reverseObjectEnumerator] allObjects] arrayByAddingObject: want[[want count] - 1]]
+                           componentsJoinedByString: @","];
+        [tw makeFirstResponder: [TRLoader viewWithIdentifier: want[0] inView: tb]];
+        NSMutableArray *got = [NSMutableArray arrayWithObject: [Focused(tw) identifier] ?: @"?"];
+        for (NSUInteger i = 0; i < [want count]; i++)
+          { SendTab(tw, NO); [got addObject: [Focused(tw) identifier] ?: @"?"]; }
+        NSString *gotFwd = [got componentsJoinedByString: @","];
+        printf("Tab: %s (want %s)\n", [gotFwd UTF8String], [fwd UTF8String]);
+        CHECK("Tab walks split panes and segmented in order", [gotFwd isEqualToString: fwd]);
+        [tw makeFirstResponder: [TRLoader viewWithIdentifier: [want lastObject] inView: tb]];
+        got = [NSMutableArray arrayWithObject: [Focused(tw) identifier] ?: @"?"];
+        for (NSUInteger i = 0; i < [want count]; i++)
+          { SendTab(tw, YES); [got addObject: [Focused(tw) identifier] ?: @"?"]; }
+        NSString *gotBack = [got componentsJoinedByString: @","];
+        printf("Shift-Tab: %s (want %s)\n", [gotBack UTF8String], [back UTF8String]);
+        CHECK("Shift-Tab walks back", [gotBack isEqualToString: back]);
+        [tw close];
+      }
 
       printf(ok ? "KEYVIEW OK\n" : "KEYVIEW FAIL\n");
       return ok ? 0 : 1;

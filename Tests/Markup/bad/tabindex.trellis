@@ -1,0 +1,2 @@
+<!-- expect: tabindex="first": use a whole number -->
+<column><field tabindex="first" placeholder="Name"/></column>

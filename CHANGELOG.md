@@ -5,6 +5,9 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **trellis-lint:** `tabindex` must be a whole number (error), and a
+  positive one inside a `<template>` is a warning: every copy shares it,
+  so the copies jump ahead of the rest of the screen.
 - **TrellisPreview:** View > Focus Order (⌘K) numbers the controls in
   Tab order and links them; `--focus-order` for snapshots. Export Frames
   JSON adds `focusOrder` (each control's id, else its class).

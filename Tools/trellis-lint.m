@@ -219,6 +219,25 @@ static void TRLintAccessibility(TRMarkupDocument *doc, NSString *path)
             TRReport(where, @"warning", @"unlabeled", [NSString stringWithFormat:
               @"<segmented> has %lu item(s) with no title: every segment needs text", (unsigned long)blank]);
         }
+      /* tabindex: an integer; a positive one in a template is shared by
+         every copy, so all the copies jump ahead of the rest of the
+         screen (and of each other's order). */
+      NSString *ti = a[@"tabindex"];
+      if (ti)
+        {
+          NSScanner *sc = [NSScanner scannerWithString: ti];
+          NSInteger tv = 0;
+          if (![sc scanInteger: &tv] || ![sc isAtEnd])
+            TRReport(where, @"error", @"tabindex", [NSString stringWithFormat: @"tabindex=\"%@\": use a whole number", ti]);
+          else if (tv > 0)
+            for (TRMarkupElement *p = e.parent; p; p = p.parent)
+              if ([p.name isEqualToString: @"template"])
+                {
+                  TRReport(where, @"warning", @"tabindex", [NSString stringWithFormat:
+                    @"tabindex=\"%ld\" in a <template>: every copy shares it, so the copies jump ahead of the rest of the screen; leave Tab in document order (drop it, or use -1)", (long)tv]);
+                  break;
+                }
+        }
       NSString *role = a[@"role"];
       if (role && ![role isEqualToString: @"group"] && ![role isEqualToString: @"none"])
         TRReport(where, @"error", @"role", [NSString stringWithFormat: @"role \"%@\" is not supported (use group or none)", role]);

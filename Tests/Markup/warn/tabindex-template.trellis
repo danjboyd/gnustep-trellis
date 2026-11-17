@@ -1,0 +1,6 @@
+<!-- expect: tabindex="1" in a <template>: every copy shares it -->
+<column>
+  <virtual template="row">
+    <template id="row"><row><button id="open" tabindex="1">Open</button></row></template>
+  </virtual>
+</column>

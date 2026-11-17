@@ -101,7 +101,8 @@ the user's settings. trellis-render refuses to run without it.
   `hidden` drop out and come back by themselves; if the focused control
   is hidden, focus moves to the next one. CSS `order` doesn't change it.
   `tabindex="1"`, `"2"`, ... go first, in that order; `tabindex="-1"`
-  leaves a control out. Scrolled content joins the loop. For the first
+  leaves a control out. Don't put a positive one in a `<template>`
+  (lint warns): every copy shares it. Scrolled content joins the loop. For the first
   responder, use the root box's `firstKeyView`. The loop wraps through
   the root box, so a screen whose controls are all hidden or disabled
   never stalls Tab.

@@ -18,7 +18,8 @@
   "style": {
    "display": "block",
    "boxSizing": "content-box",
-   "width": 250
+   "width": 250,
+   "position": "static"
   },
   "children": [
    {

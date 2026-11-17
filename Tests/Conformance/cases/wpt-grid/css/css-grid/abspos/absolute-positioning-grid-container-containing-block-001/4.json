@@ -40,7 +40,8 @@
    {
     "style": {
      "display": "block",
-     "boxSizing": "content-box"
+     "boxSizing": "content-box",
+     "position": "static"
     },
     "children": [
      {
@@ -198,7 +199,7 @@
   ]
  },
  "requires": [
-  "abspos-ancestor-cb",
+  "abspos-grid-descendant",
   "block-layout"
  ]
 }

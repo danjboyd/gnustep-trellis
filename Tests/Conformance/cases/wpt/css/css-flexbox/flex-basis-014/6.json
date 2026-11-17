@@ -19,7 +19,8 @@
    "display": "flex",
    "boxSizing": "content-box",
    "flexDirection": "column",
-   "width": 100
+   "width": 100,
+   "position": "static"
   },
   "children": [
    {
@@ -30,7 +31,8 @@
      "flexGrow": "1",
      "flexShrink": "1",
      "flexBasis": "0%",
-     "flexDirection": "row"
+     "flexDirection": "row",
+     "position": "static"
     },
     "children": [
      {

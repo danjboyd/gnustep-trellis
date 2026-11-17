@@ -1,0 +1,22 @@
+{
+ "spec": "Tests/Reference/migration.trellis",
+ "width": 520,
+ "height": 680,
+ "about": "Frames that changed between 0.5.x and 0.7. 'frame' is what 0.7 lays out, 'was' what 0.5.1 did. 'at' is an element id, then child indices. scripts/check-migration.py checks them.",
+ "checks": [
+  {"at": "pctBlock/0", "since": "0.6", "why": "a block's children don't shrink: height: 100px overflows the 50px block", "frame": {"y": 0, "height": 100}, "was": {"height": 45}},
+  {"at": "pctBlock/1", "since": "0.6", "why": "and the next child follows it", "frame": {"y": 100, "height": 10}, "was": {"y": 45, "height": 5}},
+  {"at": "pctAutoColumn/0", "since": "0.6", "why": "height: 50% of an auto-height column acts as auto (empty: 0)", "frame": {"height": 0}, "was": {"height": 7}},
+  {"at": "pctAutoColumn/1", "since": "0.6", "why": "so the fixed child keeps its 20px", "frame": {"y": 0, "height": 20}, "was": {"y": 7, "height": 13}},
+  {"at": "pctUnstretched/0/0", "since": "0.6", "why": "height: 50% in a flex-start (unstretched) item acts as auto: its content's 40px", "frame": {"height": 40}, "was": {"height": 20}},
+  {"at": "pctStretched/0/0", "since": "-", "why": "control: a stretched item's height is definite, so 50% of 80 resolves", "frame": {"height": 40}, "was": {"height": 40}},
+  {"at": "rtlRow/0", "since": "0.6", "why": "margin-inline-start is the right margin under direction: rtl", "frame": {"x": 150}, "was": {"x": 170}},
+  {"at": "rtlRow/1/0", "since": "0.6", "why": "padding-inline-end is the left padding under rtl", "frame": {"x": 15}, "was": {"x": 0}},
+  {"at": "rtlRow/2", "since": "0.6", "why": "inset-inline-start is right: 5px under rtl", "frame": {"x": 185}, "was": {"x": 5}},
+  {"at": "ltrRow/0", "since": "-", "why": "control: ltr is unchanged", "frame": {"x": 20}, "was": {"x": 20}},
+  {"at": "gridMax/3", "since": "0.7", "why": "CSSWG #3648: the empty max-content track stays at 0 instead of taking the spanning item's leftover", "frame": {"width": 0}, "was": {"width": 51}},
+  {"at": "gridMax/0", "since": "0.7", "why": "so column 2 starts right after the 19px gap", "frame": {"x": 19}, "was": {"x": 70}},
+  {"at": "gridMin/3", "since": "0.7", "why": "CSSWG #3648, min-content variant: the empty track stays at 0", "frame": {"width": 0}, "was": {"width": 1}},
+  {"at": "gridMin/0", "since": "0.7", "why": "column 2 starts after the gap", "frame": {"x": 19}, "was": {"x": 20}}
+ ]
+}

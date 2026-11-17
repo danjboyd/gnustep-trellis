@@ -136,6 +136,8 @@ jobs:
         run: make -f Makefile.macos check-view
       - name: Frame replay of the golden dumps, with self-test
         run: make -f Makefile.macos check-reference
+      - name: 0.5 -> 0.7 migration frames
+        run: make -f Makefile.macos check-migration
       - name: Window-free render smoke test
         run: |
           for s in Dashboard Settings AskDetail; do

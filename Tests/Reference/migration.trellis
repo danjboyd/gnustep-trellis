@@ -1,0 +1,65 @@
+<!-- Migration fixture (0.5.x -> 0.7): the layouts whose results changed.
+     Fake data only. Each section is a case scripts/check-migration.py
+     reads by id; see docs/migration-0.7.md for what moves and why.
+     1. Percentage heights (0.6): block children don't shrink or flex; a %
+        height resolves only against a definite height.
+     2. Logical properties under rtl (0.6): margin/padding/inset-inline-*
+        follow the box's direction (they were always mapped as ltr).
+     3. Spanning grid items over an empty intrinsic track (0.7, CSSWG
+        #3648): leftover space goes to spanned tracks that can still grow,
+        not beyond the limit of the empty one. -->
+<column id="migration" class="page" no-outlet="yes">
+  <row class="section">
+    <box id="pctBlock" class="pct-block" no-outlet="yes"><box class="tall"/><box class="after"/></box>
+    <column id="pctAutoColumn" class="pct-auto" no-outlet="yes"><box class="half"/><box class="fixed20"/></column>
+    <row id="pctUnstretched" class="pct-row" no-outlet="yes"><box class="start"><box class="half"><box class="fixed40"/></box></box></row>
+    <row id="pctStretched" class="pct-row" no-outlet="yes"><box class="stretched"><box class="half"/></box></row>
+  </row>
+  <row id="rtlRow" class="rtl" no-outlet="yes">
+    <box class="mstart"/><box class="pend"><box class="fill"/></box><box class="abs"/>
+  </row>
+  <row id="ltrRow" class="ltr" no-outlet="yes">
+    <box class="mstart"/><box class="pend"><box class="fill"/></box><box class="abs"/>
+  </row>
+  <box id="gridMax" class="g gmax" no-outlet="yes">
+    <box class="span23 w20"/><box class="row2 all w109"/><box class="span12 w90"/><box class="empty1"/>
+  </box>
+  <box id="gridMin" class="g gmin" no-outlet="yes">
+    <box class="span23 w50"/><box class="row2 all w100"/><box class="span12 w40"/><box class="empty1"/>
+  </box>
+</column>
+
+<style>
+  .page  { padding: 8px; gap: 12px; align-items: flex-start; }
+  .section { gap: 12px; align-items: flex-start; }
+  /* 1. percentage heights */
+  .pct-block { display: block; width: 60px; height: 50px; overflow: hidden; }
+  .tall  { height: 100px; flex-shrink: 1; }
+  .after { height: 10px; }
+  .pct-auto { width: 60px; }
+  .half  { height: 50%; }
+  .fixed20 { height: 20px; }
+  .fixed40 { height: 40px; width: 40px; }
+  .pct-row { width: 60px; height: 80px; align-items: stretch; }  /* <row> centres by default */
+  .start { align-self: flex-start; width: 50px; }
+  .stretched { width: 50px; }
+  /* 2. logical properties under rtl */
+  .rtl, .ltr { width: 200px; height: 30px; }
+  .rtl { direction: rtl; }
+  .ltr { direction: ltr; }
+  .mstart { width: 30px; margin-inline-start: 20px; }
+  .pend { width: 45px; padding-inline-end: 15px; }
+  .fill { flex-grow: 1; }
+  .abs { position: absolute; width: 10px; height: 10px; inset-inline-start: 5px; top: 5px; }
+  /* 3. spanning items over an empty intrinsic track (grid-gutters shape) */
+  .g { display: grid; width: 100px; column-gap: 19px; row-gap: 5px; grid-auto-rows: 10px; }
+  .gmax { grid-template-columns: max-content minmax(20px, max-content) 1fr; }
+  .gmin { grid-template-columns: min-content minmax(20px, min-content) 2fr; }
+  .span23 { grid-column: 2 / span 2; grid-row: 1; }
+  .row2   { grid-row: 2; }
+  .all    { grid-column: 1 / -1; }
+  .span12 { grid-column: 1 / span 2; grid-row: 3; }
+  .empty1 { grid-column: 1; grid-row: 4; }
+  .w20 { width: 20px; } .w50 { width: 50px; } .w109 { width: 109px; } .w100 { width: 100px; }
+  .w90 { width: 90px; } .w40 { width: 40px; }
+</style>

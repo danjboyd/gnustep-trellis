@@ -137,6 +137,11 @@ check-reference: all
 	python3 -I scripts/check-reference.py replay --runner $(B)/trellis-case
 	python3 -I scripts/check-reference.py selftest --runner $(B)/trellis-case
 
+# The frames that changed from 0.5.x to 0.7 (docs/migration-0.7.md), on
+# the migration fixture, window-free.
+check-migration: gui
+	python3 -I scripts/check-migration.py --render $(B)/trellis-render
+
 # Unit tests for the conformance importers (Python, no build needed).
 check-importers:
 	python3 -I Tests/Conformance/tools/test_import_wpt.py
@@ -144,4 +149,4 @@ check-importers:
 
 clean:
 	rm -rf $(B)
-.PHONY: all gui check check-view check-reference check-importers conformance-record clean
+.PHONY: all gui check check-view check-reference check-migration check-importers conformance-record clean

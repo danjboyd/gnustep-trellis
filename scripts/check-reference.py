@@ -431,7 +431,7 @@ def main():
     ap.add_argument("--widths", default="340,520,900")
     ap.add_argument("--height", type=int, default=680)
     ap.add_argument("--appearances", default="light,dark")
-    a = ap.parse_args()
+    a = ap.parse_intermixed_args()
     if a.mode == "render":
         if not a.dumps:
             ap.error("render needs OUTDIR")

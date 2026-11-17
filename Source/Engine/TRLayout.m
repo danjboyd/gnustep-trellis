@@ -481,26 +481,62 @@ const TRStyleStorage *TRResolveSizeKeywords(TRNode *c, const TRStyleStorage *cs,
 
   /* Heights (horizontal writing): the content keywords are all the content
      height at the box's width; stretch is the space less margins. */
-  __block TRFloat contentH = TRUndefined;
-  TRFloat (^heightFor)(TRUnit) = ^TRFloat(TRUnit u) {
+  /* A wrapping column's min/max-height keywords break lines at the box's
+     own definite height (as Chrome does): the content height is then its
+     longest line. Without a definite height it is one line. */
+  __block TRFloat contentH = TRUndefined, boundH = TRUndefined;
+  TRFloat ownHeight = TRBoxSize(cs, cs->height, refH, pbH);
+  BOOL colWrap = cs->display == TRDisplayFlex && c->_measure == nil && cs->flexWrap != TRFlexWrapNoWrap
+    && (cs->flexDirection == TRFlexDirectionColumn || cs->flexDirection == TRFlexDirectionColumnReverse)
+    && !isnan(ownHeight);
+  TRFloat (^heightFor)(TRUnit, BOOL) = ^TRFloat(TRUnit u, BOOL bound) {
     if (u == TRUnitStretch) return isnan(availH) ? TRUndefined : TRMax(pbH, availH - mv);
-    if (isnan(contentH))
+    if (bound && colWrap && !isnan(boundH)) return boundH;
+    if (!(bound && colWrap) && !isnan(contentH)) return contentH;
+    TRFloat w = TRBoxSize(buf, buf->width, refW, pbW);
+    if (!isnan(w))
+      w = TRMax(TRClamp(w, TRBoxSize(buf, buf->minWidth, refW, pbW), TRBoxSize(buf, buf->maxWidth, refW, pbW)), pbW);
+    TRMeasureMode wm = !isnan(w) ? TRMeasureModeExactly : (isnan(availW) ? TRMeasureModeUndefined : TRMeasureModeAtMost);
+    if (isnan(w) && !isnan(availW)) w = TRMax(0, availW - mh);
+    if (!(bound && colWrap))
+      return contentH = TRLayoutNode(c, w, TRUndefined, wm, TRMeasureModeUndefined, refW, refH, NO, dir).height;
+    TREdges e = TRResolveEdges(cs, refW);
+    TRFloat innerW = isnan(w) ? TRUndefined : TRMax(0, w - TRPBHorizontal(&e));
+    TRFloat limit = TRMax(0, ownHeight - pbH);
+    TRFloat gap = TRMax(0, TRDefault(TRResolve(cs->rowGap, limit), 0));
+    TRFloat line = 0, longest = 0;
+    BOOL lineEmpty = YES;
+    for (TRNode *k in c->_children)
       {
-        TRFloat w = TRBoxSize(buf, buf->width, refW, pbW);
-        if (!isnan(w))
-          w = TRMax(TRClamp(w, TRBoxSize(buf, buf->minWidth, refW, pbW), TRBoxSize(buf, buf->maxWidth, refW, pbW)), pbW);
-        TRMeasureMode wm = !isnan(w) ? TRMeasureModeExactly : (isnan(availW) ? TRMeasureModeUndefined : TRMeasureModeAtMost);
-        if (isnan(w) && !isnan(availW)) w = TRMax(0, availW - mh);
-        contentH = TRLayoutNode(c, w, TRUndefined, wm, TRMeasureModeUndefined, refW, refH, NO, dir).height;
+        if (TRNodeIsNone(k) || k->_style->_s.position == TRPositionAbsolute) continue;
+        const TRStyleStorage *ks = TRChildStyle(k, cdir);
+        TRDirection kd = ks->direction == TRDirectionInherit ? cdir : ks->direction;
+        TREdges ke = TRResolveEdges(ks, innerW);
+        TRFloat kpbW = TRPBHorizontal(&ke), kpbH = TRPBVertical(&ke);
+        TRFloat kw = TRBoxSize(ks, ks->width, innerW, kpbW);
+        if (!isnan(kw))
+          kw = TRMax(TRClamp(kw, TRBoxSize(ks, ks->minWidth, innerW, kpbW), TRBoxSize(ks, ks->maxWidth, innerW, kpbW)), kpbW);
+        TRFloat kh = TRBoxSize(ks, ks->height, TRUndefined, kpbH);
+        if (isnan(kh))
+          kh = TRLayoutNode(k, isnan(kw) ? innerW : kw, TRUndefined,
+                            !isnan(kw) ? TRMeasureModeExactly : (isnan(innerW) ? TRMeasureModeUndefined : TRMeasureModeAtMost),
+                            TRMeasureModeUndefined, innerW, TRUndefined, NO, kd).height;
+        kh = TRMax(TRClamp(kh, TRBoxSize(ks, ks->minHeight, TRUndefined, kpbH), TRBoxSize(ks, ks->maxHeight, TRUndefined, kpbH)), kpbH);
+        kh += TRDefault(TRResolve(ks->margin[TREdgeTop], innerW), 0)
+            + TRDefault(TRResolve(ks->margin[TREdgeBottom], innerW), 0);
+        if (!lineEmpty && line + gap + kh > limit) { line = 0; lineEmpty = YES; }
+        line += (lineEmpty ? 0 : gap) + kh;
+        lineEmpty = NO;
+        longest = TRMax(longest, line);
       }
-    return contentH;
+    return boundH = longest + pbH;
   };
-  #define TR_FIX_H(FIELD, EMPTY) \
-    if (TRUnitIsIntrinsic(cs->FIELD.unit)) { TRFloat v = heightFor(cs->FIELD.unit); \
+  #define TR_FIX_H(FIELD, EMPTY, BOUND) \
+    if (TRUnitIsIntrinsic(cs->FIELD.unit)) { TRFloat v = heightFor(cs->FIELD.unit, BOUND); \
       buf->FIELD = isnan(v) ? EMPTY : TRSizeValue(cs, v, pbH); }
-  TR_FIX_H(height, TRAuto)
-  TR_FIX_H(minHeight, TRAuto)
-  TR_FIX_H(maxHeight, TRNone)
+  TR_FIX_H(height, TRAuto, NO)
+  TR_FIX_H(minHeight, TRAuto, YES)
+  TR_FIX_H(maxHeight, TRNone, YES)
   #undef TR_FIX_H
 
   /* flex-basis: the keyword's size in the main axis; stretch acts as
@@ -508,7 +544,7 @@ const TRStyleStorage *TRResolveSizeKeywords(TRNode *c, const TRStyleStorage *cs,
   if (cs->flexBasis.unit == TRUnitStretch) buf->flexBasis = TRAuto;
   else if (TRUnitIsIntrinsic(cs->flexBasis.unit))
     {
-      TRFloat v = mainIsWidth ? widthFor(cs->flexBasis.unit) : heightFor(cs->flexBasis.unit);
+      TRFloat v = mainIsWidth ? widthFor(cs->flexBasis.unit) : heightFor(cs->flexBasis.unit, NO);
       buf->flexBasis = isnan(v) ? TRAuto : TRSizeValue(cs, v, mainIsWidth ? pbW : pbH);
     }
   return buf;

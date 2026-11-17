@@ -5,6 +5,12 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Changed (layout):** `min-height`/`max-height: min-content` (and
+  `max-content`, `fit-content`) on a wrapping column with a definite
+  `height` now break lines at that height, as Chrome does: the keyword's
+  size is the longest line, not every item in one line. `height:
+  min-content` is unchanged (one line). Known gaps 73 to 71.
+
 ## 0.9.0 (2026-11-17)
 
 Five layout behavior changes, each closer to the browser (see

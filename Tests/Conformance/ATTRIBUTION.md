@@ -70,5 +70,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     python3 -I Tests/Conformance/tools/import_wpt.py  /tmp/wpt  Tests/Conformance/cases/wpt-grid css/css-grid wpt-grid
     python3 -I Tests/Conformance/tools/import_wpt.py  /tmp/wpt  Tests/Conformance/cases/wpt-sizing css/css-sizing wpt-sizing
 
+**Before replacing the cases with a newer WPT snapshot**, import into a
+scratch directory and review what changed:
+
+    python3 -I Tests/Conformance/tools/import_wpt.py /tmp/wpt /tmp/new/wpt-grid css/css-grid wpt-grid
+    python3 -I Tests/Conformance/tools/snapshot_diff.py Tests/Conformance/cases/wpt-grid /tmp/new/wpt-grid
+
+It matches cases by file and input (not by their positional index) and
+lists cases whose expectations upstream **revised** (same input, new
+numbers: the engine may need to follow), whose input changed, and those
+added, removed or only renumbered. It exits non-zero when anything but the
+recorded commit changed. `--json` gives the same summary for scripts.
+
 `reference/` holds a Yoga-backed runner used to sanity-check the importers:
 `make -f Tests/Conformance/Makefile.macos check-reference YOGA=/tmp/yoga`.

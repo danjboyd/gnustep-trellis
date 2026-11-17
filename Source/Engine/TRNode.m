@@ -268,10 +268,19 @@ static TRFloat TRRootInset(TRValue v, TRFloat ref)
       }
     /* A root with max-width/height and no available size: fit-content,
        bounded by the max as a border box. */
+    /* A larger min-width/height wins over the max (CSS 2.1 10.4/10.7). */
     if (wm == TRMeasureModeUndefined && s->maxWidth.unit == TRUnitPoint)
-      { aw = s->maxWidth.value + extra[TREdgeLeft % 2]; wm = TRMeasureModeAtMost; }
+      {
+        aw = s->maxWidth.value;
+        if (s->minWidth.unit == TRUnitPoint) aw = MAX(aw, s->minWidth.value);
+        aw += extra[TREdgeLeft % 2]; wm = TRMeasureModeAtMost;
+      }
     if (hm == TRMeasureModeUndefined && s->maxHeight.unit == TRUnitPoint)
-      { ah = s->maxHeight.value + extra[TREdgeTop % 2]; hm = TRMeasureModeAtMost; }
+      {
+        ah = s->maxHeight.value;
+        if (s->minHeight.unit == TRUnitPoint) ah = MAX(ah, s->minHeight.value);
+        ah += extra[TREdgeTop % 2]; hm = TRMeasureModeAtMost;
+      }
   }
 
   /* aspect-ratio on the root: a definite size in one axis (floored at

@@ -2386,5 +2386,38 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/root_min_width_over_max_width",
+  "note": "a root with no available width fits within its max-width, but a larger min-width wins: max-width: min-content (60) and min-width: max-content (90) give 90, so the fr columns are 10 and 40 (WPT flex-sizing-columns-min-max-width-001/7)",
+  "available": {
+   "width": null,
+   "height": null
+  },
+  "root": {
+   "style": "display: grid; max-width: min-content; min-width: max-content; grid-template-columns: minmax(10px, 1fr) minmax(10px, 4fr); grid-template-rows: 10px; column-gap: 40px",
+   "children": [
+    {
+     "style": ""
+    },
+    {
+     "style": ""
+    }
+   ]
+  },
+  "expected": {
+   "width": 90,
+   "height": 10,
+   "children": [
+    {
+     "x": 0,
+     "width": 10
+    },
+    {
+     "x": 50,
+     "width": 40
+    }
+   ]
+  }
  }
 ]

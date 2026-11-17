@@ -80,7 +80,9 @@ target-size lint.
   window's appearance), and File > Export PNG… / Export Frames JSON…
   (trellis-render's `--json` document, with lint). Headless flags
   `--export-json` and `--appearance`. Tests/View/preview-export.sh in
-  check-gui.
+  check-gui. On macOS the snapshot and JSON resolve colours under the
+  chosen appearance, with the window background drawn in (found by the
+  macOS check).
 - **Tests:** virtual-box.m waits for focus to leave a sentinel before
   the next Tab (the hand-off is deferred; on Cocoa it could take more than
   one run-loop pass once the list scrolls). Found and fixed by the macOS
@@ -107,7 +109,10 @@ target-size lint.
   mid-way starts from the current frames, and reduced motion (Cocoa's
   setting, `TRReduceMotion` / `TRELLIS_REDUCE_MOTION=1` on GNUstep, or
   `+[TRBoxView setReducesMotionOverride:]`) turns it off.
-  `-layoutTrellisAnimated` and `isAnimatingLayout` on TRBoxView.
+  `-layoutTrellisAnimated` and `isAnimatingLayout` on TRBoxView, and
+  for tests a fixed clock (`+setAnimationTimeOverride:`) with
+  `-stepLayoutAnimation`, so animations step deterministically however
+  slowly timers fire.
   Tests/View/layout-transition.m (check-gui, zombies on).
 
 ## 0.3.0 (2026-11-16)

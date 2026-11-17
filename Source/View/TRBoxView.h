@@ -77,6 +77,11 @@
 @property (nonatomic, readonly) BOOL isAnimatingLayout;
 + (BOOL)reducesMotion;
 + (void)setReducesMotionOverride:(NSNumber *)reduce;   /* nil: follow the system */
+/* For tests: a fixed animation clock (seconds; nil: real time), and one
+   frame of the running animation now, at that clock. With both, a test
+   steps an animation deterministically, however slowly timers fire. */
++ (void)setAnimationTimeOverride:(NSNumber *)seconds;
+- (void)stepLayoutAnimation;
 
 /* The height this box's content needs at a width (content changes since
    the last layout included); the layout is left as it was. */

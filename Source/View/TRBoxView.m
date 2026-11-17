@@ -419,6 +419,14 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
 static NSMutableArray<TRFrameAnimation *> *gTRCollecting;
 
 static NSNumber *gTRReduceMotionOverride;
+static NSNumber *gTRAnimationTimeOverride;
+
+/* The animation clock: real time, or the test's (setAnimationTimeOverride:). */
+static NSTimeInterval TRAnimationNow(void)
+{
+  return gTRAnimationTimeOverride ? [gTRAnimationTimeOverride doubleValue]
+                                  : [NSDate timeIntervalSinceReferenceDate];
+}
 
 /* -tr-layout-transition: <time> [easing] | none. Returns the duration in
    seconds (0 = none), or -1 when the style doesn't say. */
@@ -496,6 +504,17 @@ static double TREase(double t, int easing)
   gTRReduceMotionOverride = reduce;
 }
 
++ (void)setAnimationTimeOverride:(NSNumber *)seconds
+{
+  gTRAnimationTimeOverride = seconds;
+}
+
+- (void)stepLayoutAnimation
+{
+  TRBoxView *root = [self rootBox];
+  if (root->_animationTimer != nil) [root animationTick];
+}
+
 - (BOOL)isAnimatingLayout
 {
   return _animationTimer != nil;
@@ -523,7 +542,7 @@ static double TREase(double t, int easing)
 - (void)animationTick
 {
   NSTimeInterval t = _animationDuration > 0
-    ? ([NSDate timeIntervalSinceReferenceDate] - _animationStart) / _animationDuration : 1;
+    ? (TRAnimationNow() - _animationStart) / _animationDuration : 1;
   if (t >= 1) { [self finishLayoutAnimation]; return; }
   double k = TREase(t, _animationEasing);
   for (TRFrameAnimation *a in _animations)
@@ -859,7 +878,7 @@ static double TREase(double t, int easing)
       _animations = collected;
       _animationDuration = duration;
       _animationEasing = easing;
-      _animationStart = [NSDate timeIntervalSinceReferenceDate];
+      _animationStart = TRAnimationNow();
       for (TRFrameAnimation *a in collected)
         {
           NSView *v = a->view;

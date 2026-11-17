@@ -480,10 +480,28 @@ static void TPSetSchemeDefault(NSString *appearance)
   _appearance = [appearance copy];
 #ifndef GNUSTEP
   if (@available(macOS 10.14, *))
-    [_window setAppearance: appearance ? [NSAppearance appearanceNamed:
-      [appearance isEqualToString: @"dark"] ? NSAppearanceNameDarkAqua : NSAppearanceNameAqua] : nil];
+    {
+      NSAppearance *ap = appearance ? [NSAppearance appearanceNamed:
+        [appearance isEqualToString: @"dark"] ? NSAppearanceNameDarkAqua : NSAppearanceNameAqua] : nil;
+      [_window setAppearance: ap];
+      /* Also on the content view: a snapshot never shows the window, and
+         views draw under the appearance they have, not the window's. */
+      [_content setAppearance: ap];
+    }
 #endif
 }
+
+#ifndef GNUSTEP
+/* Run a block with the content's appearance as the drawing appearance, so
+   dynamic colours (window background, label colours) resolve under it. */
+- (void)underContentAppearance:(void (^)(void))block
+{
+  if (@available(macOS 11.0, *))
+    [[_content effectiveAppearance] performAsCurrentDrawingAppearance: block];
+  else
+    block();
+}
+#endif
 
 #ifdef GNUSTEP
 - (void)relaunchWithAppearance:(NSString *)appearance
@@ -524,7 +542,20 @@ static void TPSetSchemeDefault(NSString *appearance)
   NSRect b = [_content bounds];
   [_content display];
   NSBitmapImageRep *rep = [_content bitmapImageRepForCachingDisplayInRect: b];
+#ifdef GNUSTEP
   [_content cacheDisplayInRect: b toBitmapImageRep: rep];
+#else
+  [self underContentAppearance: ^{
+    [_content cacheDisplayInRect: b toBitmapImageRep: rep];
+    /* The window background, under what the views drew, as on screen. */
+    NSGraphicsContext *ctx = [NSGraphicsContext graphicsContextWithBitmapImageRep: rep];
+    [NSGraphicsContext saveGraphicsState];
+    [NSGraphicsContext setCurrentContext: ctx];
+    [[NSColor windowBackgroundColor] set];
+    NSRectFillUsingOperation(b, NSCompositingOperationDestinationOver);
+    [NSGraphicsContext restoreGraphicsState];
+  }];
+#endif
   return [rep representationUsingType: NSPNGFileType properties: @{}];
 }
 
@@ -545,7 +576,12 @@ static NSString *TPThemeName(void)
   [self relayoutAndLint];
   NSSize s = [_content bounds].size;
   NSMutableDictionary *tree = [TPDump(_screen, _screen.node) mutableCopy];
+#ifdef GNUSTEP
   NSColor *wb = [[NSColor windowBackgroundColor] colorUsingColorSpaceName: NSCalibratedRGBColorSpace];
+#else
+  __block NSColor *wb = nil;
+  [self underContentAppearance: ^{ wb = [[NSColor windowBackgroundColor] colorUsingColorSpace: [NSColorSpace sRGBColorSpace]]; }];
+#endif
   if (wb)
     tree[@"windowBackground"] = [NSString stringWithFormat: @"#%02x%02x%02x", (int)lround([wb redComponent] * 255),
                                   (int)lround([wb greenComponent] * 255), (int)lround([wb blueComponent] * 255)];

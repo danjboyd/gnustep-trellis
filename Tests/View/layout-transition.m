@@ -36,6 +36,17 @@ static void RunFor(double seconds)
     [[NSRunLoop currentRunLoop] runMode: NSDefaultRunLoopMode beforeDate: [NSDate dateWithTimeIntervalSinceNow: 0.005]];
 }
 
+static BOOL WaitUntil(BOOL (^cond)(void), double timeout)
+{
+  NSDate *end = [NSDate dateWithTimeIntervalSinceNow: timeout];
+  while (!cond() && [end timeIntervalSinceNow] > 0)
+    [[NSRunLoop currentRunLoop] runMode: NSDefaultRunLoopMode beforeDate: [NSDate dateWithTimeIntervalSinceNow: 0.01]];
+  return cond();
+}
+
+static void SetClock(double t) { [TRBoxView setAnimationTimeOverride: @(t)]; }
+static void Step(TRBoxView *root, double t) { SetClock(t); [root stepLayoutAnimation]; }
+
 static NSView *V(TRBoxView *root, NSString *ident) { return [TRLoader viewWithIdentifier: ident inView: root]; }
 
 int main(void)
@@ -46,6 +57,9 @@ int main(void)
       [NSApplication sharedApplication];
 #endif
       [TRBoxView setReducesMotionOverride: @NO];
+      /* A fixed clock, stepped by hand: no dependence on how often timers
+         fire (macOS throttles them in background processes). */
+      [TRBoxView setAnimationTimeOverride: @0];
       NSError *err = nil;
       TRMarkupDocument *doc = [TRMarkupDocument documentWithString: kSpec name: @"transition.trellis" error: &err];
       TRBoxView *root = doc ? [TRLoader loadDocument: doc owner: nil error: &err] : nil;
@@ -58,40 +72,48 @@ int main(void)
       [root layoutTrellis];
       RunFor(0.05);
       NSView *a = V(root, @"rowA"), *banner = V(root, @"banner");
+      TRBoxView *inner = (TRBoxView *)V(root, @"inner");
       CGFloat y0 = [a frame].origin.y;
       Expect("first layout places without animating", ![root isAnimatingLayout] && y0 == 64);
 
-      /* Hide the banner: rows move up 64 px over 200 ms. */
+      /* The deferred layout after a style change animates by itself. */
       [root setStyleDeclarations: @"display: none" forSubview: banner];
-      RunFor(0.06);
+      Expect("a style change starts an animation (deferred layout)",
+             WaitUntil(^BOOL { return [root isAnimatingLayout]; }, 3));
+      Step(root, 0.1);
       CGFloat mid = [a frame].origin.y;
-      printf("     row A: %.1f -> %.1f (mid-way)\n", y0, mid);
-      Expect("animating after a style change", [root isAnimatingLayout]);
+      printf("     row A: %.1f -> %.1f (at 0.1 s of 0.2)\n", y0, mid);
       Expect("mid-way between the old and new frames", mid < y0 - 1 && mid > 1);
-      RunFor(0.3);
+      Step(root, 1.0);
       Expect("ends at the new frame", ![root isAnimatingLayout] && [a frame].origin.y == 0);
 
       /* Nested boxes animate too (the transition inherits). */
       NSView *dot = V(root, @"dot");
       CGFloat d0 = [dot frame].origin.y;
-      [(TRBoxView *)V(root, @"inner") setStyleDeclarations: @"height: 10px" forSubview: V(root, @"tall")];
-      RunFor(0.06);
+      SetClock(10);
+      [inner setStyleDeclarations: @"height: 10px" forSubview: V(root, @"tall")];
+      [root layoutTrellisAnimated];
+      Step(root, 10.06);
       CGFloat dm = [dot frame].origin.y;
-      RunFor(0.3);
+      Step(root, 11);
       printf("     nested dot: %.1f -> %.1f -> %.1f\n", d0, dm, [dot frame].origin.y);
       Expect("a nested box's subviews animate", dm < d0 && dm > [dot frame].origin.y);
 
-      /* Interrupt: show the banner again mid-way, then hide it again. */
+      /* Interrupt: show the banner, and hide it again mid-way. */
+      SetClock(20);
       [root setStyleDeclarations: @"display: flex; height: 60px" forSubview: banner];
-      RunFor(0.08);
+      [root layoutTrellisAnimated];
+      Step(root, 20.08);
       CGFloat before = [a frame].origin.y;
       [root setStyleDeclarations: @"display: none" forSubview: banner];
-      RunFor(0.02);
+      [root layoutTrellisAnimated];
       CGFloat after = [a frame].origin.y;
-      printf("     interrupted at %.1f, then %.1f\n", before, after);
-      Expect("a change mid-way starts from where the view is", fabs(after - before) < 30 && after <= before);
-      RunFor(0.3);
-      Expect("and ends at the newest frame", [a frame].origin.y == 0);
+      printf("     interrupted at %.1f, restarts from %.1f\n", before, after);
+      Expect("a change mid-way starts from where the view is", before > 1 && before < 63 && fabs(after - before) < 0.5);
+      Step(root, 20.18);
+      Expect("...and heads for the newest frame", [a frame].origin.y < before);
+      Step(root, 21);
+      Expect("...and ends there", [a frame].origin.y == 0 && ![root isAnimatingLayout]);
 
       /* A resize never animates. */
       [win setContentSize: NSMakeSize(260, 380)];
@@ -101,30 +123,35 @@ int main(void)
       /* Reduce motion: changes jump. */
       [TRBoxView setReducesMotionOverride: @YES];
       [root setStyleDeclarations: @"display: flex; height: 60px" forSubview: banner];
-      RunFor(0.03);
+      [root layoutTrellisAnimated];
       Expect("reduced motion: no animation", ![root isAnimatingLayout] && [a frame].origin.y == 64);
       [TRBoxView setReducesMotionOverride: @NO];
 
       /* -tr-layout-transition: none on a nested box stops it there. */
-      [root setStyleDeclarations: @"-tr-layout-transition: none" forSubview: V(root, @"inner")];
+      [root setStyleDeclarations: @"-tr-layout-transition: none" forSubview: inner];
       [root layoutTrellis];
-      RunFor(0.3);
       CGFloat dn = [dot frame].origin.y;
-      [(TRBoxView *)V(root, @"inner") setStyleDeclarations: @"height: 40px" forSubview: V(root, @"tall")];
-      RunFor(0.04);
+      SetClock(30);
+      [inner setStyleDeclarations: @"height: 40px" forSubview: V(root, @"tall")];
+      [root layoutTrellisAnimated];
+      Step(root, 30.04);
       Expect("none on a nested box: its subviews jump", [dot frame].origin.y == dn + 30);
 
-      /* Freed mid-animation. */
+      /* Freed mid-animation, with its timer still scheduled. */
       @autoreleasepool
         {
+          SetClock(40);
           [root setStyleDeclarations: @"display: none" forSubview: banner];
-          RunFor(0.04);
+          [root layoutTrellisAnimated];
+          Step(root, 40.04);
           Expect("animating before the free", [root isAnimatingLayout]);
           [win setContentView: [[NSView alloc] initWithFrame: NSMakeRect(0, 0, 10, 10)]];
           root = nil;
           a = banner = dot = nil;
+          inner = nil;
         }
       RunFor(0.3);
+      [TRBoxView setAnimationTimeOverride: nil];
       [win close];
     }
   printf(gFail ? "TRANSITION FAIL\n" : "TRANSITION OK\n");

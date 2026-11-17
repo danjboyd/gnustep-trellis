@@ -132,9 +132,9 @@
      {
       "children": [
        {
-        "baseline": 12.9130859375,
+        "baseline": 12.568359375,
         "class": "NSTextField",
-        "height": 16,
+        "height": 10,
         "intrinsic": {
          "height": 16,
          "width": 54
@@ -150,14 +150,14 @@
         "style": "font-weight: bold",
         "text": "Queues",
         "textColor": "#000000d8",
-        "width": 164,
-        "x": 8,
-        "y": 8
+        "width": 10,
+        "x": 0,
+        "y": 0
        },
        {
-        "baseline": 13.568359375,
+        "baseline": 12.568359375,
         "class": "NSButton",
-        "height": 18,
+        "height": 10,
         "interactive": true,
         "intrinsic": {
          "height": 18,
@@ -169,14 +169,14 @@
         },
         "textColor": "#000000d8",
         "title": "Mine",
-        "width": 164,
-        "x": 8,
-        "y": 30
+        "width": 10,
+        "x": 0,
+        "y": 0
        },
        {
-        "baseline": 13.568359375,
+        "baseline": 12.568359375,
         "class": "NSButton",
-        "height": 18,
+        "height": 10,
         "interactive": true,
         "intrinsic": {
          "height": 18,
@@ -188,14 +188,14 @@
         },
         "textColor": "#000000d8",
         "title": "Unassigned",
-        "width": 164,
-        "x": 8,
-        "y": 54
+        "width": 10,
+        "x": 0,
+        "y": 0
        },
        {
-        "baseline": 13.568359375,
+        "baseline": 12.568359375,
         "class": "NSButton",
-        "height": 18,
+        "height": 10,
         "interactive": true,
         "intrinsic": {
          "height": 18,
@@ -207,14 +207,14 @@
         },
         "textColor": "#000000d8",
         "title": "Open",
-        "width": 164,
-        "x": 8,
-        "y": 78
+        "width": 10,
+        "x": 0,
+        "y": 0
        },
        {
-        "baseline": 13.568359375,
+        "baseline": 12.568359375,
         "class": "NSButton",
-        "height": 18,
+        "height": 10,
         "interactive": true,
         "intrinsic": {
          "height": 18,
@@ -226,15 +226,14 @@
         },
         "textColor": "#000000d8",
         "title": "Closed",
-        "width": 164,
-        "x": 8,
-        "y": 102
+        "width": 10,
+        "x": 0,
+        "y": 0
        },
        {
         "baseline": 12.568359375,
         "class": "NSTextField",
         "height": 10,
-        "hidden": true,
         "intrinsic": {
          "height": 16,
          "width": 78
@@ -255,9 +254,9 @@
         "y": 0
        },
        {
-        "baseline": 28,
+        "baseline": 20,
         "class": "NSSlider",
-        "height": 28,
+        "height": 20,
         "interactive": true,
         "intrinsic": {
          "height": 28,
@@ -268,22 +267,22 @@
          "width": 0
         },
         "style": "align-self: stretch",
-        "width": 164,
-        "x": 8,
-        "y": 126
+        "width": 100,
+        "x": 0,
+        "y": 0
        },
        {
-        "baseline": 18,
+        "baseline": 16,
         "class": "NSProgressIndicator",
-        "height": 18,
+        "height": 16,
         "measured": {
          "height": 18,
          "width": 0
         },
         "style": "align-self: stretch; min-width: 60px; min-height: 16px",
-        "width": 164,
-        "x": 8,
-        "y": 160
+        "width": 100,
+        "x": 0,
+        "y": 0
        }
       ],
       "class": "TRBoxView",
@@ -292,9 +291,10 @@
         "(max-width: 500px)"
        ]
       },
-      "height": 578,
+      "height": 100,
+      "hidden": true,
       "style": "display: none; flex-direction: column; padding-left: 8px; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; row-gap: 6px; column-gap: 6px",
-      "width": 180,
+      "width": 100,
       "x": 0,
       "y": 0
      },
@@ -323,7 +323,7 @@
             "style": "font-weight: bold",
             "text": "Ticket 101",
             "textColor": "#000000d8",
-            "width": 128,
+            "width": 137,
             "x": 9,
             "y": 9
            },
@@ -345,7 +345,7 @@
             },
             "text": "Printer on floor two jams on duplex jobs after the driver update.",
             "textColor": "#000000d8",
-            "width": 128,
+            "width": 137,
             "x": 9,
             "y": 29
            }
@@ -353,7 +353,7 @@
           "class": "TRBoxView",
           "height": 102,
           "style": "flex-direction: column; padding-left: 8px; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; row-gap: 4px; column-gap: 4px; border-color: -tr-separator",
-          "width": 146,
+          "width": 155,
           "x": 0,
           "y": 0
          },
@@ -378,7 +378,7 @@
             "style": "font-weight: bold",
             "text": "Ticket 102",
             "textColor": "#000000d8",
-            "width": 128,
+            "width": 138,
             "x": 9,
             "y": 9
            },
@@ -400,7 +400,7 @@
             },
             "text": "VPN drops every hour.",
             "textColor": "#000000d8",
-            "width": 128,
+            "width": 138,
             "x": 9,
             "y": 29
            }
@@ -408,8 +408,8 @@
           "class": "TRBoxView",
           "height": 102,
           "style": "flex-direction: column; padding-left: 8px; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; row-gap: 4px; column-gap: 4px; border-color: -tr-separator",
-          "width": 145,
-          "x": 154,
+          "width": 154,
+          "x": 163,
           "y": 0
          },
          {
@@ -433,7 +433,7 @@
             "style": "font-weight: bold",
             "text": "Ticket 103",
             "textColor": "#000000d8",
-            "width": 128,
+            "width": 137,
             "x": 9,
             "y": 9
            },
@@ -451,11 +451,11 @@
             },
             "needed": {
              "height": 64,
-             "width": 128
+             "width": 133
             },
             "text": "New hire needs a laptop, a badge and accounts by Monday morning.",
             "textColor": "#000000d8",
-            "width": 128,
+            "width": 137,
             "x": 9,
             "y": 29
            }
@@ -463,9 +463,9 @@
           "class": "TRBoxView",
           "height": 102,
           "style": "flex-direction: column; padding-left: 8px; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; row-gap: 4px; column-gap: 4px; border-color: -tr-separator",
-          "width": 146,
-          "x": 0,
-          "y": 110
+          "width": 155,
+          "x": 325,
+          "y": 0
          },
          {
           "children": [
@@ -488,7 +488,7 @@
             "style": "font-weight: bold",
             "text": "Ticket 104",
             "textColor": "#000000d8",
-            "width": 281,
+            "width": 462,
             "x": 9,
             "y": 9
            },
@@ -510,7 +510,7 @@
             },
             "text": "Spans the whole row.",
             "textColor": "#000000d8",
-            "width": 281,
+            "width": 462,
             "x": 9,
             "y": 29
            }
@@ -518,15 +518,15 @@
           "class": "TRBoxView",
           "height": 54,
           "style": "flex-direction: column; padding-left: 8px; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; row-gap: 4px; column-gap: 4px; grid-column: 1 / -1; border-color: -tr-separator",
-          "width": 299,
+          "width": 480,
           "x": 0,
-          "y": 220
+          "y": 110
          }
         ],
         "class": "TRBoxView",
-        "height": 274,
+        "height": 164,
         "style": "display: grid; row-gap: 8px; column-gap: 8px; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr))",
-        "width": 299,
+        "width": 480,
         "x": 8,
         "y": 8
        },
@@ -548,9 +548,9 @@
         },
         "text": "Ticket #101 is blocked; see notes.txt.",
         "textColor": "#000000d8",
-        "width": 299,
+        "width": 480,
         "x": 8,
-        "y": 290
+        "y": 180
        },
        {
         "children": [
@@ -610,9 +610,9 @@
         "class": "TRBoxView",
         "height": 32,
         "style": "flex-wrap: wrap; align-items: center; row-gap: 6px; column-gap: 6px",
-        "width": 299,
+        "width": 480,
         "x": 8,
-        "y": 314
+        "y": 204
        },
        {
         "children": [
@@ -635,7 +635,7 @@
           "text": "First",
           "textColor": "#000000d8",
           "width": 31,
-          "x": 268,
+          "x": 449,
           "y": 8
          },
          {
@@ -657,7 +657,7 @@
           "text": "Second",
           "textColor": "#000000d8",
           "width": 50,
-          "x": 208,
+          "x": 389,
           "y": 8
          },
          {
@@ -675,16 +675,16 @@
           },
           "title": "Third",
           "width": 66,
-          "x": 132,
+          "x": 313,
           "y": 0
          }
         ],
         "class": "TRBoxView",
         "height": 32,
         "style": "direction: rtl; align-items: center; row-gap: 10px; column-gap: 10px",
-        "width": 299,
+        "width": 480,
         "x": 8,
-        "y": 354
+        "y": 244
        },
        {
         "children": [
@@ -709,7 +709,7 @@
           "text": "3",
           "textColor": "#000000d8",
           "width": 25,
-          "x": 274,
+          "x": 455,
           "y": 0
          },
          {
@@ -733,9 +733,9 @@
         "class": "TRBoxView",
         "height": 48,
         "style": "height: 48px",
-        "width": 299,
+        "width": 480,
         "x": 8,
-        "y": 394
+        "y": 284
        },
        {
         "children": [
@@ -761,7 +761,7 @@
               },
               "text": "09:00 opened",
               "textColor": "#000000d8",
-              "width": 299,
+              "width": 480,
               "x": 0,
               "y": 0
              },
@@ -783,7 +783,7 @@
               },
               "text": "09:05 assigned",
               "textColor": "#000000d8",
-              "width": 299,
+              "width": 480,
               "x": 0,
               "y": 16
              },
@@ -805,7 +805,7 @@
               },
               "text": "09:20 replied",
               "textColor": "#000000d8",
-              "width": 299,
+              "width": 480,
               "x": 0,
               "y": 32
              },
@@ -827,7 +827,7 @@
               },
               "text": "10:00 escalated",
               "textColor": "#000000d8",
-              "width": 299,
+              "width": 480,
               "x": 0,
               "y": 48
              },
@@ -849,7 +849,7 @@
               },
               "text": "10:30 resolved",
               "textColor": "#000000d8",
-              "width": 299,
+              "width": 480,
               "x": 0,
               "y": 64
              },
@@ -871,7 +871,7 @@
               },
               "text": "11:00 closed",
               "textColor": "#000000d8",
-              "width": 299,
+              "width": 480,
               "x": 0,
               "y": 80
              }
@@ -879,33 +879,33 @@
             "class": "TRBoxView",
             "height": 96,
             "style": "flex-direction: column",
-            "width": 299,
+            "width": 480,
             "x": 0,
             "y": 0
            }
           ],
           "class": "TRBoxView",
-          "height": 120,
+          "height": 230,
           "style": "flex-direction: column",
-          "width": 299,
+          "width": 480,
           "x": 0,
           "y": 0
          }
         ],
         "class": "TRScrollBox",
-        "height": 120,
+        "height": 230,
         "overflow": "scroll",
         "style": "flex-grow: 1; flex-basis: 0%; height: 80px; min-width: 0px; min-height: 0px",
-        "width": 299,
+        "width": 480,
         "x": 8,
-        "y": 450
+        "y": 340
        }
       ],
       "class": "TRBoxView",
       "height": 578,
       "style": "flex-direction: column; flex-grow: 1; padding-left: 8px; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; row-gap: 8px; column-gap: 8px",
-      "width": 315,
-      "x": 181,
+      "width": 496,
+      "x": 0,
       "y": 0
      }
     ],
@@ -914,7 +914,7 @@
     "id": "main",
     "measured": {
      "height": 428,
-     "width": 634
+     "width": 453
     },
     "split": "row",
     "style": "align-self: stretch; flex-grow: 1; flex-basis: 0%; min-width: 0px; min-height: 0px",

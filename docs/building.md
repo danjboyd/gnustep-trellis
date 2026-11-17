@@ -91,8 +91,6 @@ $P Screen.trellis --snapshot out.png --export-json out.json \
 - Repeat exports are **byte-identical**, PNG and JSON, for the same spec,
   size and appearance (checked on the controls and migration fixtures,
   two widths, both appearances, three runs each).
-- **Limits:** a spec that can't be read or parsed still exits 0 and writes
-  a PNG of the error message (no JSON); an unknown `--appearance` value
-  is used as given (the light appearance is drawn, and the JSON records
-  the value). Check that the JSON exists, or use `trellis-render`, which
-  exits non-zero on errors, when a script needs to know.
+- **Exit status:** 0 on success; 1 when the spec or its sample fails to
+  load (the snapshot then shows the error message, and no JSON is
+  written); 2 for an `--appearance` other than `light` or `dark`.

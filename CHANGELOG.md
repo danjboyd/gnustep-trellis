@@ -5,6 +5,14 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Fixed:** hiding the view that has keyboard focus (`hidden`,
+  `-setHidden:forSubview:`, a container query) moves focus to the next
+  view in the loop on Cocoa too; GNUstep already did.
+- **Fixed:** while a text field was being edited, rebuilding the key-view
+  loop put the field editor in it in place of the field (GNUstep).
+- **Fixed:** scrolled content that hides or shows a view on its own
+  layout now updates the outer box's key-view loop.
+
 ## 0.5.0 (2026-11-17)
 
 Adds API (listed in docs/api.md, nothing removed): `<split>` resizable

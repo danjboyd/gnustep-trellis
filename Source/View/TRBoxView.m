@@ -804,6 +804,18 @@ static double TREase(double t, int easing)
   return [sv isKindOfClass: [TRBoxView class]] && _node.parent == [(TRBoxView *)sv node];
 }
 
+/* The view inside box that has keyboard focus (a text field while its
+   field editor is active), or nil. */
+static NSView *TRFocusedViewIn(NSView *box)
+{
+  id fr = [[box window] firstResponder];
+  if ([fr isKindOfClass: [NSText class]] && [(NSText *)fr isFieldEditor]
+      && [[(NSText *)fr delegate] isKindOfClass: [NSView class]])
+    fr = [(NSText *)fr delegate];
+  if (![fr isKindOfClass: [NSView class]] || fr == box || ![fr isDescendantOf: box]) return nil;
+  return fr;
+}
+
 - (TRBoxView *)rootBox
 {
   TRBoxView *b = self;
@@ -898,6 +910,17 @@ static double TREase(double t, int easing)
       collected = [NSMutableArray array];
       gTRCollecting = collected;
     }
+  /* Focus inside a view this layout hides moves to the next view in the
+     loop as it stood before (or to the window when none is left). */
+  NSView *focused = TRFocusedViewIn(self);
+  NSMutableArray *focusChain = nil;
+  if (focused != nil)
+    {
+      focusChain = [NSMutableArray array];
+      NSView *v = [focused nextKeyView];
+      for (int i = 0; v != nil && v != focused && i < 256; i++, v = [v nextKeyView])
+        [focusChain addObject: v];
+    }
   [self applyFramesInheriting: -1 easing: 0];
   gTRCollecting = nil;
   if ([collected count])
@@ -929,6 +952,18 @@ static double TREase(double t, int easing)
       [[NSRunLoop currentRunLoop] addTimer: _animationTimer forMode: NSModalPanelRunLoopMode];
     }
   [self recalculateTrellisKeyViewLoop];
+  /* GNUstep moves focus itself when a view holding it is hidden (to the
+     next valid key view); AppKit leaves it on the hidden view. */
+  NSView *now = TRFocusedViewIn(self);
+  if (focused != nil && [focused isHiddenOrHasHiddenAncestor]
+      && (now == nil || [now isHiddenOrHasHiddenAncestor]))
+    {
+      NSView *target = nil;
+      for (NSView *v in focusChain)
+        if ([v isDescendantOf: self] && ![v isHiddenOrHasHiddenAncestor] && [v canBecomeKeyView])
+          { target = v; break; }
+      [[self window] makeFirstResponder: target];
+    }
 }
 
 /* ---- Keyboard focus order ---- */
@@ -979,6 +1014,18 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
       if (doc) TRCollectKeyViews(doc, out);
       return;
     }
+  /* A field editor is never a member: the field it edits is. */
+  if ([v isKindOfClass: [NSText class]] && [(NSText *)v isFieldEditor]) return;
+  /* A control is a leaf. A text field being edited may say it can't take
+     focus (GNUstep), since its field editor has it, but it is still in
+     the loop; and the field editor sits inside it. */
+  if ([v isKindOfClass: [NSControl class]])
+    {
+      if (([v acceptsFirstResponder] || [v canBecomeKeyView] || [(NSControl *)v currentEditor] != nil)
+          && TRTabIndex(v) >= 0)
+        [out addObject: v];
+      return;
+    }
   if ([v acceptsFirstResponder] || [v canBecomeKeyView])
     {
       if (TRTabIndex(v) >= 0) [out addObject: v];
@@ -990,9 +1037,13 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
 - (void)recalculateTrellisKeyViewLoop
 {
   if (!_managesKeyViewLoop) return;
-  /* Only the outermost Trellis box (scrolled content joins its loop). */
+  /* Only the outermost Trellis box (scrolled content joins its loop): a
+     box inside another one, such as scrolled content laid out on its own,
+     hands the work to the outermost. */
+  TRBoxView *outer = nil;
   for (NSView *p = [self superview]; p != nil; p = [p superview])
-    if ([p isKindOfClass: [TRBoxView class]]) return;
+    if ([p isKindOfClass: [TRBoxView class]]) outer = (TRBoxView *)p;
+  if (outer != nil) { [outer recalculateTrellisKeyViewLoop]; return; }
   NSMutableArray *views = [NSMutableArray array];
   TRCollectKeyViews(self, views);
   /* Positive tab indexes first (ascending, stable), then document order. */

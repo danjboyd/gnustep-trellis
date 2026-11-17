@@ -17,6 +17,11 @@ version may change the API listed in docs/api.md, and says so here.
   aligned `flex-start` in a row, or an item of an auto-height column,
   `height: 50%` now acts as `auto` (it took half of the laid-out height).
   With these two, every conformance case that runs passes (2977/2977).
+- **Fixed:** an absolutely positioned grid item now takes `justify-self`
+  and `align-self` (or the grid's `justify-items` / `align-items`) in an
+  axis whose insets are both auto, and its margins; both were ignored. A
+  set inset still positions it as in CSS 2. WPT: with inline-grid cases
+  enabled, wpt-grid passes 1383/1390 (was 1324).
 - **Fixed:** logical properties follow `direction`: in a right-to-left box
   `margin-inline-start`, `padding-inline-start`, `border-inline-start`
   and `inset-inline-start` are the right edge (they were always the left).

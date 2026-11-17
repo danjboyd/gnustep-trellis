@@ -302,6 +302,8 @@ typedef struct {
   BOOL autoMinW, autoMinH;    /* content-based (automatic) minimum size in that axis */
 } TRGridItem;
 
+static inline double TRGZero(double v) { return isnan(v) ? 0 : v; }
+
 static inline double TRGResolve(TRValue v, double ref)
 {
   switch (v.unit)
@@ -1388,23 +1390,65 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           double cbW = cbEnd[1] - cbStart[1], cbH = cbEnd[0] - cbStart[0];
           double L = TRGResolve(cs->inset[TREdgeLeft], cbW), R = TRGResolve(cs->inset[TREdgeRight], cbW);
           double T = TRGResolve(cs->inset[TREdgeTop], cbH), B = TRGResolve(cs->inset[TREdgeBottom], cbH);
+          /* Margins (percentages against the containing block's width;
+             auto counts as 0). */
+          double mL = TRGZero(TRGResolve(cs->margin[TREdgeLeft], cbW)), mR = TRGZero(TRGResolve(cs->margin[TREdgeRight], cbW));
+          double mT = TRGZero(TRGResolve(cs->margin[TREdgeTop], cbW)), mB = TRGZero(TRGResolve(cs->margin[TREdgeBottom], cbW));
+          /* Self-alignment (CSS Grid 9.1 and css-align-3): in an axis
+             whose insets are both auto, an explicit justify-self /
+             align-self (or the container's -items) aligns the margin box
+             in the grid area. A set inset positions the box as in CSS 2,
+             and so does normal. */
+          TRAlign js = cs->justifySelf == TRAlignAuto ? s->justifyItems : cs->justifySelf;
+          TRAlign as = cs->alignSelf == TRAlignAuto ? s->alignItems : cs->alignSelf;
+          if (js == TRAlignAuto || !isnan(L) || !isnan(R)) js = TRAlignNormal;
+          if (as == TRAlignAuto || !isnan(T) || !isnan(B)) as = TRAlignNormal;
+          double imX = cbX + (isnan(L) ? 0 : L), imW = MAX(0, cbW - (isnan(L) ? 0 : L) - (isnan(R) ? 0 : R));
+          double imY = cbY + (isnan(T) ? 0 : T), imH = MAX(0, cbH - (isnan(T) ? 0 : T) - (isnan(B) ? 0 : B));
           double w = TRGBox(cs, cs->width, cbW, YES, cbW), h = TRGBox(cs, cs->height, cbH, NO, cbW);
-          if (isnan(w) && !isnan(L) && !isnan(R)) w = MAX(0, cbW - L - R);
-          if (isnan(h) && !isnan(T) && !isnan(B)) h = MAX(0, cbH - T - B);
+          if (isnan(w) && ((!isnan(L) && !isnan(R)) || js == TRAlignStretch)) w = MAX(0, imW - mL - mR);
+          if (isnan(h) && ((!isnan(T) && !isnan(B)) || as == TRAlignStretch)) h = MAX(0, imH - mT - mB);
           if (isnan(w) || isnan(h))
             {
-              TRSize sz = TRLayoutNode(c, isnan(w) ? cbW : w, isnan(h) ? NAN : h,
+              TRSize sz = TRLayoutNode(c, isnan(w) ? MAX(0, imW - mL - mR) : w, isnan(h) ? NAN : h,
                                        isnan(w) ? TRMeasureModeAtMost : TRMeasureModeExactly,
                                        isnan(h) ? TRMeasureModeUndefined : TRMeasureModeExactly, cbW, cbH, NO, dir);
               if (isnan(w)) w = sz.width;
               if (isnan(h)) h = sz.height;
             }
+          double minw = TRGBox(cs, cs->minWidth, cbW, YES, cbW), maxw = TRGBox(cs, cs->maxWidth, cbW, YES, cbW);
+          if (!isnan(maxw)) w = MIN(w, maxw);
+          if (!isnan(minw)) w = MAX(w, minw);
+          double minh = TRGBox(cs, cs->minHeight, cbH, NO, cbW), maxh = TRGBox(cs, cs->maxHeight, cbH, NO, cbW);
+          if (!isnan(maxh)) h = MIN(h, maxh);
+          if (!isnan(minh)) h = MAX(h, minh);
           TRLayoutNode(c, w, h, TRMeasureModeExactly, TRMeasureModeExactly, cbW, cbH, YES, dir);
-          /* Over-constrained (both insets and a width): the containing
-             block's direction decides, so rtl keeps right (CSS 2 10.3.7). */
-          BOOL useRight = !isnan(R) && (isnan(L) || rtl);
-          double x = useRight ? cbX + cbW - R - w : (!isnan(L) ? cbX + L : (rtl ? cbX + cbW - w : cbX));
-          double y = !isnan(T) ? cbY + T : (!isnan(B) ? cbY + cbH - B - h : cbY);
+          double x, y;
+          /* Physical left/right; start/end follow the grid's direction. */
+          TRAlign jx = js;
+          if (jx == TRAlignFlexStart || jx == TRAlignBaseline) jx = TRAlignStart;
+          if (jx == TRAlignFlexEnd || jx == TRAlignLastBaseline) jx = TRAlignEnd;
+          if (jx == TRAlignStart) jx = rtl ? TRAlignRight : TRAlignLeft;
+          else if (jx == TRAlignEnd) jx = rtl ? TRAlignLeft : TRAlignRight;
+          if (jx == TRAlignLeft) x = imX + mL;
+          else if (jx == TRAlignRight) x = imX + imW - mR - w;
+          else if (jx == TRAlignCenter) x = imX + mL + (imW - mL - mR - w) / 2;
+          else
+            {
+              /* normal/stretch: CSS 2. Over-constrained (both insets and
+                 a width): the containing block's direction decides, so rtl
+                 keeps right (CSS 2 10.3.7). */
+              BOOL useRight = !isnan(R) && (isnan(L) || rtl);
+              x = useRight ? cbX + cbW - R - mR - w
+                           : (!isnan(L) ? cbX + L + mL : (rtl ? cbX + cbW - mR - w : cbX + mL));
+            }
+          TRAlign ay = as;
+          if (ay == TRAlignFlexStart || ay == TRAlignBaseline) ay = TRAlignStart;
+          if (ay == TRAlignFlexEnd || ay == TRAlignLastBaseline) ay = TRAlignEnd;
+          if (ay == TRAlignStart) y = imY + mT;
+          else if (ay == TRAlignEnd) y = imY + imH - mB - h;
+          else if (ay == TRAlignCenter) y = imY + mT + (imH - mT - mB - h) / 2;
+          else y = !isnan(T) ? cbY + T + mT : (!isnan(B) ? cbY + cbH - B - mB - h : cbY + mT);
           c->_rawFrame = TRRectMake(x, y, w, h);
           c->_lineIndex = -1;
         }

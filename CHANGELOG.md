@@ -5,6 +5,12 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Changed (layout):** a root with `aspect-ratio` whose auto width fills
+  the available width now takes its height from the ratio, but never less
+  than its content height (min-height: auto). Before, it took its content
+  height. Fixes WPT stretch/aspect-ratio-1/2 and /3; known gaps are down
+  to 89.
+
 - **Fixed:** an abspos box inside static boxes whose containing block is
   a grid now takes its grid placement from that grid: its grid-row and
   grid-column name the area, as for a direct child. A grid's own

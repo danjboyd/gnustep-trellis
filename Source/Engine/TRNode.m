@@ -303,6 +303,18 @@ static void TRClearDirty(TRNode *n)
           wm = TRMeasureModeExactly;
           ah = TR_CLAMP_H(TR_W_TO_H(aw)); hm = TRMeasureModeExactly;
         }
+      else if (!hDef && wm == TRMeasureModeExactly && !isnan(aw))
+        {
+          /* An auto width that fills the available width is definite too.
+             With min-height: auto the height is at least the content's
+             (css-sizing-4 automatic minimum for aspect-ratio boxes). */
+          aw = TR_CLAMP_W(aw);
+          TRFloat h = TR_W_TO_H(aw);
+          if (s->minHeight.unit == TRUnitAuto && s->overflow == TROverflowVisible)
+            h = MAX(h, TRLayoutNode(self, aw, TRUndefined, TRMeasureModeExactly, TRMeasureModeUndefined,
+                                    available.width, available.height, NO, own).height);
+          ah = TR_CLAMP_H(h); hm = TRMeasureModeExactly;
+        }
       #undef TR_CLAMP_W
       #undef TR_CLAMP_H
       #undef TR_W_TO_H

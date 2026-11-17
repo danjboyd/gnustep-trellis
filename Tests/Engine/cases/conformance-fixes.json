@@ -2326,5 +2326,65 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/root_aspect_ratio_auto_width_fills",
+  "note": "a root whose auto width fills the available width takes its height from aspect-ratio, but not below its content (min-height: auto)",
+  "available": {
+   "width": 100,
+   "height": null
+  },
+  "root": {
+   "style": "aspect-ratio: 2",
+   "children": [
+    {
+     "style": "width: 30px; height: 40px"
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 50,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 30,
+     "height": 40
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/root_aspect_ratio_content_wins",
+  "note": "the content is taller than the ratio height, so the content height wins",
+  "available": {
+   "width": 100,
+   "height": null
+  },
+  "root": {
+   "style": "aspect-ratio: 4; flex-direction: column",
+   "children": [
+    {
+     "style": "height: 40px"
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 40,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 100,
+     "height": 40
+    }
+   ]
+  }
  }
 ]

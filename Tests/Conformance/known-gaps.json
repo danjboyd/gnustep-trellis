@@ -68,8 +68,6 @@
   "wpt-sizing/css/css-sizing/keyword-sizes-on-abspos/5": "uses min-width: initial, which Trellis doesn't support",
   "wpt-sizing/css/css-sizing/keyword-sizes-on-flex-item-001/4": "intrinsic size keyword case, not yet analysed",
   "wpt-sizing/css/css-sizing/keyword-sizes-on-flex-item-002/3": "intrinsic size keyword case, not yet analysed",
-  "wpt-sizing/css/css-sizing/stretch/aspect-ratio-1/2": "height: stretch with an indefinite containing-block height should act as auto, so aspect-ratio gives the height from the width (50); Trellis gives the content height (40)",
-  "wpt-sizing/css/css-sizing/stretch/aspect-ratio-1/3": "min-height: stretch with an indefinite containing-block height should act as auto, so aspect-ratio gives the height from the width",
   "wpt-sizing/css/css-sizing/stretch/auto-margins-2/4": "stretch on a descendant in a non-root context, not yet analysed",
   "wpt-sizing/css/css-sizing/stretch/auto-margins-2/5": "stretch on a descendant in a non-root context, not yet analysed",
   "wpt-sizing/css/css-sizing/stretch/block-height-004/7": "uses display: flow-root, which Trellis doesn't support",

@@ -145,6 +145,7 @@ check-gui:: all
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/virtual-bench.m -o obj/gui-tests/virtual-bench $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/layout-transition.m -o obj/gui-tests/layout-transition $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/rich-text.m -o obj/gui-tests/rich-text $(GUI_TEST_LIBS)
+	@$(CC) $(GUI_TEST_FLAGS) Tests/View/box-paint.m -o obj/gui-tests/box-paint $(GUI_TEST_LIBS)
 	@echo "== view checks (headless)"
 	@export LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH; status=0; \
 	  timeout 60 scripts/run-headless.sh obj/gui-tests/size-for-width > obj/gui-tests/hook.log 2>&1 || status=1; \
@@ -172,6 +173,8 @@ check-gui:: all
 	  NSZombieEnabled=YES timeout 60 scripts/run-headless.sh obj/gui-tests/rich-text > obj/gui-tests/richtext.log 2>&1 || status=1; \
 	  if grep -q "deallocated instance" obj/gui-tests/richtext.log; then echo "RICHTEXT FAIL: message sent to a freed object"; status=1; fi; \
 	  grep -v _NET_WORKAREA obj/gui-tests/richtext.log | tail -1; \
+	  timeout 60 scripts/run-headless.sh obj/gui-tests/box-paint > obj/gui-tests/boxpaint.log 2>&1 || status=1; \
+	  grep -v _NET_WORKAREA obj/gui-tests/boxpaint.log | tail -1; \
 	  timeout 300 scripts/run-headless.sh obj/gui-tests/virtual-bench > obj/gui-tests/vbench.log 2>&1 || status=1; \
 	  grep -v _NET_WORKAREA obj/gui-tests/vbench.log | tail -3; \
 	  Tests/View/appearance.sh || status=1; \

@@ -594,16 +594,18 @@ static int TREdgeFromSuffix(NSString *suffix)
       });
       TRValue w = TRPx(0);
       BOOL sawWidth = NO;
+      NSString *bs = nil;
       for (NSString *t in TRTokens(v))
         {
           if (!sawWidth && TRParseLength(t, &len, NO, NO)) { w = len; sawWidth = YES; }
           else if ([styles containsObject: [t lowercaseString]])
-            _other[@"border-style"] = t;
+            { bs = [t lowercaseString]; _other[@"border-style"] = bs; }
           else
             _other[@"border-color"] = t;
         }
-      if (!sawWidth && _other[@"border-style"] != nil
-          && ![_other[@"border-style"] isEqualToString: @"none"])
+      if ([bs isEqualToString: @"none"] || [bs isEqualToString: @"hidden"])
+        w = TRPx(0);   /* CSS: no style means no border, whatever the width */
+      else if (!sawWidth && bs != nil)
         w = TRPx(3);   /* CSS 'medium' */
       for (int i = 0; i < 4; i++) _s.border[i] = w;
       return YES;

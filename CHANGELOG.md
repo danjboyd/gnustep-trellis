@@ -5,6 +5,9 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- Dashed, dotted and double borders draw as such (they drew solid).
+  `border: 2px none` now has no width, as in CSS.
+
 ## 0.4.0 (2026-11-17)
 
 Adds API (listed in docs/api.md, nothing removed): virtualized lists and

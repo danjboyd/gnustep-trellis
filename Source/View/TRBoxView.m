@@ -1105,6 +1105,45 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
 
 /* ---- Drawing ---- */
 
+/* Strokes a uniform border of width bw inside r. dashed: dashes of 3bw
+   with gaps of 2bw (roughly what browsers draw); dotted: round dots one
+   bw across, a dot's width apart; double: two lines of bw/3 with a bw/3
+   gap. Other styles (groove, ridge, inset, outset) draw solid. */
+static void TRStrokeBorder(NSRect r, CGFloat bw, CGFloat radius, NSString *style)
+{
+  if ([style isEqualToString: @"double"] && bw >= 3)
+    {
+      CGFloat t = bw / 3;
+      for (int i = 0; i < 2; i++)
+        {
+          CGFloat inset = (i == 0) ? t / 2 : bw - t / 2;
+          CGFloat rr = MAX(0, radius - (inset - bw / 2));
+          NSBezierPath *p = [NSBezierPath bezierPathWithRoundedRect: NSInsetRect(r, inset, inset)
+                                                            xRadius: rr yRadius: rr];
+          [p setLineWidth: t];
+          [p stroke];
+        }
+      return;
+    }
+  NSBezierPath *p = [NSBezierPath bezierPathWithRoundedRect: NSInsetRect(r, bw / 2, bw / 2)
+                                                    xRadius: radius yRadius: radius];
+  [p setLineWidth: bw];
+  if ([style isEqualToString: @"dashed"])
+    {
+      CGFloat dash[2] = { 3 * bw, 2 * bw };
+      [p setLineDash: dash count: 2 phase: 0];
+      [p setLineCapStyle: NSButtLineCapStyle];
+    }
+  else if ([style isEqualToString: @"dotted"])
+    {
+      /* Zero-length dashes with round caps draw as dots of diameter bw. */
+      CGFloat dash[2] = { 0, 2 * bw };
+      [p setLineDash: dash count: 2 phase: 0];
+      [p setLineCapStyle: NSRoundLineCapStyle];
+    }
+  [p stroke];
+}
+
 - (void)drawRect:(NSRect)dirty
 {
   NSDictionary *d = _node.style.otherDeclarations;
@@ -1128,10 +1167,7 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
       if (c)
         {
           [c set];
-          NSBezierPath *p = [NSBezierPath bezierPathWithRoundedRect: NSInsetRect(r, bw / 2, bw / 2)
-                                                            xRadius: radius yRadius: radius];
-          [p setLineWidth: bw];
-          [p stroke];
+          TRStrokeBorder(r, bw, radius, [d[@"border-style"] lowercaseString]);
         }
     }
 }

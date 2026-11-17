@@ -525,5 +525,29 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/abspos_stretch_less_insets",
+  "note": "width/height: stretch on an abspos box fill the containing block less its insets: 200 - 30 - 20 = 150 wide, 200 - 10 - 40 = 150 tall (WPT stretch/auto-margins-2/4,5)",
+  "root": {
+   "style": "width: 200px; height: 200px",
+   "children": [
+    {
+     "style": "position: absolute; left: 30px; right: 20px; top: 10px; bottom: 40px; width: stretch; height: stretch"
+    }
+   ]
+  },
+  "expected": {
+   "width": 200,
+   "height": 200,
+   "children": [
+    {
+     "x": 30,
+     "y": 10,
+     "width": 150,
+     "height": 150
+    }
+   ]
+  }
  }
 ]

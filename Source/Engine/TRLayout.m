@@ -650,7 +650,17 @@ static void TRLayoutAbsChild(TRNode *c, TRDirection cbDir, TRFloat cbX, TRFloat 
                              const TRFloat ppad[4], const TRFloat pborder[4])
 {
   TRStyleStorage kwBuf;
-  const TRStyleStorage *cs = TRResolveSizeKeywords(c, TRChildStyle(c, pdir), &kwBuf, cbW, cbH, cbW, cbH, YES, pdir);
+  /* Size keywords use the inset-modified containing block: the
+     containing block less the insets that aren't auto. */
+  const TRStyleStorage *raw = TRChildStyle(c, pdir);
+  TRFloat kwW = cbW, kwH = cbH;
+  if (!isnan(kwW))
+    kwW = TRMax(0, kwW - TRDefault(TRResolve(raw->inset[TREdgeLeft], cbW), 0)
+                       - TRDefault(TRResolve(raw->inset[TREdgeRight], cbW), 0));
+  if (!isnan(kwH))
+    kwH = TRMax(0, kwH - TRDefault(TRResolve(raw->inset[TREdgeTop], cbH), 0)
+                       - TRDefault(TRResolve(raw->inset[TREdgeBottom], cbH), 0));
+  const TRStyleStorage *cs = TRResolveSizeKeywords(c, raw, &kwBuf, kwW, kwH, cbW, cbH, YES, pdir);
   c->_pctIndefH = NO;
   TREdges ce = TRResolveEdges(cs, cbW);
   TRFloat cpbW = TRPBHorizontal(&ce), cpbH = TRPBVertical(&ce);

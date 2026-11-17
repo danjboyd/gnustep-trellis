@@ -11,6 +11,15 @@ version may change the API listed in docs/api.md, and says so here.
   min/max-height and min/max-width already apply when its abspos boxes
   are placed, so `bottom: 0` uses the final height. The
   `abspos-grid-descendant` skip is removed (3 cases).
+- **Conformance:** the WPT importer gives an abspos root its containing
+  block (the positioned ancestor's padding box, or the 800×600 viewport)
+  on an axis whose size depends on it, and a `height: stretch` root its
+  parent's definite height. 22 known gaps now pass: conformance is
+  3581/3581 with the fix above. CSSWG #11044 cases, where a stretch box's margins count as 0
+  in a parent that isn't a BFC, are tagged `margin-collapse`, and
+  `min-height`/`max-height: stretch` against a definite parent is tagged
+  `containing-block-height`. Known gaps are down from 127 to 91; the
+  remaining stretch entries have specific reasons.
 
 ## 0.8.0 (2026-11-17)
 

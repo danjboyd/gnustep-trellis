@@ -36,6 +36,7 @@ import subprocess
 import sys
 
 VIEWPORT_CONTENT_WIDTH = 784
+VIEWPORT = (800, 600)             # WPT's viewport: the initial containing block
 WPT_ROOT = "."
 SUITE = "wpt"
 DEFAULT_FONT_SIZE = 16
@@ -997,6 +998,9 @@ class Converter:
                 self.requires.add("block-layout")
                 if margins_collapse(node["style"], child_nodes, is_root or parent_display in CONTAINERS):
                     self.requires.add("margin-collapse")
+                if not self.establishes_bfc(el, node["style"], parent_display, is_root) \
+                        and stretch_margin_zeroed(node["style"], child_nodes):
+                    self.requires.add("margin-collapse")
         if child_nodes:
             node["children"] = child_nodes
             exp["children"] = child_exp
@@ -1055,6 +1059,16 @@ class Converter:
         if op is ancestors[0] and "data-offset-y" in el.attrs:
             self.y_from_root = True
 
+    def establishes_bfc(self, el, style, parent_display, is_root):
+        """Whether a block box is a formatting-context root in CSS (the case
+        root counts only when something makes it one)."""
+        return parent_display in CONTAINERS \
+            or style.get("overflow", "visible") != "visible" \
+            or style.get("display") in ("flow-root", "inline-block") \
+            or self.position(el) in ("absolute", "fixed") \
+            or self.page.declared(el).get("float", "none").strip() != "none" \
+            or bool(is_root and self.root_sizing)
+
     def root_margin_collapses(self, root, tree, exp):
         """The case root is a block in the page, so unless something makes it
         a formatting-context root, its first child's top margin collapses
@@ -1112,14 +1126,54 @@ class Converter:
                 self.checks += 1
         return path_to(exp_root, ae, [])
 
+    def root_containing_block(self, root):
+        """An abspos root's containing block size: the nearest positioned
+        ancestor's padding box when its size is declared, or the initial
+        containing block (the viewport) when there's none. None when the
+        size isn't known from the styles."""
+        if self.position(root) == "fixed":
+            return {"width": VIEWPORT[0], "height": VIEWPORT[1]}
+        n = root.parent
+        while n is not None and n.tag not in ("html", "#document"):
+            if self.position(n) != "static":
+                break
+            n = n.parent
+        if n is None or n.tag in ("html", "#document"):
+            return {"width": VIEWPORT[0], "height": VIEWPORT[1]}
+        if n.tag == "body":
+            return None
+        d = self.page.declared(n)
+        fs = self.page.font(n)[0]
+        out = {}
+        for axis, a, b in (("width", "left", "right"), ("height", "top", "bottom")):
+            v = to_px(d.get(axis, "auto"), fs)
+            if not isinstance(v, (int, float)):
+                return None
+            pad = [to_px(d.get("padding-" + x, "0"), fs) or 0 for x in (a, b)]
+            bor = [to_px(d.get("border-%s-width" % x, "0"), fs) or 0 for x in (a, b)]
+            if any(isinstance(x, str) for x in pad + bor):
+                return None
+            out[axis] = fmt(v - sum(bor) if d.get("box-sizing") == "border-box" else v + sum(pad))
+        return out
+
+    def parent_height_definite(self, root):
+        p = root.parent
+        if p is None or p.tag in ("html", "#document", "body"):
+            return False
+        return isinstance(to_px(self.page.declared(p).get("height", "auto"),
+                                self.page.font(p)[0]), (int, float))
+
     def available_height_for_root(self, root):
         """The parent's definite content height, when the root's own height
         is a percentage that resolves against it. (A given
         available height is laid out exactly, so it's only passed when the
         root sizes itself from it.)"""
         d = self.page.declared(root)
-        if "%" not in d.get("height", ""):
-            if any("%" in d.get(k, "") for k in ("min-height", "max-height")):
+        if "%" not in d.get("height", "") and not STRETCH_RE.search(d.get("height", "")):
+            if any("%" in d.get(k, "") for k in ("min-height", "max-height")) or (
+                    any(STRETCH_RE.search(d.get(k, "")) for k in ("min-height", "max-height"))
+                    and self.position(root) not in ("absolute", "fixed")
+                    and self.parent_height_definite(root)):
                 # A % min/max-height with auto height needs the containing
                 # block's height without fixing the root's size; the format
                 # can't express that (a given available height is exact).
@@ -1135,6 +1189,19 @@ class Converter:
         h = to_px(pd.get("height", "auto"), self.page.font(p)[0])
         if not isinstance(h, (int, float)):
             return None
+        if STRETCH_RE.search(d.get("height", "")) and self.display(p) == "block" \
+                and self.position(root) not in ("absolute", "fixed") \
+                and pd.get("overflow", "visible").strip() == "visible" \
+                and self.position(p) not in ("absolute", "fixed") \
+                and pd.get("float", "none").strip() == "none":
+            # CSSWG #11044 (see stretch_margin_zeroed): the parent isn't a
+            # BFC, so a root margin on a side without border or padding is
+            # treated as 0 when resolving stretch.
+            for s in ("top", "bottom"):
+                m = to_px(d.get("margin-" + s, "0"), self.page.font(root)[0])
+                if m and not to_px(pd.get("padding-" + s, "0"), 16) \
+                        and not to_px(pd.get("border-%s-width" % s, "0"), 16):
+                    self.requires.add("margin-collapse")
         if pd.get("box-sizing") == "border-box":
             for s in ("top", "bottom"):
                 h -= (to_px(pd.get("padding-" + s, "0"), 16) or 0) + \
@@ -1207,6 +1274,28 @@ def margins_collapse(style, children, own_bfc):
         for side, child in (("Top", flow[0]), ("Bottom", flow[-1])):
             if not style.get("padding" + side) and not style.get("border%sWidth" % side) \
                     and _margin(child["style"], side):
+                return True
+    return False
+
+
+STRETCH_RE = re.compile(r"(^|\s)(stretch|-webkit-fill-available|-moz-available)(\s|$)")
+
+
+def stretch_margin_zeroed(style, children):
+    """CSSWG #11044: a stretch block size in a parent that isn't a BFC
+    treats a margin as 0 where the parent has no border or padding on that
+    side (the margin could collapse through), even when it doesn't actually
+    collapse. Trellis never collapses, so it keeps the margin."""
+    for c in children:
+        cs = c["style"]
+        if cs.get("position") in ("absolute", "fixed"):
+            continue
+        if not any(isinstance(cs.get(k), str) and STRETCH_RE.search(cs[k])
+                   for k in ("height", "minHeight", "maxHeight")):
+            continue
+        for side in ("Top", "Bottom"):
+            if _margin(cs, side) and not style.get("padding" + side) \
+                    and not style.get("border%sWidth" % side):
                 return True
     return False
 
@@ -1338,6 +1427,25 @@ def convert_file(path, rel, commit):
             # Shrink-to-fit root: trellis-case lays a given available width
             # out exactly, so leave it unconstrained (content size).
             case["available"] = {"width": None, "height": None}
+        if rs.get("position") in ("absolute", "fixed"):
+            cb = conv.root_containing_block(root)
+            if cb is not None:
+                # trellis-case lays a given available size out exactly, so
+                # pass the containing block only on an axis whose size comes
+                # from it: insets on both sides, or a %, stretch or
+                # fit-content size. Otherwise the root shrinks to fit.
+                def needs(axis, a, b):
+                    if rs.get(a) is not None and rs.get(b) is not None:
+                        return True
+                    for k in (axis, "min" + axis.title(), "max" + axis.title()):
+                        v = rs.get(k)
+                        if isinstance(v, str) and ("%" in v or STRETCH_RE.search(v)
+                                                   or "fit-content" in v):
+                            return True
+                    return False
+                case["available"] = {
+                    "width": cb["width"] if needs("width", "left", "right") else None,
+                    "height": cb["height"] if needs("height", "top", "bottom") else None}
         if anchor_path is not None:
             case["anchor"] = anchor_path
         if conv.root_margin_collapses(root, tree, exp):

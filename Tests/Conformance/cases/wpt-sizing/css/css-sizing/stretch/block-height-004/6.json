@@ -51,6 +51,7 @@
  },
  "requires": [
   "block-layout",
-  "intrinsic-size-keyword"
+  "intrinsic-size-keyword",
+  "margin-collapse"
  ]
 }

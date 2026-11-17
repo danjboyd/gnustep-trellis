@@ -39,6 +39,7 @@
  },
  "requires": [
   "block-layout",
+  "containing-block-height",
   "intrinsic-size-keyword"
  ]
 }

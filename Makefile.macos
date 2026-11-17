@@ -137,6 +137,15 @@ check-reference: all
 	python3 -I scripts/check-reference.py replay --runner $(B)/trellis-case
 	python3 -I scripts/check-reference.py selftest --runner $(B)/trellis-case
 
+# TrellisPreview's snapshot/export path (Tests/View/preview-export.sh),
+# headless: a copy of the app marked LSUIElement (no Dock icon) whose
+# window is never ordered front, so it runs over ssh.
+check-preview: gui
+	rm -rf $(B)/preview-check && mkdir -p $(B)/preview-check
+	cp -R $(B)/TrellisPreview.app $(B)/preview-check/
+	/usr/libexec/PlistBuddy -c 'Add :LSUIElement bool true' $(B)/preview-check/TrellisPreview.app/Contents/Info.plist
+	PREVIEW=$(CURDIR)/$(B)/preview-check/TrellisPreview.app/Contents/MacOS/TrellisPreview bash Tests/View/preview-export.sh
+
 # The frames that changed from 0.5.x to 0.7 (docs/migration-0.7.md), on
 # the migration fixture, window-free.
 check-migration: gui
@@ -149,4 +158,4 @@ check-importers:
 
 clean:
 	rm -rf $(B)
-.PHONY: all gui check check-view check-reference check-migration check-importers conformance-record clean
+.PHONY: all gui check check-view check-preview check-reference check-migration check-importers conformance-record clean

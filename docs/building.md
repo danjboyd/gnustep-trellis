@@ -48,3 +48,19 @@ Plain Apple clang (Command Line Tools); no Xcode project or GNUstep needed:
 make -f Makefile.macos check   # engine and conformance
 make -f Makefile.macos gui     # libTrellis, the tools and TrellisPreview.app
 ```
+
+The other checks, all headless (no window is ordered front, so they run
+over ssh); each builds what it needs:
+
+```sh
+make -f Makefile.macos check-view       # every Tests/View test under NSZombieEnabled, scroll query, markup lint
+make -f Makefile.macos check-preview    # TrellisPreview snapshot and frames export, light and dark
+make -f Makefile.macos check-reference  # frame replay of the golden dumps, with self-test
+make -f Makefile.macos check-migration  # the frames that changed from 0.5.x to 0.7
+make -f Makefile.macos check-importers  # conformance importer unit tests (Python only)
+python3 -I scripts/conformance-summary.py check --platform macos --runner build/trellis-case
+```
+
+The last line is the conformance gate CI runs: it fails if a suite passes
+fewer cases than `docs/conformance/macos.json` records. On a fresh clone
+the whole set takes under a minute on an M-series Mac with `make -j2`.

@@ -1,0 +1,75 @@
+<!-- Fixture for scripts/check-reference.py: every supported control with
+     fake data, in the layouts the AIManager pilot uses. All names and text
+     are made up. Rendered at 340/520/900 x 680 in light and dark; the dumps
+     replay through the engine on either platform. -->
+<column id="controls" class="page" no-outlet="yes">
+  <row class="toolbar">
+    <field id="search" placeholder="Search tickets" a11y-label="Search" no-outlet="yes"/>
+    <segmented id="mode" items="Tiles, Table, Board" selected="Table" a11y-label="View" no-outlet="yes"/>
+    <popup id="sort" items="Newest, Oldest, Priority" a11y-label="Sort" no-outlet="yes"/>
+    <spacer/>
+    <button>New ticket</button>
+  </row>
+  <separator/>
+  <split id="main" class="main" no-outlet="yes">
+    <column class="side">
+      <label class="head">Queues</label>
+      <checkbox state="on">Mine</checkbox>
+      <checkbox>Unassigned</checkbox>
+      <radio state="on">Open</radio>
+      <radio>Closed</radio>
+      <label class="muted" hidden>Hidden note</label>
+      <slider min="0" max="10" value="4" a11y-label="Priority" class="wide"/>
+      <progress value="60" a11y-label="Sync" class="wide"/>
+    </column>
+    <column class="body">
+      <box class="cards">
+        <column class="card"><label class="head">Ticket 101</label><text>Printer on floor two jams on duplex jobs after the driver update.</text></column>
+        <column class="card"><label class="head">Ticket 102</label><text>VPN drops every hour.</text></column>
+        <column class="card"><label class="head">Ticket 103</label><text>New hire needs a laptop, a badge and accounts by Monday morning.</text></column>
+        <column class="card wide-card"><label class="head">Ticket 104</label><text>Spans the whole row.</text></column>
+      </box>
+      <text class="note">Ticket <a href="https://example.com/t/101">#101</a> is <b>blocked</b>; see <code>notes.txt</code>.</text>
+      <row class="actions" disabled>
+        <button>Assign</button>
+        <button>Close</button>
+        <button bordered="no" class="chip">Later</button>
+      </row>
+      <row class="rtl-row" dir="rtl">
+        <label>First</label><label>Second</label><button>Third</button>
+      </row>
+      <box class="badge-host">
+        <label class="badge">3</label>
+        <image a11y-label="Avatar" class="avatar"/>
+      </box>
+      <scroll class="log">
+        <column>
+          <label>09:00 opened</label><label>09:05 assigned</label><label>09:20 replied</label>
+          <label>10:00 escalated</label><label>10:30 resolved</label><label>11:00 closed</label>
+        </column>
+      </scroll>
+    </column>
+  </split>
+</column>
+
+<style>
+  .page     { container-type: inline-size; padding: 12px; gap: 8px; }
+  .toolbar  { gap: 8px; flex-wrap: wrap; }
+  #search   { flex: 1; min-width: 120px; }
+  .main     { flex-grow: 1; }
+  .side     { width: 180px; min-width: 120px; padding: 8px; gap: 6px; }
+  .body     { flex-grow: 1; padding: 8px; gap: 8px; }
+  .wide     { align-self: stretch; }
+  .head     { font-weight: bold; }
+  .muted    { color: GrayText; }
+  .cards    { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+  .card     { padding: 8px; gap: 4px; border-width: 1px; border-color: -tr-separator; }
+  .wide-card { grid-column: 1 / -1; }
+  .actions  { gap: 6px; flex-wrap: wrap; }
+  .rtl-row  { gap: 10px; }
+  .badge-host { height: 48px; }
+  .badge    { position: absolute; right: 0; top: 0; padding: 2px 6px; }
+  .avatar   { width: 32px; height: 32px; }
+  .log      { height: 80px; }
+  @container (max-width: 500px) { .side { display: none; } .toolbar { gap: 4px; } }
+</style>

@@ -26,14 +26,19 @@ the layout engine from those metrics.
       follow from text and control sizes.
 
   render OUTDIR [SPEC...]
-      Write dumps here for every spec (default: Examples/TrellisDemo and
-      dogfood, *.trellis) at widths 340, 520 and 900, 680 tall, light and
+      Write dumps here for every spec (default: Examples/TrellisDemo,
+      Tests/Reference and dogfood, *.trellis) at widths 340, 520 and 900, 680 tall, light and
       dark. The other platform replays them: replay is symmetric, so
       `replay OUTDIR/*.json` on Linux checks macOS dumps and vice versa.
 
+  selftest [DUMP...]
+      Change one geometry value per dump (a leaf moved 5px; 5px more
+      padding on a box) and check that replay catches each change.
+
   all [DUMP...]
       replay, then structure. With no dumps, every dump under dogfood/frames
-      and Tests/Reference.
+      and Tests/Reference/dumps (golden dumps of Tests/Reference/*.trellis,
+      one directory per platform that recorded them).
 
 Exit status is 1 if replay finds a difference or structure finds a
 structural mismatch. Run with python3 -I from the repository root.
@@ -98,10 +103,12 @@ def frame(n):
 
 def build(n, docs, path):
     """Engine node and expected frames for dump node n. Scroll documents are
-    appended to docs as (path, document node, width, height)."""
+    appended to docs as (path, node, width, height, "scroll" | "pane" | "item")."""
     style = parse_style(n.get("style"))
     node, exp = {"style": style}, frame(n)
-    if style.get("display") == "none":
+    # A hidden view (hidden= or -setHidden:forSubview:) is laid out as if
+    # display: none, whatever its style says.
+    if style.get("display") == "none" or n.get("hidden"):
         node["style"] = {"display": "none"}
         return node, None
     if is_leaf(n):
@@ -120,8 +127,10 @@ def build(n, docs, path):
             dy = sum(px(style.get(f"{k}-{e}")) for k in ("padding", "border") for e in ("top", "bottom"))
             cw = max(0, n.get("width", 0) - dx)
             ch = max(0, n.get("height", 0) - dy)
-            m = n.get("needed") or n.get("intrinsic")
-            intr = n.get("intrinsic") or m
+            # "measured" (since 0.6.x) is the engine's own max-content measure;
+            # older dumps only have the cell's "intrinsic" size.
+            m = n.get("needed") or n.get("measured") or n.get("intrinsic")
+            intr = n.get("measured") or n.get("intrinsic") or m
             if m is None:
                 node["measure"] = {"width": cw, "height": ch}
             elif cw < intr["width"] - 0.5:
@@ -142,12 +151,20 @@ def build(n, docs, path):
                 # less a legacy scroller (GNUstep's is 19pt; macOS overlay
                 # scrollers take none). Its own frame records that width.
                 docs.append((f"{path}/scroll[{i}]", d, d.get("width", n.get("width", 0)),
-                             n.get("height", 0)))
+                             n.get("height", 0), "scroll"))
         elif "split" in n:
             # NSSplitView places the panes; each pane lays out at its size.
             for i, d in enumerate(n.get("children") or []):
                 if not d.get("hidden"):
-                    docs.append((f"{path}/pane[{i}]", d, d.get("width", 0), d.get("height", 0), True))
+                    docs.append((f"{path}/pane[{i}]", d, d.get("width", 0), d.get("height", 0), "pane"))
+        elif "virtual" in n:
+            # TRVirtualLayout places the realized items; each one lays out
+            # its own content at the size it was given: natural height in a
+            # single column, the row's height in a grid (its items stretch).
+            mode = "item" if n["virtual"].get("columns", 1) <= 1 else "pane"
+            for i, d in enumerate(n.get("children") or []):
+                docs.append((f"{path}/item[{d.get('item', i)}]", d, d.get("width", 0),
+                             d.get("height", 0), mode))
         return node, exp
     kids, kexp = [], []
     for i, c in enumerate(n.get("children") or []):
@@ -174,12 +191,16 @@ def cases_for_dump(path):
     name = os.path.basename(path)
     cases = [{"id": f"reference/{name}", "root": node, "expected": exp, "tolerance": TOLERANCE}]
     while docs:
-        dpath, dn, w, h, *pane = docs.pop(0)
+        dpath, dn, w, h, mode = docs.pop(0)
         sub = []
         node, exp = build(dn, sub, dpath)
+        if exp is None:
+            continue
         node["style"].pop("height", None)
-        if pane:
+        if mode == "pane":
             node["style"] = dict(node["style"], width=f"{w}px", height=f"{h}px")
+        elif mode == "item":
+            node["style"] = dict(node["style"], width=f"{w}px")
         else:
             # A scroll document is laid out at the scroll box's width and its
             # natural height, but never shorter than the scroll box.
@@ -191,7 +212,7 @@ def cases_for_dump(path):
     return cases
 
 
-def replay(dumps, runner):
+def replay(dumps, runner, quiet=False):
     bad = 0
     with tempfile.TemporaryDirectory() as tmp:
         for p in dumps:
@@ -202,8 +223,11 @@ def replay(dumps, runner):
             lines = (r.stdout + r.stderr).splitlines()
             summary = next((l for l in reversed(lines) if l.startswith("PASS")), "?")
             ok = r.returncode == 0 and " fail 0 " in summary + " "
-            print(f"{'ok  ' if ok else 'FAIL'} replay {p}: {len(cases)} case(s); {summary}")
-            if not ok:
+            if not quiet:
+                print(f"{'ok  ' if ok else 'FAIL'} replay {p}: {len(cases)} case(s); {summary}")
+            if not ok and quiet:
+                bad += 1
+            elif not ok:
                 bad += 1
                 case = None
                 for l in lines:
@@ -218,7 +242,7 @@ def replay(dumps, runner):
 def shape(n, path="root"):
     """Flattened structure: (path, class, id, display:none) per node."""
     style = parse_style(n.get("style"))
-    out = [(path, n.get("class"), n.get("id"), style.get("display") == "none")]
+    out = [(path, n.get("class"), n.get("id"), style.get("display") == "none" or bool(n.get("hidden")))]
     for i, c in enumerate(n.get("children") or []):
         out += shape(c, f"{path}/{c.get('id') or c.get('class')}[{i}]")
     return out
@@ -293,9 +317,60 @@ def structure(dumps, render, appearance, geometry_limit):
     return bad
 
 
+def _checked_nodes(n, out, top=True):
+    """(node, is_leaf) for the main-tree nodes replay compares, root excluded."""
+    style = parse_style(n.get("style"))
+    if style.get("display") == "none" or n.get("hidden"):
+        return out
+    if not top:
+        out.append((n, is_leaf(n)))
+    if not is_leaf(n):
+        for c in n.get("children") or []:
+            _checked_nodes(c, out, False)
+    return out
+
+
+def selftest(dumps, runner):
+    """Check that replay catches a changed geometry value: for each dump,
+    move one leaf 5px (an expected frame changes) and add 5px of
+    padding-left to one box with children (a layout input changes). Both
+    must make the replay fail; a dump that still passes means the checker
+    is blind there."""
+    caught = total = 0
+    with tempfile.TemporaryDirectory() as tmp:
+        for p in dumps:
+            base = json.load(open(p))
+            for kind in ("leaf-x", "box-padding"):
+                d = json.loads(json.dumps(base))
+                nodes = _checked_nodes(d["root"], [])
+                if kind == "leaf-x":
+                    pick = [n for n, leaf in nodes if leaf and n.get("width", 0) > 0]
+                    if not pick:
+                        continue
+                    target = pick[len(pick) // 2]
+                    target["x"] = target.get("x", 0) + 5
+                else:
+                    pick = [n for n, leaf in nodes if not leaf and n.get("children")]
+                    if not pick:
+                        continue
+                    target = pick[len(pick) // 2]
+                    st = parse_style(target.get("style"))
+                    pad = px(st.get("padding-left")) + 5
+                    target["style"] = (target.get("style") or "") + f"; padding-left: {pad:g}px"
+                f = os.path.join(tmp, os.path.basename(p))
+                json.dump(d, open(f, "w"))
+                hit = replay([f], runner, quiet=True) > 0
+                total += 1
+                caught += hit
+                if not hit:
+                    print(f"MISS selftest {p}: {kind} on {target.get('class')} {target.get('id', '')} not caught")
+    print(f"{'ok  ' if caught == total else 'FAIL'} selftest: {caught}/{total} changed values caught")
+    return 0 if caught == total else 1
+
+
 def default_specs():
-    return sorted(glob.glob("Examples/TrellisDemo/*.trellis") + glob.glob("dogfood/**/*.trellis",
-                                                                          recursive=True))
+    return sorted(glob.glob("Examples/TrellisDemo/*.trellis") + glob.glob("Tests/Reference/*.trellis")
+                  + glob.glob("dogfood/**/*.trellis", recursive=True))
 
 
 def render_all(outdir, specs, render, widths, height, appearances):
@@ -331,12 +406,13 @@ def render_all(outdir, specs, render, widths, height, appearances):
 
 
 def default_dumps():
-    return sorted(glob.glob("dogfood/frames/*.json") + glob.glob("Tests/Reference/*.json"))
+    return sorted(glob.glob("dogfood/frames/*.json")
+                  + glob.glob("Tests/Reference/dumps/**/*.json", recursive=True))
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("mode", choices=["replay", "structure", "render", "all"])
+    ap.add_argument("mode", choices=["replay", "structure", "render", "selftest", "all"])
     ap.add_argument("dumps", nargs="*")
     # Makefile.macos builds into build/, GNUmakefile into obj/.
     built = lambda t: f"build/{t}" if os.path.exists(f"build/{t}") else f"obj/{t}"
@@ -362,6 +438,8 @@ def main():
         print("no dumps")
         return 2
     bad = 0
+    if a.mode == "selftest":
+        bad += selftest(dumps, a.runner)
     if a.mode in ("replay", "all"):
         bad += replay(dumps, a.runner)
     if a.mode in ("structure", "all"):

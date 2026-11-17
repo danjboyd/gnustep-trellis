@@ -129,10 +129,18 @@ check-view: gui
 	grep 'cases' $(B)/view-tests/markup.log; \
 	if [ $$status -eq 0 ]; then echo "CHECKVIEW OK"; else echo "CHECKVIEW FAIL"; fi; exit $$status
 
+# Frame replay (scripts/check-reference.py): the golden dumps in
+# Tests/Reference/dumps and dogfood/frames, from either platform, laid out
+# again by this engine; then a self-test that a changed geometry value in
+# each dump is caught. Engine only: no windows, no AppKit.
+check-reference: all
+	python3 -I scripts/check-reference.py replay --runner $(B)/trellis-case
+	python3 -I scripts/check-reference.py selftest --runner $(B)/trellis-case
+
 # Unit tests for the conformance importers (Python, no build needed).
 check-importers:
 	python3 -I Tests/Conformance/tools/test_import_wpt.py
 
 clean:
 	rm -rf $(B)
-.PHONY: all gui check check-view check-importers conformance-record clean
+.PHONY: all gui check check-view check-reference check-importers conformance-record clean

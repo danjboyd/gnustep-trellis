@@ -111,6 +111,16 @@ static NSDictionary *TRDumpView(NSView *v, TRNode *node)
      reads it for align-items: baseline (check-reference.py replays it). */
   if (node.baselineBlock != nil)
     d[@"baseline"] = @(node.baselineBlock(TRSizeMake(f.size.width, f.size.height)));
+  /* What the engine's measure block returns with no constraint (max-content):
+     a control that sizes itself (-trellisSizeForWidth:) can differ from its
+     cell's intrinsic size. check-reference.py replays it. */
+  if (node.measureBlock != nil)
+    {
+      TRSize ms = node.measureBlock(TRSizeMake(TRUndefined, TRUndefined),
+                                    TRMeasureModeUndefined, TRMeasureModeUndefined);
+      if (!isnan(ms.width) && !isnan(ms.height))
+        d[@"measured"] = @{@"width": @(ceil(ms.width)), @"height": @(ceil(ms.height))};
+    }
   if (node)
     {
       NSString *decl = [node.style declarationString];

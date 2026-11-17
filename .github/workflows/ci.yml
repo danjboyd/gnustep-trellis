@@ -127,6 +127,8 @@ jobs:
         run: make -f Makefile.macos check-importers
       - name: View tests under NSZombieEnabled (window-free)
         run: make -f Makefile.macos check-view
+      - name: Frame replay of the golden dumps, with self-test
+        run: make -f Makefile.macos check-reference
       - name: Window-free render smoke test
         run: |
           for s in Dashboard Settings AskDetail; do

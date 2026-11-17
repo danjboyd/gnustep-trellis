@@ -1,0 +1,943 @@
+{
+ "appearance": "dark",
+ "lint": [
+  {
+   "message": "NSButton at root/2/1/2/2: text #ffffff3f on #323232 has contrast 2.2:1 (needs 3:1); use system colours (CanvasText on Canvas, GrayText)",
+   "path": "root/2/1/2/2",
+   "rule": "low-contrast",
+   "severity": "warning"
+  }
+ ],
+ "root": {
+  "children": [
+   {
+    "children": [
+     {
+      "baseline": 15.9130859375,
+      "class": "NSTextField",
+      "editable": true,
+      "height": 21,
+      "id": "search",
+      "interactive": true,
+      "intrinsic": {
+       "height": 21,
+       "width": 94
+      },
+      "measured": {
+       "height": 21,
+       "width": 94
+      },
+      "style": "flex-grow: 1; flex-basis: 0%; min-width: 120px",
+      "width": 120,
+      "x": 0,
+      "y": 2
+     },
+     {
+      "baseline": 12.568359375,
+      "class": "TRSegmentedControl",
+      "height": 24,
+      "id": "mode",
+      "interactive": true,
+      "intrinsic": {
+       "height": 24,
+       "width": 140
+      },
+      "measured": {
+       "height": 24,
+       "width": 191
+      },
+      "width": 191,
+      "x": 124,
+      "y": 0
+     },
+     {
+      "baseline": 16.568359375,
+      "class": "NSPopUpButton",
+      "height": 25,
+      "id": "sort",
+      "interactive": true,
+      "intrinsic": {
+       "height": 25,
+       "width": 113
+      },
+      "measured": {
+       "height": 25,
+       "width": 113
+      },
+      "title": "Newest",
+      "width": 113,
+      "x": 319,
+      "y": 0
+     },
+     {
+      "baseline": 0,
+      "class": "NSView",
+      "height": 0,
+      "measured": {
+       "height": 0,
+       "width": 0
+      },
+      "style": "flex-grow: 1; flex-basis: 0%",
+      "width": 60,
+      "x": 436,
+      "y": 12
+     },
+     {
+      "baseline": 18.568359375,
+      "class": "NSButton",
+      "height": 32,
+      "interactive": true,
+      "intrinsic": {
+       "height": 32,
+       "width": 99
+      },
+      "measured": {
+       "height": 32,
+       "width": 99
+      },
+      "title": "New ticket",
+      "width": 99,
+      "x": 0,
+      "y": 29
+     }
+    ],
+    "class": "TRBoxView",
+    "container": {
+     "matched": [
+      "(max-width: 500px)"
+     ]
+    },
+    "height": 61,
+    "style": "flex-wrap: wrap; align-items: center; row-gap: 4px; column-gap: 4px",
+    "width": 496,
+    "x": 12,
+    "y": 12
+   },
+   {
+    "baseline": 1,
+    "class": "NSBox",
+    "height": 1,
+    "measured": {
+     "height": 1,
+     "width": 0
+    },
+    "style": "align-self: stretch; flex-shrink: 0; min-width: 1px; min-height: 1px",
+    "width": 496,
+    "x": 12,
+    "y": 81
+   },
+   {
+    "baseline": 578,
+    "children": [
+     {
+      "children": [
+       {
+        "baseline": 12.9130859375,
+        "class": "NSTextField",
+        "height": 16,
+        "intrinsic": {
+         "height": 16,
+         "width": 54
+        },
+        "measured": {
+         "height": 16,
+         "width": 54
+        },
+        "needed": {
+         "height": 16,
+         "width": 54
+        },
+        "style": "font-weight: bold",
+        "text": "Queues",
+        "textColor": "#ffffffd8",
+        "width": 164,
+        "x": 8,
+        "y": 8
+       },
+       {
+        "baseline": 13.568359375,
+        "class": "NSButton",
+        "height": 18,
+        "interactive": true,
+        "intrinsic": {
+         "height": 18,
+         "width": 56
+        },
+        "measured": {
+         "height": 18,
+         "width": 56
+        },
+        "textColor": "#ffffffd8",
+        "title": "Mine",
+        "width": 164,
+        "x": 8,
+        "y": 30
+       },
+       {
+        "baseline": 13.568359375,
+        "class": "NSButton",
+        "height": 18,
+        "interactive": true,
+        "intrinsic": {
+         "height": 18,
+         "width": 98
+        },
+        "measured": {
+         "height": 18,
+         "width": 98
+        },
+        "textColor": "#ffffffd8",
+        "title": "Unassigned",
+        "width": 164,
+        "x": 8,
+        "y": 54
+       },
+       {
+        "baseline": 13.568359375,
+        "class": "NSButton",
+        "height": 18,
+        "interactive": true,
+        "intrinsic": {
+         "height": 18,
+         "width": 59
+        },
+        "measured": {
+         "height": 18,
+         "width": 59
+        },
+        "textColor": "#ffffffd8",
+        "title": "Open",
+        "width": 164,
+        "x": 8,
+        "y": 78
+       },
+       {
+        "baseline": 13.568359375,
+        "class": "NSButton",
+        "height": 18,
+        "interactive": true,
+        "intrinsic": {
+         "height": 18,
+         "width": 69
+        },
+        "measured": {
+         "height": 18,
+         "width": 69
+        },
+        "textColor": "#ffffffd8",
+        "title": "Closed",
+        "width": 164,
+        "x": 8,
+        "y": 102
+       },
+       {
+        "baseline": 12.568359375,
+        "class": "NSTextField",
+        "height": 10,
+        "hidden": true,
+        "intrinsic": {
+         "height": 16,
+         "width": 78
+        },
+        "measured": {
+         "height": 16,
+         "width": 78
+        },
+        "needed": {
+         "height": 16,
+         "width": 78
+        },
+        "style": "color: GrayText",
+        "text": "Hidden note",
+        "textColor": "#ffffff8c",
+        "width": 10,
+        "x": 0,
+        "y": 0
+       },
+       {
+        "baseline": 28,
+        "class": "NSSlider",
+        "height": 28,
+        "interactive": true,
+        "intrinsic": {
+         "height": 28,
+         "width": 0
+        },
+        "measured": {
+         "height": 28,
+         "width": 0
+        },
+        "style": "align-self: stretch",
+        "width": 164,
+        "x": 8,
+        "y": 126
+       },
+       {
+        "baseline": 18,
+        "class": "NSProgressIndicator",
+        "height": 18,
+        "measured": {
+         "height": 18,
+         "width": 0
+        },
+        "style": "align-self: stretch; min-width: 60px; min-height: 16px",
+        "width": 164,
+        "x": 8,
+        "y": 160
+       }
+      ],
+      "class": "TRBoxView",
+      "container": {
+       "matched": [
+        "(max-width: 500px)"
+       ]
+      },
+      "height": 578,
+      "style": "display: none; flex-direction: column; padding-left: 8px; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; row-gap: 6px; column-gap: 6px",
+      "width": 180,
+      "x": 0,
+      "y": 0
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "baseline": 12.9130859375,
+            "class": "NSTextField",
+            "height": 16,
+            "intrinsic": {
+             "height": 16,
+             "width": 70
+            },
+            "measured": {
+             "height": 16,
+             "width": 70
+            },
+            "needed": {
+             "height": 16,
+             "width": 70
+            },
+            "style": "font-weight: bold",
+            "text": "Ticket 101",
+            "textColor": "#ffffffd8",
+            "width": 128,
+            "x": 9,
+            "y": 9
+           },
+           {
+            "baseline": 12.568359375,
+            "class": "NSTextField",
+            "height": 64,
+            "intrinsic": {
+             "height": 16,
+             "width": 387
+            },
+            "measured": {
+             "height": 16,
+             "width": 387
+            },
+            "needed": {
+             "height": 64,
+             "width": 128
+            },
+            "text": "Printer on floor two jams on duplex jobs after the driver update.",
+            "textColor": "#ffffffd8",
+            "width": 128,
+            "x": 9,
+            "y": 29
+           }
+          ],
+          "class": "TRBoxView",
+          "height": 102,
+          "style": "flex-direction: column; padding-left: 8px; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; row-gap: 4px; column-gap: 4px; border-color: -tr-separator",
+          "width": 146,
+          "x": 0,
+          "y": 0
+         },
+         {
+          "children": [
+           {
+            "baseline": 12.9130859375,
+            "class": "NSTextField",
+            "height": 16,
+            "intrinsic": {
+             "height": 16,
+             "width": 71
+            },
+            "measured": {
+             "height": 16,
+             "width": 71
+            },
+            "needed": {
+             "height": 16,
+             "width": 71
+            },
+            "style": "font-weight: bold",
+            "text": "Ticket 102",
+            "textColor": "#ffffffd8",
+            "width": 128,
+            "x": 9,
+            "y": 9
+           },
+           {
+            "baseline": 12.568359375,
+            "class": "NSTextField",
+            "height": 32,
+            "intrinsic": {
+             "height": 16,
+             "width": 140
+            },
+            "measured": {
+             "height": 16,
+             "width": 140
+            },
+            "needed": {
+             "height": 32,
+             "width": 110
+            },
+            "text": "VPN drops every hour.",
+            "textColor": "#ffffffd8",
+            "width": 128,
+            "x": 9,
+            "y": 29
+           }
+          ],
+          "class": "TRBoxView",
+          "height": 102,
+          "style": "flex-direction: column; padding-left: 8px; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; row-gap: 4px; column-gap: 4px; border-color: -tr-separator",
+          "width": 145,
+          "x": 154,
+          "y": 0
+         },
+         {
+          "children": [
+           {
+            "baseline": 12.9130859375,
+            "class": "NSTextField",
+            "height": 16,
+            "intrinsic": {
+             "height": 16,
+             "width": 72
+            },
+            "measured": {
+             "height": 16,
+             "width": 72
+            },
+            "needed": {
+             "height": 16,
+             "width": 72
+            },
+            "style": "font-weight: bold",
+            "text": "Ticket 103",
+            "textColor": "#ffffffd8",
+            "width": 128,
+            "x": 9,
+            "y": 9
+           },
+           {
+            "baseline": 12.568359375,
+            "class": "NSTextField",
+            "height": 64,
+            "intrinsic": {
+             "height": 16,
+             "width": 419
+            },
+            "measured": {
+             "height": 16,
+             "width": 419
+            },
+            "needed": {
+             "height": 64,
+             "width": 128
+            },
+            "text": "New hire needs a laptop, a badge and accounts by Monday morning.",
+            "textColor": "#ffffffd8",
+            "width": 128,
+            "x": 9,
+            "y": 29
+           }
+          ],
+          "class": "TRBoxView",
+          "height": 102,
+          "style": "flex-direction: column; padding-left: 8px; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; row-gap: 4px; column-gap: 4px; border-color: -tr-separator",
+          "width": 146,
+          "x": 0,
+          "y": 110
+         },
+         {
+          "children": [
+           {
+            "baseline": 12.9130859375,
+            "class": "NSTextField",
+            "height": 16,
+            "intrinsic": {
+             "height": 16,
+             "width": 72
+            },
+            "measured": {
+             "height": 16,
+             "width": 72
+            },
+            "needed": {
+             "height": 16,
+             "width": 72
+            },
+            "style": "font-weight: bold",
+            "text": "Ticket 104",
+            "textColor": "#ffffffd8",
+            "width": 281,
+            "x": 9,
+            "y": 9
+           },
+           {
+            "baseline": 12.568359375,
+            "class": "NSTextField",
+            "height": 16,
+            "intrinsic": {
+             "height": 16,
+             "width": 133
+            },
+            "measured": {
+             "height": 16,
+             "width": 133
+            },
+            "needed": {
+             "height": 16,
+             "width": 133
+            },
+            "text": "Spans the whole row.",
+            "textColor": "#ffffffd8",
+            "width": 281,
+            "x": 9,
+            "y": 29
+           }
+          ],
+          "class": "TRBoxView",
+          "height": 54,
+          "style": "flex-direction: column; padding-left: 8px; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; border-left-width: 1px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; row-gap: 4px; column-gap: 4px; grid-column: 1 / -1; border-color: -tr-separator",
+          "width": 299,
+          "x": 0,
+          "y": 220
+         }
+        ],
+        "class": "TRBoxView",
+        "height": 274,
+        "style": "display: grid; row-gap: 8px; column-gap: 8px; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr))",
+        "width": 299,
+        "x": 8,
+        "y": 8
+       },
+       {
+        "baseline": 12.568359375,
+        "class": "TRRichLabel",
+        "height": 16,
+        "intrinsic": {
+         "height": 16,
+         "width": 244
+        },
+        "measured": {
+         "height": 16,
+         "width": 244
+        },
+        "needed": {
+         "height": 16,
+         "width": 244
+        },
+        "text": "Ticket #101 is blocked; see notes.txt.",
+        "textColor": "#ffffffd8",
+        "width": 299,
+        "x": 8,
+        "y": 290
+       },
+       {
+        "children": [
+         {
+          "baseline": 18.568359375,
+          "class": "NSButton",
+          "height": 32,
+          "intrinsic": {
+           "height": 32,
+           "width": 75
+          },
+          "measured": {
+           "height": 32,
+           "width": 75
+          },
+          "title": "Assign",
+          "width": 75,
+          "x": 0,
+          "y": 0
+         },
+         {
+          "baseline": 18.568359375,
+          "class": "NSButton",
+          "height": 32,
+          "intrinsic": {
+           "height": 32,
+           "width": 69
+          },
+          "measured": {
+           "height": 32,
+           "width": 69
+          },
+          "title": "Close",
+          "width": 69,
+          "x": 81,
+          "y": 0
+         },
+         {
+          "baseline": 14.568359375,
+          "class": "NSButton",
+          "height": 20,
+          "intrinsic": {
+           "height": 20,
+           "width": 40
+          },
+          "measured": {
+           "height": 20,
+           "width": 40
+          },
+          "textColor": "#ffffff3f",
+          "title": "Later",
+          "width": 40,
+          "x": 156,
+          "y": 6
+         }
+        ],
+        "class": "TRBoxView",
+        "height": 32,
+        "style": "flex-wrap: wrap; align-items: center; row-gap: 6px; column-gap: 6px",
+        "width": 299,
+        "x": 8,
+        "y": 314
+       },
+       {
+        "children": [
+         {
+          "baseline": 12.9130859375,
+          "class": "NSTextField",
+          "height": 16,
+          "intrinsic": {
+           "height": 16,
+           "width": 31
+          },
+          "measured": {
+           "height": 16,
+           "width": 31
+          },
+          "needed": {
+           "height": 16,
+           "width": 31
+          },
+          "text": "First",
+          "textColor": "#ffffffd8",
+          "width": 31,
+          "x": 268,
+          "y": 8
+         },
+         {
+          "baseline": 12.9130859375,
+          "class": "NSTextField",
+          "height": 16,
+          "intrinsic": {
+           "height": 16,
+           "width": 50
+          },
+          "measured": {
+           "height": 16,
+           "width": 50
+          },
+          "needed": {
+           "height": 16,
+           "width": 50
+          },
+          "text": "Second",
+          "textColor": "#ffffffd8",
+          "width": 50,
+          "x": 208,
+          "y": 8
+         },
+         {
+          "baseline": 18.568359375,
+          "class": "NSButton",
+          "height": 32,
+          "interactive": true,
+          "intrinsic": {
+           "height": 32,
+           "width": 66
+          },
+          "measured": {
+           "height": 32,
+           "width": 66
+          },
+          "title": "Third",
+          "width": 66,
+          "x": 132,
+          "y": 0
+         }
+        ],
+        "class": "TRBoxView",
+        "height": 32,
+        "style": "direction: rtl; align-items: center; row-gap: 10px; column-gap: 10px",
+        "width": 299,
+        "x": 8,
+        "y": 354
+       },
+       {
+        "children": [
+         {
+          "baseline": 14.9130859375,
+          "class": "NSTextField",
+          "height": 20,
+          "intrinsic": {
+           "height": 16,
+           "width": 13
+          },
+          "measured": {
+           "height": 16,
+           "width": 13
+          },
+          "needed": {
+           "height": 16,
+           "width": 13
+          },
+          "position": "absolute",
+          "style": "position: absolute; padding-left: 6px; padding-top: 2px; padding-right: 6px; padding-bottom: 2px; top: 0px; right: 0px",
+          "text": "3",
+          "textColor": "#ffffffd8",
+          "width": 25,
+          "x": 274,
+          "y": 0
+         },
+         {
+          "baseline": 32,
+          "class": "NSImageView",
+          "height": 32,
+          "intrinsic": {
+           "height": 0,
+           "width": 0
+          },
+          "measured": {
+           "height": 0,
+           "width": 0
+          },
+          "style": "width: 32px; height: 32px; min-width: 16px; min-height: 16px",
+          "width": 32,
+          "x": 0,
+          "y": 0
+         }
+        ],
+        "class": "TRBoxView",
+        "height": 48,
+        "style": "height: 48px",
+        "width": 299,
+        "x": 8,
+        "y": 394
+       },
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "baseline": 12.9130859375,
+              "class": "NSTextField",
+              "height": 16,
+              "intrinsic": {
+               "height": 16,
+               "width": 90
+              },
+              "measured": {
+               "height": 16,
+               "width": 90
+              },
+              "needed": {
+               "height": 16,
+               "width": 90
+              },
+              "text": "09:00 opened",
+              "textColor": "#ffffffd8",
+              "width": 299,
+              "x": 0,
+              "y": 0
+             },
+             {
+              "baseline": 12.9130859375,
+              "class": "NSTextField",
+              "height": 16,
+              "intrinsic": {
+               "height": 16,
+               "width": 98
+              },
+              "measured": {
+               "height": 16,
+               "width": 98
+              },
+              "needed": {
+               "height": 16,
+               "width": 98
+              },
+              "text": "09:05 assigned",
+              "textColor": "#ffffffd8",
+              "width": 299,
+              "x": 0,
+              "y": 16
+             },
+             {
+              "baseline": 12.9130859375,
+              "class": "NSTextField",
+              "height": 16,
+              "intrinsic": {
+               "height": 16,
+               "width": 86
+              },
+              "measured": {
+               "height": 16,
+               "width": 86
+              },
+              "needed": {
+               "height": 16,
+               "width": 86
+              },
+              "text": "09:20 replied",
+              "textColor": "#ffffffd8",
+              "width": 299,
+              "x": 0,
+              "y": 32
+             },
+             {
+              "baseline": 12.9130859375,
+              "class": "NSTextField",
+              "height": 16,
+              "intrinsic": {
+               "height": 16,
+               "width": 101
+              },
+              "measured": {
+               "height": 16,
+               "width": 101
+              },
+              "needed": {
+               "height": 16,
+               "width": 101
+              },
+              "text": "10:00 escalated",
+              "textColor": "#ffffffd8",
+              "width": 299,
+              "x": 0,
+              "y": 48
+             },
+             {
+              "baseline": 12.9130859375,
+              "class": "NSTextField",
+              "height": 16,
+              "intrinsic": {
+               "height": 16,
+               "width": 94
+              },
+              "measured": {
+               "height": 16,
+               "width": 94
+              },
+              "needed": {
+               "height": 16,
+               "width": 94
+              },
+              "text": "10:30 resolved",
+              "textColor": "#ffffffd8",
+              "width": 299,
+              "x": 0,
+              "y": 64
+             },
+             {
+              "baseline": 12.9130859375,
+              "class": "NSTextField",
+              "height": 16,
+              "intrinsic": {
+               "height": 16,
+               "width": 80
+              },
+              "measured": {
+               "height": 16,
+               "width": 80
+              },
+              "needed": {
+               "height": 16,
+               "width": 80
+              },
+              "text": "11:00 closed",
+              "textColor": "#ffffffd8",
+              "width": 299,
+              "x": 0,
+              "y": 80
+             }
+            ],
+            "class": "TRBoxView",
+            "height": 96,
+            "style": "flex-direction: column",
+            "width": 299,
+            "x": 0,
+            "y": 0
+           }
+          ],
+          "class": "TRBoxView",
+          "height": 120,
+          "style": "flex-direction: column",
+          "width": 299,
+          "x": 0,
+          "y": 0
+         }
+        ],
+        "class": "TRScrollBox",
+        "height": 120,
+        "overflow": "scroll",
+        "style": "flex-grow: 1; flex-basis: 0%; height: 80px; min-width: 0px; min-height: 0px",
+        "width": 299,
+        "x": 8,
+        "y": 450
+       }
+      ],
+      "class": "TRBoxView",
+      "height": 578,
+      "style": "flex-direction: column; flex-grow: 1; padding-left: 8px; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; row-gap: 8px; column-gap: 8px",
+      "width": 315,
+      "x": 181,
+      "y": 0
+     }
+    ],
+    "class": "TRSplitView",
+    "height": 578,
+    "id": "main",
+    "measured": {
+     "height": 428,
+     "width": 634
+    },
+    "split": "row",
+    "style": "align-self: stretch; flex-grow: 1; flex-basis: 0%; min-width: 0px; min-height: 0px",
+    "width": 496,
+    "x": 12,
+    "y": 90
+   }
+  ],
+  "class": "TRBoxView",
+  "height": 680,
+  "id": "controls",
+  "style": "flex-direction: column; padding-left: 12px; padding-top: 12px; padding-right: 12px; padding-bottom: 12px; row-gap: 8px; column-gap: 8px; container-type: inline-size",
+  "width": 520,
+  "windowBackground": "#323232",
+  "x": 0,
+  "y": 0
+ },
+ "source": "Tests/Reference/controls.trellis",
+ "theme": "default",
+ "trellis": "0.1",
+ "viewport": {
+  "height": 680,
+  "scale": 1,
+  "width": 520
+ }
+}

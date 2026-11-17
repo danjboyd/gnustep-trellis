@@ -64,3 +64,35 @@ python3 -I scripts/conformance-summary.py check --platform macos --runner build/
 The last line is the conformance gate CI runs: it fails if a suite passes
 fewer cases than `docs/conformance/macos.json` records. On a fresh clone
 the whole set takes under a minute on an M-series Mac with `make -j2`.
+
+### Headless Preview export (macOS)
+
+TrellisPreview can write a snapshot and its frames JSON without showing a
+window, so it runs over ssh. Use a copy of the app marked `LSUIElement`
+so no Dock icon appears (`make -f Makefile.macos check-preview` makes one
+in `build/preview-check`):
+
+```sh
+make -f Makefile.macos gui
+mkdir -p build/preview-check && cp -R build/TrellisPreview.app build/preview-check/
+/usr/libexec/PlistBuddy -c 'Add :LSUIElement bool true' build/preview-check/TrellisPreview.app/Contents/Info.plist
+P=build/preview-check/TrellisPreview.app/Contents/MacOS/TrellisPreview
+$P Screen.trellis --snapshot out.png --export-json out.json \
+   --appearance dark --width 340 --height 680
+```
+
+- `Screen.sample.json` beside the spec is applied, as in the window.
+- `--appearance light|dark` sets the window's and content view's
+  appearance. `--width`/`--height` set the content size in points; the
+  default is 640 x 480. `--focus-order` draws the Tab-order overlay into
+  the snapshot.
+- The PNG is drawn at **1x**: its pixel size equals the point size
+  (340 x 680 above), whatever the screen's backing scale.
+- Repeat exports are **byte-identical**, PNG and JSON, for the same spec,
+  size and appearance (checked on the controls and migration fixtures,
+  two widths, both appearances, three runs each).
+- **Limits:** a spec that can't be read or parsed still exits 0 and writes
+  a PNG of the error message (no JSON); an unknown `--appearance` value
+  is used as given (the light appearance is drawn, and the JSON records
+  the value). Check that the JSON exists, or use `trellis-render`, which
+  exits non-zero on errors, when a script needs to know.

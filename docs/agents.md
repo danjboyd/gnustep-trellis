@@ -95,7 +95,7 @@ the user's settings. trellis-render refuses to run without it.
   write `display: flex` back). A plain `-setHidden:` on the view doesn't
   last: the next layout shows or hides views by their style and this
   flag. In a sample file, `"hidden": true` does the same.
-- **Disabling (unreleased):** `disabled` on a control greys it out; on a
+- **Disabling (since 0.5.1):** `disabled` on a control greys it out; on a
   container (a row, a column, a split) it disables every control inside,
   like an HTML fieldset, and leaves labels as they are. In code,
   `TRSetEnabled(view, YES)` turns a control or a container back on (a

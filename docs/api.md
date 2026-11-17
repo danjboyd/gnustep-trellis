@@ -14,7 +14,7 @@ The markup and CSS described in [agents.md](agents.md), sections 2 to 4,
 are public: element names, attributes (`id`, `class`, `action`,
 `no-outlet`, `default`, `wraps`, `placeholder`, `tabindex`, `a11y-label`,
 `label-for`, `role` (`group`, `none`), `items`, `type`, since 0.5
-`hidden`, unreleased `disabled`, ...), the
+`hidden`, since 0.5.1 `disabled`, ...), the
 `<!-- owner: Class -->` comment, `<style>` with the listed properties,
 selectors and `@container` queries, and the `Screen.sample.json`
 convention. Unknown properties and bad values stay errors.
@@ -84,10 +84,10 @@ value, and the built-in `--tr-*` tokens listed in agents.md section 3
 | `TRUpdateThemeTokens` (since 0.4) | TRLoader.h | Sets the built-in tokens' metrics from the running theme (loading a document does it). |
 | `TRApplyLeafStyle` (since 0.4) | TRBoxView.h | Text and colour declarations on a control outside any box. |
 | `TRSegmentedControl` (since 0.5): `selectedTitles` | TRLoader.h | `<segmented>`: equal segments sized for the longest label. |
-| `TRSplitView` (since 0.5): `-initWithDirection:`, `direction`, `-addPane:`, `panes`, `-setInitialSize:forPane:`, `-setMinimumSize:maximumSize:forPane:`, `-setGrowWeight:forPane:`, `-setSizingFromStyle:forPane:`, `-setHidden:forPane:`, `-isPaneHidden:` and `enabled` (unreleased), `-dividerPositions`, `-setDividerPositions:`, `autosave`, `target`, `action` | TRSplitView.h | Resizable panes (`<split>`); its own NSSplitView delegate. |
+| `TRSplitView` (since 0.5): `-initWithDirection:`, `direction`, `-addPane:`, `panes`, `-setInitialSize:forPane:`, `-setMinimumSize:maximumSize:forPane:`, `-setGrowWeight:forPane:`, `-setSizingFromStyle:forPane:`, `-setHidden:forPane:`, `-isPaneHidden:` and `enabled` (since 0.5.1), `-dividerPositions`, `-setDividerPositions:`, `autosave`, `target`, `action` | TRSplitView.h | Resizable panes (`<split>`); its own NSSplitView delegate. |
 | `TRKeyViewProvider` protocol (since 0.4): `-trellisKeyViewSubtrees` | TRBoxView.h | A view that supplies its focusable subtrees in order to the managed key-view loop. |
 | `TRSetTabIndex`, `TRTabIndex` (since 0.2) | TRBoxView.h | A view's tab index (markup `tabindex`). |
-| `TRSetEnabled` (unreleased) | TRBoxView.h | Enables or disables a control, or every control inside a view (markup `disabled`). |
+| `TRSetEnabled` (since 0.5.1) | TRBoxView.h | Enables or disables a control, or every control inside a view (markup `disabled`). |
 | `TRSetAccessibilityLabel`/`TRAccessibilityLabel`, `TRSetAccessibilityTitleView`/`TRAccessibilityTitleView`, `TRSetAccessibilityRole`/`TRAccessibilityRole` (since 0.2); `TRSetAccessibilityCollection`/`TRAccessibilityCollection`, `TRSetAccessibilityPosition`/`TRAccessibilityPosition` (since 0.4) | TRBoxView.h | Accessibility name, label link, role, and collection count and item positions; also pushed to NSAccessibility on Cocoa. |
 
 ## Engine (libTrellisEngine, Foundation only)

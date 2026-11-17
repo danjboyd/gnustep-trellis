@@ -5,6 +5,13 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+## 0.5.1 (2026-11-17)
+
+Adds API (listed in docs/api.md, nothing removed): split panes that can
+be hidden, keyboard resizing of split dividers, a `disabled` attribute
+and `TRSetEnabled`; focus and accessibility fixes, new lint checks, a
+Focus Order view in TrellisPreview, and linear-time markup parsing.
+
 - **Fixed:** markup parsing was quadratic in the file's size (each
   element's line and column were counted from the start): 6,000 elements
   took 1.2 s to parse, now 19 ms, so TrellisPreview reloads big screens

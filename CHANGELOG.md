@@ -12,6 +12,10 @@ version may change the API listed in docs/api.md, and says so here.
   its style, so showing it again needs no `display:`. A sample file's
   `"hidden"` uses it too (it used to set the view's own flag, which the
   next layout undid).
+- On GNUstep, `AccentColor` and `LinkText` never resolve to a grey: with
+  the default theme (whose selection colour is white) they drew white on
+  white; they now fall back to a fixed blue. Adwaita and Gumdrop keep
+  their own selection blue.
 
 ## 0.4.0 (2026-11-17)
 

@@ -165,7 +165,9 @@ collapses as in HTML, and the runs follow the label's `color`,
   `CanvasText` for a content background and its text,
   `-tr-window-background` for panels, `GrayText` for secondary text,
   `AccentColor` for accented backgrounds (`LinkText` for coloured text: Cocoa's
-  accent colour doesn't adapt to Dark), `Highlight` with `HighlightText` for selections,
+  accent colour doesn't adapt to Dark; on GNUstep both take the theme's
+  selection blue, or a fixed blue when the theme's is grey, as in the
+  default theme), `Highlight` with `HighlightText` for selections,
   `ButtonFace`/`ButtonText`, `Field`/`FieldText`, `LinkText`,
   `-tr-separator` for borders and `-tr-error` for errors.
   `Mark` with `MarkText` and `-tr-warning-background` with

@@ -190,7 +190,7 @@ NSColor *TRColorFromCSS(NSString *css)
                @"selecteditemtext": @"alternateSelectedControlTextColor",
                @"accentcolor": @"controlAccentColor|selectedControlColor",
                @"accentcolortext": @"alternateSelectedControlTextColor",
-               @"linktext": @"linkColor|selectedControlColor|blueColor",
+               @"linktext": @"linkColor|selectedControlColor",
                @"mark": @"findHighlightColor|yellowColor", @"marktext": @"blackColor",   /* Mark is a light highlight in both appearances */
                /* Trellis extensions */
                @"-tr-window-background": @"windowBackgroundColor",
@@ -205,13 +205,36 @@ NSColor *TRColorFromCSS(NSString *css)
     if ([c isEqualToString: @"-tr-warning-text"])
       return TRSRGB(0x8A/255.0, 0x3B/255.0, 0x06/255.0, 1);
     NSString *names = sys[c];
+#ifdef GNUSTEP
+    /* GNUstep has no controlAccentColor or linkColor, and its default
+       theme's selectedControlColor is white: an accent or a link drawn
+       with it vanishes on a light window. Skip grey candidates for these
+       two and fall back to a fixed blue (themes like Adwaita and Gumdrop
+       give a blue selectedControlColor, which is used). On Cocoa a grey
+       accent can be the user's choice (Graphite), so it stays. */
+    BOOL wantsHue = [c isEqualToString: @"accentcolor"] || [c isEqualToString: @"linktext"];
+#endif
     if (names != nil)
-      for (NSString *name in [names componentsSeparatedByString: @"|"])
-        {
-          SEL sel = NSSelectorFromString(name);
-          if ([NSColor respondsToSelector: sel])
-            return ((NSColor *(*)(id, SEL))[NSColor methodForSelector: sel])([NSColor class], sel);
-        }
+      {
+        for (NSString *name in [names componentsSeparatedByString: @"|"])
+          {
+            SEL sel = NSSelectorFromString(name);
+            if (![NSColor respondsToSelector: sel]) continue;
+            NSColor *col = ((NSColor *(*)(id, SEL))[NSColor methodForSelector: sel])([NSColor class], sel);
+#ifdef GNUSTEP
+            if (wantsHue)
+              {
+                NSColor *rgb = [col colorUsingColorSpaceName: NSCalibratedRGBColorSpace];
+                CGFloat r = [rgb redComponent], g = [rgb greenComponent], b = [rgb blueComponent];
+                if (rgb == nil || MAX(r, MAX(g, b)) - MIN(r, MIN(g, b)) < 0.15) continue;
+              }
+#endif
+            return col;
+          }
+#ifdef GNUSTEP
+        if (wantsHue) return TRSRGB(0.16, 0.45, 0.85, 1);
+#endif
+      }
   }
   if ([c isEqualToString: @"transparent"]) return [NSColor clearColor];
   if ([c isEqualToString: @"black"]) return [NSColor blackColor];

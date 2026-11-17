@@ -2,7 +2,8 @@
    gaps along an edge, solid and double ones don't; `border: 2px none` has
    no width. hidden="yes" and -setHidden:forSubview: take a view out of
    the layout without touching its style, so showing it again restores
-   the style's own display. Prints BOXPAINT OK. */
+   the style's own display. AccentColor and LinkText are never grey.
+   Prints BOXPAINT OK. */
 #import <AppKit/AppKit.h>
 #import "TRBoxView.h"
 #import "TRLoader.h"
@@ -98,6 +99,17 @@ int main(void)
       [none setFrame: NSMakeRect(0, 0, 50, 50)];
       [none layoutTrellis];
       Expect("border: 2px none has no width", [none.node layoutBorderForEdge: TREdgeTop] == 0);
+
+      /* AccentColor and LinkText have a hue even in GNUstep's default
+         theme, whose selectedControlColor is white. */
+      for (NSString *name in @[@"AccentColor", @"LinkText"])
+        {
+          NSColor *c = [TRColorFromCSS(name) colorUsingColorSpaceName: NSCalibratedRGBColorSpace];
+          CGFloat r = [c redComponent], g = [c greenComponent], bl = [c blueComponent];
+          printf("     %s: %.2f %.2f %.2f\n", [name UTF8String], r, g, bl);
+          Expect([[name stringByAppendingString: @" is a colour, not grey or white"] UTF8String],
+                 c != nil && MAX(r, MAX(g, bl)) - MIN(r, MIN(g, bl)) >= 0.15);
+        }
 
       /* Hiding. */
       NSString *spec =

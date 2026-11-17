@@ -5,6 +5,9 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **TrellisPreview:** View > Focus Order (⌘K) numbers the controls in
+  Tab order and links them; `--focus-order` for snapshots. Export Frames
+  JSON adds `focusOrder` (each control's id, else its class).
 - **Added:** split panes can be hidden: `hidden` on a `<split>` pane, or
   `-[TRSplitView setHidden:forPane:]` and `-isPaneHidden:`. The pane and
   its divider leave, the others take its space, and it comes back at the

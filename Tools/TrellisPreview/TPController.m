@@ -3,6 +3,8 @@
    - Live reload: the file (and Name.sample.json) are polled twice a second.
    - Resize the window to see the layout respond; View > Width presets.
    - View > Inspector draws box outlines and lint findings over the screen.
+   - View > Focus Order numbers the controls in Tab order and links them
+     (--focus-order for a snapshot). The frames JSON lists the order too.
    - Theme menu (GNUstep: any installed GSTheme; macOS: light/dark).
    - View > Light / Dark Appearance (GNUstep: the Adwaita colour scheme,
      set for this process only, by relaunching; macOS: the window's
@@ -33,8 +35,25 @@
 
 /* ---- Overlay ---- */
 
+/* The views in the root's key-view loop, in Tab order. */
+static NSArray<NSView *> *TPFocusOrder(TRBoxView *root)
+{
+  NSMutableArray *a = [NSMutableArray array];
+  NSView *first = root.firstKeyView, *v = first;
+  for (int i = 0; v != nil && i < 512; i++)
+    {
+      /* On GNUstep the chain wraps through a sentinel outside the tree. */
+      if ([v isDescendantOf: root] && ![a containsObject: v]) [a addObject: v];
+      v = [v nextKeyView];
+      if (v == first) break;
+    }
+  return a;
+}
+
 @interface TPOverlay : NSView
 @property (nonatomic, weak) NSView *target;
+@property (nonatomic) BOOL showOutlines;          /* View > Inspector */
+@property (nonatomic) BOOL showFocusOrder;        /* View > Focus Order */
 @property (nonatomic, copy) NSArray *findings;   /* lint dictionaries with "path" */
 @end
 
@@ -82,6 +101,39 @@ static NSView *TPViewAtPath(NSView *root, NSString *path)
 {
   NSView *t = self.target;
   if (t == nil) return;
+  if (self.showFocusOrder && [t isKindOfClass: [TRBoxView class]])
+    {
+      NSArray *order = TPFocusOrder((TRBoxView *)t);
+      NSColor *ink = [NSColor colorWithCalibratedRed: 0.55 green: 0.2 blue: 0.75 alpha: 0.9];
+      NSBezierPath *link = [NSBezierPath bezierPath];
+      [link setLineWidth: 1.5];
+      CGFloat dash[] = { 4, 3 };
+      [link setLineDash: dash count: 2 phase: 0];
+      for (NSUInteger i = 0; i < [order count]; i++)
+        {
+          NSRect r = [self convertRect: [order[i] bounds] fromView: order[i]];
+          NSPoint c = NSMakePoint(NSMidX(r), NSMidY(r));
+          if (i == 0) [link moveToPoint: c]; else [link lineToPoint: c];
+        }
+      [[ink colorWithAlphaComponent: 0.45] set];
+      [link stroke];
+      NSDictionary *num = @{NSFontAttributeName: [NSFont boldSystemFontOfSize: 10],
+                            NSForegroundColorAttributeName: [NSColor whiteColor]};
+      for (NSUInteger i = 0; i < [order count]; i++)
+        {
+          NSRect r = [self convertRect: [order[i] bounds] fromView: order[i]];
+          [ink set];
+          NSFrameRectWithWidth(r, 1.5);
+          NSString *label = [NSString stringWithFormat: @"%lu", (unsigned long)i + 1];
+          NSSize ts = [label sizeWithAttributes: num];
+          CGFloat d = MAX(ts.width + 6, ts.height + 2);
+          NSRect badge = NSMakeRect(NSMinX(r) - d / 2, NSMinY(r) - d / 2, d, d);
+          [[NSBezierPath bezierPathWithOvalInRect: badge] fill];
+          [label drawAtPoint: NSMakePoint(NSMidX(badge) - ts.width / 2, NSMidY(badge) - ts.height / 2)
+              withAttributes: num];
+        }
+    }
+  if (!self.showOutlines) return;
   TPOutline(t, self);
   NSDictionary *attrs = @{NSFontAttributeName: [NSFont systemFontOfSize: 10],
                           NSForegroundColorAttributeName: [NSColor whiteColor]};
@@ -124,6 +176,7 @@ static NSView *TPViewAtPath(NSView *root, NSString *path)
   NSDate *_mtime, *_sampleMtime;
   NSTimer *_timer;
   BOOL _inspector;
+  BOOL _focusOrder;
   NSString *_snapshot;
   NSSize _initialSize;
   NSArray *_findings;
@@ -135,6 +188,16 @@ static NSView *TPViewAtPath(NSView *root, NSString *path)
 @implementation TPController
 
 - (void)setExportJSON:(NSString *)path { _exportJSON = [path copy]; }
+- (void)setShowsFocusOrder:(BOOL)yn { _focusOrder = yn; }
+
+/* The overlay is up while it has something to draw. */
+- (void)updateOverlay
+{
+  [_overlay removeFromSuperview];
+  _overlay.showOutlines = _inspector;
+  _overlay.showFocusOrder = _focusOrder;
+  if (_inspector || _focusOrder) [_content addSubview: _overlay];
+}
 - (void)setInitialAppearance:(NSString *)a { _appearance = [a copy]; }
 
 - (instancetype)initWithPath:(NSString *)path snapshot:(NSString *)snapshot size:(NSSize)size inspector:(BOOL)insp
@@ -172,6 +235,7 @@ static NSDate *TPModDate(NSString *path)
 
   NSMenu *view = [[NSMenu alloc] initWithTitle: @"View"];
   [view addItemWithTitle: @"Inspector" action: @selector(toggleInspector:) keyEquivalent: @"i"];
+  [view addItemWithTitle: @"Focus Order" action: @selector(toggleFocusOrder:) keyEquivalent: @"k"];
   for (NSNumber *w in @[@360, @520, @800, @1200])
     {
       NSMenuItem *it = (NSMenuItem *)[view addItemWithTitle: [NSString stringWithFormat: @"Width %@", w]
@@ -328,8 +392,7 @@ static NSDate *TPModDate(NSString *path)
   [_screen setAutoresizingMask: NSViewWidthSizable | NSViewHeightSizable];
   [_screen setFrame: [_content bounds]];
   [_content addSubview: _screen positioned: NSWindowBelow relativeTo: nil];
-  [_overlay removeFromSuperview];
-  if (_inspector) [_content addSubview: _overlay];
+  [self updateOverlay];
   [self relayoutAndLint];
 }
 
@@ -431,8 +494,14 @@ static NSDictionary *TPDump(NSView *v, TRNode *node)
 - (void)toggleInspector:(id)sender
 {
   _inspector = !_inspector;
-  [_overlay removeFromSuperview];
-  if (_inspector) [_content addSubview: _overlay];
+  [self updateOverlay];
+  [self relayoutAndLint];
+}
+
+- (void)toggleFocusOrder:(id)sender
+{
+  _focusOrder = !_focusOrder;
+  [self updateOverlay];
   [self relayoutAndLint];
 }
 
@@ -517,6 +586,7 @@ static void TPSetSchemeDefault(NSString *appearance)
                                @"--width", [NSString stringWithFormat: @"%.0f", s.width],
                                @"--height", [NSString stringWithFormat: @"%.0f", s.height]]];
   if (_inspector) [args addObject: @"--inspector"];
+  if (_focusOrder) [args addObject: @"--focus-order"];
   NSString *theme = [[GSTheme theme] name];
   if ([theme length]) [args addObjectsFromArray: @[@"-GSTheme", theme]];
   NSTask *t = [NSTask new];
@@ -589,12 +659,16 @@ static NSString *TPThemeName(void)
   if (wb)
     tree[@"windowBackground"] = [NSString stringWithFormat: @"#%02x%02x%02x", (int)lround([wb redComponent] * 255),
                                   (int)lround([wb greenComponent] * 255), (int)lround([wb blueComponent] * 255)];
+  /* Tab order: each control's id, else its class. */
+  NSMutableArray *focus = [NSMutableArray array];
+  for (NSView *v in TPFocusOrder(_screen)) [focus addObject: [v identifier] ?: NSStringFromClass([v class])];
   NSDictionary *doc = @{
     @"trellis": @"0.1", @"source": _path ?: @"",
     @"theme": TPThemeName(),
     @"appearance": _appearance ?: @"default",
     @"viewport": @{@"width": @(s.width), @"height": @(s.height), @"scale": @1},
-    @"root": tree, @"lint": TRLintFrameTree(tree, s.width, s.height) };
+    @"root": tree, @"lint": TRLintFrameTree(tree, s.width, s.height),
+    @"focusOrder": focus };
   return [NSJSONSerialization dataWithJSONObject: doc options: NSJSONWritingPrettyPrinted error: NULL];
 }
 
@@ -628,7 +702,7 @@ int main(int argc, const char **argv)
     {
       NSString *path = nil, *snapshot = nil;
       NSSize size = NSMakeSize(640, 480);
-      BOOL inspector = NO;
+      BOOL inspector = NO, focusOrder = NO;
       NSString *exportJSON = nil, *appearance = nil;
       for (int i = 1; i < argc; i++)
         {
@@ -638,6 +712,7 @@ int main(int argc, const char **argv)
           else if ([a isEqualToString: @"--width"] && next) { size.width = [next doubleValue]; i++; }
           else if ([a isEqualToString: @"--height"] && next) { size.height = [next doubleValue]; i++; }
           else if ([a isEqualToString: @"--inspector"]) inspector = YES;
+          else if ([a isEqualToString: @"--focus-order"]) focusOrder = YES;
           else if ([a isEqualToString: @"--export-json"] && next) { exportJSON = next; i++; }
           else if ([a isEqualToString: @"--appearance"] && next) { appearance = next; i++; }
           else if ([[a pathExtension] isEqualToString: @"trellis"]) path = [a stringByStandardizingPath];
@@ -647,6 +722,7 @@ int main(int argc, const char **argv)
       [NSApplication sharedApplication];
       TPController *c = [[TPController alloc] initWithPath: path snapshot: snapshot size: size inspector: inspector];
       [c setExportJSON: exportJSON];
+      [c setShowsFocusOrder: focusOrder];
       if (appearance) [c setInitialAppearance: appearance];
       if (snapshot)
         {

@@ -517,6 +517,11 @@ def expand_flex(v):
         return {"flex-grow": "0", "flex-shrink": "1", "flex-basis": "auto"}
     num = re.compile(r"^\d*\.?\d+$")
     toks = v.split()
+    # A unitless zero right after two flex factors is the basis ("1 0 0" is
+    # grow 1, shrink 0, basis 0; css-flexbox-1 7.2), not a third number.
+    for i, t in enumerate(toks):
+        if i >= 2 and num.match(t) and float(t) == 0 and all(num.match(x) for x in toks[i - 2:i]):
+            toks[i] = "0px"
     kinds = "".join("n" if num.match(t) else "b" for t in toks)
     # Grammar: [<grow> <shrink>?] || <basis>: the numbers must be adjacent,
     # with at most two of them and one basis. Invalid -> declaration dropped.

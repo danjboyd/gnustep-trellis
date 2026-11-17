@@ -160,7 +160,10 @@ collapses as in HTML, and the runs follow the label's `color`,
 - **Drawing:** `background-color` and `border-color`/`border-radius` on
   boxes; `border-style` (or the style in `border:`) `solid`, `dashed`,
   `dotted` or `double` (since 0.5; `groove`, `ridge`, `inset` and `outset`
-  draw solid, and `none` or `hidden` in `border:` means no border); `color`, `font-size`, `font-weight` and `text-align` on text
+  draw solid, and `none` or `hidden` in `border:` means no border);
+  per-side borders `border-top`/`-right`/`-bottom`/`-left: 1px solid
+  -tr-separator` and their `-color`/`-style` longhands (since 0.5; sides
+  that differ draw square corners); `color`, `font-size`, `font-weight` and `text-align` on text
   controls; `white-space: nowrap`.
 - **Layout transitions (opt-in):** `-tr-layout-transition: 200ms` on a box
   (optionally `linear` or `ease-in-out`; the default is ease-out) makes its

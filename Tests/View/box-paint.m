@@ -1,6 +1,7 @@
 /* Box painting and hiding (headless): dashed and dotted borders leave
    gaps along an edge, solid and double ones don't; `border: 2px none` has
-   no width. hidden="yes" and -setHidden:forSubview: take a view out of
+   no width; per-side borders (border-right: ...) paint
+   their side only. hidden="yes" and -setHidden:forSubview: take a view out of
    the layout without touching its style, so showing it again restores
    the style's own display. AccentColor and LinkText are never grey.
    Prints BOXPAINT OK. */
@@ -99,6 +100,29 @@ int main(void)
       [none setFrame: NSMakeRect(0, 0, 50, 50)];
       [none layoutTrellis];
       Expect("border: 2px none has no width", [none.node layoutBorderForEdge: TREdgeTop] == 0);
+
+      /* Per-side borders: a sidebar's right divider only. */
+      {
+        NSBitmapImageRep *side = Render(@"border-right: 4px solid #ff0000");
+        NSInteger right = [side pixelsWide] - (NSInteger)(2 * scale), mid = [side pixelsHigh] / 2;
+        Expect("border-right paints the right edge", IsRed(side, right, mid));
+        Expect("and not the left or top", !IsRed(side, (NSInteger)(2 * scale), mid)
+               && !IsRed(side, [side pixelsWide] / 2, (NSInteger)(2 * scale)));
+        NSBitmapImageRep *mixed = Render(@"border: 4px solid #ff0000; border-bottom: 4px dashed #ff0000");
+        NSInteger bt = 0;
+        RedRun(mixed, [mixed pixelsHigh] - (NSInteger)(2 * scale) - 1, &bt);
+        Expect("border-bottom: dashed after border: solid dashes the bottom only",
+               bt >= 6 && RedRun(mixed, (NSInteger)(2 * scale), NULL) >= (NSInteger)(span * scale) - 1);
+        NSBitmapImageRep *none = Render(@"border-left: 4px solid #ff0000; border: none");
+        Expect("border: none afterwards clears a side", !IsRed(none, (NSInteger)(2 * scale), [none pixelsHigh] / 2));
+        TRBoxView *b = [[TRBoxView alloc] initWithStyle: @"border-top: 2px solid -tr-separator; border-left: 1px dotted red"];
+        Expect("side widths go into layout", [b.node.style borderWidthForEdge: TREdgeTop].value == 2
+               && [b.node.style borderWidthForEdge: TREdgeLeft].value == 1
+               && [b.node.style borderWidthForEdge: TREdgeRight].value == 0);
+        Expect("a side's colour and style are kept",
+               [b.node.style.otherDeclarations[@"border-top-color"] isEqualToString: @"-tr-separator"]
+               && [b.node.style.otherDeclarations[@"border-left-style"] isEqualToString: @"dotted"]);
+      }
 
       /* AccentColor and LinkText have a hue even in GNUstep's default
          theme, whose selectedControlColor is white. */

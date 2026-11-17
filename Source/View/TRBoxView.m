@@ -1142,6 +1142,65 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
 
 /* ---- Drawing ---- */
 
+static BOOL TRSameString(NSString *a, NSString *b)
+{
+  return a == b || [a isEqualToString: b];
+}
+
+/* One side of a border whose sides differ (no rounded corners): the edge's
+   strip inside r (flipped: top is minY), solid, dashed, dotted or double. */
+static void TRStrokeEdge(NSRect r, TREdge e, CGFloat bw, NSString *style)
+{
+  NSRect strip;
+  switch (e)
+    {
+      case TREdgeLeft: strip = NSMakeRect(NSMinX(r), NSMinY(r), bw, NSHeight(r)); break;
+      case TREdgeRight: strip = NSMakeRect(NSMaxX(r) - bw, NSMinY(r), bw, NSHeight(r)); break;
+      case TREdgeTop: strip = NSMakeRect(NSMinX(r), NSMinY(r), NSWidth(r), bw); break;
+      default: strip = NSMakeRect(NSMinX(r), NSMaxY(r) - bw, NSWidth(r), bw); break;
+    }
+  BOOL vertical = (e == TREdgeLeft || e == TREdgeRight);
+  if ([style isEqualToString: @"dashed"] || [style isEqualToString: @"dotted"])
+    {
+      NSBezierPath *p = [NSBezierPath bezierPath];
+      if (vertical)
+        {
+          [p moveToPoint: NSMakePoint(NSMidX(strip), NSMinY(strip))];
+          [p lineToPoint: NSMakePoint(NSMidX(strip), NSMaxY(strip))];
+        }
+      else
+        {
+          [p moveToPoint: NSMakePoint(NSMinX(strip), NSMidY(strip))];
+          [p lineToPoint: NSMakePoint(NSMaxX(strip), NSMidY(strip))];
+        }
+      [p setLineWidth: bw];
+      if ([style isEqualToString: @"dashed"])
+        {
+          CGFloat dash[2] = { 3 * bw, 2 * bw };
+          [p setLineDash: dash count: 2 phase: 0];
+        }
+      else
+        {
+          CGFloat dash[2] = { 0, 2 * bw };
+          [p setLineDash: dash count: 2 phase: 0];
+          [p setLineCapStyle: NSRoundLineCapStyle];
+        }
+      [p stroke];
+      return;
+    }
+  if ([style isEqualToString: @"double"] && bw >= 3)
+    {
+      CGFloat t = bw / 3;
+      NSRect a = strip, b = strip;
+      if (vertical) { a.size.width = t; b.size.width = t; b.origin.x += bw - t; }
+      else { a.size.height = t; b.size.height = t; b.origin.y += bw - t; }
+      [NSBezierPath fillRect: a];   /* source-over, unlike NSRectFill */
+      [NSBezierPath fillRect: b];
+      return;
+    }
+  [NSBezierPath fillRect: strip];
+}
+
 /* Strokes a uniform border of width bw inside r. dashed: dashes of 3bw
    with gaps of 2bw (roughly what browsers draw); dotted: round dots one
    bw across, a dot's width apart; double: two lines of bw/3 with a bw/3
@@ -1198,14 +1257,39 @@ static void TRStrokeBorder(NSRect r, CGFloat bw, CGFloat radius, NSString *style
           [[NSBezierPath bezierPathWithRoundedRect: r xRadius: radius yRadius: radius] fill];
         }
     }
-  if (bw > 0)
+  /* Per-side widths, colours and styles (border-right: ... and friends). */
+  static NSString *const sides[4] = { @"left", @"top", @"right", @"bottom" };
+  CGFloat w[4];
+  NSString *col[4], *sty[4];
+  BOOL uniform = YES;
+  for (int e = 0; e < 4; e++)
     {
-      NSColor *c = bc ? TRColorFromCSS(bc) : [NSColor grayColor];
-      if (c)
+      w[e] = [_node layoutBorderForEdge: (TREdge)e];
+      col[e] = d[[NSString stringWithFormat: @"border-%@-color", sides[e]]] ?: bc;
+      sty[e] = d[[NSString stringWithFormat: @"border-%@-style", sides[e]]] ?: [d[@"border-style"] lowercaseString];
+      if (e > 0 && (w[e] != w[0] || !TRSameString(col[e], col[0]) || !TRSameString(sty[e], sty[0])))
+        uniform = NO;
+    }
+  if (uniform)
+    {
+      if (bw > 0)
         {
-          [c set];
-          TRStrokeBorder(r, bw, radius, [d[@"border-style"] lowercaseString]);
+          NSColor *c = bc ? TRColorFromCSS(bc) : [NSColor grayColor];
+          if (c)
+            {
+              [c set];
+              TRStrokeBorder(r, bw, radius, sty[0]);
+            }
         }
+      return;
+    }
+  for (int e = 0; e < 4; e++)
+    {
+      if (w[e] <= 0) continue;
+      NSColor *c = col[e] ? TRColorFromCSS(col[e]) : [NSColor grayColor];
+      if (c == nil) continue;
+      [c set];
+      TRStrokeEdge(r, (TREdge)e, w[e], sty[e]);
     }
 }
 

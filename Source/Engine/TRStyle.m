@@ -218,7 +218,8 @@ static NSSet *TRVisualProperties(void)
       @"line-height", @"text-align", @"white-space", @"text-overflow",
       @"border-color", @"border-style", @"border-radius",
       @"border-top-color", @"border-right-color", @"border-bottom-color",
-      @"border-left-color", @"box-shadow", @"visibility", @"z-index",
+      @"border-left-color", @"border-top-style", @"border-right-style",
+      @"border-bottom-style", @"border-left-style", @"box-shadow", @"visibility", @"z-index",
       @"cursor", @"content", @"container-type", @"container-name",
       @"-tr-layout-transition", nil];
   });
@@ -583,36 +584,73 @@ static int TREdgeFromSuffix(NSString *suffix)
       _s.border[e] = len;
       return YES;
     }
-  if ([p isEqualToString: @"border"])
+  int borderEdge = -1;
+  if ([p hasPrefix: @"border-"] && [p rangeOfString: @"-" options: 0
+        range: NSMakeRange(7, [p length] - 7)].location == NSNotFound)
+    borderEdge = TREdgeFromSuffix([p substringFromIndex: 7]);
+  if ([p isEqualToString: @"border"] || borderEdge >= 0
+      || ([p hasPrefix: @"border-"] && [p hasPrefix: @"border-inline-"])
+      || ([p hasPrefix: @"border-"] && [p hasPrefix: @"border-block-"]))
     {
-      /* border: <width> || <style> || <color>; only the width is layout. */
+      /* border[-side]: <width> || <style> || <color>; only the width is
+         layout. A side's style and colour go in border-<side>-style and
+         -color; the all-sides shorthand clears those. */
+      if (borderEdge < 0 && ![p isEqualToString: @"border"])
+        {
+          borderEdge = TREdgeFromSuffix([p substringFromIndex: 7]);
+          if (borderEdge < 0) return NO;
+        }
       static NSSet *styles;
       static dispatch_once_t once;
       dispatch_once(&once, ^{
         styles = [NSSet setWithObjects: @"none", @"hidden", @"solid", @"dashed",
           @"dotted", @"double", @"groove", @"ridge", @"inset", @"outset", nil];
       });
+      static NSString *const sideNames[4] = { @"left", @"top", @"right", @"bottom" };
       TRValue w = TRPx(0);
       BOOL sawWidth = NO;
-      NSString *bs = nil;
+      NSString *bs = nil, *bc = nil;
       for (NSString *t in TRTokens(v))
         {
           if (!sawWidth && TRParseLength(t, &len, NO, NO)) { w = len; sawWidth = YES; }
-          else if ([styles containsObject: [t lowercaseString]])
-            { bs = [t lowercaseString]; _other[@"border-style"] = bs; }
-          else
-            _other[@"border-color"] = t;
+          else if ([styles containsObject: [t lowercaseString]]) bs = [t lowercaseString];
+          else bc = t;
         }
       if ([bs isEqualToString: @"none"] || [bs isEqualToString: @"hidden"])
         w = TRPx(0);   /* CSS: no style means no border, whatever the width */
       else if (!sawWidth && bs != nil)
         w = TRPx(3);   /* CSS 'medium' */
-      for (int i = 0; i < 4; i++) _s.border[i] = w;
+      if (borderEdge < 0)
+        {
+          if (bs) _other[@"border-style"] = bs;
+          if (bc) _other[@"border-color"] = bc;
+          for (int i = 0; i < 4; i++)
+            {
+              [_other removeObjectForKey: [NSString stringWithFormat: @"border-%@-style", sideNames[i]]];
+              [_other removeObjectForKey: [NSString stringWithFormat: @"border-%@-color", sideNames[i]]];
+              _s.border[i] = w;
+            }
+        }
+      else
+        {
+          NSString *side = sideNames[borderEdge];
+          NSString *sk = [NSString stringWithFormat: @"border-%@-style", side];
+          NSString *ck = [NSString stringWithFormat: @"border-%@-color", side];
+          if (bs) _other[sk] = bs; else _other[sk] = @"solid";
+          if (bc) _other[ck] = bc; else [_other removeObjectForKey: ck];
+          _s.border[borderEdge] = w;
+        }
       return YES;
     }
   if ([TRVisualProperties() containsObject: p] || [p hasPrefix: @"--"]
       || [p hasPrefix: @"-trellis-"])
     {
+      /* An all-sides colour or style replaces the per-side ones. */
+      if ([p isEqualToString: @"border-color"] || [p isEqualToString: @"border-style"])
+        for (NSString *side in @[@"left", @"top", @"right", @"bottom"])
+          [_other removeObjectForKey: [NSString stringWithFormat: @"border-%@-%@", side,
+                                         [p substringFromIndex: 7]]];
+      if ([p hasSuffix: @"-style"] && [p hasPrefix: @"border-"]) v = [v lowercaseString];
       _other[p] = v;
       return YES;
     }

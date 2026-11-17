@@ -16,6 +16,11 @@ version may change the API listed in docs/api.md, and says so here.
   the default theme (whose selection colour is white) they drew white on
   white; they now fall back to a fixed blue. Adwaita and Gumdrop keep
   their own selection blue.
+- Per-side borders: `border-top`, `-right`, `-bottom`, `-left` (and the
+  logical `border-inline-*`/`border-block-*`) shorthands and the
+  `border-<side>-style` longhands. Sides that differ draw separately
+  (square corners). `border:`, `border-color:` and `border-style:` reset
+  the sides.
 - `<segmented>` and `TRSegmentedControl`: a segmented control with
   `<item>` children or `items=`, `tracking=one|any|momentary`, a
   selection by title in markup, code (`selectedTitles`) and sample files,

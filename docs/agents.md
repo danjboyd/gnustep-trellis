@@ -398,6 +398,11 @@ it a row. Lint reports this as `stretched`.
     a pane being hidden moves to the next view. Use it for a sidebar or
     inspector the user toggles. (`-setHidden:forSubview:` is for box
     children; a pane belongs to the split.)
+  - `display: none` in a pane's style hides it the same way (since 0.7.1),
+    so a container query can drop a sidebar at narrow widths:
+    `@container (max-width: 500px) { .side { display: none; } }`. It comes
+    back when the query stops matching. A pane is out while either
+    `hidden` or `display: none` holds; `-isPaneHidden:` reports either.
 
 ## 6. From code
 

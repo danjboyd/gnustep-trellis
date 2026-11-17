@@ -186,12 +186,14 @@ static NSView *TPViewAtPath(NSView *root, NSString *path)
   NSArray *_findings;
   NSString *_appearance;   /* nil (theme default), "light" or "dark" */
   NSString *_exportJSON;   /* headless: write the frames JSON here */
+  BOOL _loadFailed;        /* the spec (or its sample) didn't load */
 }
 @end
 
 @implementation TPController
 
 - (void)setExportJSON:(NSString *)path { _exportJSON = [path copy]; }
+- (BOOL)loadFailed { return _loadFailed; }
 - (void)setShowsFocusOrder:(BOOL)yn { _focusOrder = yn; }
 
 /* The overlay is up while it has something to draw. */
@@ -368,6 +370,7 @@ static NSDate *TPModDate(NSString *path)
 
 - (void)showError:(NSString *)msg
 {
+  _loadFailed = YES;
   [_screen removeFromSuperview];
   _screen = nil;
   [_errorLabel setStringValue: msg];
@@ -395,6 +398,7 @@ static NSDate *TPModDate(NSString *path)
       [self showError: err ? [err localizedDescription] : @"cannot load"];
       return;
     }
+  _loadFailed = NO;
   [_errorLabel removeFromSuperview];
   [_screen removeFromSuperview];
   _screen = screen;
@@ -458,7 +462,19 @@ static NSDictionary *TPDump(NSView *v, TRNode *node)
       if (!isnan(ms.width) && !isnan(ms.height))
         d[@"measured"] = @{@"width": @(ceil(ms.width)), @"height": @(ceil(ms.height))};
     }
-  if (node.style.position == TRPositionAbsolute) d[@"position"] = @"absolute";
+  if (node)
+    {
+      /* Layout style and matched container conditions, as in
+         trellis-render's dump, so a Preview export replays the same. */
+      NSString *decl = [node.style declarationString];
+      if ([decl length]) d[@"style"] = decl;
+      if (node.style.position == TRPositionAbsolute) d[@"position"] = @"absolute";
+      TROverflow ov = node.style.overflow;
+      if (ov != TROverflowVisible)
+        d[@"overflow"] = ov == TROverflowHidden ? @"hidden" : (ov == TROverflowScroll ? @"scroll" : @"auto");
+      NSArray *m = node.matchedConditions;
+      if ([m count]) d[@"container"] = @{@"matched": m};
+    }
   if ([v isKindOfClass: [NSControl class]] && [(NSControl *)v cell])
     {
       NSCell *cell = [(NSControl *)v cell];
@@ -482,7 +498,12 @@ static NSDictionary *TPDump(NSView *v, TRNode *node)
     }
   else if ([v isKindOfClass: [TRSplitView class]])
     for (NSView *pv in [(TRSplitView *)v panes])
-      [kids addObject: TPDump(pv, [pv isKindOfClass: [TRBoxView class]] ? ((TRBoxView *)pv).node : nil)];
+      {
+        NSMutableDictionary *k = [TPDump(pv, [pv isKindOfClass: [TRBoxView class]] ? ((TRBoxView *)pv).node : nil) mutableCopy];
+        /* A hidden pane (hidden, or display: none) is out of the split. */
+        if ([(TRSplitView *)v isPaneHidden: pv]) k[@"hidden"] = @YES;
+        [kids addObject: k];
+      }
   else if ([v isKindOfClass: [TRVirtualBox class]])
     {
       TRVirtualBox *vb = (TRVirtualBox *)v;
@@ -740,6 +761,11 @@ int main(int argc, const char **argv)
           else if ([[a pathExtension] isEqualToString: @"trellis"]) path = [a stringByStandardizingPath];
           else if ([a hasPrefix: @"-"] && next && ![next hasPrefix: @"-"]) i++;   /* NSUserDefaults args, e.g. -GSTheme X */
         }
+      if (appearance && ![appearance isEqualToString: @"light"] && ![appearance isEqualToString: @"dark"])
+        {
+          fprintf(stderr, "TrellisPreview: --appearance takes light or dark, not \"%s\"\n", [appearance UTF8String]);
+          return 2;
+        }
       if (appearance) TPSetSchemeDefault(appearance);   /* before the theme loads */
       [NSApplication sharedApplication];
       TPController *c = [[TPController alloc] initWithPath: path snapshot: snapshot size: size inspector: inspector];
@@ -751,6 +777,13 @@ int main(int argc, const char **argv)
           /* Headless check: no run loop, no services (pasteboard etc.). */
           [c applicationDidFinishLaunching:
                [NSNotification notificationWithName: NSApplicationDidFinishLaunchingNotification object: NSApp]];
+          /* Like trellis-render: a spec that doesn't load is a failure,
+             though the snapshot (of the error message) is still written. */
+          if ([c loadFailed])
+            {
+              fprintf(stderr, "TrellisPreview: %s did not load\n", [path ?: @"(no file)" UTF8String]);
+              return 1;
+            }
           return 0;
         }
       [NSApp setDelegate: c];

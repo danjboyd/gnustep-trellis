@@ -184,7 +184,12 @@ static NSDictionary *TRDumpView(NSView *v, TRNode *node)
     {
       NSMutableArray *kids = [NSMutableArray array];
       for (NSView *pv in [(TRSplitView *)v panes])
-        [kids addObject: TRDumpView(pv, [pv isKindOfClass: [TRBoxView class]] ? ((TRBoxView *)pv).node : nil)];
+        {
+          NSMutableDictionary *k = [TRDumpView(pv, [pv isKindOfClass: [TRBoxView class]] ? ((TRBoxView *)pv).node : nil) mutableCopy];
+          /* A hidden pane (hidden, or display: none) is out of the split. */
+          if ([(TRSplitView *)v isPaneHidden: pv]) k[@"hidden"] = @YES;
+          [kids addObject: k];
+        }
       d[@"split"] = [(TRSplitView *)v direction] == TRSplitDirectionRow ? @"row" : @"column";
       d[@"children"] = kids;
     }

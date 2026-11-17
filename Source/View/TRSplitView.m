@@ -15,6 +15,8 @@
   CGFloat grow;        /* flex-grow; -1: unset */
   CGFloat size;        /* current size along the split (kept while hidden) */
   BOOL hidden;         /* out of the split's subviews until shown */
+  BOOL userHidden;     /* hidden by markup or -setHidden:forPane: */
+  BOOL styleHidden;    /* display: none in its resolved style (a container query) */
   NSView *parked;      /* holds the view while it's out */
 }
 @end
@@ -26,6 +28,8 @@
 - (CGFloat)available;
 - (void)applySizes;
 - (void)save;
+- (void)park:(TRSplitPane *)p hidden:(BOOL)hidden;
+- (BOOL)syncStyleHidden;
 @end
 
 static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
@@ -46,6 +50,7 @@ static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
   BOOL _parking;        /* taking a hidden pane out of the subviews */
   NSInteger _keyDivider; /* the divider the keyboard moves */
   BOOL _disabled;        /* no dragging, no keyboard */
+  BOOL _syncing;         /* re-reading the panes' display: none */
 }
 
 - (instancetype)initWithDirection:(TRSplitDirection)direction
@@ -128,10 +133,28 @@ static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
 - (void)setHidden:(BOOL)hidden forPane:(NSView *)pane
 {
   TRSplitPane *p = [self infoForPane: pane];
-  if (p == nil || p->hidden == hidden) return;
+  if (p == nil || p->userHidden == hidden) return;
+  p->userHidden = hidden;
+  BOOL eff = p->userHidden || p->styleHidden;
+  if (eff != p->hidden)
+    {
+      [self park: p hidden: eff];
+      [self applySizes];
+    }
+  [self save];
+  /* The parent box remeasures the split and rebuilds the key-view loop. */
+  NSView *sv = [self superview];
+  if ([sv isKindOfClass: [TRBoxView class]]) [(TRBoxView *)sv invalidateSubview: self];
+}
+
+/* Takes a pane out of the subviews (focus inside it moves on first) or
+   puts it back in its place at its old size. The caller lays out. */
+- (void)park:(TRSplitPane *)p hidden:(BOOL)hidden
+{
+  NSView *pane = hidden ? p->view : p->parked;
+  if (pane == nil || p->hidden == hidden) return;
   if (hidden)
     {
-      /* Focus inside the pane moves to the next view outside it first. */
       NSWindow *w = [self window];
       id fr = [w firstResponder];
       if ([fr isKindOfClass: [NSText class]] && [(NSText *)fr isFieldEditor]) fr = [(NSText *)fr delegate];
@@ -148,8 +171,6 @@ static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
       _parking = YES;
       [pane removeFromSuperview];
       _parking = NO;
-      /* Its space goes to the panes left. */
-      [self applySizes];
     }
   else
     {
@@ -161,7 +182,6 @@ static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
       if (before) [self addSubview: pane positioned: NSWindowBelow relativeTo: before];
       else [self addSubview: pane];
       p->parked = nil;
-      /* It comes back at its old size, taken from the others. */
       if (_sized)
         {
           NSMutableArray *others = [[self shown] mutableCopy];
@@ -171,12 +191,34 @@ static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
           for (TRSplitPane *q in [self shown]) sum += q->size;
           [self distribute: [self available] - sum among: others];
         }
-      [self applySizes];
     }
-  [self save];
-  /* The parent box remeasures the split and rebuilds the key-view loop. */
+}
+
+/* A pane whose resolved style is display: none (a container query that
+   tests the container around the split) is out like a hidden one. Each
+   pane's own tree is laid out once to re-evaluate its conditions. YES if
+   any pane came or went. */
+- (BOOL)syncStyleHidden
+{
+  if (_syncing) return NO;
+  _syncing = YES;
+  BOOL changed = NO;
   NSView *sv = [self superview];
-  if ([sv isKindOfClass: [TRBoxView class]]) [(TRBoxView *)sv invalidateSubview: self];
+  TRNode *cq = [sv isKindOfClass: [TRBoxView class]] ? [(TRBoxView *)sv nodeForSubview: self] : nil;
+  for (TRSplitPane *p in [_panes copy])
+    {
+      NSView *v = p->view ?: p->parked;
+      if (![v isKindOfClass: [TRBoxView class]]) continue;
+      TRBoxView *b = (TRBoxView *)v;
+      b.node.containerQueryParent = cq;
+      NSSize fs = [b frame].size;
+      [b.node layoutWithAvailableSize: TRSizeMake(fs.width, fs.height) direction: [b inheritedLayoutDirection]];
+      p->styleHidden = (b.node.style.display == TRDisplayNone);
+      BOOL eff = p->userHidden || p->styleHidden;
+      if (eff != p->hidden) { [self park: p hidden: eff]; changed = YES; }
+    }
+  _syncing = NO;
+  return changed;
 }
 
 - (void)setInitialSize:(CGFloat)size forPane:(NSView *)pane
@@ -327,6 +369,7 @@ static CGFloat TRPoints(TRValue v, CGFloat unset)
 /* Sets the pane frames from the sizes (fitting them to the split first). */
 - (void)applySizes
 {
+  BOOL came = [self syncStyleHidden];
   NSArray<TRSplitPane *> *shown = [self shown];
   NSUInteger n = [shown count];
   if ([_panes count] == 0 || [self length] <= 0) return;
@@ -357,6 +400,13 @@ static CGFloat TRPoints(TRValue v, CGFloat unset)
     }
   _applying = NO;
   [self setNeedsDisplay: YES];
+  /* A pane that came or went: the parent box remeasures the split and
+     rebuilds the key-view loop, as for -setHidden:forPane:. */
+  if (came)
+    {
+      NSView *outer = [self superview];
+      if ([outer isKindOfClass: [TRBoxView class]]) [(TRBoxView *)outer invalidateSubview: self];
+    }
 }
 
 /* Reads the sizes back from the pane frames (after AppKit moved a divider). */

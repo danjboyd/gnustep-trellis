@@ -291,6 +291,42 @@ int main(void)
                [[ks dividerPositions][1] doubleValue] == before && ![ks acceptsFirstResponder]);
         [kw close];
       }
+      /* A container query's display: none hides a pane like hidden, and
+         it comes back when the query stops matching. */
+      {
+        TRBoxView *cr = Load(@"<column class=\"wrap\"><split id=\"cs\" class=\"cs\">"
+                             @"<box id=\"side\" class=\"side\"/><box id=\"main\"/></split></column>"
+                             @"<style> .wrap { container-type: inline-size; } .cs { height: 100px; flex: none; }"
+                             @" .side { width: 120px; }"
+                             @" @container (max-width: 500px) { .side { display: none; } } </style>", &err);
+        if (cr == nil) { printf("cq spec: %s\n", [[err localizedDescription] UTF8String]); return 2; }
+        NSWindow *cw = [[NSWindow alloc] initWithContentRect: NSMakeRect(0, 0, 800, 200)
+                                                   styleMask: NSWindowStyleMaskTitled
+                                                     backing: NSBackingStoreBuffered defer: NO];
+        [cw setReleasedWhenClosed: NO];
+        [cr setFrame: NSMakeRect(0, 0, 800, 200)];
+        [cw setContentView: cr];
+        [cr layoutTrellis];
+        TRSplitView *cs = (TRSplitView *)[TRLoader viewWithIdentifier: @"cs" inView: cr];
+        NSView *side = [TRLoader viewWithIdentifier: @"side" inView: cr];
+        NSView *mainPane = [TRLoader viewWithIdentifier: @"main" inView: cr];
+        Expect("container query: wide, the side pane is shown", ![cs isPaneHidden: side] && [[cs subviews] count] == 2);
+        [cr setFrame: NSMakeRect(0, 0, 400, 200)];
+        [cr layoutTrellis];
+        Expect("container query display: none hides the pane", [cs isPaneHidden: side] && [[cs subviews] count] == 1);
+        Expect("the other pane takes the width", fabs(NSWidth([mainPane frame]) - NSWidth([cs bounds])) < 1);
+        [cr setFrame: NSMakeRect(0, 0, 800, 200)];
+        [cr layoutTrellis];
+        Expect("wider again: the side pane comes back at its size",
+               ![cs isPaneHidden: side] && fabs(NSWidth([side frame]) - 120) < 1);
+        [cs setHidden: YES forPane: side];
+        Expect("hidden in code stays hidden while the query doesn't match", [cs isPaneHidden: side]);
+        [cs setHidden: NO forPane: side];
+        [cr setFrame: NSMakeRect(0, 0, 400, 200)];
+        [cr layoutTrellis];
+        Expect("shown in code but display: none: still out", [cs isPaneHidden: side]);
+        [cw close];
+      }
       Expect("hidden=\"maybe\" on a pane is an error",
              Load(@"<column><split><box hidden=\"maybe\"/><box/></split></column>", &err) == nil);
 

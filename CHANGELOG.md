@@ -5,6 +5,16 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Fixed:** a split pane whose resolved style is `display: none` (for
+  example from a container query) leaves the split like a hidden pane, and
+  comes back when the style changes; it used to keep its width. Frame dumps
+  (trellis-render, TrellisPreview) mark hidden panes `"hidden": true`.
+- **Fixed (TrellisPreview):** `--snapshot` / `--export-json` exit 1 when
+  the spec or its sample doesn't load (the snapshot of the error message is
+  still written); `--appearance` takes only `light` or `dark` (exit 2
+  otherwise). Its frames JSON now carries each node's `style`, `overflow`
+  and matched `container` conditions, like trellis-render's.
+
 - docs/migration-0.7.md: what changed for a screen from 0.5.x to 0.7 and
   what to check, with a fixture (Tests/Reference/migration.trellis) and
   `make check-migration`.

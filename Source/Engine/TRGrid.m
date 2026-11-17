@@ -664,13 +664,17 @@ static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
                 aff[i - a] = (mk == TRBreadthAuto || mk == TRBreadthMinContent || mk == TRBreadthMaxContent);
               }
             TRDistributeBase(tr, limitSet, a, b, minC - have, aff, NO);
-            /* 2. Max-content minimums take its max-content contribution. */
+            /* 2. Max-content minimums take its max-content contribution;
+               so do auto minimums when the grid is sized under a
+               max-content constraint (an indefinite width). */
             {
               double haveB = gapsS;
+              const BOOL maxConstraint = columns && isnan(avail);
               for (NSInteger i = a; i < b; i++)
                 {
                   haveB += tr[i].base;
-                  aff[i - a] = (tr[i].size.min.kind == TRBreadthMaxContent);
+                  TRBreadthKind mk = tr[i].size.min.kind;
+                  aff[i - a] = (mk == TRBreadthMaxContent || (maxConstraint && mk == TRBreadthAuto));
                 }
               TRDistributeBase(tr, limitSet, a, b, maxC - haveB, aff, YES);
             }

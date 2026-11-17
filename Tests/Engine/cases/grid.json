@@ -899,5 +899,48 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_spanning_max_content_auto_tracks",
+  "note": "under a max-content constraint a spanning item's max-content contribution grows auto-minimum bases (30 + 80 = 110, WPT grid-intrinsic-width-minmax-tracks-001/22); laid out at that definite width, column 2 grows to its 80 limit and the 30 left stretches both auto columns: 15 / 95",
+  "available": {
+   "width": 784,
+   "height": null
+  },
+  "root": {
+   "style": "display: grid; width: max-content; grid-template-columns: auto auto; grid-template-rows: 10px",
+   "children": [
+    {
+     "style": "grid-row: 1; grid-column: 1 / -1",
+     "measure": {
+      "text": "XX XX XX",
+      "charWidth": 10,
+      "lineHeight": 10
+     }
+    },
+    {
+     "style": "grid-row: 1; grid-column: 2",
+     "measure": {
+      "text": "XX XX XX",
+      "charWidth": 10,
+      "lineHeight": 10
+     }
+    }
+   ]
+  },
+  "expected": {
+   "width": 110,
+   "height": 10,
+   "children": [
+    {
+     "x": 0,
+     "width": 110
+    },
+    {
+     "x": 15,
+     "width": 95
+    }
+   ]
+  }
  }
 ]

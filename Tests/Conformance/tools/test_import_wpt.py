@@ -27,6 +27,16 @@ class FlexShorthand(unittest.TestCase):
         self.assertEqual(W.expand_flex("10px")["flex-grow"], "1")
         self.assertEqual(W.expand_flex("auto 1 1")["flex-basis"], "auto")
 
+    def test_unitless_zero_basis(self):
+        # A unitless zero after two flex factors is the basis (flex-flow-013).
+        self.assertEqual(W.expand_flex("1 0 0"),
+                         {"flex-grow": "1", "flex-shrink": "0", "flex-basis": "0px"})
+        self.assertEqual(W.expand_flex("2 1 0"),
+                         {"flex-grow": "2", "flex-shrink": "1", "flex-basis": "0px"})
+        # Otherwise a zero is still a factor, and three numbers are invalid.
+        self.assertEqual(W.expand_flex("0 1")["flex-basis"], "0%")
+        self.assertIsNone(W.expand_flex("1 0 1"))
+
     def test_invalid_is_dropped(self):
         # grow and shrink must be adjacent (flex-shorthand-flex-basis-middle)
         self.assertIsNone(W.expand_flex("1 0% 1"))

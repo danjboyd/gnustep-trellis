@@ -146,6 +146,24 @@ static BOOL TRValueFromObject(id obj, TRValue *out, BOOL allowAuto, BOOL allowNo
   return NO;
 }
 
+/* min-content, max-content, fit-content and stretch (with the prefixed
+   spellings of stretch) for the size properties. */
+static BOOL TRSizeKeyword(id obj, TRValue *out)
+{
+  if (![obj isKindOfClass: [NSString class]]) return NO;
+  NSString *t = [[obj stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]] lowercaseString];
+  TRUnit u;
+  if ([t isEqualToString: @"min-content"]) u = TRUnitMinContent;
+  else if ([t isEqualToString: @"max-content"]) u = TRUnitMaxContent;
+  else if ([t isEqualToString: @"fit-content"]) u = TRUnitFitContent;
+  else if ([t isEqualToString: @"stretch"] || [t isEqualToString: @"-webkit-fill-available"]
+           || [t isEqualToString: @"-moz-available"]) u = TRUnitStretch;
+  else return NO;
+  out->value = 0;
+  out->unit = u;
+  return YES;
+}
+
 typedef struct { const char *name; int value; } TRKeyword;
 
 static BOOL TRLookup(NSString *tok, const TRKeyword *table, int *out)
@@ -503,7 +521,7 @@ const TRStyleStorage *TRStyleStorageForDirection(TRStyle *st, TRDirection dir)
     _s.FIELD = (TYPE)k; return YES; }
 #define LENGTH(NAME, FIELD, AUTO, NONE) \
   if ([p isEqualToString: NAME]) { \
-    if (!TRValueFromObject(obj, &len, AUTO, NONE)) return NO; \
+    if (!TRSizeKeyword(obj, &len) && !TRValueFromObject(obj, &len, AUTO, NONE)) return NO; \
     _s.FIELD = len; return YES; }
 
   KEYWORD(@"display", kDisplay, display, TRDisplay)
@@ -944,6 +962,10 @@ static NSString *TRValueString(TRValue v)
       case TRUnitUndefined: return @"none";
       case TRUnitPercent: return [NSString stringWithFormat: @"%g%%", v.value];
       case TRUnitPoint: return [NSString stringWithFormat: @"%gpx", v.value];
+      case TRUnitMinContent: return @"min-content";
+      case TRUnitMaxContent: return @"max-content";
+      case TRUnitFitContent: return @"fit-content";
+      case TRUnitStretch: return @"stretch";
     }
   return @"";
 }

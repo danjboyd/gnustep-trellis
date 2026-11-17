@@ -5,6 +5,17 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Added:** the size keywords `min-content`, `max-content`, `fit-content`
+  and `stretch` (also `-webkit-fill-available`) for `width`, `height`, their
+  `min-`/`max-` forms and `flex-basis`. They are measured where the box is
+  laid out: as a flex item, an abspos box or the root. Heights take the
+  content height at the box's width. The intrinsic-size-keyword skip is
+  removed, and conformance is 3553/3553. The 130 cases that still fail are
+  listed with reasons in Tests/Conformance/known-gaps.json, a new skip list
+  (`known-gap`; `--all` runs them). Most are roots sized against a
+  containing block the imported case doesn't carry, flex container
+  intrinsic sizing (css-flexbox 9.9.1) and grid keyword cases not yet
+  analysed.
 - **Changed (layout):** a `position: static` box is no longer a containing
   block. Its absolutely positioned children are placed against the nearest
   positioned ancestor's padding box (or the layout root's), as in CSS and

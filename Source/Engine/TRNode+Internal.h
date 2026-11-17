@@ -82,6 +82,14 @@ static inline const TRStyleStorage *TRChildStyle(TRNode *c, TRDirection parentDi
 void TRLayoutStaticDescendants(TRNode *cur, TRDirection cbDir, TRFloat ox, TRFloat oy,
                                TRFloat cbX, TRFloat cbY, TRFloat cbW, TRFloat cbH);
 
+/* The style with min-content / max-content / fit-content / stretch sizes
+   measured and written as px into buf (or cs itself when it has none).
+   availW/availH: the space the parent offers the margin box (NAN when
+   indefinite); refW/refH: percentage bases; mainIsWidth: flex-basis axis. */
+const TRStyleStorage *TRResolveSizeKeywords(TRNode *c, const TRStyleStorage *cs, TRStyleStorage *buf,
+                                            TRFloat availW, TRFloat availH, TRFloat refW, TRFloat refH,
+                                            BOOL mainIsWidth, TRDirection dir);
+
 /* The layout algorithm (TRLayout.m). Returns the node's border-box size.
    aw/ah: border-box constraint, read according to wm/hm.
    ow/oh: the containing block's inner size, for percentages.

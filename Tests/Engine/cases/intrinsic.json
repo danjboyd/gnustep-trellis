@@ -1,0 +1,355 @@
+[
+ {
+  "id": "engine/kw_width_max_content",
+  "note": "max-content: the widest layout (no wrapping)",
+  "root": {
+   "style": "flex-direction: column; align-items: flex-start; width: 300px",
+   "children": [
+    {
+     "style": "width: max-content; flex-wrap: wrap",
+     "children": [
+      {
+       "style": "width: 30px; height: 10px"
+      },
+      {
+       "style": "width: 50px; height: 10px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 300,
+   "height": 10,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 80,
+     "height": 10,
+     "children": [
+      {
+       "x": 0,
+       "y": 0,
+       "width": 30,
+       "height": 10
+      },
+      {
+       "x": 30,
+       "y": 0,
+       "width": 50,
+       "height": 10
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/kw_width_min_content",
+  "note": "min-content: the narrowest layout (every soft wrap taken)",
+  "root": {
+   "style": "flex-direction: column; align-items: flex-start; width: 300px",
+   "children": [
+    {
+     "style": "width: min-content; flex-wrap: wrap",
+     "children": [
+      {
+       "style": "width: 30px; height: 10px"
+      },
+      {
+       "style": "width: 50px; height: 10px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 300,
+   "height": 20,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 50,
+     "height": 20,
+     "children": [
+      {
+       "x": 0,
+       "y": 0,
+       "width": 30,
+       "height": 10
+      },
+      {
+       "x": 0,
+       "y": 10,
+       "width": 50,
+       "height": 10
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/kw_width_fit_content_narrow",
+  "note": "fit-content: max-content clamped to the space, but not below min-content",
+  "root": {
+   "style": "flex-direction: column; align-items: flex-start; width: 60px",
+   "children": [
+    {
+     "style": "width: fit-content; flex-wrap: wrap",
+     "children": [
+      {
+       "style": "width: 30px; height: 10px"
+      },
+      {
+       "style": "width: 50px; height: 10px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 60,
+   "height": 20,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 60,
+     "height": 20,
+     "children": [
+      {
+       "x": 0,
+       "y": 0,
+       "width": 30,
+       "height": 10
+      },
+      {
+       "x": 0,
+       "y": 10,
+       "width": 50,
+       "height": 10
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/kw_width_fit_content_wide",
+  "note": "fit-content in a wide space is max-content, not the full width (unlike stretch)",
+  "root": {
+   "style": "flex-direction: column; width: 300px",
+   "children": [
+    {
+     "style": "width: fit-content; flex-wrap: wrap",
+     "children": [
+      {
+       "style": "width: 30px; height: 10px"
+      },
+      {
+       "style": "width: 50px; height: 10px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 300,
+   "height": 10,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 80,
+     "height": 10,
+     "children": [
+      {
+       "x": 0,
+       "y": 0,
+       "width": 30,
+       "height": 10
+      },
+      {
+       "x": 30,
+       "y": 0,
+       "width": 50,
+       "height": 10
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/kw_width_stretch",
+  "note": "stretch: the space less margins",
+  "root": {
+   "style": "flex-direction: column; align-items: flex-start; width: 200px",
+   "children": [
+    {
+     "style": "width: stretch; height: 10px; margin: 0 10px"
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 200,
+   "height": 10,
+   "children": [
+    {
+     "x": 10,
+     "y": 0,
+     "width": 180,
+     "height": 10
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/kw_height_max_content_no_stretch",
+  "note": "a height keyword isn't auto, so align-items: stretch leaves it at its content height",
+  "root": {
+   "style": "width: 200px; height: 100px",
+   "children": [
+    {
+     "style": "height: max-content",
+     "children": [
+      {
+       "style": "width: 20px; height: 15px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 200,
+   "height": 100,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 20,
+     "height": 15,
+     "children": [
+      {
+       "x": 0,
+       "y": 0,
+       "width": 20,
+       "height": 15
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/kw_min_width_max_content",
+  "note": "min-width: max-content keeps an item from shrinking below its content",
+  "root": {
+   "style": "width: 50px",
+   "children": [
+    {
+     "style": "min-width: max-content",
+     "children": [
+      {
+       "style": "width: 30px; height: 10px"
+      },
+      {
+       "style": "width: 50px; height: 10px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 50,
+   "height": 10,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 80,
+     "height": 10,
+     "children": [
+      {
+       "x": 0,
+       "y": 0,
+       "width": 30,
+       "height": 10
+      },
+      {
+       "x": 30,
+       "y": 0,
+       "width": 50,
+       "height": 10
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/kw_content_box",
+  "note": "with box-sizing: content-box the keyword size is still the border box's content plus padding",
+  "root": {
+   "style": "flex-direction: column; align-items: flex-start; width: 300px",
+   "children": [
+    {
+     "style": "box-sizing: content-box; width: max-content; padding: 0 5px",
+     "children": [
+      {
+       "style": "width: 30px; height: 10px"
+      },
+      {
+       "style": "width: 50px; height: 10px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 300,
+   "height": 10,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 90,
+     "height": 10,
+     "children": [
+      {
+       "x": 5,
+       "y": 0,
+       "width": 30,
+       "height": 10
+      },
+      {
+       "x": 35,
+       "y": 0,
+       "width": 50,
+       "height": 10
+      }
+     ]
+    }
+   ]
+  }
+ }
+]

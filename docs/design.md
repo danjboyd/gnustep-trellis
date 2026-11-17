@@ -254,7 +254,7 @@ Agents must not assume browser behaviour in these cases:
 | Unitless lengths | invalid, except 0 | accepted as px; `trellis-lint` warns |
 | Unknown property names | ignored | **an error** |
 | Selectors and cascade | yes | inline styles have none; `.trellis` files have file-scoped type, class and id selectors only |
-| Units | many | `px`, `%` and `auto` (plus `fr` in v1.1) |
+| Units | many | `px`, `%` and `auto` (plus `fr` in v1.1), and the size keywords `min-content`, `max-content`, `fit-content` and `stretch` (since 0.8) |
 
 ## 5. The agent loop: trellis-render and trellis-lint
 

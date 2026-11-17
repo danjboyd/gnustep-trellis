@@ -40,8 +40,16 @@ typedef NS_ENUM(unsigned char, TRUnit) {
   TRUnitUndefined = 0,  /* e.g. max-width: none */
   TRUnitAuto,
   TRUnitPoint,          /* CSS px; 1px = 1 point */
-  TRUnitPercent
+  TRUnitPercent,
+  /* Intrinsic size keywords (css-sizing-3/4), for width, height, their
+     min/max and flex-basis only. */
+  TRUnitMinContent,
+  TRUnitMaxContent,
+  TRUnitFitContent,
+  TRUnitStretch
 };
+
+static inline BOOL TRUnitIsIntrinsic(TRUnit u) { return u >= TRUnitMinContent; }
 
 /* A CSS length-percentage-or-auto. */
 typedef struct { TRFloat value; TRUnit unit; } TRValue;

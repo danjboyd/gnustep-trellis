@@ -294,6 +294,140 @@ static TRSize TRLayoutLeaf(TRNode *node, const TRStyleStorage *s, const TREdges 
 }
 
 /* ------------------------------------------------------------------ */
+#pragma mark Intrinsic size keywords
+
+static inline BOOL TRStorageHasSizeKeyword(const TRStyleStorage *s)
+{
+  return TRUnitIsIntrinsic(s->width.unit) || TRUnitIsIntrinsic(s->height.unit)
+    || TRUnitIsIntrinsic(s->minWidth.unit) || TRUnitIsIntrinsic(s->maxWidth.unit)
+    || TRUnitIsIntrinsic(s->minHeight.unit) || TRUnitIsIntrinsic(s->maxHeight.unit)
+    || TRUnitIsIntrinsic(s->flexBasis.unit);
+}
+
+/* A border-box size as a value in the box's own box-sizing. */
+static inline TRValue TRSizeValue(const TRStyleStorage *s, TRFloat borderBox, TRFloat pb)
+{
+  return TRPx(s->boxSizing == TRBoxSizingContentBox ? TRMax(0, borderBox - pb) : borderBox);
+}
+
+/* The min-content width (border box) of a box (css-sizing-3 5.1). A flex
+   container sums its items' min-content contributions (one line) or takes
+   the largest (wrapping, or a column); a contribution is the item's
+   definite width or its own min-content width, clamped by its min/max,
+   plus margins (css-flexbox 9.9.1). Leaves and grids are laid out into
+   zero width. */
+static TRFloat TRMinContentWidth(TRNode *node, const TRStyleStorage *s, TRFloat refW, TRFloat refH, TRDirection dir)
+{
+  BOOL any = NO;
+  for (TRNode *c in node->_children)
+    if (!TRNodeIsNone(c) && c->_style->_s.position != TRPositionAbsolute) { any = YES; break; }
+  if (!any || s->display == TRDisplayGrid || node->_measure != nil)
+    return TRLayoutNode(node, 0, TRUndefined, TRMeasureModeAtMost, TRMeasureModeUndefined, refW, refH, NO, dir).width;
+  TREdges e = TRResolveEdges(s, refW);
+  TRFloat pbW = TRPBHorizontal(&e);
+  BOOL row = s->display != TRDisplayBlock
+    && (s->flexDirection == TRFlexDirectionRow || s->flexDirection == TRFlexDirectionRowReverse);
+  BOOL sum = row && s->flexWrap == TRFlexWrapNoWrap;
+  TRFloat gap = TRMax(0, TRDefault(TRResolve(s->columnGap, TRUndefined), 0));
+  TRFloat total = 0;
+  NSInteger count = 0;
+  for (TRNode *c in node->_children)
+    {
+      if (TRNodeIsNone(c) || c->_style->_s.position == TRPositionAbsolute) continue;
+      const TRStyleStorage *cs = TRChildStyle(c, dir);
+      TREdges ce = TRResolveEdges(cs, TRUndefined);
+      TRFloat cpb = TRPBHorizontal(&ce);
+      TRFloat w = TRBoxSize(cs, cs->width, TRUndefined, cpb);
+      if (isnan(w))
+        {
+          TRDirection cd = cs->direction == TRDirectionInherit ? dir : cs->direction;
+          w = TRMinContentWidth(c, cs, TRUndefined, TRUndefined, cd);
+        }
+      w = TRMax(TRClamp(w, TRBoxSize(cs, cs->minWidth, TRUndefined, cpb), TRBoxSize(cs, cs->maxWidth, TRUndefined, cpb)), cpb);
+      w += TRDefault(TRResolve(cs->margin[TREdgeLeft], TRUndefined), 0) + TRDefault(TRResolve(cs->margin[TREdgeRight], TRUndefined), 0);
+      total = sum ? total + w : TRMax(total, w);
+      count++;
+    }
+  if (sum && count > 1) total += gap * (count - 1);
+  return TRMax(total, 0) + pbW;
+}
+
+const TRStyleStorage *TRResolveSizeKeywords(TRNode *c, const TRStyleStorage *cs, TRStyleStorage *buf,
+                                            TRFloat availW, TRFloat availH, TRFloat refW, TRFloat refH,
+                                            BOOL mainIsWidth, TRDirection dir)
+{
+  if (!TRStorageHasSizeKeyword(cs)) return cs;
+  *buf = *cs;
+  TREdges e = TRResolveEdges(cs, refW);
+  TRFloat pbW = TRPBHorizontal(&e), pbH = TRPBVertical(&e);
+  TRFloat mh = TRDefault(TRResolve(cs->margin[TREdgeLeft], refW), 0) + TRDefault(TRResolve(cs->margin[TREdgeRight], refW), 0);
+  TRFloat mv = TRDefault(TRResolve(cs->margin[TREdgeTop], refW), 0) + TRDefault(TRResolve(cs->margin[TREdgeBottom], refW), 0);
+
+  /* Widths: min-content is the narrowest layout, max-content the widest,
+     fit-content max-content clamped to the space (but not below
+     min-content), stretch the space less margins. */
+  __block TRFloat minC = TRUndefined, maxC = TRUndefined;
+  TRDirection cdir = cs->direction == TRDirectionInherit ? dir : cs->direction;
+  #define TR_MINC (isnan(minC) ? (minC = TRMinContentWidth(c, cs, refW, refH, cdir)) : minC)
+  #define TR_MAXC (isnan(maxC) ? (maxC = TRLayoutNode(c, TRUndefined, TRUndefined, TRMeasureModeUndefined, TRMeasureModeUndefined, refW, refH, NO, dir).width) : maxC)
+  TRFloat (^widthFor)(TRUnit) = ^TRFloat(TRUnit u) {
+    switch (u)
+      {
+        case TRUnitMinContent: return TR_MINC;
+        case TRUnitMaxContent: return TR_MAXC;
+        case TRUnitFitContent:
+          if (isnan(availW)) return TR_MAXC;
+          return TRMin(TR_MAXC, TRMax(TR_MINC, availW - mh));
+        case TRUnitStretch: return isnan(availW) ? TRUndefined : TRMax(pbW, availW - mh);
+        default: return TRUndefined;
+      }
+  };
+  #undef TR_MINC
+  #undef TR_MAXC
+  #define TR_FIX_W(FIELD, EMPTY) \
+    if (TRUnitIsIntrinsic(cs->FIELD.unit)) { TRFloat v = widthFor(cs->FIELD.unit); \
+      buf->FIELD = isnan(v) ? EMPTY : TRSizeValue(cs, v, pbW); }
+  TR_FIX_W(width, TRAuto)
+  TR_FIX_W(minWidth, TRAuto)
+  TR_FIX_W(maxWidth, TRNone)
+  #undef TR_FIX_W
+
+  /* Heights (horizontal writing): the content keywords are all the content
+     height at the box's width; stretch is the space less margins. */
+  __block TRFloat contentH = TRUndefined;
+  TRFloat (^heightFor)(TRUnit) = ^TRFloat(TRUnit u) {
+    if (u == TRUnitStretch) return isnan(availH) ? TRUndefined : TRMax(pbH, availH - mv);
+    if (isnan(contentH))
+      {
+        TRFloat w = TRBoxSize(buf, buf->width, refW, pbW);
+        if (!isnan(w))
+          w = TRMax(TRClamp(w, TRBoxSize(buf, buf->minWidth, refW, pbW), TRBoxSize(buf, buf->maxWidth, refW, pbW)), pbW);
+        TRMeasureMode wm = !isnan(w) ? TRMeasureModeExactly : (isnan(availW) ? TRMeasureModeUndefined : TRMeasureModeAtMost);
+        if (isnan(w) && !isnan(availW)) w = TRMax(0, availW - mh);
+        contentH = TRLayoutNode(c, w, TRUndefined, wm, TRMeasureModeUndefined, refW, refH, NO, dir).height;
+      }
+    return contentH;
+  };
+  #define TR_FIX_H(FIELD, EMPTY) \
+    if (TRUnitIsIntrinsic(cs->FIELD.unit)) { TRFloat v = heightFor(cs->FIELD.unit); \
+      buf->FIELD = isnan(v) ? EMPTY : TRSizeValue(cs, v, pbH); }
+  TR_FIX_H(height, TRAuto)
+  TR_FIX_H(minHeight, TRAuto)
+  TR_FIX_H(maxHeight, TRNone)
+  #undef TR_FIX_H
+
+  /* flex-basis: the keyword's size in the main axis; stretch acts as
+     content, as in Yoga (browsers differ). */
+  if (cs->flexBasis.unit == TRUnitStretch) buf->flexBasis = TRAuto;
+  else if (TRUnitIsIntrinsic(cs->flexBasis.unit))
+    {
+      TRFloat v = mainIsWidth ? widthFor(cs->flexBasis.unit) : heightFor(cs->flexBasis.unit);
+      buf->flexBasis = isnan(v) ? TRAuto : TRSizeValue(cs, v, mainIsWidth ? pbW : pbH);
+    }
+  return buf;
+}
+
+/* ------------------------------------------------------------------ */
 #pragma mark Absolute positioning
 
 /* justify-content as flex-start / flex-end / center / space-*: normal and
@@ -378,7 +512,8 @@ static void TRLayoutAbsChild(TRNode *c, TRDirection cbDir, TRFloat cbX, TRFloat 
                              const TRStyleStorage *ps, TRDirection pdir, TRFloat pW, TRFloat pH,
                              const TRFloat ppad[4], const TRFloat pborder[4])
 {
-  const TRStyleStorage *cs = TRChildStyle(c, pdir);
+  TRStyleStorage kwBuf;
+  const TRStyleStorage *cs = TRResolveSizeKeywords(c, TRChildStyle(c, pdir), &kwBuf, cbW, cbH, cbW, cbH, YES, pdir);
   c->_pctIndefH = NO;
   TREdges ce = TRResolveEdges(cs, cbW);
   TRFloat cpbW = TRPBHorizontal(&ce), cpbH = TRPBVertical(&ce);
@@ -543,6 +678,7 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
   NSArray<TRNode *> *children = node->_children;
   NSUInteger nChildren = [children count];
   TRItem *items = calloc(nChildren ? nChildren : 1, sizeof(TRItem));
+  TRStyleStorage *kwBufs = NULL;   /* items' styles with size keywords resolved */
   NSInteger n = 0;
   for (NSUInteger ci = 0; ci < nChildren; ci++)
     {
@@ -557,6 +693,11 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
       TRItem *it = &items[n++];
       it->node = child;
       it->s = cs;
+      if (TRStorageHasSizeKeyword(cs))
+        {
+          if (kwBufs == NULL) kwBufs = malloc((nChildren ? nChildren : 1) * sizeof(TRStyleStorage));
+          it->s = TRResolveSizeKeywords(child, cs, &kwBufs[n - 1], innerW, innerH, refW, refH, isRow, dir);
+        }
       it->line = (NSInteger)ci;   /* document order, for the stable sort */
     }
   if (n > 1) qsort(items, (size_t)n, sizeof(TRItem), TRCompareOrder);
@@ -1141,6 +1282,7 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
 
   free(lines);
   free(items);
+  free(kwBufs);
   return TRSizeMake(W, H);
 }
 

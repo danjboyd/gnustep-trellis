@@ -173,7 +173,10 @@ static void TRClearDirty(TRNode *n)
 - (void)_layoutOnceWithAvailableSize:(TRSize)available direction:(TRDirection)direction
 {
   TRDirection own = _style->_s.direction == TRDirectionInherit ? direction : _style->_s.direction;
-  const TRStyleStorage *s = TRStyleStorageForDirection(_style, own);
+  TRStyleStorage kwBuf;
+  const TRStyleStorage *s = TRResolveSizeKeywords(self, TRStyleStorageForDirection(_style, own), &kwBuf,
+                                                  available.width, available.height,
+                                                  available.width, available.height, YES, own);
   TRFloat aw = available.width, ah = available.height;
   TRMeasureMode wm = isnan(aw) ? TRMeasureModeUndefined : TRMeasureModeExactly;
   TRMeasureMode hm = isnan(ah) ? TRMeasureModeUndefined : TRMeasureModeExactly;

@@ -229,7 +229,10 @@ collapses as in HTML, and the runs follow the label's `color`,
   circle reaches another control (WCAG 2.2, 2.5.8). Desktop controls about
   22 px tall pass with a normal gap; tight rows of small icon buttons
   don't. Give them `min-width`/`min-height: 24px` or a `gap`.
-- **Units:** `px`, `%` and `auto`.
+- **Units:** `px`, `%` and `auto`. `width`, `height`, their `min-`/`max-`
+  forms and `flex-basis` also take `min-content`, `max-content`,
+  `fit-content` and `stretch` (since 0.8; `flex-basis: stretch` acts as
+  `content`, as in Yoga).
 - **Selectors:** `type`, `.class`, `#id`, `a b`, `a > b`, and comma
   lists. **Not supported:** `:hover` and other pseudo-classes, attribute
   selectors, `+`, `~`, and `!important` ordering.

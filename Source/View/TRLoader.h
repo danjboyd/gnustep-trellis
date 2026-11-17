@@ -6,6 +6,7 @@
 
 #import <AppKit/AppKit.h>
 #import "TRBoxView.h"
+#import "TRViewMeasure.h"
 #import "TRMarkup.h"
 
 /* Elements and what they build:
@@ -114,6 +115,15 @@ void TRUpdateThemeTokens(void);
 - (BOOL)activateLinkAtCharacterIndex:(NSUInteger)index;
 /* Where the run with this index draws (for tests and cursor rects). */
 - (NSRect)rectForLinkAtRun:(NSUInteger)runIndex;
+@end
+
+/* <segmented>: an NSSegmentedControl whose segments share its width
+   equally and that asks for room to fit its longest label in every
+   segment, in the regular and the bold face (themes draw either).
+   selectedTitles lists the selected segments' labels; setting it selects
+   exactly those. */
+@interface TRSegmentedControl : NSSegmentedControl <TRSizeForWidth>
+@property (nonatomic, copy) NSArray<NSString *> *selectedTitles;
 @end
 
 /* An NSScrollView whose document view is a Trellis column. */

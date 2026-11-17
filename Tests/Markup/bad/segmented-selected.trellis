@@ -1,0 +1,4 @@
+<!-- expect: selected="Grid": no item has that title -->
+<row>
+  <segmented items="Tiles, Table" selected="Grid"/>
+</row>

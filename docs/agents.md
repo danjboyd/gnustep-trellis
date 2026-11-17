@@ -67,7 +67,8 @@ the user's settings. trellis-render refuses to run without it.
 - **Elements:** `column`, `row`, `box`, `scroll`, `label`, `text` (a
   wrapping label), `field`, `button`, `checkbox`, `radio`, `popup` (with
   `<item>` children or `items="A, B"`), `image`, `slider`, `progress`,
-  `separator`, `spacer`, `split` (resizable panes, since 0.5), `virtual`,
+  `separator`, `spacer`, `segmented` (since 0.5), `split` (resizable
+  panes, since 0.5), `virtual`,
   and `view type="MyNSViewSubclass"`.
 - **Text:** put a label's or button's text in its content:
   `<button>Save</button>`.
@@ -78,6 +79,14 @@ the user's settings. trellis-render refuses to run without it.
 - **Flat buttons:** `<button bordered="no">` draws the title only (chips
   on a coloured bar); `color:` colours a button's title. Setting the
   title later in code drops the colour: set `attributedTitle` instead.
+- **Segmented controls (since 0.5):** `<segmented action="viewChanged:"
+  selected="Tiles"><item>Tiles</item><item>Table</item></segmented>` (or
+  `items="Tiles, Table"`). `tracking="one"` (default: a switch),
+  `"any"` (toggles; mark several with `<item selected="yes">`) or
+  `"momentary"` (buttons). Segments share the width equally and the
+  control asks for room for its longest label. In code it's a
+  `TRSegmentedControl`: `selectedTitles` reads and sets the selection; in
+  a sample file, `{"selected": "Table"}` or a list of titles.
 - **Hiding (since 0.5):** `hidden` (or `hidden="yes"`) starts an element
   hidden; in code, `[box setHidden: NO forSubview: view]` shows it again.
   A hidden view is laid out as if `display: none`, but its style is left

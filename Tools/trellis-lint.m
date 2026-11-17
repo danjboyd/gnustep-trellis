@@ -289,6 +289,39 @@ static void TRLintTrellis(NSString *path, NSString *header)
         if (c.attributes[@"hidden"])
           TRReport(where, @"error", @"split", @"a <split> pane can't be hidden (not supported yet)");
     }
+  /* <segmented>: items, tracking, selection. */
+  for (TRMarkupElement *e in [doc allElements])
+    {
+      if (![e.name isEqualToString: @"segmented"]) continue;
+      NSString *where = [NSString stringWithFormat: @"%@:%lu:%lu", path, (unsigned long)e.line, (unsigned long)e.column];
+      NSMutableArray *titles = [NSMutableArray array];
+      NSUInteger chosen = 0;
+      for (TRMarkupElement *c in e.children)
+        {
+          if (![c.name isEqualToString: @"item"])
+            {
+              TRReport(where, @"error", @"segmented", [NSString stringWithFormat:
+                @"<segmented> may only contain <item> elements, not <%@>", c.name]);
+              continue;
+            }
+          NSString *sel = c.attributes[@"selected"];
+          if ([sel isEqualToString: @"yes"] || [sel isEqualToString: @"true"]) chosen++;
+          [titles addObject: c.attributes[@"title"] ?: [c text] ?: @""];
+        }
+      for (NSString *t in [e.attributes[@"items"] componentsSeparatedByString: @","])
+        [titles addObject: [t stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]]];
+      if ([titles count] == 0)
+        TRReport(where, @"error", @"segmented", @"<segmented> has no items (use <item> children or items=\"A, B\")");
+      NSString *tracking = e.attributes[@"tracking"] ?: @"one";
+      if (![tracking isEqualToString: @"one"] && ![tracking isEqualToString: @"any"] && ![tracking isEqualToString: @"momentary"])
+        TRReport(where, @"error", @"segmented", [NSString stringWithFormat: @"tracking=\"%@\": use one, any or momentary", tracking]);
+      NSString *sel = e.attributes[@"selected"];
+      if (sel && ![titles containsObject: sel])
+        TRReport(where, @"error", @"segmented", [NSString stringWithFormat: @"selected=\"%@\": no item has that title", sel]);
+      if (sel) chosen++;
+      if ([tracking isEqualToString: @"one"] && chosen > 1)
+        TRReport(where, @"error", @"segmented", @"<segmented tracking=\"one\"> can select only one item");
+    }
   TRLintColours(doc, path);
   TRLintAccessibility(doc, path);
   if (header == nil) return;

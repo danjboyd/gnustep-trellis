@@ -390,6 +390,44 @@ static NSArray *TRCollapseRuns(NSArray *runs)
 
 static NSString *const TRRunAttributeName = @"TRRunIndex";
 
+@implementation TRSegmentedControl
+
+- (NSSize)trellisSizeForWidth:(CGFloat)width
+{
+  NSFont *f = [self font] ?: [NSFont systemFontOfSize: 0];
+  NSFont *bold = [[NSFontManager sharedFontManager] convertFont: f toHaveTrait: NSBoldFontMask];
+  CGFloat widest = 0;
+  NSInteger n = [self segmentCount];
+  for (NSInteger i = 0; i < n; i++)
+    {
+      NSString *l = [self labelForSegment: i] ?: @"";
+      for (NSFont *font in bold ? @[f, bold] : @[f])
+        widest = MAX(widest, [l sizeWithAttributes: @{NSFontAttributeName: font}].width);
+    }
+  NSSize cell = TRCellSize([self cell]);
+  CGFloat h = MAX(cell.height, ceil([f ascender] - [f descender]) + 8);
+  CGFloat w = n * (ceil(widest) + 24) + 2;
+  return NSMakeSize(MAX(w, cell.width), MAX(h, 24));
+}
+
+- (NSArray<NSString *> *)selectedTitles
+{
+  NSMutableArray *a = [NSMutableArray array];
+  for (NSInteger i = 0; i < [self segmentCount]; i++)
+    if ([self isSelectedForSegment: i]) [a addObject: [self labelForSegment: i] ?: @""];
+  return a;
+}
+
+- (void)setSelectedTitles:(NSArray<NSString *> *)titles
+{
+  for (NSInteger i = 0; i < [self segmentCount]; i++)
+    [self setSelected: [titles containsObject: [self labelForSegment: i] ?: @""] forSegment: i];
+}
+
+@end
+
+/* ------------------------------------------------------------------ */
+
 @implementation TRRichLabel
 {
   NSArray *_runs;
@@ -744,6 +782,65 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
       if (a[@"selected"]) [p selectItemWithTitle: a[@"selected"]];
       v = p;
     }
+  else if ([n isEqualToString: @"segmented"])
+    {
+      NSMutableArray *titles = [NSMutableArray array];
+      NSMutableIndexSet *chosen = [NSMutableIndexSet indexSet];
+      for (TRMarkupElement *c in e.children)
+        {
+          if (![c.name isEqualToString: @"item"])
+            {
+              if (error) *error = TRLoadError(doc, c, @"<segmented> may only contain <item> elements, not <%@>", c.name);
+              return nil;
+            }
+          if (TRYes(c.attributes[@"selected"])) [chosen addIndex: [titles count]];
+          [titles addObject: c.attributes[@"title"] ?: [c text] ?: @""];
+        }
+      if (a[@"items"])
+        for (NSString *t in [a[@"items"] componentsSeparatedByString: @","])
+          [titles addObject: [t stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]]];
+      if ([titles count] == 0)
+        {
+          if (error) *error = TRLoadError(doc, e, @"<segmented> has no items (use <item> children or items=\"A, B\")");
+          return nil;
+        }
+      NSString *tracking = a[@"tracking"] ?: @"one";
+      NSSegmentSwitchTracking mode;
+      if ([tracking isEqualToString: @"one"]) mode = NSSegmentSwitchTrackingSelectOne;
+      else if ([tracking isEqualToString: @"any"]) mode = NSSegmentSwitchTrackingSelectAny;
+      else if ([tracking isEqualToString: @"momentary"]) mode = NSSegmentSwitchTrackingMomentary;
+      else
+        {
+          if (error) *error = TRLoadError(doc, e, @"<segmented tracking=\"%@\">: use one, any or momentary", tracking);
+          return nil;
+        }
+      if (a[@"selected"])
+        {
+          NSUInteger i = [titles indexOfObject: a[@"selected"]];
+          if (i == NSNotFound)
+            {
+              if (error) *error = TRLoadError(doc, e, @"<segmented selected=\"%@\">: no item has that title", a[@"selected"]);
+              return nil;
+            }
+          [chosen addIndex: i];
+        }
+      if (mode == NSSegmentSwitchTrackingSelectOne && [chosen count] > 1)
+        {
+          if (error) *error = TRLoadError(doc, e, @"<segmented tracking=\"one\"> can select only one item");
+          return nil;
+        }
+      TRSegmentedControl *sc = [[TRSegmentedControl alloc] initWithFrame: NSMakeRect(0, 0, 100, 24)];
+      [sc setSegmentCount: [titles count]];
+      [[sc cell] setTrackingMode: mode];
+      for (NSUInteger i = 0; i < [titles count]; i++)
+        {
+          [sc setLabel: titles[i] forSegment: i];
+          [sc setWidth: 0 forSegment: i];   /* size to the label */
+        }
+      for (NSUInteger i = [chosen firstIndex]; i != NSNotFound; i = [chosen indexGreaterThanIndex: i])
+        [sc setSelected: YES forSegment: i];
+      v = sc;
+    }
   else if ([n isEqualToString: @"image"])
     {
       NSImageView *iv = [[NSImageView alloc] initWithFrame: NSMakeRect(0, 0, 10, 10)];
@@ -834,7 +931,8 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
       container = NO;
     }
 
-  if (!container && ![n isEqualToString: @"popup"] && ![n isEqualToString: @"scroll"]
+  if (!container && ![n isEqualToString: @"popup"] && ![n isEqualToString: @"segmented"]
+      && ![n isEqualToString: @"scroll"]
       && ![n isEqualToString: @"virtual"] && ![n isEqualToString: @"split"]
       && ![v isKindOfClass: [TRRichLabel class]] && [e.children count])
     {
@@ -1207,6 +1305,12 @@ static NSView *TRFindView(NSString *identifier, NSView *root)
           NSArray *items = [val isKindOfClass: [NSArray class]] ? val : d[@"items"];
           if (items) { [(NSPopUpButton *)v removeAllItems]; [(NSPopUpButton *)v addItemsWithTitles: items]; }
           if (d[@"selected"]) [(NSPopUpButton *)v selectItemWithTitle: d[@"selected"]];
+        }
+      else if ([v isKindOfClass: [TRSegmentedControl class]])
+        {
+          id sel = d[@"selected"] ?: str;
+          if ([sel isKindOfClass: [NSString class]]) sel = @[sel];
+          if ([sel isKindOfClass: [NSArray class]]) [(TRSegmentedControl *)v setSelectedTitles: sel];
         }
       else if ([v isKindOfClass: [NSButton class]])
         {

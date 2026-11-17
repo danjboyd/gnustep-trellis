@@ -16,6 +16,10 @@ version may change the API listed in docs/api.md, and says so here.
   the default theme (whose selection colour is white) they drew white on
   white; they now fall back to a fixed blue. Adwaita and Gumdrop keep
   their own selection blue.
+- `<segmented>` and `TRSegmentedControl`: a segmented control with
+  `<item>` children or `items=`, `tracking=one|any|momentary`, a
+  selection by title in markup, code (`selectedTitles`) and sample files,
+  sized so every label fits in the bold face too.
 - `<split>` and `TRSplitView`: resizable panes, sized from each pane's
   CSS (starting size, min/max, flex-grow), with divider positions kept
   under `autosave=` and readable and settable in code.

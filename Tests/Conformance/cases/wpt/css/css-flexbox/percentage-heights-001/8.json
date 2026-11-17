@@ -12,7 +12,7 @@
  "pixelScale": 0,
  "available": {
   "width": 784,
-  "height": null
+  "height": 800
  },
  "root": {
   "style": {

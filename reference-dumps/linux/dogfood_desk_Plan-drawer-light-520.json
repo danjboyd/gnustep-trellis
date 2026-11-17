@@ -1,0 +1,2523 @@
+{
+ "appearance": "light",
+ "lint": [],
+ "root": {
+  "background": "#aaaaaa",
+  "children": [
+   {
+    "background": "#1c1d1f",
+    "children": [
+     {
+      "baseline": 12,
+      "class": "NSButton",
+      "container": {
+       "matched": [
+        "(max-width: 639px)"
+       ]
+      },
+      "height": 19,
+      "id": "railToggle",
+      "interactive": true,
+      "intrinsic": {
+       "height": 19,
+       "width": 44
+      },
+      "style": "color: #e4e5e8",
+      "textColor": "#e4e5e8",
+      "title": "\u2630 Rail",
+      "width": 44,
+      "x": 16,
+      "y": 8
+     },
+     {
+      "baseline": 12,
+      "class": "NSTextField",
+      "height": 15,
+      "intrinsic": {
+       "height": 15,
+       "width": 63
+      },
+      "needed": {
+       "height": 15,
+       "width": 63
+      },
+      "style": "color: #ffffff; font-weight: bold",
+      "text": "Helpdesk",
+      "textColor": "#ffffff",
+      "width": 63,
+      "x": 76,
+      "y": 10
+     },
+     {
+      "children": [
+       {
+        "baseline": 12,
+        "class": "NSButton",
+        "height": 19,
+        "interactive": true,
+        "intrinsic": {
+         "height": 19,
+         "width": 53
+        },
+        "style": "color: #ffffff; font-weight: bold",
+        "textColor": "#ffffff",
+        "title": "Mine 5",
+        "width": 53,
+        "x": 0,
+        "y": 0
+       },
+       {
+        "background": "#f6c08a",
+        "children": [
+         {
+          "baseline": 12,
+          "class": "NSTextField",
+          "height": 15,
+          "intrinsic": {
+           "height": 15,
+           "width": 52
+          },
+          "needed": {
+           "height": 15,
+           "width": 52
+          },
+          "style": "color: #3b1d03; font-weight: bold",
+          "text": "1 hotfix",
+          "textColor": "#3b1d03",
+          "width": 52,
+          "x": 8,
+          "y": 2
+         }
+        ],
+        "class": "TRBoxView",
+        "height": 19,
+        "style": "padding-left: 8px; padding-top: 2px; padding-right: 8px; padding-bottom: 2px; background-color: #f6c08a; border-radius: 4px",
+        "width": 68,
+        "x": 67,
+        "y": 0
+       },
+       {
+        "baseline": 12,
+        "class": "NSButton",
+        "container": {
+         "matched": [
+          "(max-width: 639px)"
+         ]
+        },
+        "height": 10,
+        "hidden": true,
+        "intrinsic": {
+         "height": 19,
+         "width": 76
+        },
+        "style": "display: none; color: #e4e5e8",
+        "textColor": "#e4e5e8",
+        "title": "5 need you",
+        "width": 10,
+        "x": 0,
+        "y": 0
+       },
+       {
+        "baseline": 12,
+        "class": "NSButton",
+        "container": {
+         "matched": [
+          "(max-width: 639px)"
+         ]
+        },
+        "height": 10,
+        "hidden": true,
+        "intrinsic": {
+         "height": 19,
+         "width": 91
+        },
+        "style": "display: none; color: #e4e5e8",
+        "textColor": "#e4e5e8",
+        "title": "6 with agents",
+        "width": 10,
+        "x": 0,
+        "y": 0
+       },
+       {
+        "baseline": 12,
+        "class": "NSButton",
+        "container": {
+         "matched": [
+          "(max-width: 639px)"
+         ]
+        },
+        "height": 10,
+        "hidden": true,
+        "intrinsic": {
+         "height": 19,
+         "width": 114
+        },
+        "style": "display: none; color: #e4e5e8",
+        "textColor": "#e4e5e8",
+        "title": "2 with requesters",
+        "width": 10,
+        "x": 0,
+        "y": 0
+       },
+       {
+        "baseline": 12,
+        "class": "NSButton",
+        "container": {
+         "matched": [
+          "(max-width: 639px)"
+         ]
+        },
+        "height": 10,
+        "hidden": true,
+        "intrinsic": {
+         "height": 19,
+         "width": 67
+        },
+        "style": "display: none; color: #e4e5e8",
+        "textColor": "#e4e5e8",
+        "title": "2 blocked",
+        "width": 10,
+        "x": 0,
+        "y": 0
+       }
+      ],
+      "class": "TRBoxView",
+      "height": 19,
+      "id": "pulse",
+      "style": "flex-wrap: wrap; align-items: center; row-gap: 6px; column-gap: 14px",
+      "width": 135,
+      "x": 155,
+      "y": 8
+     },
+     {
+      "baseline": 0,
+      "class": "NSView",
+      "container": {
+       "matched": [
+        "(max-width: 639px)"
+       ]
+      },
+      "height": 0,
+      "hidden": true,
+      "style": "display: none; flex-grow: 1; flex-basis: 0%",
+      "width": 0,
+      "x": 0,
+      "y": 0
+     },
+     {
+      "children": [
+       {
+        "baseline": 12,
+        "class": "NSTextField",
+        "height": 15,
+        "id": "oldestWait",
+        "intrinsic": {
+         "height": 15,
+         "width": 91
+        },
+        "needed": {
+         "height": 15,
+         "width": 91
+        },
+        "style": "color: #e4e5e8",
+        "text": "Oldest wait 3 h",
+        "textColor": "#e4e5e8",
+        "width": 91,
+        "x": 0,
+        "y": 0
+       },
+       {
+        "baseline": 12,
+        "class": "NSTextField",
+        "height": 15,
+        "id": "unheard",
+        "intrinsic": {
+         "height": 15,
+         "width": 125
+        },
+        "needed": {
+         "height": 15,
+         "width": 125
+        },
+        "style": "color: #e4e5e8",
+        "text": "1 unheard over 24 h",
+        "textColor": "#e4e5e8",
+        "width": 125,
+        "x": 107,
+        "y": 0
+       }
+      ],
+      "class": "TRBoxView",
+      "height": 15,
+      "style": "flex-wrap: wrap; align-items: center; row-gap: 4px; column-gap: 16px",
+      "width": 232,
+      "x": 16,
+      "y": 35
+     }
+    ],
+    "class": "TRBoxView",
+    "height": 58,
+    "id": "topBar",
+    "style": "flex-wrap: wrap; align-items: center; padding-left: 16px; padding-top: 8px; padding-right: 16px; padding-bottom: 8px; row-gap: 8px; column-gap: 16px; background-color: #1c1d1f",
+    "width": 520,
+    "x": 0,
+    "y": 0
+   },
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "baseline": 15,
+        "class": "NSTextField",
+        "editable": true,
+        "height": 0,
+        "id": "filter",
+        "interactive": true,
+        "intrinsic": {
+         "height": 21,
+         "width": 18
+        },
+        "width": 0,
+        "x": 0,
+        "y": 0
+       },
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "baseline": 15,
+              "class": "NSTextField",
+              "height": 22,
+              "intrinsic": {
+               "height": 14,
+               "width": 86
+              },
+              "needed": {
+               "height": 14,
+               "width": 86
+              },
+              "style": "padding-left: 8px; padding-top: 4px; padding-right: 8px; padding-bottom: 4px; font-size: 11px; font-weight: bold",
+              "text": "Your move \u00b7 5",
+              "textColor": "#000000",
+              "width": 16,
+              "x": 0,
+              "y": 0
+             },
+             {
+              "baseline": 14,
+              "class": "NSTextField",
+              "height": 20,
+              "intrinsic": {
+               "height": 14,
+               "width": 37
+              },
+              "needed": {
+               "height": 14,
+               "width": 37
+              },
+              "style": "padding-left: 8px; padding-top: 6px; padding-right: 8px; color: -tr-error; font-size: 11px; font-weight: bold",
+              "text": "Hotfix",
+              "textColor": "#ff0000",
+              "width": 16,
+              "x": 0,
+              "y": 24
+             },
+             {
+              "background": "#aaaaaa",
+              "children": [
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 555,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 270
+                },
+                "needed": {
+                 "height": 555,
+                 "width": 0
+                },
+                "style": "color: HighlightText",
+                "text": "Login page returns 500 after password reset",
+                "textColor": "#000000",
+                "width": 0,
+                "x": 8,
+                "y": 6
+               },
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 285,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 151
+                },
+                "needed": {
+                 "height": 285,
+                 "width": 0
+                },
+                "style": "color: HighlightText; font-size: 12px",
+                "text": "Plan \u00b7 Sam Ortiz \u00b7 12 min",
+                "textColor": "#000000",
+                "width": 0,
+                "x": 8,
+                "y": 562
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 853,
+              "style": "flex-direction: column; padding-left: 8px; padding-top: 6px; padding-right: 8px; padding-bottom: 6px; row-gap: 1px; column-gap: 1px; background-color: Highlight; border-radius: 6px",
+              "width": 16,
+              "x": 0,
+              "y": 46
+             },
+             {
+              "baseline": 14,
+              "class": "NSTextField",
+              "height": 20,
+              "intrinsic": {
+               "height": 14,
+               "width": 118
+              },
+              "needed": {
+               "height": 14,
+               "width": 118
+              },
+              "style": "padding-left: 8px; padding-top: 6px; padding-right: 8px; color: GrayText; font-size: 11px; font-weight: bold",
+              "text": "Replies and stalled",
+              "textColor": "#000000",
+              "width": 16,
+              "x": 0,
+              "y": 901
+             },
+             {
+              "children": [
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 465,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 213
+                },
+                "needed": {
+                 "height": 465,
+                 "width": 0
+                },
+                "text": "Invoice totals differ from the ledger",
+                "textColor": "#000000",
+                "width": 0,
+                "x": 8,
+                "y": 6
+               },
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 360,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 184
+                },
+                "needed": {
+                 "height": 360,
+                 "width": 0
+                },
+                "style": "color: GrayText; font-size: 12px",
+                "text": "New reply \u00b7 Priya Nair \u00b7 40 min",
+                "textColor": "#000000",
+                "width": 0,
+                "x": 8,
+                "y": 472
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 838,
+              "style": "flex-direction: column; padding-left: 8px; padding-top: 6px; padding-right: 8px; padding-bottom: 6px; row-gap: 1px; column-gap: 1px; border-radius: 6px",
+              "width": 16,
+              "x": 0,
+              "y": 923
+             },
+             {
+              "baseline": 14,
+              "class": "NSTextField",
+              "height": 20,
+              "intrinsic": {
+               "height": 14,
+               "width": 37
+              },
+              "needed": {
+               "height": 14,
+               "width": 37
+              },
+              "style": "padding-left: 8px; padding-top: 6px; padding-right: 8px; color: GrayText; font-size: 11px; font-weight: bold",
+              "text": "Verify",
+              "textColor": "#000000",
+              "width": 16,
+              "x": 0,
+              "y": 1763
+             },
+             {
+              "children": [
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 585,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 292
+                },
+                "needed": {
+                 "height": 585,
+                 "width": 0
+                },
+                "text": "Dashboard chart shows the wrong fiscal quarter",
+                "textColor": "#000000",
+                "width": 0,
+                "x": 8,
+                "y": 6
+               },
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 375,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 197
+                },
+                "needed": {
+                 "height": 375,
+                 "width": 0
+                },
+                "style": "color: GrayText; font-size: 12px",
+                "text": "agent-web \u00b7 Dana Whitfield \u00b7 1 h",
+                "textColor": "#000000",
+                "width": 0,
+                "x": 8,
+                "y": 592
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 973,
+              "style": "flex-direction: column; padding-left: 8px; padding-top: 6px; padding-right: 8px; padding-bottom: 6px; row-gap: 1px; column-gap: 1px; border-radius: 6px",
+              "width": 16,
+              "x": 0,
+              "y": 1785
+             },
+             {
+              "baseline": 14,
+              "class": "NSTextField",
+              "height": 20,
+              "intrinsic": {
+               "height": 14,
+               "width": 27
+              },
+              "needed": {
+               "height": 14,
+               "width": 27
+              },
+              "style": "padding-left: 8px; padding-top: 6px; padding-right: 8px; color: GrayText; font-size: 11px; font-weight: bold",
+              "text": "Plan",
+              "textColor": "#000000",
+              "width": 16,
+              "x": 0,
+              "y": 2760
+             },
+             {
+              "children": [
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 435,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 218
+                },
+                "needed": {
+                 "height": 435,
+                 "width": 0
+                },
+                "text": "Search is slow on the contacts page",
+                "textColor": "#000000",
+                "width": 0,
+                "x": 8,
+                "y": 6
+               },
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 345,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 181
+                },
+                "needed": {
+                 "height": 345,
+                 "width": 0
+                },
+                "style": "color: GrayText; font-size: 12px",
+                "text": "agent-data \u00b7 Tom Becker \u00b7 2 h",
+                "textColor": "#000000",
+                "width": 0,
+                "x": 8,
+                "y": 442
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 793,
+              "style": "flex-direction: column; padding-left: 8px; padding-top: 6px; padding-right: 8px; padding-bottom: 6px; row-gap: 1px; column-gap: 1px; border-radius: 6px",
+              "width": 16,
+              "x": 0,
+              "y": 2782
+             },
+             {
+              "baseline": 14,
+              "class": "NSTextField",
+              "height": 20,
+              "intrinsic": {
+               "height": 14,
+               "width": 38
+              },
+              "needed": {
+               "height": 14,
+               "width": 38
+              },
+              "style": "padding-left: 8px; padding-top: 6px; padding-right: 8px; color: GrayText; font-size: 11px; font-weight: bold",
+              "text": "Intake",
+              "textColor": "#000000",
+              "width": 16,
+              "x": 0,
+              "y": 3577
+             },
+             {
+              "children": [
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 495,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 245
+                },
+                "needed": {
+                 "height": 495,
+                 "width": 0
+                },
+                "text": "CSV export drops the last row in Reports",
+                "textColor": "#000000",
+                "width": 0,
+                "x": 8,
+                "y": 6
+               },
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 375,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 190
+                },
+                "needed": {
+                 "height": 375,
+                 "width": 0
+                },
+                "style": "color: GrayText; font-size: 12px",
+                "text": "Maria Lopez \u00b7 3 h \u00b7 draft unsent",
+                "textColor": "#000000",
+                "width": 0,
+                "x": 8,
+                "y": 502
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 883,
+              "style": "flex-direction: column; padding-left: 8px; padding-top: 6px; padding-right: 8px; padding-bottom: 6px; row-gap: 1px; column-gap: 1px; border-radius: 6px",
+              "width": 16,
+              "x": 0,
+              "y": 3599
+             },
+             {
+              "baseline": 1,
+              "class": "NSBox",
+              "height": 1,
+              "style": "align-self: stretch; flex-shrink: 0; min-width: 1px; min-height: 1px; margin-top: 10px; margin-bottom: 4px",
+              "width": 1,
+              "x": 0,
+              "y": 4494
+             },
+             {
+              "children": [
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 15,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 73
+                },
+                "needed": {
+                 "height": 15,
+                 "width": 73
+                },
+                "style": "flex-grow: 1; flex-basis: 0%; min-width: 0px",
+                "text": "With agents",
+                "textColor": "#000000",
+                "width": 0,
+                "x": 8,
+                "y": 4
+               },
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 15,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 8
+                },
+                "needed": {
+                 "height": 15,
+                 "width": 8
+                },
+                "text": "6",
+                "textColor": "#000000",
+                "width": 8,
+                "x": 16,
+                "y": 4
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 23,
+              "style": "align-items: center; padding-left: 8px; padding-top: 4px; padding-right: 8px; padding-bottom: 4px; row-gap: 8px; column-gap: 8px",
+              "width": 16,
+              "x": 0,
+              "y": 4501
+             },
+             {
+              "children": [
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 15,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 96
+                },
+                "needed": {
+                 "height": 15,
+                 "width": 96
+                },
+                "style": "flex-grow: 1; flex-basis: 0%; min-width: 0px",
+                "text": "With requesters",
+                "textColor": "#000000",
+                "width": 0,
+                "x": 8,
+                "y": 4
+               },
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 15,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 8
+                },
+                "needed": {
+                 "height": 15,
+                 "width": 8
+                },
+                "text": "2",
+                "textColor": "#000000",
+                "width": 8,
+                "x": 16,
+                "y": 4
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 23,
+              "style": "align-items: center; padding-left: 8px; padding-top: 4px; padding-right: 8px; padding-bottom: 4px; row-gap: 8px; column-gap: 8px",
+              "width": 16,
+              "x": 0,
+              "y": 4526
+             },
+             {
+              "children": [
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 15,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 47
+                },
+                "needed": {
+                 "height": 15,
+                 "width": 47
+                },
+                "style": "flex-grow: 1; flex-basis: 0%; min-width: 0px",
+                "text": "Blocked",
+                "textColor": "#000000",
+                "width": 0,
+                "x": 8,
+                "y": 4
+               },
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 15,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 8
+                },
+                "needed": {
+                 "height": 15,
+                 "width": 8
+                },
+                "text": "2",
+                "textColor": "#000000",
+                "width": 8,
+                "x": 16,
+                "y": 4
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 23,
+              "style": "align-items: center; padding-left: 8px; padding-top: 4px; padding-right: 8px; padding-bottom: 4px; row-gap: 8px; column-gap: 8px",
+              "width": 16,
+              "x": 0,
+              "y": 4551
+             },
+             {
+              "children": [
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 15,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 47
+                },
+                "needed": {
+                 "height": 15,
+                 "width": 47
+                },
+                "style": "flex-grow: 1; flex-basis: 0%; min-width: 0px",
+                "text": "Projects",
+                "textColor": "#000000",
+                "width": 0,
+                "x": 8,
+                "y": 4
+               },
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 15,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 8
+                },
+                "needed": {
+                 "height": 15,
+                 "width": 8
+                },
+                "text": "1",
+                "textColor": "#000000",
+                "width": 8,
+                "x": 16,
+                "y": 4
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 23,
+              "style": "align-items: center; padding-left: 8px; padding-top: 4px; padding-right: 8px; padding-bottom: 4px; row-gap: 8px; column-gap: 8px",
+              "width": 16,
+              "x": 0,
+              "y": 4576
+             },
+             {
+              "children": [
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 15,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 51
+                },
+                "needed": {
+                 "height": 15,
+                 "width": 51
+                },
+                "style": "flex-grow: 1; flex-basis: 0%; min-width: 0px",
+                "text": "Snoozed",
+                "textColor": "#000000",
+                "width": 0,
+                "x": 8,
+                "y": 4
+               },
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 15,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 8
+                },
+                "needed": {
+                 "height": 15,
+                 "width": 8
+                },
+                "text": "0",
+                "textColor": "#000000",
+                "width": 8,
+                "x": 16,
+                "y": 4
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 23,
+              "style": "align-items: center; padding-left: 8px; padding-top: 4px; padding-right: 8px; padding-bottom: 4px; row-gap: 8px; column-gap: 8px",
+              "width": 16,
+              "x": 0,
+              "y": 4601
+             }
+            ],
+            "class": "TRBoxView",
+            "height": 4636,
+            "style": "flex-direction: column; padding-bottom: 12px; row-gap: 2px; column-gap: 2px",
+            "width": 0,
+            "x": 0,
+            "y": 0
+           }
+          ],
+          "class": "TRBoxView",
+          "height": 4636,
+          "style": "flex-direction: column",
+          "width": 0,
+          "x": 0,
+          "y": 0
+         }
+        ],
+        "class": "TRScrollBox",
+        "height": 0,
+        "id": "rail",
+        "overflow": "scroll",
+        "style": "flex-grow: 1; flex-basis: 0%; min-width: 0px; min-height: 0px",
+        "width": 0,
+        "x": 0,
+        "y": 0
+       }
+      ],
+      "class": "TRBoxView",
+      "container": {
+       "matched": [
+        "(max-width: 639px)"
+       ]
+      },
+      "height": 100,
+      "hidden": true,
+      "style": "display: none; flex-direction: column; flex-shrink: 0; width: 260px; padding-left: 12px; padding-top: 12px; padding-right: 10px; row-gap: 8px; column-gap: 8px",
+      "width": 100,
+      "x": 0,
+      "y": 0
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "background": "#ffffff",
+              "children": [
+               {
+                "children": [
+                 {
+                  "children": [
+                   {
+                    "background": "#f6c08a",
+                    "children": [
+                     {
+                      "baseline": 12,
+                      "class": "NSTextField",
+                      "height": 15,
+                      "intrinsic": {
+                       "height": 15,
+                       "width": 41
+                      },
+                      "needed": {
+                       "height": 15,
+                       "width": 41
+                      },
+                      "style": "color: #3b1d03; font-weight: bold",
+                      "text": "Hotfix",
+                      "textColor": "#3b1d03",
+                      "width": 41,
+                      "x": 6,
+                      "y": 1
+                     }
+                    ],
+                    "class": "TRBoxView",
+                    "height": 17,
+                    "style": "padding-left: 6px; padding-top: 1px; padding-right: 6px; padding-bottom: 1px; background-color: #f6c08a; border-radius: 4px",
+                    "width": 53,
+                    "x": 0,
+                    "y": 0
+                   },
+                   {
+                    "baseline": 12,
+                    "class": "NSTextField",
+                    "height": 15,
+                    "id": "gateLine",
+                    "intrinsic": {
+                     "height": 15,
+                     "width": 200
+                    },
+                    "needed": {
+                     "height": 15,
+                     "width": 200
+                    },
+                    "style": "font-size: 12px; font-weight: bold",
+                    "text": "PLAN: IS THIS THE RIGHT FIX?",
+                    "textColor": "#000000",
+                    "width": 200,
+                    "x": 0,
+                    "y": 21
+                   },
+                   {
+                    "baseline": 12,
+                    "class": "NSTextField",
+                    "height": 480,
+                    "intrinsic": {
+                     "height": 15,
+                     "width": 296
+                    },
+                    "needed": {
+                     "height": 480,
+                     "width": 12
+                    },
+                    "style": "color: GrayText; font-size: 12px",
+                    "text": "#491 \u00b7 Sign-in \u00b7 Opened 31 min ago \u00b7 agent-web",
+                    "textColor": "#000000",
+                    "width": 12,
+                    "x": 0,
+                    "y": 40
+                   }
+                  ],
+                  "class": "TRBoxView",
+                  "height": 520,
+                  "style": "flex-wrap: wrap; align-items: baseline; row-gap: 4px; column-gap: 10px",
+                  "width": 0,
+                  "x": 16,
+                  "y": 16
+                 },
+                 {
+                  "baseline": 21,
+                  "class": "NSTextField",
+                  "height": 999,
+                  "id": "cardTitle",
+                  "intrinsic": {
+                   "height": 27,
+                   "width": 563
+                  },
+                  "needed": {
+                   "height": 999,
+                   "width": 0
+                  },
+                  "style": "font-size: 22px; font-weight: bold",
+                  "text": "Login page returns 500 after password reset",
+                  "textColor": "#000000",
+                  "width": 0,
+                  "x": 16,
+                  "y": 542
+                 },
+                 {
+                  "baseline": 12,
+                  "class": "NSTextField",
+                  "height": 525,
+                  "id": "requester",
+                  "intrinsic": {
+                   "height": 15,
+                   "width": 249
+                  },
+                  "needed": {
+                   "height": 525,
+                   "width": 0
+                  },
+                  "text": "Sam Ortiz, Operations \u00b7 Unblocks 1 ticket",
+                  "textColor": "#000000",
+                  "width": 0,
+                  "x": 16,
+                  "y": 1547
+                 },
+                 {
+                  "children": [
+                   {
+                    "background": "#aaaaaa",
+                    "children": [
+                     {
+                      "baseline": 13,
+                      "class": "NSTextField",
+                      "height": 629,
+                      "id": "lastHeard",
+                      "intrinsic": {
+                       "height": 17,
+                       "width": 390
+                      },
+                      "needed": {
+                       "height": 629,
+                       "width": 13
+                      },
+                      "style": "color: CanvasText; font-size: 13px",
+                      "text": "Requester last heard from us: 19 min ago, acknowledgment",
+                      "textColor": "#000000",
+                      "width": 13,
+                      "x": 8,
+                      "y": 3
+                     }
+                    ],
+                    "class": "TRBoxView",
+                    "height": 635,
+                    "style": "padding-left: 8px; padding-top: 3px; padding-right: 8px; padding-bottom: 3px; background-color: -tr-window-background; border-radius: 4px",
+                    "width": 29,
+                    "x": 0,
+                    "y": 0
+                   }
+                  ],
+                  "class": "TRBoxView",
+                  "height": 635,
+                  "style": "align-items: center",
+                  "width": 0,
+                  "x": 16,
+                  "y": 2078
+                 }
+                ],
+                "class": "TRBoxView",
+                "container": {
+                 "matched": [
+                  "(max-width: 639px)"
+                 ]
+                },
+                "height": 2729,
+                "id": "cardHeader",
+                "style": "flex-direction: column; padding-left: 16px; padding-top: 16px; padding-right: 16px; padding-bottom: 16px; row-gap: 6px; column-gap: 6px",
+                "width": 32,
+                "x": 1,
+                "y": 1
+               },
+               {
+                "children": [
+                 {
+                  "children": [
+                   {
+                    "baseline": 11,
+                    "class": "NSTextField",
+                    "height": 14,
+                    "intrinsic": {
+                     "height": 14,
+                     "width": 174
+                    },
+                    "needed": {
+                     "height": 14,
+                     "width": 174
+                    },
+                    "style": "color: GrayText; font-size: 11px; font-weight: bold",
+                    "text": "Diagnosis \u00b7 confidence high",
+                    "textColor": "#000000",
+                    "width": 0,
+                    "x": 0,
+                    "y": 0
+                   },
+                   {
+                    "baseline": 14,
+                    "class": "NSTextField",
+                    "height": 3114,
+                    "intrinsic": {
+                     "height": 18,
+                     "width": 1560
+                    },
+                    "needed": {
+                     "height": 3114,
+                     "width": 0
+                    },
+                    "style": "font-size: 15px",
+                    "text": "After a password reset, the sign-in handler looks up the old reset token, finds it deleted, and throws instead of continuing. Anyone who resets a password cannot sign in until their session cookie is cleared.",
+                    "textColor": "#000000",
+                    "width": 0,
+                    "x": 0,
+                    "y": 20
+                   },
+                   {
+                    "baseline": 12,
+                    "class": "NSTextField",
+                    "height": 1005,
+                    "intrinsic": {
+                     "height": 15,
+                     "width": 488
+                    },
+                    "needed": {
+                     "height": 1005,
+                     "width": 0
+                    },
+                    "style": "color: GrayText; font-size: 12px",
+                    "text": "Based on: reproduced on staging; the stack trace ends in the reset-token lookup",
+                    "textColor": "#000000",
+                    "width": 0,
+                    "x": 0,
+                    "y": 3140
+                   }
+                  ],
+                  "class": "TRBoxView",
+                  "height": 4145,
+                  "style": "flex-direction: column; row-gap: 6px; column-gap: 6px",
+                  "width": 0,
+                  "x": 16,
+                  "y": 12
+                 },
+                 {
+                  "children": [
+                   {
+                    "baseline": 11,
+                    "class": "NSTextField",
+                    "height": 14,
+                    "intrinsic": {
+                     "height": 14,
+                     "width": 78
+                    },
+                    "needed": {
+                     "height": 14,
+                     "width": 78
+                    },
+                    "style": "color: GrayText; font-size: 11px; font-weight: bold",
+                    "text": "Proposed fix",
+                    "textColor": "#000000",
+                    "width": 0,
+                    "x": 0,
+                    "y": 0
+                   },
+                   {
+                    "children": [
+                     {
+                      "baseline": 12,
+                      "class": "NSTextField",
+                      "height": 870,
+                      "intrinsic": {
+                       "height": 15,
+                       "width": 414
+                      },
+                      "needed": {
+                       "height": 870,
+                       "width": 0
+                      },
+                      "text": "1. Treat a missing reset token as already used, and continue sign-in.",
+                      "textColor": "#000000",
+                      "width": 0,
+                      "x": 0,
+                      "y": 0
+                     },
+                     {
+                      "baseline": 12,
+                      "class": "NSTextField",
+                      "height": 660,
+                      "intrinsic": {
+                       "height": 15,
+                       "width": 316
+                      },
+                      "needed": {
+                       "height": 660,
+                       "width": 0
+                      },
+                      "text": "2. Add a test that signs in immediately after a reset.",
+                      "textColor": "#000000",
+                      "width": 0,
+                      "x": 0,
+                      "y": 874
+                     },
+                     {
+                      "baseline": 12,
+                      "class": "NSTextField",
+                      "height": 720,
+                      "intrinsic": {
+                       "height": 15,
+                       "width": 344
+                      },
+                      "needed": {
+                       "height": 720,
+                       "width": 0
+                      },
+                      "text": "3. Deploy to production and watch the sign-in error rate.",
+                      "textColor": "#000000",
+                      "width": 0,
+                      "x": 0,
+                      "y": 1538
+                     }
+                    ],
+                    "class": "TRBoxView",
+                    "height": 2258,
+                    "id": "steps",
+                    "style": "flex-direction: column; row-gap: 4px; column-gap: 4px",
+                    "width": 0,
+                    "x": 0,
+                    "y": 20
+                   }
+                  ],
+                  "class": "TRBoxView",
+                  "height": 2278,
+                  "style": "flex-direction: column; row-gap: 6px; column-gap: 6px",
+                  "width": 0,
+                  "x": 16,
+                  "y": 4177
+                 },
+                 {
+                  "background": "#fceedd",
+                  "children": [
+                   {
+                    "baseline": 11,
+                    "class": "NSTextField",
+                    "height": 14,
+                    "intrinsic": {
+                     "height": 14,
+                     "width": 74
+                    },
+                    "needed": {
+                     "height": 14,
+                     "width": 74
+                    },
+                    "style": "color: -tr-warning-text; font-size: 11px; font-weight: bold",
+                    "text": "Blast radius",
+                    "textColor": "#8a3b06",
+                    "width": 0,
+                    "x": 16,
+                    "y": 12
+                   },
+                   {
+                    "children": [
+                     {
+                      "children": [
+                       {
+                        "baseline": 12,
+                        "class": "NSTextField",
+                        "height": 90,
+                        "intrinsic": {
+                         "height": 15,
+                         "width": 47
+                        },
+                        "needed": {
+                         "height": 90,
+                         "width": 0
+                        },
+                        "style": "color: -tr-warning-text; font-weight: bold",
+                        "text": "Affects",
+                        "textColor": "#8a3b06",
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                       },
+                       {
+                        "baseline": 12,
+                        "class": "NSTextField",
+                        "height": 495,
+                        "intrinsic": {
+                         "height": 15,
+                         "width": 222
+                        },
+                        "needed": {
+                         "height": 495,
+                         "width": 0
+                        },
+                        "style": "color: -tr-warning-text",
+                        "text": "Sign-in service, every user signing in",
+                        "textColor": "#8a3b06",
+                        "width": 0,
+                        "x": 0,
+                        "y": 90
+                       }
+                      ],
+                      "class": "TRBoxView",
+                      "height": 585,
+                      "style": "flex-direction: column",
+                      "width": 0,
+                      "x": 0,
+                      "y": 0
+                     },
+                     {
+                      "children": [
+                       {
+                        "baseline": 12,
+                        "class": "NSTextField",
+                        "height": 150,
+                        "intrinsic": {
+                         "height": 15,
+                         "width": 71
+                        },
+                        "needed": {
+                         "height": 150,
+                         "width": 0
+                        },
+                        "style": "color: -tr-warning-text; font-weight: bold",
+                        "text": "Reversible",
+                        "textColor": "#8a3b06",
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                       },
+                       {
+                        "baseline": 12,
+                        "class": "NSTextField",
+                        "height": 495,
+                        "intrinsic": {
+                         "height": 15,
+                         "width": 231
+                        },
+                        "needed": {
+                         "height": 495,
+                         "width": 0
+                        },
+                        "style": "color: -tr-warning-text",
+                        "text": "Yes, by redeploying the previous build",
+                        "textColor": "#8a3b06",
+                        "width": 0,
+                        "x": 0,
+                        "y": 150
+                       }
+                      ],
+                      "class": "TRBoxView",
+                      "height": 645,
+                      "style": "flex-direction: column",
+                      "width": 0,
+                      "x": 0,
+                      "y": 597
+                     },
+                     {
+                      "children": [
+                       {
+                        "baseline": 12,
+                        "class": "NSTextField",
+                        "height": 285,
+                        "intrinsic": {
+                         "height": 15,
+                         "width": 150
+                        },
+                        "needed": {
+                         "height": 285,
+                         "width": 0
+                        },
+                        "style": "color: -tr-warning-text; font-weight: bold",
+                        "text": "Goes live immediately",
+                        "textColor": "#8a3b06",
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                       },
+                       {
+                        "baseline": 12,
+                        "class": "NSTextField",
+                        "height": 180,
+                        "intrinsic": {
+                         "height": 15,
+                         "width": 87
+                        },
+                        "needed": {
+                         "height": 180,
+                         "width": 0
+                        },
+                        "style": "color: -tr-warning-text",
+                        "text": "Yes, on deploy",
+                        "textColor": "#8a3b06",
+                        "width": 0,
+                        "x": 0,
+                        "y": 285
+                       }
+                      ],
+                      "class": "TRBoxView",
+                      "height": 465,
+                      "style": "flex-direction: column",
+                      "width": 0,
+                      "x": 0,
+                      "y": 1254
+                     }
+                    ],
+                    "class": "TRBoxView",
+                    "container": {
+                     "matched": [
+                      "(max-width: 639px)"
+                     ]
+                    },
+                    "height": 1719,
+                    "style": "display: grid; row-gap: 12px; column-gap: 12px; grid-template-columns: minmax(0, 1fr)",
+                    "width": 0,
+                    "x": 16,
+                    "y": 32
+                   }
+                  ],
+                  "class": "TRBoxView",
+                  "height": 1763,
+                  "style": "flex-direction: column; padding-left: 16px; padding-top: 12px; padding-right: 16px; padding-bottom: 12px; row-gap: 6px; column-gap: 6px; background-color: -tr-warning-background; border-radius: 6px",
+                  "width": 32,
+                  "x": 16,
+                  "y": 6475
+                 },
+                 {
+                  "children": [
+                   {
+                    "baseline": 1,
+                    "class": "NSBox",
+                    "height": 1,
+                    "style": "align-self: stretch; flex-shrink: 0; min-width: 1px; min-height: 1px",
+                    "width": 1,
+                    "x": 0,
+                    "y": 0
+                   },
+                   {
+                    "children": [
+                     {
+                      "baseline": 18,
+                      "class": "NSButton",
+                      "height": 25,
+                      "interactive": true,
+                      "intrinsic": {
+                       "height": 25,
+                       "width": 173
+                      },
+                      "title": "\u25b8 Alternatives considered",
+                      "width": 173,
+                      "x": 0,
+                      "y": 6
+                     },
+                     {
+                      "baseline": 0,
+                      "class": "NSView",
+                      "height": 0,
+                      "style": "flex-grow: 1; flex-basis: 0%",
+                      "width": 0,
+                      "x": 0,
+                      "y": 35
+                     },
+                     {
+                      "baseline": 12,
+                      "class": "NSTextField",
+                      "height": 225,
+                      "intrinsic": {
+                       "height": 15,
+                       "width": 122
+                      },
+                      "needed": {
+                       "height": 225,
+                       "width": 0
+                      },
+                      "style": "min-width: 0px; color: GrayText; font-size: 12px; text-align: right",
+                      "text": "2 \u00b7 Space to expand",
+                      "textColor": "#000000",
+                      "width": 0,
+                      "x": 0,
+                      "y": 39
+                     }
+                    ],
+                    "class": "TRBoxView",
+                    "height": 270,
+                    "style": "flex-wrap: wrap; align-items: center; padding-top: 6px; padding-bottom: 6px; row-gap: 4px; column-gap: 12px",
+                    "width": 0,
+                    "x": 0,
+                    "y": 7
+                   },
+                   {
+                    "baseline": 1,
+                    "class": "NSBox",
+                    "height": 1,
+                    "style": "align-self: stretch; flex-shrink: 0; min-width: 1px; min-height: 1px",
+                    "width": 1,
+                    "x": 0,
+                    "y": 283
+                   },
+                   {
+                    "children": [
+                     {
+                      "baseline": 18,
+                      "class": "NSButton",
+                      "height": 25,
+                      "interactive": true,
+                      "intrinsic": {
+                       "height": 25,
+                       "width": 87
+                      },
+                      "title": "\u25b8 Evidence",
+                      "width": 87,
+                      "x": 0,
+                      "y": 6
+                     },
+                     {
+                      "baseline": 0,
+                      "class": "NSView",
+                      "height": 0,
+                      "style": "flex-grow: 1; flex-basis: 0%",
+                      "width": 0,
+                      "x": 0,
+                      "y": 35
+                     },
+                     {
+                      "baseline": 12,
+                      "class": "NSTextField",
+                      "height": 90,
+                      "intrinsic": {
+                       "height": 15,
+                       "width": 45
+                      },
+                      "needed": {
+                       "height": 90,
+                       "width": 0
+                      },
+                      "style": "min-width: 0px; color: GrayText; font-size: 12px; text-align: right",
+                      "text": "4 items",
+                      "textColor": "#000000",
+                      "width": 0,
+                      "x": 0,
+                      "y": 39
+                     }
+                    ],
+                    "class": "TRBoxView",
+                    "height": 135,
+                    "style": "flex-wrap: wrap; align-items: center; padding-top: 6px; padding-bottom: 6px; row-gap: 4px; column-gap: 12px",
+                    "width": 0,
+                    "x": 0,
+                    "y": 290
+                   },
+                   {
+                    "baseline": 1,
+                    "class": "NSBox",
+                    "height": 1,
+                    "style": "align-self: stretch; flex-shrink: 0; min-width: 1px; min-height: 1px",
+                    "width": 1,
+                    "x": 0,
+                    "y": 431
+                   }
+                  ],
+                  "class": "TRBoxView",
+                  "height": 432,
+                  "style": "flex-direction: column; row-gap: 6px; column-gap: 6px",
+                  "width": 0,
+                  "x": 16,
+                  "y": 8258
+                 }
+                ],
+                "class": "TRBoxView",
+                "container": {
+                 "matched": [
+                  "(max-width: 639px)"
+                 ]
+                },
+                "height": 8706,
+                "id": "cardBody",
+                "style": "flex-direction: column; padding-left: 16px; padding-top: 12px; padding-right: 16px; padding-bottom: 16px; row-gap: 20px; column-gap: 20px",
+                "width": 32,
+                "x": 1,
+                "y": 2730
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 11437,
+              "id": "card",
+              "style": "flex-direction: column; width: 100%; max-width: 920px; margin-left: auto; border-left-width: 1px; border-top-width: 1px; margin-right: auto; border-right-width: 1px; border-bottom-width: 1px; background-color: Canvas; border-color: -tr-separator; border-radius: 8px",
+              "width": 2,
+              "x": 12,
+              "y": 12
+             },
+             {
+              "background": "#ffffff",
+              "children": [
+               {
+                "children": [
+                 {
+                  "baseline": 12,
+                  "class": "NSTextField",
+                  "height": 1095,
+                  "id": "replyMeta",
+                  "intrinsic": {
+                   "height": 15,
+                   "width": 518
+                  },
+                  "needed": {
+                   "height": 1095,
+                   "width": 0
+                  },
+                  "style": "flex-grow: 1; flex-basis: 0%; min-width: 0px; color: GrayText; font-size: 12px",
+                  "text": "Reply to Sam Ortiz \u00b7 Draft: diagnosis update \u00b7 updated after chat \u00b7 visible to requester",
+                  "textColor": "#000000",
+                  "width": 0,
+                  "x": 0,
+                  "y": 0
+                 },
+                 {
+                  "baseline": 12,
+                  "class": "NSTextField",
+                  "height": 15,
+                  "intrinsic": {
+                   "height": 15,
+                   "width": 51
+                  },
+                  "needed": {
+                   "height": 15,
+                   "width": 51
+                  },
+                  "style": "color: GrayText; font-size: 12px",
+                  "text": "E to edit",
+                  "textColor": "#000000",
+                  "width": 51,
+                  "x": 0,
+                  "y": 1099
+                 }
+                ],
+                "class": "TRBoxView",
+                "height": 1114,
+                "style": "flex-wrap: wrap; align-items: baseline; row-gap: 4px; column-gap: 12px",
+                "width": 0,
+                "x": 17,
+                "y": 13
+               },
+               {
+                "baseline": 13,
+                "class": "NSTextField",
+                "height": 3060,
+                "id": "replyBody",
+                "intrinsic": {
+                 "height": 17,
+                 "width": 1548
+                },
+                "needed": {
+                 "height": 3060,
+                 "width": 0
+                },
+                "style": "font-size: 14px",
+                "text": "Hi Sam, we have found the cause. Signing in right after a password reset hits an error on our side. A fix is ready and we are deploying it now. In the meantime, clearing your browser cookies for the site will let you sign in.",
+                "textColor": "#000000",
+                "width": 0,
+                "x": 17,
+                "y": 1137
+               },
+               {
+                "background": "#00000000",
+                "children": [
+                 {
+                  "baseline": 18,
+                  "class": "NSButton",
+                  "height": 25,
+                  "id": "sendOnly",
+                  "interactive": true,
+                  "intrinsic": {
+                   "height": 25,
+                   "width": 173
+                  },
+                  "title": "Send only \u00b7 Cmd+Return",
+                  "width": 173,
+                  "x": 16,
+                  "y": 10
+                 },
+                 {
+                  "baseline": 18,
+                  "class": "NSButton",
+                  "height": 25,
+                  "id": "redraft",
+                  "interactive": true,
+                  "intrinsic": {
+                   "height": 25,
+                   "width": 124
+                  },
+                  "title": "Redraft \u00b7 Cmd+R",
+                  "width": 124,
+                  "x": 16,
+                  "y": 43
+                 }
+                ],
+                "class": "TRBoxView",
+                "container": {
+                 "matched": [
+                  "(max-width: 639px)"
+                 ]
+                },
+                "height": 78,
+                "style": "flex-wrap: wrap; align-items: center; padding-left: 16px; padding-top: 10px; padding-right: 16px; padding-bottom: 10px; row-gap: 8px; column-gap: 8px; background-color: transparent",
+                "width": 32,
+                "x": 17,
+                "y": 4207
+               }
+              ],
+              "class": "TRBoxView",
+              "container": {
+               "matched": [
+                "(max-width: 639px)"
+               ]
+              },
+              "height": 4298,
+              "id": "reply",
+              "style": "flex-direction: column; width: 100%; max-width: 920px; margin-left: auto; padding-left: 16px; border-left-width: 1px; padding-top: 12px; border-top-width: 1px; margin-right: auto; padding-right: 16px; border-right-width: 1px; padding-bottom: 12px; border-bottom-width: 1px; row-gap: 10px; column-gap: 10px; background-color: Canvas; border-color: -tr-separator; border-radius: 8px",
+              "width": 34,
+              "x": 12,
+              "y": 11465
+             }
+            ],
+            "class": "TRBoxView",
+            "container": {
+             "matched": [
+              "(max-width: 639px)"
+             ]
+            },
+            "height": 15775,
+            "style": "flex-direction: column; padding-left: 12px; padding-top: 12px; padding-right: 12px; padding-bottom: 12px; row-gap: 16px; column-gap: 16px",
+            "width": 24,
+            "x": 0,
+            "y": 0
+           }
+          ],
+          "class": "TRBoxView",
+          "height": 15775,
+          "style": "flex-direction: column",
+          "width": 0,
+          "x": 0,
+          "y": 0
+         }
+        ],
+        "class": "TRScrollBox",
+        "height": 0,
+        "overflow": "scroll",
+        "style": "flex-grow: 1; flex-basis: 0%; min-width: 0px; min-height: 0px",
+        "width": 0,
+        "x": 0,
+        "y": 0
+       },
+       {
+        "background": "#ffffff",
+        "children": [
+         {
+          "children": [
+           {
+            "baseline": 15,
+            "class": "NSTextField",
+            "editable": true,
+            "height": 0,
+            "id": "note",
+            "interactive": true,
+            "intrinsic": {
+             "height": 21,
+             "width": 18
+            },
+            "width": 0,
+            "x": 0,
+            "y": 0
+           }
+          ],
+          "class": "TRBoxView",
+          "container": {
+           "matched": [
+            "(max-width: 639px)"
+           ]
+          },
+          "height": 0,
+          "style": "flex-direction: column; padding-left: 16px; padding-top: 10px; padding-right: 16px",
+          "width": 0,
+          "x": 0,
+          "y": 0
+         },
+         {
+          "children": [
+           {
+            "baseline": 18,
+            "class": "NSButton",
+            "container": {
+             "matched": [
+              "(max-width: 639px)"
+             ]
+            },
+            "height": 10,
+            "hidden": true,
+            "intrinsic": {
+             "height": 25,
+             "width": 292
+            },
+            "style": "display: none",
+            "title": "Approve and send diagnosis update \u00b7 Return",
+            "width": 10,
+            "x": 0,
+            "y": 0
+           },
+           {
+            "baseline": 18,
+            "class": "NSButton",
+            "container": {
+             "matched": [
+              "(max-width: 639px)"
+             ]
+            },
+            "height": 0,
+            "interactive": true,
+            "intrinsic": {
+             "height": 25,
+             "width": 185
+            },
+            "title": "Approve and send \u00b7 Return",
+            "width": 0,
+            "x": 0,
+            "y": 0
+           },
+           {
+            "baseline": 18,
+            "class": "NSButton",
+            "height": 0,
+            "interactive": true,
+            "intrinsic": {
+             "height": 25,
+             "width": 80
+            },
+            "title": "Revise \u00b7 R",
+            "width": 0,
+            "x": 0,
+            "y": 0
+           },
+           {
+            "baseline": 18,
+            "class": "NSButton",
+            "height": 0,
+            "interactive": true,
+            "intrinsic": {
+             "height": 25,
+             "width": 96
+            },
+            "title": "Reassign \u00b7 G",
+            "width": 0,
+            "x": 0,
+            "y": 0
+           },
+           {
+            "baseline": 18,
+            "class": "NSButton",
+            "height": 0,
+            "interactive": true,
+            "intrinsic": {
+             "height": 25,
+             "width": 101
+            },
+            "title": "Take over \u00b7 O",
+            "width": 0,
+            "x": 0,
+            "y": 0
+           },
+           {
+            "baseline": 18,
+            "class": "NSButton",
+            "height": 0,
+            "interactive": true,
+            "intrinsic": {
+             "height": 25,
+             "width": 86
+            },
+            "title": "Decline \u00b7 X",
+            "width": 0,
+            "x": 0,
+            "y": 0
+           },
+           {
+            "baseline": 12,
+            "class": "NSTextField",
+            "container": {
+             "matched": [
+              "(max-width: 639px)"
+             ]
+            },
+            "height": 0,
+            "id": "actionHint",
+            "intrinsic": {
+             "height": 15,
+             "width": 240
+            },
+            "needed": {
+             "height": 510,
+             "width": 0
+            },
+            "style": "flex-grow: 1; flex-basis: 200px; color: GrayText; font-size: 12px; text-align: left",
+            "text": "Shift+Return approves without sending",
+            "textColor": "#000000",
+            "width": 0,
+            "x": 0,
+            "y": 0
+           }
+          ],
+          "class": "TRBoxView",
+          "container": {
+           "matched": [
+            "(max-width: 639px)"
+           ]
+          },
+          "height": 0,
+          "id": "actions",
+          "style": "flex-wrap: wrap; align-items: center; padding-left: 16px; padding-top: 10px; padding-right: 16px; padding-bottom: 10px; row-gap: 8px; column-gap: 8px",
+          "width": 0,
+          "x": 0,
+          "y": 0
+         }
+        ],
+        "class": "TRBoxView",
+        "height": 0,
+        "id": "decision",
+        "style": "flex-direction: column; width: 100%; max-width: 920px; margin-left: auto; border-left-width: 1px; border-top-width: 1px; margin-right: auto; border-right-width: 1px; border-bottom-width: 1px; background-color: Canvas; border-color: -tr-separator; border-radius: 8px 8px 0 0",
+        "width": 0,
+        "x": 0,
+        "y": 0
+       }
+      ],
+      "class": "TRBoxView",
+      "container": {
+       "matched": [
+        "(max-width: 1099px)"
+       ]
+      },
+      "height": 100,
+      "hidden": true,
+      "style": "display: none; flex-direction: column; flex-grow: 1; flex-basis: 0%; min-width: 0px",
+      "width": 100,
+      "x": 0,
+      "y": 0
+     },
+     {
+      "background": "#ffffff",
+      "children": [
+       {
+        "children": [
+         {
+          "baseline": 15,
+          "class": "NSPopUpButton",
+          "height": 21,
+          "id": "drawerTabs",
+          "interactive": true,
+          "intrinsic": {
+           "height": 21,
+           "width": 96
+          },
+          "title": "Agent chat",
+          "width": 96,
+          "x": 10,
+          "y": 10
+         },
+         {
+          "baseline": 0,
+          "class": "NSView",
+          "height": 0,
+          "style": "flex-grow: 1; flex-basis: 0%",
+          "width": 339,
+          "x": 110,
+          "y": 20
+         },
+         {
+          "baseline": 18,
+          "class": "NSButton",
+          "height": 25,
+          "interactive": true,
+          "intrinsic": {
+           "height": 25,
+           "width": 57
+          },
+          "title": "\u00d7 Esc",
+          "width": 57,
+          "x": 453,
+          "y": 8
+         }
+        ],
+        "class": "TRBoxView",
+        "height": 41,
+        "style": "flex-wrap: wrap; align-items: center; padding-left: 10px; padding-top: 8px; padding-right: 10px; padding-bottom: 8px; row-gap: 4px; column-gap: 4px",
+        "width": 520,
+        "x": 0,
+        "y": 0
+       },
+       {
+        "baseline": 1,
+        "class": "NSBox",
+        "height": 1,
+        "style": "align-self: stretch; flex-shrink: 0; min-width: 1px; min-height: 1px",
+        "width": 520,
+        "x": 0,
+        "y": 41
+       },
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "children": [
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 15,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 371
+                },
+                "needed": {
+                 "height": 15,
+                 "width": 371
+                },
+                "style": "flex-grow: 1; flex-basis: 100%; min-width: 0px; color: GrayText; font-size: 12px",
+                "text": "Internal \u00b7 agent-web on #491 \u00b7 never shown to the requester",
+                "textColor": "#000000",
+                "width": 469,
+                "x": 0,
+                "y": 0
+               },
+               {
+                "baseline": 18,
+                "class": "NSButton",
+                "height": 25,
+                "interactive": true,
+                "intrinsic": {
+                 "height": 25,
+                 "width": 144
+                },
+                "title": "Show raw transcript",
+                "width": 144,
+                "x": 0,
+                "y": 21
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 46,
+              "style": "flex-wrap: wrap; align-items: center; row-gap: 6px; column-gap: 10px",
+              "width": 469,
+              "x": 16,
+              "y": 12
+             },
+             {
+              "children": [
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 15,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 95
+                },
+                "needed": {
+                 "height": 15,
+                 "width": 95
+                },
+                "style": "color: GrayText; font-size: 12px",
+                "text": "You \u00b7 3 min ago",
+                "textColor": "#000000",
+                "width": 469,
+                "x": 0,
+                "y": 0
+               },
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 15,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 363
+                },
+                "needed": {
+                 "height": 15,
+                 "width": 363
+                },
+                "text": "Why not just restart the sign-in service? Would that clear it?",
+                "textColor": "#000000",
+                "width": 469,
+                "x": 0,
+                "y": 17
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 32,
+              "style": "flex-direction: column; row-gap: 2px; column-gap: 2px",
+              "width": 469,
+              "x": 16,
+              "y": 70
+             },
+             {
+              "children": [
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 15,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 137
+                },
+                "needed": {
+                 "height": 15,
+                 "width": 137
+                },
+                "style": "color: GrayText; font-size: 12px",
+                "text": "agent-web \u00b7 3 min ago",
+                "textColor": "#000000",
+                "width": 469,
+                "x": 0,
+                "y": 0
+               },
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 30,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 878
+                },
+                "needed": {
+                 "height": 30,
+                 "width": 464
+                },
+                "text": "No. The error is in the code path, not in cached state, so it would come back on the next password reset. A restart would only sign everyone out.",
+                "textColor": "#000000",
+                "width": 469,
+                "x": 0,
+                "y": 17
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 47,
+              "style": "flex-direction: column; row-gap: 2px; column-gap: 2px",
+              "width": 469,
+              "x": 16,
+              "y": 114
+             },
+             {
+              "children": [
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 15,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 95
+                },
+                "needed": {
+                 "height": 15,
+                 "width": 95
+                },
+                "style": "color: GrayText; font-size: 12px",
+                "text": "You \u00b7 1 min ago",
+                "textColor": "#000000",
+                "width": 469,
+                "x": 0,
+                "y": 0
+               },
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 15,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 347
+                },
+                "needed": {
+                 "height": 15,
+                 "width": 347
+                },
+                "text": "Fine. Mention the cookie workaround in the reply to Sam.",
+                "textColor": "#000000",
+                "width": 469,
+                "x": 0,
+                "y": 17
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 32,
+              "style": "flex-direction: column; row-gap: 2px; column-gap: 2px",
+              "width": 469,
+              "x": 16,
+              "y": 173
+             },
+             {
+              "children": [
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 15,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 137
+                },
+                "needed": {
+                 "height": 15,
+                 "width": 137
+                },
+                "style": "color: GrayText; font-size: 12px",
+                "text": "agent-web \u00b7 1 min ago",
+                "textColor": "#000000",
+                "width": 469,
+                "x": 0,
+                "y": 0
+               },
+               {
+                "baseline": 12,
+                "class": "NSTextField",
+                "height": 30,
+                "intrinsic": {
+                 "height": 15,
+                 "width": 564
+                },
+                "needed": {
+                 "height": 30,
+                 "width": 442
+                },
+                "text": "Done. I added one sentence about clearing cookies to the draft. The plan itself is unchanged.",
+                "textColor": "#000000",
+                "width": 469,
+                "x": 0,
+                "y": 17
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 47,
+              "style": "flex-direction: column; row-gap: 2px; column-gap: 2px",
+              "width": 469,
+              "x": 16,
+              "y": 217
+             },
+             {
+              "children": [
+               {
+                "background": "#aaaaaa",
+                "children": [
+                 {
+                  "baseline": 12,
+                  "class": "NSTextField",
+                  "height": 15,
+                  "intrinsic": {
+                   "height": 15,
+                   "width": 282
+                  },
+                  "needed": {
+                   "height": 15,
+                   "width": 282
+                  },
+                  "style": "color: HighlightText; font-size: 12px",
+                  "text": "Revised brief: draft changed \u00b7 plan unchanged",
+                  "textColor": "#000000",
+                  "width": 282,
+                  "x": 8,
+                  "y": 3
+                 }
+                ],
+                "class": "TRBoxView",
+                "height": 21,
+                "style": "padding-left: 8px; padding-top: 3px; padding-right: 8px; padding-bottom: 3px; background-color: Highlight; border-radius: 4px",
+                "width": 298,
+                "x": 0,
+                "y": 0
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 21,
+              "style": "align-items: center",
+              "width": 469,
+              "x": 16,
+              "y": 276
+             }
+            ],
+            "class": "TRBoxView",
+            "height": 309,
+            "style": "flex-direction: column; padding-left: 16px; padding-top: 12px; padding-right: 16px; padding-bottom: 12px; row-gap: 12px; column-gap: 12px",
+            "width": 501,
+            "x": 0,
+            "y": 0
+           }
+          ],
+          "class": "TRBoxView",
+          "height": 485,
+          "style": "flex-direction: column",
+          "width": 501,
+          "x": 0,
+          "y": 0
+         }
+        ],
+        "class": "TRScrollBox",
+        "height": 485,
+        "overflow": "scroll",
+        "style": "flex-grow: 1; flex-basis: 0%; min-width: 0px; min-height: 0px",
+        "width": 520,
+        "x": 0,
+        "y": 42
+       },
+       {
+        "children": [
+         {
+          "baseline": 15,
+          "class": "NSTextField",
+          "editable": true,
+          "height": 21,
+          "id": "chatInput",
+          "interactive": true,
+          "intrinsic": {
+           "height": 21,
+           "width": 18
+          },
+          "width": 488,
+          "x": 16,
+          "y": 10
+         },
+         {
+          "children": [
+           {
+            "baseline": 17,
+            "class": "NSButton",
+            "height": 25,
+            "interactive": true,
+            "intrinsic": {
+             "height": 25,
+             "width": 178
+            },
+            "title": "Send to agent \u00b7 Return",
+            "width": 178,
+            "x": 0,
+            "y": 0
+           },
+           {
+            "baseline": 18,
+            "class": "NSButton",
+            "height": 25,
+            "interactive": true,
+            "intrinsic": {
+             "height": 25,
+             "width": 120
+            },
+            "title": "Send as revision",
+            "width": 120,
+            "x": 186,
+            "y": 0
+           }
+          ],
+          "class": "TRBoxView",
+          "height": 25,
+          "style": "flex-wrap: wrap; align-items: center; row-gap: 8px; column-gap: 8px",
+          "width": 488,
+          "x": 16,
+          "y": 37
+         },
+         {
+          "baseline": 12,
+          "class": "NSTextField",
+          "height": 15,
+          "intrinsic": {
+           "height": 15,
+           "width": 485
+          },
+          "needed": {
+           "height": 15,
+           "width": 485
+          },
+          "style": "color: GrayText; font-size: 12px",
+          "text": "Chat does not approve anything. C opens this pane; Escape returns to the card.",
+          "textColor": "#000000",
+          "width": 488,
+          "x": 16,
+          "y": 68
+         }
+        ],
+        "class": "TRBoxView",
+        "height": 95,
+        "style": "flex-direction: column; padding-left: 16px; padding-top: 10px; padding-right: 16px; padding-bottom: 12px; row-gap: 6px; column-gap: 6px",
+        "width": 520,
+        "x": 0,
+        "y": 527
+       }
+      ],
+      "class": "TRBoxView",
+      "container": {
+       "matched": [
+        "(max-width: 1099px)"
+       ]
+      },
+      "height": 622,
+      "id": "drawer",
+      "style": "flex-direction: column; flex-grow: 1; flex-basis: 0%; min-width: 0px; background-color: Canvas; border-color: -tr-separator",
+      "width": 520,
+      "x": 0,
+      "y": 0
+     }
+    ],
+    "class": "TRBoxView",
+    "height": 622,
+    "style": "flex-grow: 1; flex-basis: 0%; min-height: 0px",
+    "width": 520,
+    "x": 0,
+    "y": 58
+   },
+   {
+    "children": [
+     {
+      "baseline": 12,
+      "class": "NSTextField",
+      "container": {
+       "matched": [
+        "(max-width: 639px)"
+       ]
+      },
+      "height": 0,
+      "id": "undoLabel",
+      "intrinsic": {
+       "height": 15,
+       "width": 99
+      },
+      "needed": {
+       "height": 195,
+       "width": 0
+      },
+      "style": "flex-grow: 1; flex-basis: 100%; min-width: 0px; color: GrayText",
+      "text": "Nothing to undo",
+      "textColor": "#000000",
+      "width": 0,
+      "x": 0,
+      "y": 0
+     },
+     {
+      "baseline": 18,
+      "class": "NSButton",
+      "height": 0,
+      "id": "undo",
+      "interactive": true,
+      "intrinsic": {
+       "height": 25,
+       "width": 112
+      },
+      "title": "Undo \u00b7 Cmd+Z",
+      "width": 0,
+      "x": 0,
+      "y": 0
+     }
+    ],
+    "class": "TRBoxView",
+    "container": {
+     "matched": [
+      "(max-width: 639px)"
+     ]
+    },
+    "height": 100,
+    "hidden": true,
+    "id": "undoBar",
+    "style": "display: none; flex-wrap: wrap; justify-content: flex-end; align-items: center; padding-left: 16px; padding-top: 8px; padding-right: 16px; padding-bottom: 8px; row-gap: 6px; column-gap: 10px; border-color: -tr-separator",
+    "width": 100,
+    "x": 0,
+    "y": 0
+   }
+  ],
+  "class": "TRBoxView",
+  "height": 680,
+  "id": "desk",
+  "style": "flex-direction: column; background-color: -tr-window-background; container-type: inline-size",
+  "width": 520,
+  "windowBackground": "#aaaaaa",
+  "x": 0,
+  "y": 0
+ },
+ "source": "dogfood/desk/Plan-drawer.trellis",
+ "theme": "default",
+ "trellis": "0.1",
+ "viewport": {
+  "height": 680,
+  "scale": 1,
+  "width": 520
+ }
+}

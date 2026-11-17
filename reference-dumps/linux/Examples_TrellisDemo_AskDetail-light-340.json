@@ -1,0 +1,291 @@
+{
+ "appearance": "light",
+ "lint": [],
+ "root": {
+  "background": "#ffffff",
+  "children": [
+   {
+    "children": [
+     {
+      "baseline": 12,
+      "class": "NSTextField",
+      "height": 15,
+      "id": "kind",
+      "intrinsic": {
+       "height": 15,
+       "width": 56
+      },
+      "needed": {
+       "height": 15,
+       "width": 56
+      },
+      "style": "flex-shrink: 0; color: LinkText; font-weight: bold",
+      "text": "approve",
+      "textColor": "#2973d9",
+      "width": 56,
+      "x": 0,
+      "y": 0
+     },
+     {
+      "baseline": 14,
+      "class": "NSTextField",
+      "container": {
+       "matched": [
+        "(max-width: 359px)"
+       ]
+      },
+      "height": 36,
+      "id": "title",
+      "intrinsic": {
+       "height": 18,
+       "width": 463
+      },
+      "needed": {
+       "height": 36,
+       "width": 258
+      },
+      "style": "flex-grow: 1; flex-basis: 100%; order: 3; font-size: 15px",
+      "text": "Tag example-cli v0.1.8 as rc2 and publish the release notes?",
+      "textColor": "#000000",
+      "width": 308,
+      "x": 0,
+      "y": 23
+     },
+     {
+      "baseline": 12,
+      "class": "NSTextField",
+      "height": 15,
+      "id": "age",
+      "intrinsic": {
+       "height": 15,
+       "width": 69
+      },
+      "needed": {
+       "height": 15,
+       "width": 69
+      },
+      "style": "flex-shrink: 0; color: GrayText",
+      "text": "12 min ago",
+      "textColor": "#000000",
+      "width": 69,
+      "x": 64,
+      "y": 0
+     }
+    ],
+    "class": "TRBoxView",
+    "container": {
+     "matched": [
+      "(max-width: 359px)"
+     ]
+    },
+    "height": 59,
+    "style": "flex-wrap: wrap; align-items: baseline; row-gap: 8px; column-gap: 8px",
+    "width": 308,
+    "x": 16,
+    "y": 16
+   },
+   {
+    "children": [
+     {
+      "baseline": 12,
+      "class": "NSTextField",
+      "height": 15,
+      "id": "agent",
+      "intrinsic": {
+       "height": 15,
+       "width": 46
+      },
+      "needed": {
+       "height": 15,
+       "width": 46
+      },
+      "style": "flex-shrink: 0; color: GrayText",
+      "text": "agent-a",
+      "textColor": "#000000",
+      "width": 46,
+      "x": 0,
+      "y": 0
+     },
+     {
+      "baseline": 12,
+      "class": "NSTextField",
+      "height": 15,
+      "intrinsic": {
+       "height": 15,
+       "width": 4
+      },
+      "needed": {
+       "height": 15,
+       "width": 4
+      },
+      "style": "flex-shrink: 0; color: GrayText",
+      "text": "\u00b7",
+      "textColor": "#000000",
+      "width": 4,
+      "x": 52,
+      "y": 0
+     },
+     {
+      "baseline": 12,
+      "class": "NSTextField",
+      "height": 30,
+      "id": "blocks",
+      "intrinsic": {
+       "height": 15,
+       "width": 268
+      },
+      "needed": {
+       "height": 30,
+       "width": 221
+      },
+      "style": "flex-grow: 1; flex-basis: 0%; color: GrayText",
+      "text": "blocks the rc2 tag and the packager update",
+      "textColor": "#000000",
+      "width": 246,
+      "x": 62,
+      "y": 0
+     }
+    ],
+    "class": "TRBoxView",
+    "height": 30,
+    "style": "align-items: baseline; row-gap: 6px; column-gap: 6px",
+    "width": 308,
+    "x": 16,
+    "y": 85
+   },
+   {
+    "baseline": 12,
+    "class": "NSTextField",
+    "height": 75,
+    "id": "body",
+    "intrinsic": {
+     "height": 15,
+     "width": 1280
+    },
+    "needed": {
+     "height": 75,
+     "width": 300
+    },
+    "style": "min-height: 48px",
+    "text": "All tests pass on Linux and Windows. The macOS job is still flaky on the notarization step; I re-ran it twice and it passed the second time. If you approve, I'll tag rc2 now and post the release notes draft for review.",
+    "textColor": "#000000",
+    "width": 308,
+    "x": 16,
+    "y": 125
+   },
+   {
+    "children": [
+     {
+      "baseline": 17,
+      "class": "NSButton",
+      "height": 25,
+      "id": "approve",
+      "interactive": true,
+      "intrinsic": {
+       "height": 25,
+       "width": 170
+      },
+      "title": "Approve: tag rc2 now",
+      "width": 308,
+      "x": 0,
+      "y": 0
+     },
+     {
+      "baseline": 18,
+      "class": "NSButton",
+      "height": 25,
+      "id": "alternative",
+      "interactive": true,
+      "intrinsic": {
+       "height": 25,
+       "width": 183
+      },
+      "title": "Re-run the macOS job first",
+      "width": 308,
+      "x": 0,
+      "y": 31
+     },
+     {
+      "baseline": 18,
+      "class": "NSButton",
+      "height": 25,
+      "id": "defer",
+      "interactive": true,
+      "intrinsic": {
+       "height": 25,
+       "width": 121
+      },
+      "title": "Defer to Monday",
+      "width": 308,
+      "x": 0,
+      "y": 62
+     }
+    ],
+    "class": "TRBoxView",
+    "height": 87,
+    "id": "options",
+    "style": "flex-direction: column; row-gap: 6px; column-gap: 6px",
+    "width": 308,
+    "x": 16,
+    "y": 210
+   },
+   {
+    "children": [
+     {
+      "baseline": 15,
+      "class": "NSTextField",
+      "editable": true,
+      "height": 21,
+      "id": "reply",
+      "interactive": true,
+      "intrinsic": {
+       "height": 21,
+       "width": 18
+      },
+      "style": "flex-grow: 1; flex-basis: 0%",
+      "width": 247,
+      "x": 0,
+      "y": 2
+     },
+     {
+      "baseline": 18,
+      "class": "NSButton",
+      "height": 25,
+      "id": "send",
+      "interactive": true,
+      "intrinsic": {
+       "height": 25,
+       "width": 53
+      },
+      "title": "Send",
+      "width": 53,
+      "x": 255,
+      "y": 0
+     }
+    ],
+    "class": "TRBoxView",
+    "height": 25,
+    "style": "align-items: center; margin-top: 4px; row-gap: 8px; column-gap: 8px",
+    "width": 308,
+    "x": 16,
+    "y": 311
+   }
+  ],
+  "class": "TRBoxView",
+  "height": 680,
+  "id": "ask",
+  "style": "flex-direction: column; padding-left: 16px; padding-top: 16px; padding-right: 16px; padding-bottom: 16px; row-gap: 10px; column-gap: 10px; background-color: Canvas; container-type: inline-size",
+  "width": 340,
+  "windowBackground": "#aaaaaa",
+  "x": 0,
+  "y": 0
+ },
+ "source": "Examples/TrellisDemo/AskDetail.trellis",
+ "theme": "default",
+ "trellis": "0.1",
+ "viewport": {
+  "height": 680,
+  "scale": 1,
+  "width": 340
+ }
+}

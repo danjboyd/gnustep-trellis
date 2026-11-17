@@ -1,6 +1,6 @@
-# Trellis public API (v0.4)
+# Trellis public API (v0.5)
 
-This page lists what Trellis 0.4 promises to keep. Anything here changes
+This page lists what Trellis 0.5 promises to keep. Anything here changes
 only with a version bump and a CHANGELOG entry; anything not listed is
 internal and may change without notice.
 

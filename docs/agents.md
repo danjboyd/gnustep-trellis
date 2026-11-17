@@ -385,5 +385,9 @@ A custom view whose height depends on its width (a text view at natural
 height, say) can implement `-trellisSizeForWidth:` (the `TRSizeForWidth`
 protocol in TRViewMeasure.h). Trellis calls it with the width on offer,
 or `CGFLOAT_MAX` for the view's max-content size, and lays it out in one
-pass. Outlets bind by KVC, so an `IBOutlet` ivar `_title` serves
+pass. This is the way to put rendered Markdown, chat bubbles or any
+custom-drawn text in a layout: return the height your drawing needs at
+that width, and call `-[TRBoxView invalidateSubview:]` when the content
+changes. Without it, a custom view is measured by its intrinsic content
+size (or its frame). Outlets bind by KVC, so an `IBOutlet` ivar `_title` serves
 `id="title"`, and lint accepts it.

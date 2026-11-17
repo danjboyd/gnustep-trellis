@@ -5,6 +5,13 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+## 0.5.0 (2026-11-17)
+
+Adds API (listed in docs/api.md, nothing removed): `<split>` resizable
+panes, `<segmented>` controls, a `hidden` attribute and
+`-setHidden:forSubview:`, per-side borders, and dashed, dotted and double
+borders that paint as such.
+
 - Dashed, dotted and double borders draw as such (they drew solid).
   `border: 2px none` now has no width, as in CSS.
 - `hidden` attribute, `-[TRBoxView setHidden:forSubview:]` and

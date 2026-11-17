@@ -5,6 +5,16 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+## 0.9.0 (2026-11-17)
+
+Five layout behavior changes, each closer to the browser (see
+docs/migration-0.9.md): abspos roots shrink to fit; grid auto tracks
+stretch only into definite space; a root's aspect-ratio applies with a
+filling auto width; column baseline groups; and abspos descendants of a
+grid use their grid area. Flex intrinsic sizes follow css-flexbox 9.9.1.
+Conformance is 3599/3599 on Linux and macOS, with known gaps down from 127
+to 73.
+
 - **Changed (layout):** `align-items`/`align-self: baseline` (and `last
   baseline`) in a column now forms a baseline group. The baseline is
   synthesized from each border box's start (end) edge, so the items line

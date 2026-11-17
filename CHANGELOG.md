@@ -5,6 +5,15 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Behavior change (grid):** a spanning item's extra space now goes to
+  the spanned tracks that can still take it before any track grows past
+  its growth limit (CSSWG #3648, CSS Grid 2 12.5.1 "distribute space to
+  non-affected tracks"). An empty intrinsic track next to a spanning item
+  stays at its content size instead of absorbing the overflow. Matches
+  WPT 34bdce1's revised grid-gutters-and-flex-content-001. Two older WPT
+  cases that predate the change are listed in
+  Tests/Conformance/upstream-stale.json.
+
 ## 0.6.0 (2026-11-17)
 
 Changes layout behavior (a minor version, so pins on 0.5.x don't move):

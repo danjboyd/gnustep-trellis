@@ -1,0 +1,7 @@
+{
+ "about": "Imported cases whose expectations predate a spec change Trellis follows. trellis-case skips them by default (counted as upstream-stale); --all runs them. Remove an entry when upstream rebaselines the case.",
+ "cases": {
+  "wpt-grid/css/css-grid/layout-algorithm/grid-minmax-spanning-items-columns-001/12": "CSSWG #3648 (distribute space to non-affected tracks, CSS Grid 2 12.5.1): the expectation is pre-#3648. WebKit passes it only through legacy RenderGrid, since width:100% items keep the file out of its GFC; WebKit 322402@main rebaselined the GFC-covered grid-gutters-and-flex-content-001 instead.",
+  "wpt-grid/css/css-grid/layout-algorithm/grid-minmax-spanning-items-columns-001/13": "CSSWG #3648, as /12."
+ }
+}

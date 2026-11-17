@@ -1,9 +1,9 @@
 {
- "commit": "b85125a",
+ "commit": "b168933+dirty",
  "conformance": {
-  "pass": 3154,
-  "skipped": 1029,
-  "total": 3154
+  "pass": 3152,
+  "skipped": 1031,
+  "total": 3152
  },
  "date": "2026-11-17",
  "platform": "linux",
@@ -19,8 +19,8 @@
   },
   "wpt-grid": {
    "cases": 1977,
-   "pass": 1383,
-   "total": 1383
+   "pass": 1381,
+   "total": 1381
   },
   "wpt-sizing": {
    "cases": 125,

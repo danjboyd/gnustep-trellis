@@ -182,6 +182,9 @@ typedef enum { TRPass, TRFail, TRSkip } TROutcome;
    the list. */
 static NSSet *gUnsupported;
 static NSCountedSet *gSkipReasons;
+static NSDictionary *gStale;   /* upstream-stale.json: case id -> reason */
+static BOOL gRunAll;
+
 static NSSet *TRDefaultUnsupported(void)
 {
   return [NSSet setWithObjects:
@@ -215,6 +218,13 @@ static TROutcome TRRunCase(NSString *file, NSDictionary *c, NSString **suiteOut)
       suite = [parts count] > 1 ? parts[0] : @"local";
     }
   *suiteOut = suite;
+  NSString *stale = gStale[cid];
+  if (stale != nil && !gRunAll)
+    {
+      [gSkipReasons addObject: @"upstream-stale"];
+      if (gVerbose) printf("SKIP %s: upstream-stale: %s\n", [cid UTF8String], [stale UTF8String]);
+      return TRSkip;
+    }
   if (c[@"skip"])
     {
       if (gVerbose) printf("SKIP %s: %s\n", [cid UTF8String], [[c[@"skip"] description] UTF8String]);
@@ -301,12 +311,19 @@ int main(int argc, const char **argv)
     {
       NSMutableArray *files = [NSMutableArray array];
       gUnsupported = TRDefaultUnsupported();
+      /* Imported cases whose expectations predate a spec change Trellis
+         follows (id -> reason). Skipped by default, like an unsupported
+         feature; --all runs them. Kept outside the cases so a re-import
+         doesn't drop it. */
+      NSData *sd = [NSData dataWithContentsOfFile: @"Tests/Conformance/upstream-stale.json"];
+      id sj = sd ? [NSJSONSerialization JSONObjectWithData: sd options: 0 error: NULL] : nil;
+      gStale = [sj isKindOfClass: [NSDictionary class]] ? sj[@"cases"] : nil;
       gSkipReasons = [NSCountedSet set];
       for (int i = 1; i < argc; i++)
         {
           NSString *a = [NSString stringWithUTF8String: argv[i]];
           if ([a isEqualToString: @"--verbose"] || [a isEqualToString: @"-v"]) gVerbose = YES;
-          else if ([a isEqualToString: @"--all"]) gUnsupported = [NSSet set];
+          else if ([a isEqualToString: @"--all"]) { gUnsupported = [NSSet set]; gRunAll = YES; }
           else if ([a isEqualToString: @"--unsupported"] && i + 1 < argc)
             {
               NSString *list = [NSString stringWithUTF8String: argv[++i]];

@@ -465,5 +465,65 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/abspos_root_shrinks_to_fit",
+  "note": "an abspos root without both insets in an axis takes its fit-content width and content height, not the whole available space",
+  "available": {
+   "width": 800,
+   "height": 600
+  },
+  "root": {
+   "style": "position: absolute; left: 10px",
+   "children": [
+    {
+     "style": "width: 80px; height: 30px"
+    }
+   ]
+  },
+  "expected": {
+   "x": 10,
+   "y": 0,
+   "width": 80,
+   "height": 30,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 80,
+     "height": 30
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/abspos_root_both_insets_fill",
+  "note": "with left and right (top and bottom) it fills the space less the insets",
+  "available": {
+   "width": 800,
+   "height": 600
+  },
+  "root": {
+   "style": "position: absolute; left: 10px; right: 20px; top: 0; bottom: 100px",
+   "children": [
+    {
+     "style": "width: 80px; height: 30px"
+    }
+   ]
+  },
+  "expected": {
+   "x": 10,
+   "y": 0,
+   "width": 770,
+   "height": 500,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 80,
+     "height": 30
+    }
+   ]
+  }
  }
 ]

@@ -170,6 +170,14 @@ static void TRClearDirty(TRNode *n)
   TRClearDirty(self);
 }
 
+/* A root inset in px, or a % of the available size; else 0. */
+static TRFloat TRRootInset(TRValue v, TRFloat ref)
+{
+  if (v.unit == TRUnitPoint) return v.value;
+  if (v.unit == TRUnitPercent && !isnan(ref)) return v.value * ref / 100;
+  return 0;
+}
+
 - (void)_layoutOnceWithAvailableSize:(TRSize)available direction:(TRDirection)direction
 {
   TRDirection own = _style->_s.direction == TRDirectionInherit ? direction : _style->_s.direction;
@@ -201,6 +209,13 @@ static void TRClearDirty(TRNode *n)
       TRFloat ml = s->margin[TREdgeLeft].unit == TRUnitPoint ? s->margin[TREdgeLeft].value : 0;
       TRFloat mr = s->margin[TREdgeRight].unit == TRUnitPoint ? s->margin[TREdgeRight].value : 0;
       aw = MAX(0, aw - ml - mr);
+      /* An abspos root without both left and right shrinks to fit the
+         space (CSS 2 10.3.7): its auto width is fit-content, not stretch. */
+      if (s->position == TRPositionAbsolute
+          && (s->inset[TREdgeLeft].unit == TRUnitAuto || s->inset[TREdgeRight].unit == TRUnitAuto))
+        wm = TRMeasureModeAtMost;
+      else if (s->position == TRPositionAbsolute)
+        aw = MAX(0, aw - TRRootInset(s->inset[TREdgeLeft], available.width) - TRRootInset(s->inset[TREdgeRight], available.width));
     }
   if (s->height.unit == TRUnitPoint || (s->height.unit == TRUnitPercent && !isnan(ah)))
     {
@@ -220,6 +235,13 @@ static void TRClearDirty(TRNode *n)
       TRFloat mt = s->margin[TREdgeTop].unit == TRUnitPoint ? s->margin[TREdgeTop].value : 0;
       TRFloat mb = s->margin[TREdgeBottom].unit == TRUnitPoint ? s->margin[TREdgeBottom].value : 0;
       ah = MAX(0, ah - mt - mb);
+      /* ...and without both top and bottom its auto height is its content
+         height (CSS 2 10.6.4). The space still resolves percentages. */
+      if (s->position == TRPositionAbsolute
+          && (s->inset[TREdgeTop].unit == TRUnitAuto || s->inset[TREdgeBottom].unit == TRUnitAuto))
+        { ah = TRUndefined; hm = TRMeasureModeUndefined; }
+      else if (s->position == TRPositionAbsolute)
+        ah = MAX(0, ah - TRRootInset(s->inset[TREdgeTop], available.height) - TRRootInset(s->inset[TREdgeBottom], available.height));
     }
   /* min/max win over the root's own width/height (definite sizes only). */
   {

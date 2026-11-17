@@ -1225,7 +1225,11 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
         if (colsT[i].size.min.kind == TRBreadthPercent) { colsT[i].size.min.kind = TRBreadthAuto; percentCols = YES; }
         if (colsT[i].size.max.kind == TRBreadthPercent) { colsT[i].size.max.kind = TRBreadthAuto; percentCols = YES; }
       }
-  TRSizeTracks(colsT, nCols, innerW, colGap, items, n, YES, s->justifyContent, minInnerW, maxInnerW);
+  /* Auto tracks stretch only into definite free space (CSS Grid 12.8): a
+     grid whose width is only bounded (shrink-to-fit) sizes to its tracks,
+     and stretches once it is laid out at that width. */
+  TRAlign colStretch = wm == TRMeasureModeAtMost ? TRAlignStart : s->justifyContent;
+  TRSizeTracks(colsT, nCols, innerW, colGap, items, n, YES, colStretch, minInnerW, maxInnerW);
   double contentW = NAN;
   if (percentCols)
     {
@@ -1237,7 +1241,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       if (!isnan(minInnerW)) contentW = MAX(contentW, minInnerW);
       if (!isnan(maxInnerW)) contentW = MIN(contentW, maxInnerW);
       for (NSInteger i = 0; i < nCols; i++) colsT[i].size = savedCols[i];
-      TRSizeTracks(colsT, nCols, contentW, colGap, items, n, YES, s->justifyContent, minInnerW, maxInnerW);
+      TRSizeTracks(colsT, nCols, contentW, colGap, items, n, YES, colStretch, minInnerW, maxInnerW);
     }
   /* left/right are physical: columns are placed from the inline start and
      mirrored for rtl, where left is the end and right the start. */

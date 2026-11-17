@@ -5,6 +5,17 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Changed (layout):** an abspos root shrinks to fit the space it's given,
+  as in CSS 2: without both left and right its auto width is fit-content,
+  and without both top and bottom its auto height is its content height.
+  With both insets it fills the space less the insets. Before, it always
+  filled the available size.
+- **Changed (layout, grid):** a grid whose width is only bounded (for
+  example a shrink-to-fit grid in an `align-items: flex-start` column)
+  sizes its auto columns to their content. Auto tracks stretch only into
+  definite free space (CSS Grid 12.8), so an empty implicit column no
+  longer takes the whole space.
+
 - **Changed (layout):** a root with `aspect-ratio` whose auto width fills
   the available width now takes its height from the ratio, but never less
   than its content height (min-height: auto). Before, it took its content

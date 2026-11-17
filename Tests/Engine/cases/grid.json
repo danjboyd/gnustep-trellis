@@ -717,5 +717,48 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_shrink_to_fit_auto_column",
+  "note": "a shrink-to-fit grid sizes its auto column to the content; auto tracks stretch only into definite free space",
+  "available": {
+   "width": 800,
+   "height": null
+  },
+  "root": {
+   "style": "flex-direction: column; align-items: flex-start; width: 300px",
+   "children": [
+    {
+     "style": "display: grid; grid-template-rows: 20px",
+     "children": [
+      {
+       "style": "width: 50px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 300,
+   "height": 20,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 50,
+     "height": 20,
+     "children": [
+      {
+       "x": 0,
+       "y": 0,
+       "width": 50,
+       "height": 20
+      }
+     ]
+    }
+   ]
+  }
  }
 ]

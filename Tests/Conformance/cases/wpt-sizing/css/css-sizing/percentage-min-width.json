@@ -3,7 +3,7 @@
  "source": {
   "suite": "wpt-sizing",
   "file": "css/css-sizing/percentage-min-width.html",
-  "commit": "76f3efc65c27333e528675406167145735718fab",
+  "commit": "34bdce16413b56bcc6c90c42ad1ed051769bbe2b",
   "license": "BSD-3-Clause",
   "copyright": "web-platform-tests contributors"
  },

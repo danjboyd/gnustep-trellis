@@ -13,9 +13,9 @@ not covered by Trellis's LGPL. Separate copies are in [LICENSES/](LICENSES/).
 | Suite | Upstream | Imported from | Licence |
 |---|---|---|---|
 | `yoga` | https://github.com/facebook/yoga: `tests/generated/*.cpp` (generated from `gentest/fixtures/*.html`) | commit `cac7b345c06804703dc6868f740f04ad8a863f27` | MIT |
-| `wpt` | https://github.com/web-platform-tests/wpt: `css/css-flexbox` tests using `resources/check-layout-th.js` | commit `76f3efc65c27333e528675406167145735718fab` | BSD-3-Clause |
-| `wpt-grid` | https://github.com/web-platform-tests/wpt: `css/css-grid` tests using `resources/check-layout-th.js` | commit `76f3efc65c27333e528675406167145735718fab` | BSD-3-Clause |
-| `wpt-sizing` | https://github.com/web-platform-tests/wpt: `css/css-sizing` tests using `resources/check-layout-th.js` | commit `76f3efc65c27333e528675406167145735718fab` | BSD-3-Clause |
+| `wpt` | https://github.com/web-platform-tests/wpt: `css/css-flexbox` tests using `resources/check-layout-th.js` | commit `34bdce16413b56bcc6c90c42ad1ed051769bbe2b` | BSD-3-Clause |
+| `wpt-grid` | https://github.com/web-platform-tests/wpt: `css/css-grid` tests using `resources/check-layout-th.js` | commit `34bdce16413b56bcc6c90c42ad1ed051769bbe2b` | BSD-3-Clause |
+| `wpt-sizing` | https://github.com/web-platform-tests/wpt: `css/css-sizing` tests using `resources/check-layout-th.js` | commit `34bdce16413b56bcc6c90c42ad1ed051769bbe2b` | BSD-3-Clause |
 
 ## Yoga: MIT License
 

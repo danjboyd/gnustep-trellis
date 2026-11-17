@@ -5,6 +5,14 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+## 0.8.0 (2026-11-17)
+
+One behavior change: a `position: static` box is no longer a containing
+block (see docs/migration-0.8.md; only layouts that write `static` move).
+Size keywords are added (`min-content`, `max-content`, `fit-content`,
+`stretch`). Conformance is 3556/3556 on Linux. A new known-gaps list
+keeps the default run honest.
+
 - **Added:** the size keywords `min-content`, `max-content`, `fit-content`
   and `stretch` (also `-webkit-fill-available`) for `width`, `height`, their
   `min-`/`max-` forms and `flex-basis`. They are measured where the box is

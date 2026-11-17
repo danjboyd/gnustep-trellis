@@ -417,5 +417,53 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/abspos_grid_descendant_area",
+  "note": "an abspos box inside a static grid item uses the positioned grid's area for its grid-column/grid-row; with no placement it uses the grid's padding box, whose height already includes min-height",
+  "root": {
+   "style": "display: grid; grid-template-columns: 50px 100px; grid-template-rows: 20px; min-height: 100px; width: 150px",
+   "children": [
+    {
+     "style": "position: static",
+     "children": [
+      {
+       "style": "position: absolute; grid-column: 2; grid-row: 1 / 2; left: 0; bottom: 0; width: 10px; height: 10px"
+      },
+      {
+       "style": "position: absolute; bottom: 0; right: 0; width: 10px; height: 10px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 150,
+   "height": 100,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 50,
+     "height": 20,
+     "children": [
+      {
+       "x": 50,
+       "y": 10,
+       "width": 10,
+       "height": 10
+      },
+      {
+       "x": 140,
+       "y": 90,
+       "width": 10,
+       "height": 10
+      }
+     ]
+    }
+   ]
+  }
  }
 ]

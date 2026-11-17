@@ -78,9 +78,13 @@ static inline const TRStyleStorage *TRChildStyle(TRNode *c, TRDirection parentDi
 
 /* Places the abspos boxes inside cur's static descendants against a
    containing block's padding box (cbX, cbY, cbW, cbH); (ox, oy) is cur's
-   origin in the containing block's border-box coordinates (TRLayout.m). */
+   origin in the containing block's border-box coordinates (TRLayout.m).
+   area, when set, gives an abspos box its own containing block instead (a
+   grid area, in the containing block's border-box coordinates). */
+typedef void (^TRAbsAreaBlock)(TRNode *abs, TRFloat *x, TRFloat *y, TRFloat *w, TRFloat *h);
 void TRLayoutStaticDescendants(TRNode *cur, TRDirection cbDir, TRFloat ox, TRFloat oy,
-                               TRFloat cbX, TRFloat cbY, TRFloat cbW, TRFloat cbH);
+                               TRFloat cbX, TRFloat cbY, TRFloat cbW, TRFloat cbH,
+                               TRAbsAreaBlock area);
 
 /* The style with min-content / max-content / fit-content / stretch sizes
    measured and written as px into buf (or cs itself when it has none).

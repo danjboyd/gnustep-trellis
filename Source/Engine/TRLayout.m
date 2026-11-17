@@ -571,7 +571,8 @@ static void TRLayoutAbsChild(TRNode *c, TRDirection cbDir, TRFloat cbX, TRFloat 
    boxes only) whose containing block is this one. (ox, oy) is cur's
    border-box origin in the containing block's border-box coordinates. */
 void TRLayoutStaticDescendants(TRNode *cur, TRDirection cbDir, TRFloat ox, TRFloat oy,
-                                      TRFloat cbX, TRFloat cbY, TRFloat cbW, TRFloat cbH)
+                               TRFloat cbX, TRFloat cbY, TRFloat cbW, TRFloat cbH,
+                               TRAbsAreaBlock area)
 {
   for (TRNode *sc in cur->_children)
     {
@@ -580,9 +581,13 @@ void TRLayoutStaticDescendants(TRNode *cur, TRDirection cbDir, TRFloat ox, TRFlo
       const TRStyleStorage *ss = TRStyleStorageForDirection(sc->_style, sc->_ldir);
       for (TRNode *a in sc->_children)
         if (!TRNodeIsNone(a) && a->_style->_s.position == TRPositionAbsolute)
-          TRLayoutAbsChild(a, cbDir, cbX - sx, cbY - sy, cbW, cbH, ss, sc->_ldir,
-                           sc->_rawFrame.width, sc->_rawFrame.height, sc->_lpad, sc->_lborder);
-      TRLayoutStaticDescendants(sc, cbDir, sx, sy, cbX, cbY, cbW, cbH);
+          {
+            TRFloat ax = cbX, ay = cbY, aw = cbW, ah = cbH;
+            if (area) area(a, &ax, &ay, &aw, &ah);
+            TRLayoutAbsChild(a, cbDir, ax - sx, ay - sy, aw, ah, ss, sc->_ldir,
+                             sc->_rawFrame.width, sc->_rawFrame.height, sc->_lpad, sc->_lborder);
+          }
+      TRLayoutStaticDescendants(sc, cbDir, sx, sy, cbX, cbY, cbW, cbH, area);
     }
 }
 
@@ -597,7 +602,7 @@ static void TRLayoutAbsDescendants(TRNode *node, const TRStyleStorage *s, TRDire
   for (TRNode *c in node->_children)
     if (!TRNodeIsNone(c) && c->_style->_s.position == TRPositionAbsolute)
       TRLayoutAbsChild(c, dir, cbX, cbY, cbW, cbH, s, dir, W, H, pad, border);
-  TRLayoutStaticDescendants(node, dir, 0, 0, cbX, cbY, cbW, cbH);
+  TRLayoutStaticDescendants(node, dir, 0, 0, cbX, cbY, cbW, cbH, nil);
 }
 
 /* ------------------------------------------------------------------ */

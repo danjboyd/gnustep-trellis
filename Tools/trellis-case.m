@@ -201,7 +201,6 @@ static NSSet *TRDefaultUnsupported(void)
     @"position-sticky",
     @"grid-template-shorthand",  /* grid / grid-template with area strings */
     @"abspos-ancestor-cb",       /* abspos whose containing block the format can't express (fixed, or no positioned ancestor in the case) */
-    @"abspos-grid-descendant",   /* abspos whose containing block is a grid container beyond its parent */
     @"containing-block-height",  /* % min/max-height on a root: no way to give a CB height without fixing it */
     @"css-calc",                 /* calc(), min(), max(), clamp() values */
     @"margin-collapse",          /* CSS 2 collapsing margins (a block is a flex column here) */

@@ -1319,6 +1319,22 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
   W = MAX(W, pbW);
   H = MAX(H, pbH);
 
+  /* The grid's own min/max size, which TRLayoutNode applies afterwards,
+     already holds here: abspos boxes are placed against the final box. */
+  if (perform && hm != TRMeasureModeExactly)
+    {
+      double mn = TRGBox(s, s->minHeight, oh, NO, ow), mx = TRGBox(s, s->maxHeight, oh, NO, ow);
+      if (!isnan(mx)) H = MIN(H, mx);
+      if (!isnan(mn)) H = MAX(H, mn);
+      H = MAX(H, pbH);
+    }
+  if (perform && wm != TRMeasureModeExactly)
+    {
+      double mn = TRGBox(s, s->minWidth, ow, YES, ow), mx = TRGBox(s, s->maxWidth, ow, YES, ow);
+      if (!isnan(mx)) W = MIN(W, mx);
+      if (!isnan(mn)) W = MAX(W, mn);
+      W = MAX(W, pbW);
+    }
   if (perform)
     {
       double innerFinalW = W - pbW;
@@ -1417,6 +1433,55 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           realRows = MAX(realRows, items[k].r1);
           realCols = MAX(realCols, items[k].c1);
         }
+      /* The grid area named by an abspos box's grid-row/grid-column, in the
+         grid's border-box coordinates: [0] rows (y), [1] columns (x). Used
+         for children and for abspos boxes inside static descendants. */
+      void (^gridArea)(TRNode *, double *, double *) = ^(TRNode *c, double *cbStart, double *cbEnd) {
+      TRStyle *cst = c->_style;
+      for (int axis = 0; axis < 2; axis++)
+        {
+          TRTrack *tr = axis == 0 ? rowsT : colsT;
+          NSInteger nt = axis == 0 ? realRows : realCols;
+          double origin = axis == 0 ? pad[TREdgeTop] + border[TREdgeTop]
+                                    : pad[TREdgeLeft] + border[TREdgeLeft];
+          double padStart = axis == 0 ? border[TREdgeTop] : border[TREdgeLeft];
+          double padEnd = axis == 0 ? H - border[TREdgeBottom] : W - border[TREdgeRight];
+          NSString *sv = axis == 0 ? cst->_gridRowStart : cst->_gridColumnStart;
+          NSString *ev = axis == 0 ? cst->_gridRowEnd : cst->_gridColumnEnd;
+          NSString *aName = nil, *bName = nil;
+          TRLine a, b;
+          TRParseLine(sv, &a, &aName);
+          TRParseLine(ev, &b, &bName);
+          NSInteger expl = axis == 0 ? explicitRows : explicitCols;
+          NSDictionary *names = axis == 0 ? rowLines : colLines;
+          NSInteger si = 0, ei = 0;
+          BOOL sDef = TRResolveLine(a, aName, expl, names, YES, &si);
+          BOOL eDef = TRResolveLine(b, bName, expl, names, NO, &ei);
+          NSInteger off = axis == 0 ? offR : offC;
+          si += off; ei += off;
+          if (sDef && !eDef && b.kind == TRLineSpan) { ei = si + b.n; eDef = YES; }
+          if (eDef && !sDef && a.kind == TRLineSpan) { si = ei - a.n; sDef = si >= 0; }
+          if (sDef && eDef && ei < si) { NSInteger t = si; si = ei; ei = t; }
+          if (sDef && (si < 0 || si > nt)) sDef = NO;
+          if (eDef && (ei < 0 || ei > nt)) eDef = NO;
+          /* si/ei are in 0..nt when defined (checked above). */
+          double sp = !sDef ? 0 : (si < nt ? tr[si].pos : (nt ? tr[nt - 1].pos + tr[nt - 1].base : 0));
+          double ep = !eDef ? 0 : (ei == 0 ? (nt ? tr[0].pos : 0) : tr[ei - 1].pos + tr[ei - 1].base);
+          if (axis == 1 && rtl)
+            {
+              /* Columns run right to left: the start line is the right edge. */
+              double inner = W - pbW;
+              cbStart[axis] = !eDef ? padStart : origin + inner - ep;
+              cbEnd[axis] = !sDef ? padEnd : origin + inner - sp;
+            }
+          else
+            {
+              cbStart[axis] = !sDef ? padStart : origin + sp;
+              cbEnd[axis] = !eDef ? padEnd : origin + ep;
+            }
+          if (cbEnd[axis] < cbStart[axis]) cbEnd[axis] = cbStart[axis];
+        }
+      };
       for (NSUInteger i = 0; i < nc; i++)
         {
           TRNode *c = children[i];
@@ -1424,51 +1489,8 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           if (TRNodeIsNone(c) || cs->position != TRPositionAbsolute) continue;
           /* A static grid isn't a containing block: an ancestor places it. */
           if (s->position == TRPositionStatic && !node->_isLayoutRoot) continue;
-          TRStyle *cst = c->_style;
-          double cbStart[2], cbEnd[2];   /* [0] rows (y), [1] columns (x); border-box coordinates */
-          for (int axis = 0; axis < 2; axis++)
-            {
-              TRTrack *tr = axis == 0 ? rowsT : colsT;
-              NSInteger nt = axis == 0 ? realRows : realCols;
-              double origin = axis == 0 ? pad[TREdgeTop] + border[TREdgeTop]
-                                        : pad[TREdgeLeft] + border[TREdgeLeft];
-              double padStart = axis == 0 ? border[TREdgeTop] : border[TREdgeLeft];
-              double padEnd = axis == 0 ? H - border[TREdgeBottom] : W - border[TREdgeRight];
-              NSString *sv = axis == 0 ? cst->_gridRowStart : cst->_gridColumnStart;
-              NSString *ev = axis == 0 ? cst->_gridRowEnd : cst->_gridColumnEnd;
-              NSString *aName = nil, *bName = nil;
-              TRLine a, b;
-              TRParseLine(sv, &a, &aName);
-              TRParseLine(ev, &b, &bName);
-              NSInteger expl = axis == 0 ? explicitRows : explicitCols;
-              NSDictionary *names = axis == 0 ? rowLines : colLines;
-              NSInteger si = 0, ei = 0;
-              BOOL sDef = TRResolveLine(a, aName, expl, names, YES, &si);
-              BOOL eDef = TRResolveLine(b, bName, expl, names, NO, &ei);
-              NSInteger off = axis == 0 ? offR : offC;
-              si += off; ei += off;
-              if (sDef && !eDef && b.kind == TRLineSpan) { ei = si + b.n; eDef = YES; }
-              if (eDef && !sDef && a.kind == TRLineSpan) { si = ei - a.n; sDef = si >= 0; }
-              if (sDef && eDef && ei < si) { NSInteger t = si; si = ei; ei = t; }
-              if (sDef && (si < 0 || si > nt)) sDef = NO;
-              if (eDef && (ei < 0 || ei > nt)) eDef = NO;
-              /* si/ei are in 0..nt when defined (checked above). */
-              double sp = !sDef ? 0 : (si < nt ? tr[si].pos : (nt ? tr[nt - 1].pos + tr[nt - 1].base : 0));
-              double ep = !eDef ? 0 : (ei == 0 ? (nt ? tr[0].pos : 0) : tr[ei - 1].pos + tr[ei - 1].base);
-              if (axis == 1 && rtl)
-                {
-                  /* Columns run right to left: the start line is the right edge. */
-                  double inner = W - pbW;
-                  cbStart[axis] = !eDef ? padStart : origin + inner - ep;
-                  cbEnd[axis] = !sDef ? padEnd : origin + inner - sp;
-                }
-              else
-                {
-                  cbStart[axis] = !sDef ? padStart : origin + sp;
-                  cbEnd[axis] = !eDef ? padEnd : origin + ep;
-                }
-              if (cbEnd[axis] < cbStart[axis]) cbEnd[axis] = cbStart[axis];
-            }
+          double cbStart[2], cbEnd[2];
+          gridArea(c, cbStart, cbEnd);
           double cbX = cbStart[1], cbY = cbStart[0];
           double cbW = cbEnd[1] - cbStart[1], cbH = cbEnd[0] - cbStart[0];
           double L = TRGResolve(cs->inset[TREdgeLeft], cbW), R = TRGResolve(cs->inset[TREdgeRight], cbW);
@@ -1539,7 +1561,12 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       if (s->position != TRPositionStatic || node->_isLayoutRoot)
         TRLayoutStaticDescendants(node, dir, 0, 0, border[TREdgeLeft], border[TREdgeTop],
                                   W - border[TREdgeLeft] - border[TREdgeRight],
-                                  H - border[TREdgeTop] - border[TREdgeBottom]);
+                                  H - border[TREdgeTop] - border[TREdgeBottom],
+                                  ^(TRNode *a, TRFloat *x, TRFloat *y, TRFloat *w, TRFloat *h) {
+                                    double st[2], en[2];
+                                    gridArea(a, st, en);
+                                    *x = st[1]; *y = st[0]; *w = en[1] - st[1]; *h = en[0] - st[0];
+                                  });
       node->_contentSize = TRSizeMake(MAX(W, maxX + pad[TREdgeRight] + border[TREdgeRight]),
                                       MAX(H, maxY + pad[TREdgeBottom] + border[TREdgeBottom]));
     }

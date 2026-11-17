@@ -5,6 +5,13 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Fixed:** an abspos box inside static boxes whose containing block is
+  a grid now takes its grid placement from that grid: its grid-row and
+  grid-column name the area, as for a direct child. A grid's own
+  min/max-height and min/max-width already apply when its abspos boxes
+  are placed, so `bottom: 0` uses the final height. The
+  `abspos-grid-descendant` skip is removed (3 cases).
+
 ## 0.8.0 (2026-11-17)
 
 One behavior change: a `position: static` box is no longer a containing

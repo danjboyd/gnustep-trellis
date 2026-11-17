@@ -1,26 +1,26 @@
 {
- "commit": "5022e8a",
+ "commit": "6ddbd55",
  "conformance": {
-  "pass": 2955,
-  "skipped": 1199,
-  "total": 2966
+  "pass": 2960,
+  "skipped": 1188,
+  "total": 2977
  },
- "date": "2026-11-16",
+ "date": "2026-11-17",
  "platform": "macos",
  "suites": {
   "engine": {
-   "pass": 126,
-   "total": 126
+   "pass": 141,
+   "total": 141
   },
   "wpt": {
    "cases": 977,
    "pass": 827,
-   "total": 838
+   "total": 844
   },
   "wpt-grid": {
    "cases": 1977,
-   "pass": 1201,
-   "total": 1201
+   "pass": 1206,
+   "total": 1206
   },
   "wpt-sizing": {
    "cases": 125,

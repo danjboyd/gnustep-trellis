@@ -101,10 +101,37 @@ conformance-record: all
 	python3 -I scripts/conformance-summary.py record --platform macos --runner $(B)/trellis-case
 	python3 -I scripts/conformance-summary.py table
 
+# The view tests, headless and window-free (nothing is ordered front), each
+# under NSZombieEnabled except the benchmark. A test fails on a non-zero
+# exit, a FAIL line, or a message to a freed object. preview-open-file is
+# GNUstep's alert check (it needs -finishLaunching in a GUI session), so it
+# is left out. Needs hot reload compiled in (no hot_reload=no) for HOTRELOAD.
+VIEW_TESTS := $(filter-out preview-open-file,$(basename $(notdir $(wildcard Tests/View/*.m))))
+TIMEOUT    := perl -e 'alarm shift; exec @ARGV or die'
+
+check-view: gui
+	@mkdir -p $(B)/view-tests
+	@for t in $(VIEW_TESTS); do \
+	  $(CC) $(CFLAGS) -Wno-deprecated-declarations -ISource/View Tests/View/$$t.m -framework AppKit \
+	    -L$(B) -lTrellis -lTrellisEngine -Wl,-rpath,$(CURDIR)/$(B) -o $(B)/view-tests/$$t || exit 1; \
+	done
+	@status=0; for t in $(VIEW_TESTS); do \
+	  log=$(B)/view-tests/$$t.log; \
+	  if [ $$t = virtual-bench ]; then z=NO; else z=YES; fi; \
+	  NSZombieEnabled=$$z $(TIMEOUT) 120 $(B)/view-tests/$$t > $$log 2>&1; rc=$$?; \
+	  if [ $$rc -ne 0 ] || grep -q '^FAIL\| FAIL' $$log; then echo "$$t: FAIL (exit $$rc)"; grep 'FAIL' $$log | head -5; status=1; \
+	  elif grep -q 'deallocated instance' $$log; then echo "$$t: FAIL (message to a freed object)"; status=1; \
+	  else tail -1 $$log; fi; \
+	done; \
+	RENDER=$(B)/trellis-render bash Tests/View/scroll-container-query.sh | tail -1 || status=1; \
+	LINT=$(B)/trellis-lint bash Tests/Markup/run.sh > $(B)/view-tests/markup.log 2>&1 || status=1; \
+	grep 'cases' $(B)/view-tests/markup.log; \
+	if [ $$status -eq 0 ]; then echo "CHECKVIEW OK"; else echo "CHECKVIEW FAIL"; fi; exit $$status
+
 # Unit tests for the conformance importers (Python, no build needed).
 check-importers:
 	python3 -I Tests/Conformance/tools/test_import_wpt.py
 
 clean:
 	rm -rf $(B)
-.PHONY: all gui check check-importers conformance-record clean
+.PHONY: all gui check check-view check-importers conformance-record clean

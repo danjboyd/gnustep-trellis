@@ -163,16 +163,35 @@ static void TRLintColours(TRMarkupDocument *doc, NSString *path)
     }
 }
 
+/* hidden on the element or an ancestor (the loader's reading: bare,
+   "hidden" or yes hide; no/false/off/0 don't). */
+static BOOL TRLintHidden(TRMarkupElement *e)
+{
+  for (; e != nil; e = e.parent)
+    {
+      NSString *h = e.attributes[@"hidden"];
+      if (h == nil) continue;
+      NSString *l = [h lowercaseString];
+      if (![l isEqualToString: @"no"] && ![l isEqualToString: @"false"]
+          && ![l isEqualToString: @"off"] && ![l isEqualToString: @"0"])
+        return YES;
+    }
+  return NO;
+}
+
 /* Accessibility: every control needs a name assistive apps can read. */
 static void TRLintAccessibility(TRMarkupDocument *doc, NSString *path)
 {
-  NSMutableSet *ids = [NSMutableSet set], *labelled = [NSMutableSet set];
+  NSMutableSet *labelled = [NSMutableSet set];
+  NSMutableDictionary *byId = [NSMutableDictionary dictionary];
   for (TRMarkupElement *e in [doc allElements])
     {
-      if ([e identifier]) [ids addObject: [e identifier]];
+      if ([e identifier]) byId[[e identifier]] = e;
       if (e.attributes[@"label-for"]) [labelled addObject: e.attributes[@"label-for"]];
     }
-  NSSet *needsLabel = [NSSet setWithObjects: @"field", @"popup", @"slider", @"progress", @"image", @"view", nil];
+  NSSet *ids = [NSSet setWithArray: [byId allKeys]];
+  NSSet *needsLabel = [NSSet setWithObjects: @"field", @"popup", @"slider", @"progress", @"image", @"view",
+                                             @"segmented", nil];
   NSSet *titled = [NSSet setWithObjects: @"button", @"checkbox", @"radio", nil];
   for (TRMarkupElement *e in [doc allElements])
     {
@@ -181,6 +200,25 @@ static void TRLintAccessibility(TRMarkupDocument *doc, NSString *path)
       NSString *target = a[@"label-for"];
       if (target && ![ids containsObject: target])
         TRReport(where, @"error", @"label-for", [NSString stringWithFormat: @"label-for=\"%@\": no element with that id", target]);
+      else if (target && TRLintHidden(byId[target]) && !TRLintHidden(e))
+        TRReport(where, @"warning", @"label-for", [NSString stringWithFormat:
+          @"label-for=\"%@\": that element is hidden but this label isn't; hide them together (wrap both in one box and hide it)", target]);
+      /* A segment without a title has no name to read or click. */
+      if ([e.name isEqualToString: @"segmented"])
+        {
+          NSUInteger blank = 0;
+          for (TRMarkupElement *c in e.children)
+            if ([c.name isEqualToString: @"item"]
+                && [[(c.attributes[@"title"] ?: c.text ?: @"") stringByTrimmingCharactersInSet:
+                       [NSCharacterSet whitespaceAndNewlineCharacterSet]] length] == 0)
+              blank++;
+          if (a[@"items"])
+            for (NSString *t in [a[@"items"] componentsSeparatedByString: @","])
+              if ([[t stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]] length] == 0) blank++;
+          if (blank)
+            TRReport(where, @"warning", @"unlabeled", [NSString stringWithFormat:
+              @"<segmented> has %lu item(s) with no title: every segment needs text", (unsigned long)blank]);
+        }
       NSString *role = a[@"role"];
       if (role && ![role isEqualToString: @"group"] && ![role isEqualToString: @"none"])
         TRReport(where, @"error", @"role", [NSString stringWithFormat: @"role \"%@\" is not supported (use group or none)", role]);

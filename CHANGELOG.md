@@ -5,6 +5,10 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **trellis-lint:** `unlabeled` now covers `<segmented>` (the group needs
+  a name) and segmented items with no text; a `label-for` whose target is
+  hidden while the label isn't is a warning. Markup tests gain
+  `Tests/Markup/warn/` cases (lint must warn, not fail).
 - **Fixed:** hiding the view that has keyboard focus (`hidden`,
   `-setHidden:forSubview:`, a container query) moves focus to the next
   view in the loop on Cocoa too; GNUstep already did.

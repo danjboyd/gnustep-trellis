@@ -2,6 +2,6 @@
   <label>View</label>
   <segmented a11y-label="View" selected="Tiles"><item>Tiles</item><item>Table</item></segmented>
   <spacer/>
-  <segmented tracking="any" items="Working, Waiting, Idle"/>
+  <segmented tracking="any" a11y-label="Status filter" items="Working, Waiting, Idle"/>
   <style> .bar { padding: 8px; gap: 8px; } </style>
 </row>

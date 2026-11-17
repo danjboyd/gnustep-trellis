@@ -23,4 +23,16 @@ for f in Tests/Markup/good/*.trellis; do
   fi
 done
 echo "markup clean cases: $((g-gfail))/$g"
-[ $fail -eq 0 ] && [ $gfail -eq 0 ]
+# Each warn/*.trellis must lint without errors but with the warning in its
+# "<!-- expect: ... -->" first line.
+w=0; wfail=0
+for f in Tests/Markup/warn/*.trellis; do
+  w=$((w+1))
+  want=$(sed -n '1s/.*expect: \(.*\) -->.*/\1/p' "$f")
+  out=$($LINT "$f" 2>&1)
+  if [ $? -ne 0 ] || ! grep -qF -- "$want" <<<"$out"; then
+    echo "FAIL $f: wanted warning '$want', got: $out"; wfail=$((wfail+1))
+  fi
+done
+echo "markup warning cases: $((w-wfail))/$w"
+[ $fail -eq 0 ] && [ $gfail -eq 0 ] && [ $wfail -eq 0 ]

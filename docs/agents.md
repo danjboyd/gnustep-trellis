@@ -97,8 +97,9 @@ the user's settings. trellis-render refuses to run without it.
   flag. In a sample file, `"hidden": true` does the same.
 - **Keyboard focus:** Tab follows document order, as in a browser:
   Trellis links the controls into the window's key-view loop after every
-  layout, so controls hidden by `display: none` (or a container query)
-  drop out and come back by themselves. CSS `order` doesn't change it.
+  layout, so controls hidden by `display: none`, a container query or
+  `hidden` drop out and come back by themselves; if the focused control
+  is hidden, focus moves to the next one. CSS `order` doesn't change it.
   `tabindex="1"`, `"2"`, ... go first, in that order; `tabindex="-1"`
   leaves a control out. Scrolled content joins the loop. For the first
   responder, use the root box's `firstKeyView`. The loop wraps through
@@ -110,8 +111,12 @@ the user's settings. trellis-render refuses to run without it.
   shows its value, an icon button, a text view). `role="group"` names a
   container (with `a11y-label`); `role="none"` hides a decorative image.
   trellis-lint warns `unlabeled` for fields (a placeholder counts),
-  popups, sliders, progress bars, images and custom views without a name,
-  and for buttons and checkboxes without a title. On Cocoa these reach
+  popups, segmented controls, sliders, progress bars, images and custom
+  views without a name, for buttons and checkboxes without a title, and
+  for a segmented item with no text. A segmented control's name is the
+  group's (`a11y-label="View"`); its items name themselves. It also warns
+  when a `label-for` target is hidden but its label isn't: hide them
+  together by hiding a box that holds both. On Cocoa these reach
   NSAccessibility; on GNUstep they're recorded but not yet exposed (see
   known-issues.md).
 - **Sample content:** put it in `Screen.sample.json`, keyed by id. It's

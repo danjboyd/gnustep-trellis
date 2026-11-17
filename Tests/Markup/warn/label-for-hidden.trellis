@@ -1,0 +1,5 @@
+<!-- expect: label-for="proxy": that element is hidden but this label isn't -->
+<column>
+  <label label-for="proxy">Proxy</label>
+  <row hidden><field id="proxy" placeholder="proxy.example.com"/></row>
+</column>

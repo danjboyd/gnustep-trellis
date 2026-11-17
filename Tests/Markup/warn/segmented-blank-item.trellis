@@ -1,0 +1,2 @@
+<!-- expect: <segmented> has 1 item(s) with no title -->
+<row><segmented a11y-label="View"><item>Tiles</item><item> </item></segmented></row>

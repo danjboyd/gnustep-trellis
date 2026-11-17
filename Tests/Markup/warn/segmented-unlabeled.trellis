@@ -1,0 +1,2 @@
+<!-- expect: <segmented> has no accessible name -->
+<row><segmented items="Tiles, Table"/></row>

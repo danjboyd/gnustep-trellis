@@ -636,7 +636,7 @@ static NSSize TRPaneNaturalSize(NSView *v, CGFloat width)
       TRBoxView *b = (TRBoxView *)v;
       if (width >= CGFLOAT_MAX / 2)
         {
-          [b.node layoutWithAvailableSize: TRSizeMake(NAN, NAN)];
+          [b.node layoutWithAvailableSize: TRSizeMake(NAN, NAN) direction: [b inheritedLayoutDirection]];
           TRRect f = b.node.layoutFrame;
           NSSize s = NSMakeSize(f.width, f.height);
           [b layoutTrellis];   /* back to its real size */

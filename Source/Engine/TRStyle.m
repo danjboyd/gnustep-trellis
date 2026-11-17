@@ -989,12 +989,32 @@ static NSString *TRKeywordString(const TRKeyword *table, int value)
   LEN(@"max-height", maxHeight)
   if (TRIsDefined(_s.aspectRatio)) [out addObject: [NSString stringWithFormat: @"aspect-ratio: %@%g", _s.aspectRatioAuto ? @"auto " : @"", _s.aspectRatio]];
   static NSString *edges[4] = { @"left", @"top", @"right", @"bottom" };
-  for (int i = 0; i < 4; i++)
+  static NSString *starts[4] = { @"margin-inline-start", @"padding-inline-start",
+    @"border-inline-start-width", @"inset-inline-start" };
+  static NSString *ends[4] = { @"margin-inline-end", @"padding-inline-end",
+    @"border-inline-end-width", @"inset-inline-end" };
+  static NSString *fmt[4] = { @"margin-%@", @"padding-%@", @"border-%@-width", @"%@" };
+  TRValue ltr[4][4], init[4][4];
+  TRGetEdges(&_s, ltr);
+  TRGetEdges(&d, init);
+  for (int k = 0; k < 4; k++)
     {
-      LEN(([NSString stringWithFormat: @"margin-%@", edges[i]]), margin[i])
-      LEN(([NSString stringWithFormat: @"padding-%@", edges[i]]), padding[i])
-      LEN(([NSString stringWithFormat: @"border-%@-width", edges[i]]), border[i])
-      LEN(edges[i], inset[i])
+      /* Sides that swap with the direction were set as logical sides and
+         are written back as such, so the string reads the same in rtl. A
+         mix of logical and physical sides that no single list of
+         declarations can say is written as mapped for ltr. */
+      const TRValue *rtl = _rtlEdges[k];
+      BOOL logical = _hasLogical
+        && !(TRValueEqual(ltr[k][TREdgeLeft], rtl[TREdgeLeft]) && TRValueEqual(ltr[k][TREdgeRight], rtl[TREdgeRight]))
+        && TRValueEqual(ltr[k][TREdgeLeft], rtl[TREdgeRight]) && TRValueEqual(ltr[k][TREdgeRight], rtl[TREdgeLeft]);
+      for (int i = 0; i < 4; i++)
+        {
+          if (TRValueEqual(ltr[k][i], init[k][i])) continue;
+          NSString *name = [NSString stringWithFormat: fmt[k], edges[i]];
+          if (logical && i == TREdgeLeft) name = starts[k];
+          else if (logical && i == TREdgeRight) name = ends[k];
+          [out addObject: [NSString stringWithFormat: @"%@: %@", name, TRValueString(ltr[k][i])]];
+        }
     }
   LEN(@"row-gap", rowGap)
   LEN(@"column-gap", columnGap)

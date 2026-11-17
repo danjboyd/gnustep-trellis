@@ -104,6 +104,15 @@ the user's settings. trellis-render refuses to run without it.
   virtual box's items aren't reached: set them up from the data source.
   In a sample file, `"disabled": true` does the same. Lint warns on
   `disabled` on a label, text, image, spacer, separator or progress bar.
+- **Right-to-left (since 0.5.2):** `dir="rtl"` on an element (as in HTML)
+  sets `direction: rtl` for it and its content; style rules and inline
+  styles can still override it. Rows run right to left, and logical sides
+  (`margin-inline-start` ...) swap. Split panes and scroll views keep the
+  direction of the element around them. `dir` takes `ltr` or `rtl`; any
+  other value is an error. On Cocoa, an app running in a right-to-left
+  localization lays out rtl by default. Tab order stays document order,
+  which is reading order in either direction. Split panes are not
+  reordered: the first pane stays on the left.
 - **Keyboard focus:** Tab follows document order, as in a browser:
   Trellis links the controls into the window's key-view loop after every
   layout, so controls hidden by `display: none`, a container query or

@@ -1,0 +1,2 @@
+<!-- expect: <column dir="sideways">: use ltr or rtl -->
+<column dir="sideways"><label>Hi</label></column>

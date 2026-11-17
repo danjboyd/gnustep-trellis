@@ -18,6 +18,13 @@ version may change the API listed in docs/api.md, and says so here.
 - **Fixed:** `position: relative` offsets (`left`, `top`, ...) on grid
   items were ignored; they now move the item, against its grid area. With
   both `left` and `right` set, an rtl container uses `right`, in flex too.
+- **Added:** `dir="rtl"` / `dir="ltr"` in markup, as in HTML (any other
+  value is an error). A box in a split pane or a scroll view lays out with
+  the direction around it; it was always ltr. On Cocoa the default follows
+  `NSApp.userInterfaceLayoutDirection`. `-[TRBoxView
+  inheritedLayoutDirection]` says which direction a box inherits.
+- **Fixed:** `-[TRStyle declarationString]` writes logical sides back as
+  logical sides, so a frame dump of an rtl screen reads back the same.
 - `trellis-case` accepts a declaration string as a node's `style`, and
   no longer skips conformance cases that need logical properties
   (WPT: 4 more pass).

@@ -598,6 +598,14 @@ static NSString *TRDecodeEntities(NSString *s)
               return NO;
             }
         }
+      NSString *dirAttr = e->_attributes[@"dir"];
+      if (dirAttr && !([dirAttr isEqualToString: @"rtl"] || [dirAttr isEqualToString: @"ltr"]))
+        {
+          _error = [NSError errorWithDomain: TRMarkupErrorDomain code: 2 userInfo: @{
+            NSLocalizedDescriptionKey: [NSString stringWithFormat: @"%@:%lu:%lu: <%@ dir=\"%@\">: use ltr or rtl",
+              _name, (unsigned long)e->_line, (unsigned long)e->_column, e->_name, dirAttr]}];
+          return NO;
+        }
       NSString *st = e->_attributes[@"style"];
       NSError *err = nil;
       if (st && [st rangeOfString: @"var("].location == NSNotFound && [TRStyle styleWithDeclarations: st error: &err] == nil)
@@ -798,6 +806,16 @@ static NSInteger TRCompareRules(id x, id y, void *ctx)
     {
       TRMatchedDeclarations *m = [TRMatchedDeclarations new];
       m->_declarations = def;
+      [out addObject: m];
+    }
+  /* dir="rtl" (HTML): direction for the element and, by inheritance, its
+     content; style rules and inline styles still override it. */
+  NSString *dirAttr = e->_attributes[@"dir"];
+  if ([dirAttr isEqualToString: @"rtl"] || [dirAttr isEqualToString: @"ltr"])
+    {
+      TRMatchedDeclarations *m = [TRMatchedDeclarations new];
+      m->_declarations = [@"direction: " stringByAppendingString: dirAttr];
+      m->_line = e->_line;
       [out addObject: m];
     }
   NSMutableArray *matched = [NSMutableArray array];

@@ -59,5 +59,6 @@
   design.md section 4a).
 - Absolute positioning is relative to the parent box, not the nearest
   positioned ancestor.
+- Split panes aren't mirrored in rtl: the first pane stays on the left.
 - Logical properties assume horizontal writing (`writing-mode` isn't
   supported): inline is left/right, block is top/bottom.

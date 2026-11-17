@@ -867,13 +867,39 @@ static NSView *TRFocusedViewIn(NSView *box)
     }
 }
 
+/* The direction a root box lays out with: that of the node holding it in
+   the nearest enclosing box (a box in a split pane or a scroll view starts
+   its own layout tree but keeps the outer direction), else the app's
+   (right-to-left in an rtl localization on Cocoa), else ltr. A box's own
+   direction property still wins. */
+- (TRDirection)inheritedLayoutDirection
+{
+  NSView *c = self;
+  for (NSView *p = [self superview]; p != nil; c = p, p = [p superview])
+    if ([p isKindOfClass: [TRBoxView class]])
+      {
+        TRNode *n = [(TRBoxView *)p nodeForSubview: c] ?: [(TRBoxView *)p node];
+        if (n.layoutDirection != TRDirectionInherit) return n.layoutDirection;
+        break;
+      }
+  /* Cocoa only; GNUstep's NSApplication has no layout direction. 1 is
+     NSUserInterfaceLayoutDirectionRightToLeft. */
+  SEL uild = NSSelectorFromString(@"userInterfaceLayoutDirection");
+  if ([NSApp respondsToSelector: uild])
+    {
+      NSInteger (*get)(id, SEL) = (NSInteger (*)(id, SEL))[NSApp methodForSelector: uild];
+      if (get(NSApp, uild) == 1) return TRDirectionRTL;
+    }
+  return TRDirectionLTR;
+}
+
 - (CGFloat)heightForWidth:(CGFloat)width
 {
   [self refreshSignatures];
-  [_node layoutWithAvailableSize: TRSizeMake(width, NAN)];
+  [_node layoutWithAvailableSize: TRSizeMake(width, NAN) direction: [self inheritedLayoutDirection]];
   CGFloat h = _node.layoutFrame.height;
   NSSize sz = [self bounds].size;
-  [_node layoutWithAvailableSize: TRSizeMake(sz.width, sz.height)];
+  [_node layoutWithAvailableSize: TRSizeMake(sz.width, sz.height) direction: [self inheritedLayoutDirection]];
   return h;
 }
 
@@ -887,7 +913,7 @@ static NSView *TRFocusedViewIn(NSView *box)
   _animateNextLayout = NO;
   [self refreshSignatures];
   NSSize sz = [self bounds].size;
-  [_node layoutWithAvailableSize: TRSizeMake(sz.width, sz.height)];
+  [_node layoutWithAvailableSize: TRSizeMake(sz.width, sz.height) direction: [self inheritedLayoutDirection]];
   /* A running animation ends where it was heading before the new frames
      go in; an animated layout then starts from the views' current frames. */
   NSMutableDictionary *current = nil;
@@ -1228,7 +1254,7 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
 
 - (NSSize)intrinsicContentSize
 {
-  [_node layoutWithAvailableSize: TRSizeMake(NAN, NAN)];
+  [_node layoutWithAvailableSize: TRSizeMake(NAN, NAN) direction: [self inheritedLayoutDirection]];
   TRRect f = _node.layoutFrame;
   NSSize s = NSMakeSize(f.width, f.height);
   /* Restore the layout for the current size. */

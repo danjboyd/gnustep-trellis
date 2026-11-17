@@ -111,7 +111,7 @@ static BOOL TRFlag(NSString *v, NSString *name, BOOL *on)
   if ([sv isKindOfClass: [TRBoxView class]])
     _box.node.containerQueryParent = [(TRBoxView *)sv nodeForSubview: self];
   NSSize cs = [self contentSize];
-  [_box.node layoutWithAvailableSize: TRSizeMake(cs.width, NAN)];
+  [_box.node layoutWithAvailableSize: TRSizeMake(cs.width, NAN) direction: [_box inheritedLayoutDirection]];
   CGFloat h = MAX(ceil(_box.node.layoutFrame.height), cs.height);
   [_box setFrame: NSMakeRect(0, 0, cs.width, h)];
   [_box layoutTrellis];

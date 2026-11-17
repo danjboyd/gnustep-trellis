@@ -165,6 +165,23 @@ class AspectRatio(unittest.TestCase):
         self.assertEqual(self.ratio("auto"), "auto")
 
 
+class AvailableHeight(unittest.TestCase):
+    def avail(self, body_style):
+        d = tempfile.mkdtemp()
+        with open(os.path.join(d, "t.html"), "w") as f:
+            f.write('<!DOCTYPE html><body%s><div style="display: flex; height: 10%%">'
+                    '</div></body>' % body_style)
+        p = W.Page(os.path.join(d, "t.html"))
+        return W.Converter(p).available_height_for_root(p.dom.body.element_children()[0])
+
+    def test_percent_of_a_definite_body(self):
+        # percentage-heights-001: <body style="height: 800px">, root height 10%
+        self.assertEqual(self.avail(' style="height: 800px"'), 800)
+
+    def test_percent_of_an_auto_body_does_not_resolve(self):
+        self.assertIsNone(self.avail(""))
+
+
 class Validation(unittest.TestCase):
     def test_left_right_not_valid_for_align(self):
         self.assertNotIn("right", W.VALID_KEYWORDS["align-content"])

@@ -1058,9 +1058,12 @@ class Converter:
                 self.requires.add("containing-block-height")
             return None
         p = root.parent
-        if p is None or p.tag in ("body", "html", "#document"):
+        if p is None or p.tag in ("html", "#document"):
             return None
         pd = self.page.declared(p)
+        if p.tag == "body" and "height" not in pd:
+            # An auto-height body: the percentage doesn't resolve.
+            return None
         h = to_px(pd.get("height", "auto"), self.page.font(p)[0])
         if not isinstance(h, (int, float)):
             return None

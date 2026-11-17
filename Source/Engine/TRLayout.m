@@ -107,8 +107,7 @@ static inline TRAlign TRResolveAlignSelf(const TRStyleStorage *item, const TRSty
 
 static inline BOOL TRIsInFlow(TRNode *child)
 {
-  const TRStyleStorage *s = &child->_style->_s;
-  return s->display != TRDisplayNone && s->position != TRPositionAbsolute;
+  return !TRNodeIsNone(child) && child->_style->_s.position != TRPositionAbsolute;
 }
 
 /* ------------------------------------------------------------------ */
@@ -374,7 +373,7 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
     {
       TRNode *child = children[ci];
       const TRStyleStorage *cs = &child->_style->_s;
-      if (cs->display == TRDisplayNone)
+      if (TRNodeIsNone(child))
         {
           if (perform) TRZeroLayout(child);
           continue;
@@ -957,7 +956,7 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
         {
           TRNode *c = children[ci];
           const TRStyleStorage *cs = &c->_style->_s;
-          if (cs->display == TRDisplayNone || cs->position != TRPositionAbsolute) continue;
+          if (TRNodeIsNone(c) || cs->position != TRPositionAbsolute) continue;
           TREdges ce = TRResolveEdges(cs, cbW);
           TRFloat cpbW = TRPBHorizontal(&ce), cpbH = TRPBVertical(&ce);
           TRFloat m[4];
@@ -1084,7 +1083,7 @@ TRSize TRLayoutNode(TRNode *node, TRFloat aw, TRFloat ah,
 
   BOOL hasInFlowOrAbs = NO;
   for (TRNode *c in node->_children)
-    if (c->_style->_s.display != TRDisplayNone) { hasInFlowOrAbs = YES; break; }
+    if (!TRNodeIsNone(c)) { hasInFlowOrAbs = YES; break; }
 
   TRSize size;
   if (s->display == TRDisplayGrid)

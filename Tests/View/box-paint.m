@@ -1,6 +1,8 @@
-/* Box painting (headless): dashed and dotted borders leave gaps along
-   an edge, solid and double ones don't; `border: 2px none` has no width.
-   Prints BOXPAINT OK. */
+/* Box painting and hiding (headless): dashed and dotted borders leave
+   gaps along an edge, solid and double ones don't; `border: 2px none` has
+   no width. hidden="yes" and -setHidden:forSubview: take a view out of
+   the layout without touching its style, so showing it again restores
+   the style's own display. Prints BOXPAINT OK. */
 #import <AppKit/AppKit.h>
 #import "TRBoxView.h"
 #import "TRLoader.h"
@@ -96,6 +98,50 @@ int main(void)
       [none setFrame: NSMakeRect(0, 0, 50, 50)];
       [none layoutTrellis];
       Expect("border: 2px none has no width", [none.node layoutBorderForEdge: TREdgeTop] == 0);
+
+      /* Hiding. */
+      NSString *spec =
+        @"<row id=\"bar\">\n"
+        @"  <label id=\"a\" hidden>Alpha</label>\n"
+        @"  <label id=\"b\">Beta</label>\n"
+        @"  <box id=\"card\" class=\"card\" hidden=\"yes\"><label>Card</label></box>\n"
+        @"</row>\n"
+        @"<style> .card { display: grid; width: 40px; } </style>\n";
+      NSError *err = nil;
+      TRMarkupDocument *doc = [TRMarkupDocument documentWithString: spec name: @"hide.trellis" error: &err];
+      TRBoxView *root = doc ? [TRLoader loadDocument: doc owner: nil error: &err] : nil;
+      if (root == nil) { printf("load failed: %s\n", [[err localizedDescription] UTF8String]); return 2; }
+      [root setFrame: NSMakeRect(0, 0, 300, 40)];
+      [root layoutTrellis];
+      NSView *a = [TRLoader viewWithIdentifier: @"a" inView: root];
+      NSView *b = [TRLoader viewWithIdentifier: @"b" inView: root];
+      TRBoxView *card = (TRBoxView *)[TRLoader viewWithIdentifier: @"card" inView: root];
+      Expect("a bare hidden attribute hides", [a isHidden] && [root isSubviewHidden: a]);
+      Expect("hidden=yes hides", [card isHidden]);
+      Expect("hidden views take no space", NSMinX([b frame]) < 1);
+      [root setHidden: NO forSubview: a];
+      [root layoutTrellis];
+      Expect("setHidden:NO shows it again", ![a isHidden] && NSMinX([b frame]) > 10);
+      /* A merge of other declarations doesn't change it either way. */
+      [root setStyleDeclarations: @"width: 40px" forSubview: card];
+      [root layoutTrellis];
+      Expect("setStyleDeclarations: leaves a hidden view hidden", [card isHidden]);
+      [root setHidden: NO forSubview: card];
+      [root layoutTrellis];
+      Expect("shown again with the style's own display (grid)",
+             ![card isHidden] && card.node.style.display == TRDisplayGrid);
+      [root setStyleDeclarations: @"display: none" forSubview: b];
+      [root layoutTrellis];
+      Expect("isSubviewHidden: is YES for display: none too", [b isHidden] && [root isSubviewHidden: b]);
+      [root setHidden: NO forSubview: b];
+      [root layoutTrellis];
+      Expect("setHidden:NO doesn't override display: none", [b isHidden]);
+
+      NSString *bad = @"<column><label hidden=\"maybe\">X</label></column>\n";
+      TRMarkupDocument *bd = [TRMarkupDocument documentWithString: bad name: @"bad.trellis" error: &err];
+      err = nil;
+      Expect("hidden=\"maybe\" is a load error",
+             bd && [TRLoader loadDocument: bd owner: nil error: &err] == nil && err != nil);
     }
   printf(gFail ? "BOXPAINT FAIL (%d)\n" : "BOXPAINT OK\n", gFail);
   return gFail ? 1 : 0;

@@ -868,7 +868,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
     {
       TRNode *c = children[i];
       const TRStyleStorage *cs = &c->_style->_s;
-      if (cs->display == TRDisplayNone) continue;
+      if (TRNodeIsNone(c)) continue;
       if (cs->position == TRPositionAbsolute) continue;
       items[n].node = c; items[n].s = cs; items[n].docOrder = (NSInteger)i;
       n++;
@@ -1327,7 +1327,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
         {
           TRNode *c = children[i];
           const TRStyleStorage *cs = &c->_style->_s;
-          if (cs->display == TRDisplayNone || cs->position != TRPositionAbsolute) continue;
+          if (TRNodeIsNone(c) || cs->position != TRPositionAbsolute) continue;
           TRStyle *cst = c->_style;
           double cbStart[2], cbEnd[2];   /* [0] rows (y), [1] columns (x); border-box coordinates */
           for (int axis = 0; axis < 2; axis++)

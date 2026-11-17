@@ -40,6 +40,10 @@ typedef TRFloat (^TRBaselineBlock)(TRSize size);
 /* The node's style. Mutating it marks the node dirty. Setting it copies. */
 @property (nonatomic, copy) TRStyle *style;
 
+/* Hidden: laid out as if `display: none`, whatever the style says, so
+   showing it again restores the style's own display. Marks it dirty. */
+@property (nonatomic, getter=isHidden) BOOL hidden;
+
 /* Optional name, used in frame dumps and lint messages. */
 @property (nonatomic, copy) NSString *identifier;
 

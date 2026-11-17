@@ -77,6 +77,14 @@
   [self markDirty];
 }
 
+- (BOOL)isHidden { return _hidden; }
+- (void)setHidden:(BOOL)hidden
+{
+  if (_hidden == hidden) return;
+  _hidden = hidden;
+  [self markDirty];
+}
+
 - (NSArray<TRNode *> *)children
 {
   return [_children copy];

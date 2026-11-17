@@ -77,6 +77,13 @@ the user's settings. trellis-render refuses to run without it.
 - **Flat buttons:** `<button bordered="no">` draws the title only (chips
   on a coloured bar); `color:` colours a button's title. Setting the
   title later in code drops the colour: set `attributedTitle` instead.
+- **Hiding (since 0.5):** `hidden` (or `hidden="yes"`) starts an element
+  hidden; in code, `[box setHidden: NO forSubview: view]` shows it again.
+  A hidden view is laid out as if `display: none`, but its style is left
+  alone, so showing it restores the style's own `display` (no need to
+  write `display: flex` back). A plain `-setHidden:` on the view doesn't
+  last: the next layout shows or hides views by their style and this
+  flag. In a sample file, `"hidden": true` does the same.
 - **Keyboard focus:** Tab follows document order, as in a browser:
   Trellis links the controls into the window's key-view loop after every
   layout, so controls hidden by `display: none` (or a container query)

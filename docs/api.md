@@ -13,7 +13,8 @@ the layout engine (Foundation only), and `TRBoxView.h`, `TRLoader.h`,
 The markup and CSS described in [agents.md](agents.md), sections 2 to 4,
 are public: element names, attributes (`id`, `class`, `action`,
 `no-outlet`, `default`, `wraps`, `placeholder`, `tabindex`, `a11y-label`,
-`label-for`, `role` (`group`, `none`), `items`, `type`, ...), the
+`label-for`, `role` (`group`, `none`), `items`, `type`, since 0.5
+`hidden`, ...), the
 `<!-- owner: Class -->` comment, `<style>` with the listed properties,
 selectors and `@container` queries, and the `Screen.sample.json`
 convention. Unknown properties and bad values stay errors.
@@ -59,7 +60,7 @@ value, and the built-in `--tr-*` tokens listed in agents.md section 3
 |---|---|---|
 | `+[TRLoader loadFile:owner:error:]`, `+loadDocument:owner:error:` | TRLoader.h | Build a view tree from a .trellis file, binding outlets by `id` (KVC: properties or ivars, `_name` included) and actions by `action=`. |
 | `+[TRLoader instantiateTemplate:...]`, `+applySample:toView:error:`, `+viewWithIdentifier:inView:` | TRLoader.h | Templates, sample content, lookup by id. |
-| `TRBoxView`: `+boxWithStyle:`, `-initWithStyle:`, `style`, `-setStyleDeclarations:`, `-addSubview:style:`, `-setStyleDeclarations:forSubview:`, `-nodeForSubview:`, `-addConditionalStyle:when:`, `-invalidateSubview:`, `-layoutTrellis`, `-rootBox`, `node`; since 0.2 `managesKeyViewLoop`, `-recalculateTrellisKeyViewLoop`, `firstKeyView`; since 0.4 `-heightForWidth:` | TRBoxView.h | A view whose subviews Trellis lays out. Plain `-addSubview:` works too (intrinsic size). |
+| `TRBoxView`: `+boxWithStyle:`, `-initWithStyle:`, `style`, `-setStyleDeclarations:`, `-addSubview:style:`, `-setStyleDeclarations:forSubview:`, `-nodeForSubview:`, `-addConditionalStyle:when:`, `-invalidateSubview:`, `-layoutTrellis`, `-rootBox`, `node`; since 0.2 `managesKeyViewLoop`, `-recalculateTrellisKeyViewLoop`, `firstKeyView`; since 0.4 `-heightForWidth:`; since 0.5 `-setHidden:forSubview:`, `-isSubviewHidden:` | TRBoxView.h | A view whose subviews Trellis lays out. Plain `-addSubview:` works too (intrinsic size). |
 | `TRScrollBox` (`contentBox`) | TRLoader.h | The view `<scroll>` creates. |
 | `TRVirtualBox` (since 0.4): `-initWithMode:`, `mode`, `virtualLayout`, `dataSource`, `-setContainerDeclarations:error:`, `estimatedSize`, `overscan`, `defaultTemplate`, `-registerTemplate:ofDocument:error:`, `-registerTemplateElement:ofDocument:`, `-registerViewFactory:forKind:`, `-reloadData`, `-insertItemsAtIndexes:`, `-removeItemsAtIndexes:`, `-moveItemAtIndex:toIndex:`, `-reloadItemsAtIndexes:`, `-scrollToItemAtIndex:position:`, `-focusItemAtIndex:last:`, `-viewForItemAtIndex:`, `-indexOfItemView:`, `realizedIndexes`, `pooledViewCount`, `visibleItemViews`, `visibleRange`, `-updateVirtualContent`; `TRVirtualDataSource`; `TRVirtualScrollPosition` | TRVirtualBox.h | The view `<virtual>` creates: views only for the items on screen, reused per template, with scroll anchoring, keyboard focus across the edge, and list/grid accessibility. |
 | `+[TRLoader instantiateTemplateElement:ofDocument:error:]` (since 0.4) | TRLoader.h | A copy of a `<template>` element (top-level or inside `<virtual>`). |
@@ -81,7 +82,7 @@ value, and the built-in `--tr-*` tokens listed in agents.md section 3
 
 | API | Header | What it is |
 |---|---|---|
-| `TRNode`: construction (`+node`, `+nodeWithStyle:`), tree (`children`, `parent`, `-addChild:`, `-insertChild:atIndex:`, `-removeChild:`, `-removeAllChildren`), `style`, `identifier`, `context`, `measureBlock`, `baselineBlock`, `-markDirty`, `dirty` | TRNode.h | A layout box. |
+| `TRNode`: construction (`+node`, `+nodeWithStyle:`), tree (`children`, `parent`, `-addChild:`, `-insertChild:atIndex:`, `-removeChild:`, `-removeAllChildren`), `style`, `identifier`, `context`, `measureBlock`, `baselineBlock`, `-markDirty`, `dirty`; since 0.5 `hidden` | TRNode.h | A layout box. |
 | Layout: `-layoutWithAvailableSize:`, `-layoutWithAvailableSize:direction:`, `pixelScale`, `layoutFrame`, `layoutDirection`, `contentSize`, `-layoutPaddingForEdge:`, `-layoutBorderForEdge:`, `-layoutMarginForEdge:`, `-absoluteFrame`, `-layoutBaseline`, `hasOverflow`, `-frameDump` | TRNode.h | Running layout and reading results. Frames are border boxes relative to the parent's border box. |
 | Container queries: `-addConditionalStyle:when:error:`, `matchedConditions` | TRNode.h | `@container`-style conditional declarations. |
 | `TRStyle`: `+style`, `+styleWithDeclarations:[error:]`, `+styleWithDictionary:error:`, `-applyDeclarations:error:`, `-applyDictionary:error:`, `-setValue:forProperty:error:`, the typed properties, the per-edge accessors, `-declarationString`, `otherDeclarations` | TRStyle.h | Layout properties by CSS name or typed. |

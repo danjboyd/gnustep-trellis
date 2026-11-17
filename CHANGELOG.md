@@ -7,6 +7,11 @@ version may change the API listed in docs/api.md, and says so here.
 
 - Dashed, dotted and double borders draw as such (they drew solid).
   `border: 2px none` now has no width, as in CSS.
+- `hidden` attribute, `-[TRBoxView setHidden:forSubview:]` and
+  `-isSubviewHidden:`, and `TRNode.hidden`: hide a view without touching
+  its style, so showing it again needs no `display:`. A sample file's
+  `"hidden"` uses it too (it used to set the view's own flag, which the
+  next layout undid).
 
 ## 0.4.0 (2026-11-17)
 

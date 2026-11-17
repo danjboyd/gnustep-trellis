@@ -48,6 +48,13 @@
 - (void)addSubview:(NSView *)view style:(NSString *)declarations;
 - (TRNode *)nodeForSubview:(NSView *)view;
 - (void)setStyleDeclarations:(NSString *)declarations forSubview:(NSView *)view;
+/* Hides or shows a subview (markup: hidden="yes"). A hidden subview is
+   laid out as if `display: none`, but its style is left alone, so showing
+   it again needs no `display:` of its own. (A plain -setHidden: on the
+   view doesn't last: the next layout shows or hides views by their
+   style.) isSubviewHidden: is YES for either hidden or display: none. */
+- (void)setHidden:(BOOL)hidden forSubview:(NSView *)view;
+- (BOOL)isSubviewHidden:(NSView *)view;
 
 /* Container queries (see TRNode). */
 - (void)addConditionalStyle:(NSString *)declarations when:(NSString *)condition;

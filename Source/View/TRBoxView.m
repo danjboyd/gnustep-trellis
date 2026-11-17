@@ -718,6 +718,20 @@ static double TREase(double t, int easing)
   return nil;
 }
 
+- (void)setHidden:(BOOL)hidden forSubview:(NSView *)view
+{
+  TRNode *n = [self nodeForSubview: view];
+  if (n == nil || n.hidden == hidden) return;
+  n.hidden = hidden;
+  [self scheduleLayout];
+}
+
+- (BOOL)isSubviewHidden:(NSView *)view
+{
+  TRNode *n = [self nodeForSubview: view];
+  return n != nil && (n.hidden || n.style.display == TRDisplayNone);
+}
+
 - (void)setStyleDeclarations:(NSString *)declarations forSubview:(NSView *)view
 {
   TRNode *n = [self nodeForSubview: view];
@@ -1040,7 +1054,7 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
           [_appliedStyles setObject: st forKey: v];
           if ([v isKindOfClass: [TRBoxView class]]) [v setNeedsDisplay: YES];
         }
-      BOOL hidden = (st.display == TRDisplayNone);
+      BOOL hidden = (st.display == TRDisplayNone) || c.hidden;
       BOOL wasShown = ![v isHidden] && [_placed containsObject: v];
       [v setHidden: hidden];
       NSRect nf = NSMakeRect(f.x, f.y, f.width, f.height);

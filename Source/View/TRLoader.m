@@ -833,6 +833,19 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
         NSView *cv = [self viewForElement: c document: doc owner: owner error: error];
         if (cv == nil) return nil;
         [box addSubview: cv];
+        NSString *h = c.attributes[@"hidden"];
+        if (h)
+          {
+            /* HTML-style: a bare hidden (or hidden="hidden") hides too. */
+            BOOL no = [h isEqualToString: @"no"] || [h isEqualToString: @"false"]
+              || [h isEqualToString: @"off"] || [h isEqualToString: @"0"];
+            if (!no && !TRYes(h) && [h length] && ![h isEqualToString: @"hidden"])
+              {
+                if (error) *error = TRLoadError(doc, c, @"hidden=\"%@\": use yes or no", h);
+                return nil;
+              }
+            [box setHidden: !no forSubview: cv];
+          }
         if (![self applyStylesOf: c toView: cv inBox: box document: doc error: error]) return nil;
       }
   return v;
@@ -1131,7 +1144,13 @@ static NSView *TRFindView(NSString *identifier, NSView *root)
         }
       else if ([v isKindOfClass: [NSProgressIndicator class]] && d[@"value"])
         [(NSProgressIndicator *)v setDoubleValue: [d[@"value"] doubleValue]];
-      if (d[@"hidden"]) [v setHidden: [d[@"hidden"] boolValue]];
+      if (d[@"hidden"])
+        {
+          if ([[v superview] isKindOfClass: [TRBoxView class]])
+            [(TRBoxView *)[v superview] setHidden: [d[@"hidden"] boolValue] forSubview: v];
+          else
+            [v setHidden: [d[@"hidden"] boolValue]];
+        }
     }
   return YES;
 }

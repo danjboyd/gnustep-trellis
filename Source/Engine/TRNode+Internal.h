@@ -26,6 +26,7 @@ typedef struct {
   TRMeasureBlock _measure;
   TRBaselineBlock _baselineFn;
   BOOL _dirty;
+  BOOL _hidden;                  /* like display: none, independent of the style */
 
   /* Results. _rawFrame is unrounded; _frame is what clients see. */
   TRRect _rawFrame;
@@ -47,6 +48,12 @@ typedef struct {
   uint64_t _matchedMask;
 }
 @end
+
+/* Out of the layout: hidden, or display: none. */
+static inline BOOL TRNodeIsNone(TRNode *n)
+{
+  return n->_hidden || n->_style->_s.display == TRDisplayNone;
+}
 
 /* The layout algorithm (TRLayout.m). Returns the node's border-box size.
    aw/ah: border-box constraint, read according to wm/hm.

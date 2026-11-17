@@ -73,10 +73,6 @@
   "wpt-sizing/css/css-sizing/stretch/flex-line-003/1": "stretch on a descendant in a non-root context, not yet analysed",
   "wpt-sizing/css/css-sizing/stretch/flex-line-004/1": "flex container intrinsic sizes (css-flexbox 9.9.1): a wrapping column container at width: min-content, so the stretch item's line width comes from the 150px sibling",
   "wpt/css/css-flexbox/flex-container-max-content-002.tentative/22": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented",
-  "wpt/css/css-flexbox/flex-container-min-content-002.tentative/22": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented",
-  "wpt/css/css-flexbox/intrinsic-size/col-wrap-baseline-001/0": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented",
-  "wpt/css/css-flexbox/intrinsic-size/col-wrap-baseline-001/1": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented",
-  "wpt/css/css-flexbox/intrinsic-size/col-wrap-baseline-001/2": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented",
-  "wpt/css/css-flexbox/intrinsic-size/col-wrap-baseline-001/3": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented"
+  "wpt/css/css-flexbox/flex-container-min-content-002.tentative/22": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented"
  }
 }

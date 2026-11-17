@@ -620,5 +620,40 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/column_baseline_synthesized",
+  "note": "align-items: baseline in a column: the baseline is synthesized from each border box's start edge, so the items line up past the largest left margin",
+  "root": {
+   "style": "flex-direction: column; align-items: baseline; width: 200px",
+   "children": [
+    {
+     "style": "width: 10px; height: 10px; margin-left: 20px"
+    },
+    {
+     "style": "width: 10px; height: 10px; margin-right: 20px"
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 200,
+   "height": 20,
+   "children": [
+    {
+     "x": 20,
+     "y": 0,
+     "width": 10,
+     "height": 10
+    },
+    {
+     "x": 20,
+     "y": 10,
+     "width": 10,
+     "height": 10
+    }
+   ]
+  }
  }
 ]

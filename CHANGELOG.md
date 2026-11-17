@@ -5,6 +5,13 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Changed (layout):** `align-items`/`align-self: baseline` (and `last
+  baseline`) in a column now forms a baseline group. The baseline is
+  synthesized from each border box's start (end) edge, so the items line
+  up past the largest margin. Before, it acted as flex-start. A box's own
+  definite height now holds while its max-content width is measured, so a
+  wrapping column with `width: max-content` breaks into lines.
+
 - **Conformance:** a shrink-to-fit root (a float, inline-flex or
   inline-grid) inside an explicitly sized ancestor is imported as
   `width: fit-content` with that ancestor's width available, so a

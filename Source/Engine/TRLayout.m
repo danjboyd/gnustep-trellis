@@ -183,6 +183,8 @@ typedef struct {
   TRAlign align;
   BOOL stretched;
   TRFloat baseline;            /* from the item's cross-start margin edge */
+  BOOL colBaseline;            /* baseline in a column: synthesized from the border-box start edge */
+  BOOL colLastBaseline;        /* last baseline in a column: from the end edge */
   TRFloat mainPos, crossPos;
   NSInteger line;
 } TRItem;
@@ -444,7 +446,11 @@ const TRStyleStorage *TRResolveSizeKeywords(TRNode *c, const TRStyleStorage *cs,
   __block TRFloat minC = TRUndefined, maxC = TRUndefined;
   TRDirection cdir = cs->direction == TRDirectionInherit ? dir : cs->direction;
   #define TR_MINC (isnan(minC) ? (minC = TRMinContentWidth(c, cs, refW, refH, cdir)) : minC)
-  #define TR_MAXC (isnan(maxC) ? (maxC = TRLayoutNode(c, TRUndefined, TRUndefined, TRMeasureModeUndefined, TRMeasureModeUndefined, refW, refH, NO, dir).width) : maxC)
+  /* The box's own definite height holds while its width is measured (a
+     wrapping column needs it to break into lines). */
+  TRFloat ownH = TRBoxSize(cs, cs->height, refH, pbH);
+  #define TR_MAXC (isnan(maxC) ? (maxC = TRLayoutNode(c, TRUndefined, ownH, TRMeasureModeUndefined, \
+                                 isnan(ownH) ? TRMeasureModeUndefined : TRMeasureModeExactly, refW, refH, NO, dir).width) : maxC)
   TRFloat (^widthFor)(TRUnit) = ^TRFloat(TRUnit u) {
     switch (u)
       {
@@ -847,7 +853,14 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
         }
 
       it->align = TRResolveAlignSelf(cs, s);
-      if (!isRow && it->align == TRAlignBaseline) it->align = TRAlignFlexStart;
+      /* In a column the cross axis is the inline axis, so items have no
+         baseline there: css-align-3 synthesizes one from the border box's
+         start edge. The items still share a baseline group, so their
+         border boxes line up past the largest start margin. */
+      TRAlign rawAlign = cs->alignSelf == TRAlignAuto ? s->alignItems : cs->alignSelf;
+      it->colLastBaseline = !isRow && rawAlign == TRAlignLastBaseline;
+      it->colBaseline = !isRow && (it->align == TRAlignBaseline || it->colLastBaseline);
+      if (it->colBaseline) it->align = TRAlignFlexStart;
 
       /* Aspect ratio transfers a definite cross size to the main axis. */
       TRFloat ar = cs->aspectRatio;
@@ -1121,7 +1134,13 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
         {
           TRItem *it = &items[j];
           TRFloat outer = it->cross + it->crossLead + it->crossTrail;
-          if (it->align == TRAlignBaseline && !it->crossLeadAuto && !it->crossTrailAuto)
+          if (it->colBaseline && !it->crossLeadAuto && !it->crossTrailAuto)
+            {
+              it->baseline = ((crossRev != it->colLastBaseline) ? it->cross : 0) + it->crossLead;
+              maxAsc = TRMax(maxAsc, it->baseline);
+              maxDesc = TRMax(maxDesc, outer - it->baseline);
+            }
+          else if (it->align == TRAlignBaseline && !it->crossLeadAuto && !it->crossTrailAuto)
             {
               TRLayoutNode(it->node, it->target, it->cross,
                            TRMeasureModeExactly, TRMeasureModeExactly, refW, refH, YES, dir);
@@ -1294,7 +1313,7 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
               }
             else
               {
-                TRAlign a = it->align;
+                TRAlign a = it->colBaseline && !it->crossLeadAuto && !it->crossTrailAuto ? TRAlignBaseline : it->align;
                 if (a == TRAlignStart) a = wrapReverse ? TRAlignFlexEnd : TRAlignFlexStart;
                 else if (a == TRAlignEnd) a = wrapReverse ? TRAlignFlexStart : TRAlignFlexEnd;
                 switch (a)

@@ -48,7 +48,6 @@
   "width": 510
  },
  "requires": [
-  "intrinsic-size-keyword",
   "measure"
  ]
 }

@@ -230,6 +230,20 @@ class RootContainingBlock(unittest.TestCase):
         self.assertNotIn("containing-block-height", auto.get("requires", []))
 
 
+class FitContentRoot(unittest.TestCase):
+    def test_float_in_zero_width_div_is_fit_content_in_zero(self):
+        d = tempfile.mkdtemp()
+        with open(os.path.join(d, "t.html"), "w") as f:
+            f.write('<!DOCTYPE html><script src="/resources/check-layout-th.js"></script>'
+                    '<body onload="checkLayout(\'.f\')"><div style="width:0">'
+                    '<div class="f" style="float:left;display:flex" data-expected-width="10">'
+                    '<div style="width:10px"></div></div></div></body>')
+        (c,) = W.convert_file(os.path.join(d, "t.html"), "t.html", "0" * 40)
+        self.assertEqual(c["root"]["style"]["width"], "fit-content")
+        self.assertEqual(c["available"]["width"], 0)
+        self.assertNotIn("intrinsic-size-keyword", c.get("requires", []))
+
+
 class AttributeSelectors(unittest.TestCase):
     def test_presence_and_value(self):
         d = tempfile.mkdtemp()

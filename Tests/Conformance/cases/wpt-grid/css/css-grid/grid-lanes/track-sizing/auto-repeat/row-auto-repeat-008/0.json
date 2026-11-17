@@ -11,7 +11,7 @@
  "tolerance": 0.999,
  "pixelScale": 0,
  "available": {
-  "width": null,
+  "width": 600,
   "height": null
  },
  "root": {
@@ -21,7 +21,8 @@
    "position": "relative",
    "gridTemplateRows": "repeat(auto-fill, 50px)",
    "minWidth": "50%",
-   "minHeight": "80%"
+   "minHeight": "80%",
+   "width": "fit-content"
   },
   "children": [
    {
@@ -50,7 +51,6 @@
  "requires": [
   "block-layout",
   "containing-block-height",
-  "grid-lanes",
-  "intrinsic-size-keyword"
+  "grid-lanes"
  ]
 }

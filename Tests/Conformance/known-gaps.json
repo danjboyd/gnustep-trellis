@@ -78,15 +78,9 @@
   "wpt/css/css-flexbox/intrinsic-size/col-wrap-baseline-001/1": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented",
   "wpt/css/css-flexbox/intrinsic-size/col-wrap-baseline-001/2": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented",
   "wpt/css/css-flexbox/intrinsic-size/col-wrap-baseline-001/3": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented",
-  "wpt/css/css-flexbox/intrinsic-size/row-005/0": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented",
-  "wpt/css/css-flexbox/intrinsic-size/row-005/1": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented",
-  "wpt/css/css-flexbox/intrinsic-size/row-005/2": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented",
-  "wpt/css/css-flexbox/intrinsic-size/row-005/3": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented",
   "wpt/css/css-flexbox/intrinsic-size/row-005/5": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented",
-  "wpt/css/css-flexbox/intrinsic-size/row-005/8": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented",
   "wpt/css/css-flexbox/intrinsic-size/row-wrap-001/0": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented",
   "wpt/css/css-flexbox/intrinsic-size/row-wrap-001/1": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented",
-  "wpt/css/css-flexbox/intrinsic-size/row-wrap-001/2": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented",
   "wpt/css/css-flexbox/intrinsic-size/row-wrap-001/3": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented",
   "wpt/css/css-flexbox/intrinsic-size/row-wrap-001/4": "flex container intrinsic sizes (css-flexbox 9.9.1, flex-basis and flex factors in max-content): not implemented"
  }

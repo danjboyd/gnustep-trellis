@@ -66,8 +66,5 @@
   ],
   "width": 400,
   "height": 400
- },
- "requires": [
-  "intrinsic-size-keyword"
- ]
+ }
 }

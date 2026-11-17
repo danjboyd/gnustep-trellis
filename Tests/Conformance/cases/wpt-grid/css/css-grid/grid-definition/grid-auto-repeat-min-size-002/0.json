@@ -11,7 +11,7 @@
  "tolerance": 0.999,
  "pixelScale": 0,
  "available": {
-  "width": null,
+  "width": 600,
   "height": null
  },
  "root": {
@@ -26,7 +26,8 @@
    "gridAutoColumns": "auto",
    "gridAutoFlow": "row",
    "minWidth": "50%",
-   "minHeight": "80%"
+   "minHeight": "80%",
+   "width": "fit-content"
   },
   "children": [
    {
@@ -52,7 +53,6 @@
   "height": 200
  },
  "requires": [
-  "containing-block-height",
-  "intrinsic-size-keyword"
+  "containing-block-height"
  ]
 }

@@ -5,6 +5,12 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Conformance:** a shrink-to-fit root (a float, inline-flex or
+  inline-grid) inside an explicitly sized ancestor is imported as
+  `width: fit-content` with that ancestor's width available, so a
+  `width: 0` container gives min-content as in the browser. Six known gaps
+  pass (intrinsic-size/row-005/0-3, /8, row-wrap-001/2).
+
 - **Fixed:** the min-content width of a single-line flex row follows
   css-flexbox 9.9.1. Each item contributes the larger of its min-content
   size and its width, bounded by its flex base size when it can't grow or

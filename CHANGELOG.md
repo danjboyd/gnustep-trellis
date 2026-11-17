@@ -5,53 +5,13 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
-- **Added:** the `touch-target` lint (WCAG 2.2, 2.5.8): a control under
-  24x24 px whose 24 px circle reaches another control in the same
-  scroller is a warning. Frame dumps mark controls `interactive`.
-  Tests/Engine/lint-targets.m in `make check`; no finding in any example
-  or dogfood screen at 340 and 900 px.
-
-- **TrellisPreview:** View > Light / Dark Appearance (GNUstep: the
-  Adwaita colour scheme, set for the process before the theme loads, so
-  switching relaunches Preview with the same file and size; macOS: the
-  window's appearance), and File > Export PNG… / Export Frames JSON…
-  (trellis-render's `--json` document, with lint). Headless flags
-  `--export-json` and `--appearance`. Tests/View/preview-export.sh in
-  check-gui.
-- **Tests:** virtual-box.m waits for focus to leave a sentinel before
-  the next Tab (the hand-off is deferred; on Cocoa it could take more than
-  one run-loop pass once the list scrolls). Found and fixed by the macOS
-  check.
-
-- **Docs:** docs/tutorial.md, "Build your first Trellis app": a small app
-  with a layout, an owner, lint, renders at two widths, a container query
-  and a smoke test. `scripts/check-tutorial.sh` extracts its files and
-  steps and runs them; CI runs it on every push (including tutorial-only
-  edits).
-
-- **Added:** rich text in `<label>` and `<text>`: `<b>`/`<strong>`,
-  `<i>`/`<em>`, `<code>`, `<br/>`, and links. `<a action="sel:"
-  href="...">` sends the action to the owner with the label as sender
-  (`clickedLink` is the href; trellis-lint checks the action); a bare
-  http(s)/mailto href opens. The runs follow the label's style, and the
-  view is a `TRRichLabel`. `-[TRMarkupElement content]` gives text and
-  children in order. Tests/View/rich-text.m (check-gui).
-
-- **Added:** layout transitions, opt-in: `-tr-layout-transition: 200ms`
-  (with `linear` / `ease-in-out`, or `none`) on a box animates its
-  subviews, and nested boxes', to their new frames after content or style
-  changes. Resizes don't animate, first appearances don't, a change
-  mid-way starts from the current frames, and reduced motion (Cocoa's
-  setting, `TRReduceMotion` / `TRELLIS_REDUCE_MOTION=1` on GNUstep, or
-  `+[TRBoxView setReducesMotionOverride:]`) turns it off.
-  `-layoutTrellisAnimated` and `isAnimatingLayout` on TRBoxView.
-  Tests/View/layout-transition.m (check-gui, zombies on).
-
 ## 0.4.0 (2026-11-17)
 
 Adds API (listed in docs/api.md, nothing removed): virtualized lists and
-grids (docs/design-virtualization.md), and CSS custom properties with
-built-in theme tokens.
+grids (docs/design-virtualization.md), CSS custom properties with
+built-in theme tokens, layout transitions, rich text in labels, a
+tutorial with a CI job, Preview export and appearance switching, and a
+target-size lint.
 
 - **Added:** `<virtual layout="list|grid">` and `TRVirtualBox`, a scroll
   view that builds views only for the items on screen (plus overscan):
@@ -108,6 +68,47 @@ built-in theme tokens.
 - **Changed:** `-[TRMarkupDocument declarationsForElement:]` returns
   declarations with custom properties resolved, and TRStyle ignores
   `--name` declarations set from code.
+- **Added:** the `touch-target` lint (WCAG 2.2, 2.5.8): a control under
+  24x24 px whose 24 px circle reaches another control in the same
+  scroller is a warning. Frame dumps mark controls `interactive`.
+  Tests/Engine/lint-targets.m in `make check`; no finding in any example
+  or dogfood screen at 340 and 900 px.
+
+- **TrellisPreview:** View > Light / Dark Appearance (GNUstep: the
+  Adwaita colour scheme, set for the process before the theme loads, so
+  switching relaunches Preview with the same file and size; macOS: the
+  window's appearance), and File > Export PNG… / Export Frames JSON…
+  (trellis-render's `--json` document, with lint). Headless flags
+  `--export-json` and `--appearance`. Tests/View/preview-export.sh in
+  check-gui.
+- **Tests:** virtual-box.m waits for focus to leave a sentinel before
+  the next Tab (the hand-off is deferred; on Cocoa it could take more than
+  one run-loop pass once the list scrolls). Found and fixed by the macOS
+  check.
+
+- **Docs:** docs/tutorial.md, "Build your first Trellis app": a small app
+  with a layout, an owner, lint, renders at two widths, a container query
+  and a smoke test. `scripts/check-tutorial.sh` extracts its files and
+  steps and runs them; CI runs it on every push (including tutorial-only
+  edits).
+
+- **Added:** rich text in `<label>` and `<text>`: `<b>`/`<strong>`,
+  `<i>`/`<em>`, `<code>`, `<br/>`, and links. `<a action="sel:"
+  href="...">` sends the action to the owner with the label as sender
+  (`clickedLink` is the href; trellis-lint checks the action); a bare
+  http(s)/mailto href opens. The runs follow the label's style, and the
+  view is a `TRRichLabel`. `-[TRMarkupElement content]` gives text and
+  children in order. Tests/View/rich-text.m (check-gui).
+
+- **Added:** layout transitions, opt-in: `-tr-layout-transition: 200ms`
+  (with `linear` / `ease-in-out`, or `none`) on a box animates its
+  subviews, and nested boxes', to their new frames after content or style
+  changes. Resizes don't animate, first appearances don't, a change
+  mid-way starts from the current frames, and reduced motion (Cocoa's
+  setting, `TRReduceMotion` / `TRELLIS_REDUCE_MOTION=1` on GNUstep, or
+  `+[TRBoxView setReducesMotionOverride:]`) turns it off.
+  `-layoutTrellisAnimated` and `isAnimatingLayout` on TRBoxView.
+  Tests/View/layout-transition.m (check-gui, zombies on).
 
 ## 0.3.0 (2026-11-16)
 

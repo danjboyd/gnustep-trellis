@@ -1,0 +1,2 @@
+<!-- expect: disabled="greyed": use yes or no -->
+<column><button disabled="greyed">Send</button></column>

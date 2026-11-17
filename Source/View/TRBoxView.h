@@ -113,6 +113,14 @@
 @property (nonatomic, readonly) NSView *firstKeyView;
 @end
 
+/* Enables or disables a control, or every control inside a view (markup:
+   disabled); labels and plain images are left as they are. Boxes, scrolled content and split panes (hidden ones too)
+   are searched; a virtual box's items are not (they're rebuilt as they
+   scroll: disable them from the data source). Disabled controls stay in
+   the key-view loop, which skips them, so enabling one later needs no
+   relayout. */
+void TRSetEnabled(NSView *view, BOOL enabled);
+
 /* The tab index of a view (markup: tabindex="N"); 0 when unset. */
 void TRSetTabIndex(NSView *view, NSInteger index);
 NSInteger TRTabIndex(NSView *view);

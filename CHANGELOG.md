@@ -5,6 +5,12 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Added:** `disabled` on a control, or on a container to disable every
+  control in it (labels are left alone), and `TRSetEnabled(view, YES|NO)`
+  in code; `"disabled"` in sample files. Disabled controls stay in the
+  key-view loop (Tab skips them), so enabling one needs no relayout.
+  trellis-lint: a bad value is an error; `disabled` on a label, text,
+  image, spacer, separator or progress bar is a warning.
 - **trellis-lint:** `tabindex` must be a whole number (error), and a
   positive one inside a `<template>` is a warning: every copy shares it,
   so the copies jump ahead of the rest of the screen.

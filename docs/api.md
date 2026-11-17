@@ -14,7 +14,7 @@ The markup and CSS described in [agents.md](agents.md), sections 2 to 4,
 are public: element names, attributes (`id`, `class`, `action`,
 `no-outlet`, `default`, `wraps`, `placeholder`, `tabindex`, `a11y-label`,
 `label-for`, `role` (`group`, `none`), `items`, `type`, since 0.5
-`hidden`, ...), the
+`hidden`, unreleased `disabled`, ...), the
 `<!-- owner: Class -->` comment, `<style>` with the listed properties,
 selectors and `@container` queries, and the `Screen.sample.json`
 convention. Unknown properties and bad values stay errors.
@@ -87,6 +87,7 @@ value, and the built-in `--tr-*` tokens listed in agents.md section 3
 | `TRSplitView` (since 0.5): `-initWithDirection:`, `direction`, `-addPane:`, `panes`, `-setInitialSize:forPane:`, `-setMinimumSize:maximumSize:forPane:`, `-setGrowWeight:forPane:`, `-setSizingFromStyle:forPane:`, `-setHidden:forPane:` and `-isPaneHidden:` (unreleased), `-dividerPositions`, `-setDividerPositions:`, `autosave`, `target`, `action` | TRSplitView.h | Resizable panes (`<split>`); its own NSSplitView delegate. |
 | `TRKeyViewProvider` protocol (since 0.4): `-trellisKeyViewSubtrees` | TRBoxView.h | A view that supplies its focusable subtrees in order to the managed key-view loop. |
 | `TRSetTabIndex`, `TRTabIndex` (since 0.2) | TRBoxView.h | A view's tab index (markup `tabindex`). |
+| `TRSetEnabled` (unreleased) | TRBoxView.h | Enables or disables a control, or every control inside a view (markup `disabled`). |
 | `TRSetAccessibilityLabel`/`TRAccessibilityLabel`, `TRSetAccessibilityTitleView`/`TRAccessibilityTitleView`, `TRSetAccessibilityRole`/`TRAccessibilityRole` (since 0.2); `TRSetAccessibilityCollection`/`TRAccessibilityCollection`, `TRSetAccessibilityPosition`/`TRAccessibilityPosition` (since 0.4) | TRBoxView.h | Accessibility name, label link, role, and collection count and item positions; also pushed to NSAccessibility on Cocoa. |
 
 ## Engine (libTrellisEngine, Foundation only)

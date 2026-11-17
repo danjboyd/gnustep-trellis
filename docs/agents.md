@@ -95,6 +95,15 @@ the user's settings. trellis-render refuses to run without it.
   write `display: flex` back). A plain `-setHidden:` on the view doesn't
   last: the next layout shows or hides views by their style and this
   flag. In a sample file, `"hidden": true` does the same.
+- **Disabling (unreleased):** `disabled` on a control greys it out; on a
+  container (a row, a column, a split) it disables every control inside,
+  like an HTML fieldset, and leaves labels as they are. In code,
+  `TRSetEnabled(view, YES)` turns a control or a container back on (a
+  plain `-setEnabled:` works for one control). Disabled controls stay in
+  the Tab order and Tab skips them, so enabling one needs no relayout. A
+  virtual box's items aren't reached: set them up from the data source.
+  In a sample file, `"disabled": true` does the same. Lint warns on
+  `disabled` on a label, text, image, spacer, separator or progress bar.
 - **Keyboard focus:** Tab follows document order, as in a browser:
   Trellis links the controls into the window's key-view loop after every
   layout, so controls hidden by `display: none`, a container query or

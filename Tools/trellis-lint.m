@@ -238,6 +238,19 @@ static void TRLintAccessibility(TRMarkupDocument *doc, NSString *path)
                   break;
                 }
         }
+      /* disabled: yes/no, on a control or a container of controls. */
+      NSString *dis = a[@"disabled"];
+      if (dis)
+        {
+          NSString *l = dis;   /* case as the loader reads it */
+          BOOL known = [l length] == 0 || [l isEqualToString: @"disabled"]
+            || [@[ @"yes", @"true", @"on", @"1", @"no", @"false", @"off", @"0" ] containsObject: l];
+          if (!known)
+            TRReport(where, @"error", @"disabled", [NSString stringWithFormat: @"disabled=\"%@\": use yes or no", dis]);
+          else if ([@[ @"label", @"text", @"image", @"spacer", @"separator", @"progress" ] containsObject: e.name])
+            TRReport(where, @"warning", @"disabled", [NSString stringWithFormat:
+              @"<%@ disabled> has no effect: only controls (and containers of them) can be disabled", e.name]);
+        }
       NSString *role = a[@"role"];
       if (role && ![role isEqualToString: @"group"] && ![role isEqualToString: @"none"])
         TRReport(where, @"error", @"role", [NSString stringWithFormat: @"role \"%@\" is not supported (use group or none)", role]);

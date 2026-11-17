@@ -1,0 +1,2 @@
+<!-- expect: <label disabled> has no effect -->
+<column><label disabled>Waiting for an answer</label><button disabled>Send</button></column>

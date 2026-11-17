@@ -149,6 +149,7 @@ check-gui:: all
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/box-paint.m -o obj/gui-tests/box-paint $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/split.m -o obj/gui-tests/split $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/segmented.m -o obj/gui-tests/segmented $(GUI_TEST_LIBS)
+	@$(CC) $(GUI_TEST_FLAGS) Tests/View/disabled.m -o obj/gui-tests/disabled $(GUI_TEST_LIBS)
 	@echo "== view checks (headless)"
 	@export LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH; status=0; \
 	  timeout 60 scripts/run-headless.sh obj/gui-tests/size-for-width > obj/gui-tests/hook.log 2>&1 || status=1; \
@@ -184,6 +185,9 @@ check-gui:: all
 	  NSZombieEnabled=YES timeout 60 scripts/run-headless.sh obj/gui-tests/segmented > obj/gui-tests/segmented.log 2>&1 || status=1; \
 	  if grep -q "deallocated instance" obj/gui-tests/segmented.log; then echo "SEGMENTED FAIL: message sent to a freed object"; status=1; fi; \
 	  grep -v _NET_WORKAREA obj/gui-tests/segmented.log | tail -1; \
+	  NSZombieEnabled=YES timeout 60 scripts/run-headless.sh obj/gui-tests/disabled > obj/gui-tests/disabled.log 2>&1 || status=1; \
+	  if grep -q "deallocated instance" obj/gui-tests/disabled.log; then echo "DISABLED FAIL: message sent to a freed object"; status=1; fi; \
+	  grep -v _NET_WORKAREA obj/gui-tests/disabled.log | tail -1; \
 	  timeout 300 scripts/run-headless.sh obj/gui-tests/virtual-bench > obj/gui-tests/vbench.log 2>&1 || status=1; \
 	  grep -v _NET_WORKAREA obj/gui-tests/vbench.log | tail -3; \
 	  Tests/View/appearance.sh || status=1; \

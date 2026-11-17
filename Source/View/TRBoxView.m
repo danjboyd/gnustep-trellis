@@ -9,6 +9,8 @@
 
 #import "TRBoxView.h"
 #import "TRViewMeasure.h"
+#import "TRVirtualBox.h"
+#import "TRSplitView.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 
@@ -994,6 +996,31 @@ static NSView *TRFocusedViewIn(NSView *box)
 
 /* Focusable views under v in document order (a TRBoxView's subviews in
    node order, a scroller's document view, other containers' subviews). */
+/* A text field that only shows text, or an image that isn't editable:
+   never in the key-view loop, and left alone by TRSetEnabled. */
+static BOOL TRIsLabelField(NSView *v)
+{
+  if ([v isKindOfClass: [NSImageView class]]) return ![(NSImageView *)v isEditable];
+  return [v isKindOfClass: [NSTextField class]] && ![(NSTextField *)v isEditable]
+         && ![(NSTextField *)v isSelectable];
+}
+
+void TRSetEnabled(NSView *view, BOOL enabled)
+{
+  if ([view isKindOfClass: [NSControl class]])
+    {
+      if (!TRIsLabelField(view)) [(NSControl *)view setEnabled: enabled];
+      return;
+    }
+  if ([view isKindOfClass: [TRVirtualBox class]]) return;
+  NSArray *kids;
+  if ([view isKindOfClass: [NSScrollView class]])
+    kids = [(NSScrollView *)view documentView] ? @[[(NSScrollView *)view documentView]] : @[];
+  else if ([view isKindOfClass: [TRSplitView class]]) kids = [(TRSplitView *)view panes];
+  else kids = [view subviews];
+  for (NSView *k in kids) TRSetEnabled(k, enabled);
+}
+
 static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
 {
   if ([v isHidden]) return;
@@ -1021,7 +1048,10 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
      the loop; and the field editor sits inside it. */
   if ([v isKindOfClass: [NSControl class]])
     {
-      if (([v acceptsFirstResponder] || [v canBecomeKeyView] || [(NSControl *)v currentEditor] != nil)
+      /* A disabled control stays in (AppKit skips it), so enabling it
+         later needs no relayout. */
+      if (([v acceptsFirstResponder] || [v canBecomeKeyView] || [(NSControl *)v currentEditor] != nil
+           || (![(NSControl *)v isEnabled] && !TRIsLabelField(v)))
           && TRTabIndex(v) >= 0)
         [out addObject: v];
       return;

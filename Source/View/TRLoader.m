@@ -66,6 +66,17 @@ static BOOL TRYes(NSString *v)
                || [v isEqualToString: @"1"]);
 }
 
+/* A yes/no attribute, HTML-style: bare, its own name, yes, true, on or 1
+   mean yes; no, false, off or 0 mean no. Returns NO for anything else. */
+static BOOL TRFlag(NSString *v, NSString *name, BOOL *on)
+{
+  if ([v isEqualToString: @"no"] || [v isEqualToString: @"false"] || [v isEqualToString: @"off"]
+      || [v isEqualToString: @"0"])
+    { *on = NO; return YES; }
+  if ([v length] == 0 || TRYes(v) || [v isEqualToString: name]) { *on = YES; return YES; }
+  return NO;
+}
+
 /* ------------------------------------------------------------------ */
 
 @implementation TRScrollBox
@@ -691,16 +702,10 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
           [sv addPane: pv];
           NSString *h = c.attributes[@"hidden"];
           BOOL hidePane = NO;
-          if (h)
+          if (h && !TRFlag(h, @"hidden", &hidePane))
             {
-              BOOL no = [h isEqualToString: @"no"] || [h isEqualToString: @"false"]
-                || [h isEqualToString: @"off"] || [h isEqualToString: @"0"];
-              if (!no && !TRYes(h) && [h length] && ![h isEqualToString: @"hidden"])
-                {
-                  if (error) *error = TRLoadError(doc, c, @"hidden=\"%@\": use yes or no", h);
-                  return nil;
-                }
-              hidePane = !no;
+              if (error) *error = TRLoadError(doc, c, @"hidden=\"%@\": use yes or no", h);
+              return nil;
             }
           /* The pane's sizing declarations go to the split; the rest style
              the pane itself, which the split sizes. */
@@ -1027,17 +1032,29 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
         if (h)
           {
             /* HTML-style: a bare hidden (or hidden="hidden") hides too. */
-            BOOL no = [h isEqualToString: @"no"] || [h isEqualToString: @"false"]
-              || [h isEqualToString: @"off"] || [h isEqualToString: @"0"];
-            if (!no && !TRYes(h) && [h length] && ![h isEqualToString: @"hidden"])
+            BOOL hide = NO;
+            if (!TRFlag(h, @"hidden", &hide))
               {
                 if (error) *error = TRLoadError(doc, c, @"hidden=\"%@\": use yes or no", h);
                 return nil;
               }
-            [box setHidden: !no forSubview: cv];
+            [box setHidden: hide forSubview: cv];
           }
         if (![self applyStylesOf: c toView: cv inBox: box document: doc error: error]) return nil;
       }
+  /* disabled: a control, or every control inside a container (like an
+     HTML fieldset), after the children exist. */
+  NSString *dis = a[@"disabled"];
+  if (dis)
+    {
+      BOOL off = NO;
+      if (!TRFlag(dis, @"disabled", &off))
+        {
+          if (error) *error = TRLoadError(doc, e, @"disabled=\"%@\": use yes or no", dis);
+          return nil;
+        }
+      if (off) TRSetEnabled(v, NO);
+    }
   return v;
 }
 
@@ -1340,6 +1357,7 @@ static NSView *TRFindView(NSString *identifier, NSView *root)
         }
       else if ([v isKindOfClass: [NSProgressIndicator class]] && d[@"value"])
         [(NSProgressIndicator *)v setDoubleValue: [d[@"value"] doubleValue]];
+      if (d[@"disabled"]) TRSetEnabled(v, ![d[@"disabled"] boolValue]);
       if (d[@"hidden"])
         {
           if ([[v superview] isKindOfClass: [TRBoxView class]])

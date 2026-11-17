@@ -1401,7 +1401,10 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           else if (!autoR)
             {
               if (js == TRAlignCenter) offX += freeW / 2;
-              else if (js == TRAlignEnd || js == TRAlignFlexEnd || js == TRAlignRight) offX += freeW;
+              /* left/right are physical: from the inline start, right is
+                 the end in ltr and left is the end in rtl. */
+              else if (js == TRAlignEnd || js == TRAlignFlexEnd
+                       || js == (rtl ? TRAlignLeft : TRAlignRight)) offX += freeW;
             }
           if (autoT && autoB) offY += MAX(0, freeH) / 2;
           else if (autoT) offY += MAX(0, freeH);

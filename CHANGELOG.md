@@ -18,7 +18,10 @@ version may change the API listed in docs/api.md, and says so here.
   for its percentage columns before resolving them, and its
   `repeat(auto-fill/auto-fit)` columns count against a definite
   `max-width` rather than the space.
-- Both are in docs/migration-0.10.md. Known gaps 73 to 28.
+- **Fixed:** `justify-self`/`justify-items: left` and `right` in an rtl
+  grid were mirrored like start/end; they are physical edges.
+- The two layout changes are in docs/migration-0.10.md. Known gaps 73 to
+  25.
 
 ## 0.9.0 (2026-11-17)
 

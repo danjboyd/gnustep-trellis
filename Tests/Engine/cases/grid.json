@@ -869,5 +869,35 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_justify_left_rtl",
+  "note": "justify-self: left/right are physical in an rtl grid: left puts the item at the cell's left edge (the cell's end), right at its right edge",
+  "direction": "rtl",
+  "root": {
+   "style": "display: grid; width: 200px; grid-template-columns: 100px 100px; grid-template-rows: 10px",
+   "children": [
+    {
+     "style": "width: 20px; justify-self: left"
+    },
+    {
+     "style": "width: 20px; justify-self: right"
+    }
+   ]
+  },
+  "expected": {
+   "width": 200,
+   "height": 10,
+   "children": [
+    {
+     "x": 100,
+     "width": 20
+    },
+    {
+     "x": 80,
+     "width": 20
+    }
+   ]
+  }
  }
 ]

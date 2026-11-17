@@ -129,8 +129,14 @@ def build(n, docs, path):
             ch = max(0, n.get("height", 0) - dy)
             # "measured" (since 0.6.x) is the engine's own max-content measure;
             # older dumps only have the cell's "intrinsic" size.
-            m = n.get("needed") or n.get("measured") or n.get("intrinsic")
-            intr = n.get("measured") or n.get("intrinsic") or m
+            meas = n.get("measured")
+            # A text view measures nothing without a width (GNUstep's
+            # NSTextView gives 0x0 at max-content); an empty measure of a
+            # non-empty frame says nothing, so fall back to the frame.
+            if meas and (meas["width"] <= 0 or meas["height"] <= 0) and cw > 0 and ch > 0:
+                meas = {"width": cw, "height": ch}
+            m = n.get("needed") or meas or n.get("intrinsic")
+            intr = meas or n.get("intrinsic") or m
             if m is None:
                 node["measure"] = {"width": cw, "height": ch}
             elif cw < intr["width"] - 0.5:

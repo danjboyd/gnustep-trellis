@@ -99,6 +99,11 @@ jobs:
       - name: Importer unit tests
         run: python3 -I Tests/Conformance/tools/test_import_wpt.py
 
+      - name: Frame replay of the golden dumps, with self-test
+        run: |
+          set +u; . scripts/env.sh; set -u
+          make check-reference
+
       - name: View checks, headless (Xvfb)
         run: |
           set +u; . scripts/env.sh; set -u

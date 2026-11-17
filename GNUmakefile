@@ -131,6 +131,14 @@ check:: all
 
 # Record this platform's results in docs/conformance/linux.json and
 # regenerate the README table (scripts/conformance-summary.py).
+# Frame replay (scripts/check-reference.py): the golden dumps in
+# Tests/Reference/dumps and dogfood/frames, from either platform, laid out
+# again by this engine; then a self-test that a changed geometry value in
+# each dump is caught. Engine only: no display needed.
+check-reference: all
+	LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH python3 -I scripts/check-reference.py replay --runner ./obj/trellis-case
+	LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH python3 -I scripts/check-reference.py selftest --runner ./obj/trellis-case
+
 conformance-record: all
 	LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH python3 -I scripts/conformance-summary.py record --platform linux --runner ./obj/trellis-case
 	python3 -I scripts/conformance-summary.py table

@@ -2,7 +2,8 @@
 # TrellisPreview's export and appearance, headless: --snapshot with
 # --export-json writes the frames JSON (the trellis-render --json
 # document, lint included), and --appearance light|dark picks the
-# Adwaita colour scheme (window background light vs dark). Prints
+# Adwaita colour scheme (window background light vs dark), checked in the
+# JSON and in the PNG's pixels (scripts/png-check.py). Prints
 # PREVIEWEXPORT OK.
 set -u
 cd "$(dirname "$0")/../.."
@@ -28,6 +29,9 @@ ok = ok and isinstance(fo, list) and len(fo) >= 1   # macOS: 1 with full keyboar
 print(f"{'ok  ' if ok else 'FAIL'} {ap}: window background #{bg}, {len(d['lint'])} lint finding(s), {len(fo)} in Tab order")
 sys.exit(0 if ok and d["appearance"] == ap and d["viewport"]["width"] == 520 else 1)
 PY
+  # The image itself, not just the JSON: 520x400 pixels (snapshots are 1x),
+  # a background that matches the appearance, and something drawn.
+  python3 -I scripts/png-check.py "$out/$ap.png" --size 520x400 --appearance "$ap" || fail=1
 done
 # The Focus Order overlay draws over the plain snapshot.
 $APP Examples/TrellisDemo/Settings.trellis --snapshot "$out/plain.png" --width 520 --height 400 >"$out/p.log" 2>&1

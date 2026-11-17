@@ -141,6 +141,7 @@ check-reference: all
 # headless: a copy of the app marked LSUIElement (no Dock icon) whose
 # window is never ordered front, so it runs over ssh.
 check-preview: gui
+	python3 -I Tests/View/test_png_check.py
 	rm -rf $(B)/preview-check && mkdir -p $(B)/preview-check
 	cp -R $(B)/TrellisPreview.app $(B)/preview-check/
 	/usr/libexec/PlistBuddy -c 'Add :LSUIElement bool true' $(B)/preview-check/TrellisPreview.app/Contents/Info.plist

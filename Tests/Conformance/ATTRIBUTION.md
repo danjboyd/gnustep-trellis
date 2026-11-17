@@ -81,6 +81,10 @@ lists cases whose expectations upstream **revised** (same input, new
 numbers: the engine may need to follow), whose input changed, and those
 added, removed or only renumbered. It exits non-zero when anything but the
 recorded commit changed. `--json` gives the same summary for scripts.
+Each import also writes `IMPORT-REPORT.tsv` beside the cases (every
+check-layout file, imported or skipped and why); with it in both trees,
+snapshot_diff says why a whole file came or went (new or deleted upstream,
+or skipped by the importer), and it detects files renamed upstream.
 
 `reference/` holds a Yoga-backed runner used to sanity-check the importers:
 `make -f Tests/Conformance/Makefile.macos check-reference YOGA=/tmp/yoga`.

@@ -53,8 +53,39 @@ class SnapshotDiff(unittest.TestCase):
 
     def test_input_changed_at_same_index(self):
         d = S.diff(tree([case(0, 100, 80)]), tree([case(0, 120, 80)]))
-        self.assertEqual(d["input-changed"], ["wpt-grid/css/css-grid/grid-model/gutters/0"])
+        self.assertEqual([r["id"] for r in d["input-changed"]],
+                         ["wpt-grid/css/css-grid/grid-model/gutters/0"])
+        self.assertEqual(d["input-changed"][0]["changes"], ["root.root.style.width: 100 -> 120"])
         self.assertFalse(d["added"] or d["removed"])
+
+    def test_renamed_file_is_moved(self):
+        old = case(0, 100, 80)
+        new = json.loads(json.dumps(old))
+        new["id"] = new["id"].replace("gutters", "gutters-001")
+        new["source"]["file"] = FILE.replace("gutters", "gutters-001")
+        d = S.diff(tree([old]), tree([new]))
+        self.assertEqual(d["moved"], [{"id": new["id"], "was": old["id"]}])
+        self.assertFalse(d["added"] or d["removed"])
+
+    def test_import_report_explains_files(self):
+        old_r = {FILE: ("imported", "1 case(s)"), "css/x.html": ("imported", "1 case(s)")}
+        new_r = {FILE: ("skipped", "writing-mode")}
+        rows = S.explain_files("removed", ["wpt-grid/css/css-grid/grid-model/gutters/0"],
+                               {"wpt-grid/css/css-grid/grid-model/gutters/0": case(0, 100, 80)},
+                               old_r, new_r)
+        self.assertEqual(rows, [(FILE, 1, "now skipped: writing-mode")])
+        gone = dict(case(0, 100, 80), id="wpt-grid/css/x/0", source={"file": "css/x.html"})
+        rows = S.explain_files("removed", [gone["id"]], {gone["id"]: gone}, old_r, new_r)
+        self.assertTrue(rows[0][2].startswith("gone upstream"))
+        rows = S.explain_files("added", [gone["id"]], {gone["id"]: gone}, {}, new_r)
+        self.assertTrue(rows[0][2].startswith("new upstream"))
+
+    def test_report_file_round_trip(self):
+        d = tempfile.mkdtemp()
+        with open(os.path.join(d, "IMPORT-REPORT.tsv"), "w") as f:
+            f.write("# wpt abc css/css-grid wpt-grid\nimported\t%s\t2 case(s)\nskipped\tcss/y.html\tfloat\n" % FILE)
+        self.assertEqual(S.load_report(d), {FILE: ("imported", "2 case(s)"), "css/y.html": ("skipped", "float")})
+        self.assertIsNone(S.load_report(tempfile.mkdtemp()))
 
     def test_removed(self):
         d = S.diff(tree([case(0, 100, 80), case(1, 200, 90)]), tree([case(0, 100, 80)]))

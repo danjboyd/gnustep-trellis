@@ -1,0 +1,101 @@
+# wpt 34bdce16413b56bcc6c90c42ad1ed051769bbe2b css/css-sizing wpt-sizing
+skipped	css/css-sizing/aspect-ratio-affects-container-width-when-height-changes.html	script mutates page
+imported	css/css-sizing/aspect-ratio/aspect-ratio-minimum-size-single-axis-scroll-container.html	4 case(s)
+imported	css/css-sizing/aspect-ratio/box-sizing-dimensions.html	4 case(s)
+imported	css/css-sizing/aspect-ratio/box-sizing-squashed.html	8 case(s)
+imported	css/css-sizing/aspect-ratio/fractional-aspect-ratio.html	2 case(s)
+imported	css/css-sizing/aspect-ratio/intrinsic-contribution-transferred-min-width-001.html	3 case(s)
+skipped	css/css-sizing/aspect-ratio/replaced-element-042.html	replaced element <canvas>
+skipped	css/css-sizing/aspect-ratio/replaced-element-043.html	replaced element <table>
+skipped	css/css-sizing/aspect-ratio/replaced-element-044.html	replaced element <canvas>
+skipped	css/css-sizing/aspect-ratio/replaced-element-intrinsic-contribution-transferred-min-width-001.html	replaced element <canvas>
+skipped	css/css-sizing/aspect-ratio/table-element-002.html	replaced element <table>
+skipped	css/css-sizing/aspect-ratio/table-element-intrinsic-contribution-001.html	replaced element <table>
+skipped	css/css-sizing/available-height-for-replaced-content-001.html	replaced element <img>
+skipped	css/css-sizing/contain-intrinsic-size/auto-007.html	selector .test::before
+skipped	css/css-sizing/contain-intrinsic-size/contain-intrinsic-size-009.html	script mutates page
+skipped	css/css-sizing/contain-intrinsic-size/contain-intrinsic-size-028.html	selector .test::before
+skipped	css/css-sizing/contain-intrinsic-size/contain-intrinsic-size-029.html	selector .test::before
+skipped	css/css-sizing/contain-intrinsic-size/contain-intrinsic-size-030.html	selector .test::before
+skipped	css/css-sizing/contain-intrinsic-size/contain-intrinsic-size-031.html	no checks
+skipped	css/css-sizing/contain-intrinsic-size/contain-intrinsic-size-032.html	script mutates page
+skipped	css/css-sizing/contain-intrinsic-size/contain-intrinsic-size-033.html	selector .test::before
+skipped	css/css-sizing/contain-intrinsic-size/contain-intrinsic-size-logical-003.html	selector .test::before
+skipped	css/css-sizing/intrinsic-percent-replaced-028.html	no checks
+skipped	css/css-sizing/intrinsic-percent-replaced-033.html	replaced element <canvas>
+skipped	css/css-sizing/intrinsic-size-fallback-replaced.html	replaced element <iframe>
+skipped	css/css-sizing/intrinsic-size-fallback-video.html	no checks
+imported	css/css-sizing/keyword-min-max-width-with-fixed-width-contribution.html	3 case(s)
+skipped	css/css-sizing/keyword-sizes-for-intrinsic-contributions-002.html	replaced element <canvas>
+skipped	css/css-sizing/keyword-sizes-for-intrinsic-contributions.html	float
+imported	css/css-sizing/keyword-sizes-on-abspos.html	30 case(s)
+imported	css/css-sizing/keyword-sizes-on-flex-item-001.html	5 case(s)
+imported	css/css-sizing/keyword-sizes-on-flex-item-002.html	5 case(s)
+skipped	css/css-sizing/keyword-sizes-on-floated-element.html	float
+imported	css/css-sizing/keyword-sizes-on-inline-block.html	5 case(s)
+skipped	css/css-sizing/keyword-sizes-on-replaced-element.html	replaced element <canvas>
+imported	css/css-sizing/min-max-width-contribution-box-sizing.html	4 case(s)
+skipped	css/css-sizing/percentage-height-replaced-content-in-auto-cb.html	script mutates page
+imported	css/css-sizing/percentage-min-width.html	1 case(s)
+skipped	css/css-sizing/replaced-fractional-height-from-aspect-ratio-2.html	replaced element <canvas>
+skipped	css/css-sizing/replaced-fractional-height-from-aspect-ratio.html	zoom
+skipped	css/css-sizing/replaced-keyword-max-width-contribution.html	replaced element <canvas>
+skipped	css/css-sizing/replaced-min-width-greater-than-max-width.html	replaced element <img>
+imported	css/css-sizing/stretch/aspect-ratio-1.html	4 case(s)
+skipped	css/css-sizing/stretch/aspect-ratio-2.html	replaced element <canvas>
+skipped	css/css-sizing/stretch/auto-margins-1.html	non-Ahem text
+imported	css/css-sizing/stretch/auto-margins-2.html	6 case(s)
+imported	css/css-sizing/stretch/block-height-001.html	18 case(s)
+imported	css/css-sizing/stretch/block-height-002.html	2 case(s)
+imported	css/css-sizing/stretch/block-height-004.html	8 case(s)
+skipped	css/css-sizing/stretch/block-height-005.html	float
+skipped	css/css-sizing/stretch/block-height-007.html	non-Ahem text
+skipped	css/css-sizing/stretch/block-height-008.html	script mutates page
+skipped	css/css-sizing/stretch/block-height-011.html	script mutates page
+skipped	css/css-sizing/stretch/content-contribution-001.html	no checks
+skipped	css/css-sizing/stretch/flex-basis-1.html	no checks
+skipped	css/css-sizing/stretch/flex-item-height-001.html	no checks
+skipped	css/css-sizing/stretch/flex-item-height-002.html	no checks
+skipped	css/css-sizing/stretch/flex-item-height-003.html	no checks
+imported	css/css-sizing/stretch/flex-line-001.html	2 case(s)
+imported	css/css-sizing/stretch/flex-line-002.html	2 case(s)
+imported	css/css-sizing/stretch/flex-line-003.html	2 case(s)
+imported	css/css-sizing/stretch/flex-line-004.html	2 case(s)
+imported	css/css-sizing/stretch/flex-line-005.html	1 case(s)
+skipped	css/css-sizing/stretch/flex-stretch-min-max-cross-001.html	non-Ahem text
+imported	css/css-sizing/stretch/grid-item-height-001.html	2 case(s)
+skipped	css/css-sizing/stretch/indefinite-1.html	no checks
+skipped	css/css-sizing/stretch/indefinite-2.html	no checks
+skipped	css/css-sizing/stretch/indefinite-3.html	no checks
+skipped	css/css-sizing/stretch/indefinite-4.html	no checks
+skipped	css/css-sizing/stretch/indefinite-5.html	no checks
+skipped	css/css-sizing/stretch/indefinite-6.html	no checks
+skipped	css/css-sizing/stretch/replaced-stretch-height-001.html	replaced element <canvas>
+skipped	css/css-sizing/stretch/stretch-alias-block-size-001.tentative.html	script mutates page
+skipped	css/css-sizing/stretch/stretch-alias-inline-size-001.tentative.html	script mutates page
+skipped	css/css-sizing/stretch/stretch-alias-max-block-size-001.tentative.html	script mutates page
+skipped	css/css-sizing/stretch/stretch-alias-max-inline-size-001.tentative.html	script mutates page
+skipped	css/css-sizing/stretch/stretch-alias-min-block-size-001.tentative.html	script mutates page
+skipped	css/css-sizing/stretch/stretch-alias-min-inline-size-001.tentative.html	script mutates page
+skipped	css/css-sizing/stretch/stretch-block-size-001.html	script mutates page
+skipped	css/css-sizing/stretch/stretch-block-size-002.html	script mutates page
+skipped	css/css-sizing/stretch/stretch-block-size-003.html	script mutates page
+skipped	css/css-sizing/stretch/stretch-inline-size-001.html	script mutates page
+skipped	css/css-sizing/stretch/stretch-inline-size-002.html	script mutates page
+skipped	css/css-sizing/stretch/stretch-inline-size-003.html	script mutates page
+skipped	css/css-sizing/stretch/stretch-max-block-size-001.html	script mutates page
+skipped	css/css-sizing/stretch/stretch-max-inline-size-001.html	script mutates page
+skipped	css/css-sizing/stretch/stretch-min-block-size-001.html	script mutates page
+skipped	css/css-sizing/stretch/stretch-min-inline-size-001.html	script mutates page
+skipped	css/css-sizing/stretch/stretch-table-001.html	replaced element <table>
+skipped	css/css-sizing/svg-intrinsic-size-001.html	no checks
+skipped	css/css-sizing/svg-intrinsic-size-002.html	no checks
+skipped	css/css-sizing/svg-intrinsic-size-003.html	no checks
+skipped	css/css-sizing/svg-intrinsic-size-004.html	no checks
+skipped	css/css-sizing/svg-intrinsic-size-008.html	no checks
+skipped	css/css-sizing/svg-intrinsic-size-009.html	no checks
+skipped	css/css-sizing/svg-intrinsic-size-010.html	no checks
+skipped	css/css-sizing/svg-intrinsic-size-011.html	no checks
+skipped	css/css-sizing/table-percentage-max-width-beside-float.html	float
+imported	css/css-sizing/table-percentage-min-width-below-float.html	1 case(s)
+imported	css/css-sizing/table-percentage-min-width-beside-float.html	1 case(s)

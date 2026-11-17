@@ -17,10 +17,16 @@ summary sorts every case into one of:
                    the browser should produce (e.g. grid-gutters-and-flex-
                    content-001/6 and /7 at 34bdce1). The engine may need to
                    follow; check these first.
-  input-changed    the file's case at this index has a different input
-  added / removed  a case or file only in one tree
+  input-changed    the file's case at this index has a different input (the
+                   differing input paths are listed)
+  moved            same input and expectations in another file (a renamed
+                   or moved upstream test)
+  added / removed  a case or file only in one tree. With the importer's
+                   IMPORT-REPORT.tsv in both trees, a whole file that came
+                   or went is explained: new or deleted upstream, or
+                   skipped / no longer skipped by the importer (and why).
 
-Exit status: 0 when nothing is revised, input-changed, added or removed
+Exit status: 0 when nothing is revised, input-changed, moved, added or removed
 (a pure commit bump), 1 otherwise, so a refresh script can stop for review.
 """
 import argparse
@@ -49,6 +55,36 @@ def load(tree):
 def input_hash(c):
     key = {k: c.get(k) for k in INPUT_KEYS}
     return hashlib.sha256(json.dumps(key, sort_keys=True).encode()).hexdigest()[:16]
+
+
+def load_report(tree):
+    """IMPORT-REPORT.tsv (written by import_wpt.py): {file: (status, detail)}."""
+    out = {}
+    p = os.path.join(tree, "IMPORT-REPORT.tsv")
+    if not os.path.exists(p):
+        return None
+    for line in open(p, encoding="utf-8"):
+        if line.startswith("#") or "\t" not in line:
+            continue
+        status, f, detail = (line.rstrip("\n").split("\t") + ["", ""])[:3]
+        out[f] = (status, detail)
+    return out
+
+
+def input_changes(a, b, path="root", out=None, limit=3):
+    """Paths where two cases' inputs differ, as 'path: old -> new'."""
+    out = [] if out is None else out
+    if len(out) >= limit:
+        return out
+    if isinstance(a, dict) and isinstance(b, dict):
+        for k in sorted(set(a) | set(b)):
+            input_changes(a.get(k), b.get(k), f"{path}.{k}", out, limit)
+    elif isinstance(a, list) and isinstance(b, list) and len(a) == len(b):
+        for i, (x, y) in enumerate(zip(a, b)):
+            input_changes(x, y, f"{path}[{i}]", out, limit)
+    elif a != b:
+        out.append(f"{path}: {json.dumps(a)[:60]} -> {json.dumps(b)[:60]}")
+    return out
 
 
 def file_of(c):
@@ -89,14 +125,54 @@ def diff(old, new):
                 out["revised"].append(entry)
         else:
             leftover.append(cid)
+    # A case with the same input and expectations in another file: the
+    # upstream file was renamed or moved.
+    by_content = collections.defaultdict(list)
+    for oid in sorted(set(old) - matched_old):
+        if oid not in new:
+            by_content[(input_hash(old[oid]), json.dumps(old[oid].get("expected"), sort_keys=True))].append(oid)
+    rest = []
     for cid in leftover:
+        c = new[cid]
+        cands = [] if cid in old else by_content.get((input_hash(c), json.dumps(c.get("expected"), sort_keys=True)))
+        if cands:
+            oid = cands.pop(0)
+            matched_old.add(oid)
+            out["moved"].append({"id": cid, "was": oid})
+        else:
+            rest.append(cid)
+    for cid in rest:
         if cid in old and cid not in matched_old:
             matched_old.add(cid)
-            out["input-changed"].append(cid)
+            out["input-changed"].append({"id": cid, "changes": input_changes(
+                {k: old[cid].get(k) for k in INPUT_KEYS}, {k: new[cid].get(k) for k in INPUT_KEYS})})
         else:
             out["added"].append(cid)
     out["removed"] = sorted(set(old) - matched_old)
     return out
+
+
+def explain_files(kind, ids, cases, old_report, new_report):
+    """Per source file: count, and why the file came or went when the
+    import reports say."""
+    files = collections.Counter(file_of(cases[i]) for i in ids)
+    rows = []
+    for f, n in sorted(files.items()):
+        why = ""
+        if old_report is not None and new_report is not None:
+            o, w = old_report.get(f), new_report.get(f)
+            if kind == "added":
+                if o is None:
+                    why = "new upstream (or newly a check-layout test)"
+                elif o[0] == "skipped":
+                    why = "no longer skipped (was: %s)" % o[1]
+            else:
+                if w is None:
+                    why = "gone upstream (deleted, renamed, or no longer a check-layout test)"
+                elif w[0] == "skipped":
+                    why = "now skipped: %s" % w[1]
+        rows.append((f, n, why))
+    return rows
 
 
 def leaf_changes(a, b, path="root"):
@@ -121,29 +197,46 @@ def main():
     ap.add_argument("--json", action="store_true", help="machine-readable summary")
     a = ap.parse_args()
     old, new = load(a.old), load(a.new)
+    old_report, new_report = load_report(a.old), load_report(a.new)
     d = diff(old, new)
     commits = sorted({c["source"].get("commit", "?")[:12] for c in old.values()}), \
         sorted({c["source"].get("commit", "?")[:12] for c in new.values()})
+    kinds = ("unchanged", "renumbered", "moved", "revised", "input-changed", "added", "removed")
+    explained = {k: explain_files(k, d[k], new if k == "added" else old, old_report, new_report)
+                 for k in ("added", "removed")}
     if a.json:
         json.dump({"commits": {"old": commits[0], "new": commits[1]},
-                   **{k: d[k] for k in ("unchanged", "renumbered", "revised", "input-changed",
-                                        "added", "removed")}},
+                   **{k: d[k] for k in kinds},
+                   "files": {k: [{"file": f, "cases": n, "why": w} for f, n, w in rows]
+                             for k, rows in explained.items()}},
                   sys.stdout, indent=1, sort_keys=True)
         print()
     else:
         print(f"WPT {','.join(commits[0])} -> {','.join(commits[1])}: "
               f"{len(old)} -> {len(new)} cases")
-        for k in ("unchanged", "renumbered", "revised", "input-changed", "added", "removed"):
+        for k in kinds:
             print(f"  {k:14} {len(d[k])}")
         for r in d["revised"]:
             print(f"revised {r['id']}" + (f" (was {r['was']})" if "was" in r else ""))
             for line in leaf_changes(r["old"], r["new"]):
                 print("    " + line)
-        for k in ("input-changed", "added", "removed"):
-            files = collections.Counter(x.rsplit("/", 1)[0] for x in d[k])
-            for f, n in sorted(files.items()):
-                print(f"{k} {f}: {n} case(s)")
-    review = any(d[k] for k in ("revised", "input-changed", "added", "removed"))
+        for r in d["moved"]:
+            print(f"moved {r['was']} -> {r['id']}")
+        shown = set()
+        for r in d["input-changed"]:
+            f = file_of(new[r["id"]])
+            key = (f, tuple(c.split(":")[0] for c in r["changes"]))
+            if key in shown:
+                continue
+            shown.add(key)
+            n = sum(1 for x in d["input-changed"] if file_of(new[x["id"]]) == f)
+            print(f"input-changed {f}: {n} case(s), e.g. {r['id'].rsplit('/', 1)[-1]}")
+            for line in r["changes"]:
+                print("    " + line)
+        for k in ("added", "removed"):
+            for f, n, why in explained[k]:
+                print(f"{k} {f}: {n} case(s)" + (f" ({why})" if why else ""))
+    review = any(d[k] for k in ("revised", "input-changed", "moved", "added", "removed"))
     return 1 if review else 0
 
 

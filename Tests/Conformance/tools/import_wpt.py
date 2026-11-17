@@ -1305,6 +1305,7 @@ def main():
                             capture_output=True, text=True, check=True).stdout.strip()
     base = os.path.join(wpt, sub)
     skips = collections.Counter()
+    report = []         # (status, file, detail) for IMPORT-REPORT.tsv
     written = files = 0
     for dirpath, _, fnames in os.walk(base):
         for fn in sorted(fnames):
@@ -1319,11 +1320,14 @@ def main():
                 cases = convert_file(path, rel, commit)
             except Skip as e:
                 skips[str(e).split(" ")[0] if str(e).startswith(("selector", "pseudo", "unit", "at-rule", "ancestor width", "line-height")) else str(e)] += 1
+                report.append(("skipped", rel, str(e)))
                 continue
             except RecursionError:
                 skips["recursion"] += 1
+                report.append(("skipped", rel, "recursion"))
                 continue
             files += 1
+            report.append(("imported", rel, "%d case(s)" % len(cases)))
             for c in cases:
                 p = os.path.join(out_dir, c["id"][len(SUITE) + 1:] + ".json")
                 os.makedirs(os.path.dirname(p), exist_ok=True)
@@ -1331,6 +1335,14 @@ def main():
                     json.dump(c, f, indent=1)
                     f.write("\n")
                 written += 1
+    # Which check-layout files were imported and which skipped (and why), so
+    # snapshot_diff.py can tell a case deleted upstream from one the
+    # importer now skips. Not .json: trellis-case only reads *.json.
+    os.makedirs(out_dir, exist_ok=True)
+    with open(os.path.join(out_dir, "IMPORT-REPORT.tsv"), "w") as f:
+        f.write("# wpt %s %s %s\n" % (commit, sub, SUITE))
+        for status, rel, detail in sorted(report, key=lambda r: r[1]):
+            f.write("%s\t%s\t%s\n" % (status, rel, detail.replace("\t", " ").replace("\n", " ")))
     print("wpt: wrote %d cases from %d files (%s)" % (written, files, commit[:12]))
     print("wpt: skipped %d files:" % sum(skips.values()))
     for reason, n in skips.most_common():

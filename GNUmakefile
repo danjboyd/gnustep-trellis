@@ -46,10 +46,11 @@ libTrellis_OBJC_FILES = \
 	Source/View/TRBoxView.m \
 	Source/View/TRViewMeasure.m \
 	Source/View/TRLoader.m \
-	Source/View/TRVirtualBox.m
+	Source/View/TRVirtualBox.m \
+	Source/View/TRSplitView.m
 libTrellis_HEADER_FILES_DIR = Source/View
 libTrellis_HEADER_FILES_INSTALL_DIR = Trellis
-libTrellis_HEADER_FILES = TRBoxView.h TRViewMeasure.h TRLoader.h TRVirtualBox.h
+libTrellis_HEADER_FILES = TRBoxView.h TRViewMeasure.h TRLoader.h TRVirtualBox.h TRSplitView.h
 libTrellis_NEEDS_GUI = yes
 libTrellis_LIBRARIES_DEPEND_UPON = -lTrellisEngine $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS)
 
@@ -146,6 +147,7 @@ check-gui:: all
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/layout-transition.m -o obj/gui-tests/layout-transition $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/rich-text.m -o obj/gui-tests/rich-text $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/box-paint.m -o obj/gui-tests/box-paint $(GUI_TEST_LIBS)
+	@$(CC) $(GUI_TEST_FLAGS) Tests/View/split.m -o obj/gui-tests/split $(GUI_TEST_LIBS)
 	@echo "== view checks (headless)"
 	@export LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH; status=0; \
 	  timeout 60 scripts/run-headless.sh obj/gui-tests/size-for-width > obj/gui-tests/hook.log 2>&1 || status=1; \
@@ -175,6 +177,9 @@ check-gui:: all
 	  grep -v _NET_WORKAREA obj/gui-tests/richtext.log | tail -1; \
 	  timeout 60 scripts/run-headless.sh obj/gui-tests/box-paint > obj/gui-tests/boxpaint.log 2>&1 || status=1; \
 	  grep -v _NET_WORKAREA obj/gui-tests/boxpaint.log | tail -1; \
+	  NSZombieEnabled=YES timeout 60 scripts/run-headless.sh obj/gui-tests/split > obj/gui-tests/split.log 2>&1 || status=1; \
+	  if grep -q "deallocated instance" obj/gui-tests/split.log; then echo "SPLIT FAIL: message sent to a freed object"; status=1; fi; \
+	  grep -v _NET_WORKAREA obj/gui-tests/split.log | tail -1; \
 	  timeout 300 scripts/run-headless.sh obj/gui-tests/virtual-bench > obj/gui-tests/vbench.log 2>&1 || status=1; \
 	  grep -v _NET_WORKAREA obj/gui-tests/vbench.log | tail -3; \
 	  Tests/View/appearance.sh || status=1; \

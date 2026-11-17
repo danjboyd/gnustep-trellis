@@ -42,6 +42,11 @@ where an entry `{"_repeat": n, "items": [...]}` is a run, `"_template"`
 picks the template, and `{i}`, `{n}` and `{n:W}` number the items;
 `"scroll-to": index` scrolls there. Ids repeat freely across templates.
 
+Since 0.5, `<split>` builds resizable panes (a `TRSplitView`):
+attributes `direction` (`row`, `column`), `divider` (`thin`, `thick`,
+`pane`) and `autosave`; each child is a pane, sized along the split by its
+`width`/`height`, `min-`/`max-` sizes and `flex-grow`.
+
 Since 0.4, rich text in `<label>` and `<text>`: `<b>`,
 `<strong>`, `<i>`, `<em>`, `<code>`, `<br>`, and `<a action= href=>`
 (see agents.md section 2).
@@ -74,6 +79,7 @@ value, and the built-in `--tr-*` tokens listed in agents.md section 3
 | `-[TRBoxView layoutTrellisAnimated]`, `isAnimatingLayout`, `+reducesMotion`, `+setReducesMotionOverride:`, `+setAnimationTimeOverride:`, `-stepLayoutAnimation` (since 0.4) | TRBoxView.h | Layout transitions: animate a layout explicitly, and the reduce-motion setting they honour. |
 | `TRUpdateThemeTokens` (since 0.4) | TRLoader.h | Sets the built-in tokens' metrics from the running theme (loading a document does it). |
 | `TRApplyLeafStyle` (since 0.4) | TRBoxView.h | Text and colour declarations on a control outside any box. |
+| `TRSplitView` (since 0.5): `-initWithDirection:`, `direction`, `-addPane:`, `panes`, `-setInitialSize:forPane:`, `-setMinimumSize:maximumSize:forPane:`, `-setGrowWeight:forPane:`, `-setSizingFromStyle:forPane:`, `-dividerPositions`, `-setDividerPositions:`, `autosave`, `target`, `action` | TRSplitView.h | Resizable panes (`<split>`); its own NSSplitView delegate. |
 | `TRKeyViewProvider` protocol (since 0.4): `-trellisKeyViewSubtrees` | TRBoxView.h | A view that supplies its focusable subtrees in order to the managed key-view loop. |
 | `TRSetTabIndex`, `TRTabIndex` (since 0.2) | TRBoxView.h | A view's tab index (markup `tabindex`). |
 | `TRSetAccessibilityLabel`/`TRAccessibilityLabel`, `TRSetAccessibilityTitleView`/`TRAccessibilityTitleView`, `TRSetAccessibilityRole`/`TRAccessibilityRole` (since 0.2); `TRSetAccessibilityCollection`/`TRAccessibilityCollection`, `TRSetAccessibilityPosition`/`TRAccessibilityPosition` (since 0.4) | TRBoxView.h | Accessibility name, label link, role, and collection count and item positions; also pushed to NSAccessibility on Cocoa. |

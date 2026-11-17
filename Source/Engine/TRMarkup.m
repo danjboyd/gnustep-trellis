@@ -741,6 +741,7 @@ static NSString *TRElementDefaults(NSString *name)
       @"separator": @"align-self: stretch; flex: none; min-height: 1px; min-width: 1px",
       @"scroll": @"flex: 1; min-height: 0; min-width: 0",
       @"virtual": @"flex: 1; min-height: 0; min-width: 0",
+      @"split": @"flex: 1; min-height: 0; min-width: 0; align-self: stretch",
       @"progress": @"min-height: 16px; min-width: 60px",
       @"image": @"min-width: 16px; min-height: 16px",
     };

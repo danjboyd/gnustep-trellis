@@ -1,0 +1,18 @@
+<column>
+  <split id="main" autosave="example-main">
+    <column class="sidebar">
+      <label>Projects</label>
+      <button>New project</button>
+    </column>
+    <split class="content" direction="column">
+      <scroll class="list"><label>Item one</label><label>Item two</label></scroll>
+      <column class="detail"><label>Details</label></column>
+    </split>
+  </split>
+  <style>
+    .sidebar { width: 220px; min-width: 160px; max-width: 360px; padding: 12px; gap: 8px; }
+    .content { flex-grow: 1; }
+    .list { height: 240px; min-height: 120px; }
+    .detail { padding: 12px; min-height: 80px; }
+  </style>
+</column>

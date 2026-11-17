@@ -29,6 +29,11 @@
   fix is being prepared for upstream (link to follow). On libs-gui without
   the fix, TrellisPreview's light/dark switch relaunches the app instead
   of activating the theme again; the relaunch is only needed there.
+- **Symbols the UI font lacks can draw as "?"** (▸ ◂ in a button title,
+  say). libs-gui substitutes another installed font for a missing glyph
+  when it finds one (DejaVu Sans covers these), but on a machine whose
+  fonts it doesn't pick, the glyph is lost. Install a font with the
+  symbols (DejaVu Sans), or use characters the UI font has.
 - `_NET_WORKAREA` warnings on stderr under bare Xvfb (no window manager)
   are harmless.
 

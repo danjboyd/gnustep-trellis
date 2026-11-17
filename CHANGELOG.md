@@ -16,6 +16,9 @@ version may change the API listed in docs/api.md, and says so here.
   the default theme (whose selection colour is white) they drew white on
   white; they now fall back to a fixed blue. Adwaita and Gumdrop keep
   their own selection blue.
+- `<split>` and `TRSplitView`: resizable panes, sized from each pane's
+  CSS (starting size, min/max, flex-grow), with divider positions kept
+  under `autosave=` and readable and settable in code.
 
 ## 0.4.0 (2026-11-17)
 

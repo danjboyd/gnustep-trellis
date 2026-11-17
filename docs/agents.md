@@ -67,7 +67,8 @@ the user's settings. trellis-render refuses to run without it.
 - **Elements:** `column`, `row`, `box`, `scroll`, `label`, `text` (a
   wrapping label), `field`, `button`, `checkbox`, `radio`, `popup` (with
   `<item>` children or `items="A, B"`), `image`, `slider`, `progress`,
-  `separator`, `spacer`, and `view type="MyNSViewSubclass"`.
+  `separator`, `spacer`, `split` (resizable panes, since 0.5), `virtual`,
+  and `view type="MyNSViewSubclass"`.
 - **Text:** put a label's or button's text in its content:
   `<button>Save</button>`.
 - **Outlets:** `id="search"` sets the owner's `search` property. Every id
@@ -311,6 +312,36 @@ it a row. Lint reports this as `stretched`.
   - Keyboard and accessibility come built in: Tab walks the items in
     order and scrolls past the edge; the box is a list or grid with the
     full count.
+- **Resizable panes: `<split>`** (since 0.5). Each child is a pane, with a
+  draggable divider between neighbours. Along the split, a pane's CSS
+  `width` (or `height` in a column) is its starting size, `min-`/`max-`
+  limit dragging, and `flex-grow` picks the panes that take the extra
+  space when the window grows (the last pane when none says).
+  `autosave="name"` keeps the divider positions in the user defaults
+  across launches.
+
+  ```xml
+  <split autosave="main-window">
+    <column class="sidebar">...</column>
+    <split class="content" direction="column">
+      <scroll class="list">...</scroll>
+      <column class="detail">...</column>
+    </split>
+  </split>
+  <style>
+    .sidebar { width: 220px; min-width: 160px; max-width: 360px; }
+    .content { flex-grow: 1; }
+    .list    { height: 240px; min-height: 120px; }
+  </style>
+  ```
+
+  - `direction="row"` (default: side by side) or `"column"` (stacked);
+    `divider="thin"` (default), `"thick"` or `"pane"`.
+  - The split fills the remaining space (`flex: 1`), like `<scroll>`.
+  - In code: `-dividerPositions`, `-setDividerPositions:` (clamped to the
+    limits, saved under `autosave`), and `target`/`action`, sent after
+    the user drags a divider.
+  - Panes can't be hidden or collapsed yet.
 
 ## 6. From code
 

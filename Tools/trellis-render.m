@@ -15,6 +15,7 @@
 #import "TRLint.h"
 #import "TRLoader.h"
 #import "TRVirtualBox.h"
+#import "TRSplitView.h"
 
 extern TRBoxView *TRSampleScreen(NSString *name);
 extern NSArray<NSString *> *TRSampleScreenNames(void);
@@ -163,6 +164,14 @@ static NSDictionary *TRDumpView(NSView *v, TRNode *node)
       TRBoxView *cb = [(TRScrollBox *)v contentBox];
       d[@"overflow"] = @"scroll";
       d[@"children"] = @[TRDumpView(cb, cb.node)];
+    }
+  if ([v isKindOfClass: [TRSplitView class]])
+    {
+      NSMutableArray *kids = [NSMutableArray array];
+      for (NSView *pv in [(TRSplitView *)v panes])
+        [kids addObject: TRDumpView(pv, [pv isKindOfClass: [TRBoxView class]] ? ((TRBoxView *)pv).node : nil)];
+      d[@"split"] = [(TRSplitView *)v direction] == TRSplitDirectionRow ? @"row" : @"column";
+      d[@"children"] = kids;
     }
   if ([v isKindOfClass: [TRVirtualBox class]])
     {

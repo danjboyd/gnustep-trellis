@@ -24,6 +24,7 @@
 #import "TRBoxView.h"
 #import "TRLoader.h"
 #import "TRVirtualBox.h"
+#import "TRSplitView.h"
 #import "TRViewMeasure.h"
 #import "TRLint.h"
 #ifdef GNUSTEP
@@ -394,6 +395,9 @@ static NSDictionary *TPDump(NSView *v, TRNode *node)
       d[@"overflow"] = @"scroll";
       [kids addObject: TPDump(cb, cb.node)];
     }
+  else if ([v isKindOfClass: [TRSplitView class]])
+    for (NSView *pv in [(TRSplitView *)v panes])
+      [kids addObject: TPDump(pv, [pv isKindOfClass: [TRBoxView class]] ? ((TRBoxView *)pv).node : nil)];
   else if ([v isKindOfClass: [TRVirtualBox class]])
     {
       TRVirtualBox *vb = (TRVirtualBox *)v;

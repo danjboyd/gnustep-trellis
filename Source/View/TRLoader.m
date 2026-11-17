@@ -5,6 +5,7 @@
 */
 
 #import "TRLoader.h"
+#import "TRSplitView.h"
 #import "TRVirtualBox.h"
 #import "TRViewMeasure.h"
 #import <objc/runtime.h>
@@ -618,6 +619,81 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
         }
       v = vb;
     }
+  else if ([n isEqualToString: @"split"])
+    {
+      NSString *dir = a[@"direction"] ?: @"row";
+      if (![dir isEqualToString: @"row"] && ![dir isEqualToString: @"column"])
+        {
+          if (error) *error = TRLoadError(doc, e, @"<split direction=\"%@\">: use row or column", dir);
+          return nil;
+        }
+      if ([e.children count] == 0)
+        {
+          if (error) *error = TRLoadError(doc, e, @"<split> has no panes");
+          return nil;
+        }
+      TRSplitView *sv = [[TRSplitView alloc] initWithDirection: [dir isEqualToString: @"column"]
+                                                                ? TRSplitDirectionColumn : TRSplitDirectionRow];
+      NSString *divider = a[@"divider"];
+      if (divider)
+        {
+          if ([divider isEqualToString: @"thin"]) [sv setDividerStyle: NSSplitViewDividerStyleThin];
+          else if ([divider isEqualToString: @"thick"]) [sv setDividerStyle: NSSplitViewDividerStyleThick];
+          else if ([divider isEqualToString: @"pane"]) [sv setDividerStyle: NSSplitViewDividerStylePaneSplitter];
+          else
+            {
+              if (error) *error = TRLoadError(doc, e, @"<split divider=\"%@\">: use thin, thick or pane", divider);
+              return nil;
+            }
+        }
+      for (TRMarkupElement *c in e.children)
+        {
+          NSView *pv = [self viewForElement: c document: doc owner: owner error: error];
+          if (pv == nil) return nil;
+          [sv addPane: pv];
+          if (c.attributes[@"hidden"])
+            {
+              if (error) *error = TRLoadError(doc, c, @"a <split> pane can't be hidden (not supported yet)");
+              return nil;
+            }
+          /* The pane's sizing declarations go to the split; the rest style
+             the pane itself, which the split sizes. */
+          NSMutableArray *base = [NSMutableArray array];
+          NSArray *matched = [doc declarationsForElement: c];
+          for (TRMatchedDeclarations *m in matched)
+            if (m.condition == nil) [base addObject: m.declarations];
+          NSString *joined = [base componentsJoinedByString: @"; "];
+          TRStyle *st = [TRStyle new];
+          NSError *err = nil;
+          if (![st applyDeclarations: joined error: &err])
+            {
+              if (error) *error = TRLoadError(doc, c, @"%@", [err localizedDescription]);
+              return nil;
+            }
+          [sv setSizingFromStyle: st forPane: pv];
+          if ([pv isKindOfClass: [TRBoxView class]])
+            {
+              TRBoxView *pb = (TRBoxView *)pv;
+              @try { [pb setStyleDeclarations: joined]; }
+              @catch (NSException *x)
+                {
+                  if (error) *error = TRLoadError(doc, c, @"%@", [x reason]);
+                  return nil;
+                }
+              TRStyle *own = pb.style;
+              own.width = TRAuto; own.height = TRAuto; own.flexBasis = TRAuto;
+              own.minWidth = TRAuto; own.minHeight = TRAuto;
+              own.maxWidth = TRNoneValue(); own.maxHeight = TRNoneValue();
+              pb.style = own;
+              for (TRMatchedDeclarations *m in matched)
+                if (m.condition != nil) [pb addConditionalStyle: m.declarations when: m.condition];
+            }
+          else
+            TRApplyLeafStyle(pv, joined);
+        }
+      if (a[@"autosave"]) sv.autosave = a[@"autosave"];
+      v = sv;
+    }
   else if ([n isEqualToString: @"label"])
     v = TRMakeLabel(a[@"text"] ?: text, TRYes(a[@"wraps"]));
   else if ([n isEqualToString: @"text"])
@@ -759,7 +835,8 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
     }
 
   if (!container && ![n isEqualToString: @"popup"] && ![n isEqualToString: @"scroll"]
-      && ![n isEqualToString: @"virtual"] && ![v isKindOfClass: [TRRichLabel class]] && [e.children count])
+      && ![n isEqualToString: @"virtual"] && ![n isEqualToString: @"split"]
+      && ![v isKindOfClass: [TRRichLabel class]] && [e.children count])
     {
       if (error) *error = TRLoadError(doc, e.children[0], @"<%@> cannot contain elements", n);
       return nil;

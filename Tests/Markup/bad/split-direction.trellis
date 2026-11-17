@@ -1,0 +1,7 @@
+<!-- expect: direction="diagonal": use row or column -->
+<column>
+  <split direction="diagonal">
+    <column><label>Left</label></column>
+    <column><label>Right</label></column>
+  </split>
+</column>

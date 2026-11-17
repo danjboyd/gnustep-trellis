@@ -899,5 +899,39 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_auto_fill_shrink_to_fit_min_width",
+  "note": "auto-fill columns in a shrink-to-fit grid with no max-width count against its min-width: the fewest 50px columns reaching 120 is 3 (WPT grid-auto-repeat-min-size-001/10)",
+  "root": {
+   "style": "flex-direction: column; align-items: flex-start; width: 0px",
+   "children": [
+    {
+     "style": "display: grid; grid-template-columns: repeat(auto-fill, 50px); grid-template-rows: 10px; min-width: 120px",
+     "children": [
+      {
+       "style": "grid-column: -2"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "width": 0,
+   "height": 10,
+   "children": [
+    {
+     "x": 0,
+     "width": 150,
+     "height": 10,
+     "children": [
+      {
+       "x": 100,
+       "width": 50
+      }
+     ]
+    }
+   ]
+  }
  }
 ]

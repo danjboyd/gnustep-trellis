@@ -5,6 +5,11 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Fixed:** markup parsing was quadratic in the file's size (each
+  element's line and column were counted from the start): 6,000 elements
+  took 1.2 s to parse, now 19 ms, so TrellisPreview reloads big screens
+  quickly. Load and layout were already linear (6,000 elements: about
+  125 ms and 105 ms on Linux). `Tests/Engine/markup-scale.m` guards it.
 - **Added:** keyboard resizing for `<split>`: the split is a Tab stop
   after its first pane (macOS: with full keyboard access); arrows move
   the divider 10pt (1pt with Option), Home/End go to the limits, `[`/`]`

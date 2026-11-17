@@ -111,6 +111,10 @@ check:: all
 	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ISource/Engine Tests/Engine/lint-targets.m \
 	  -o obj/lint-targets -L./obj -lTrellisEngine $(shell gnustep-config --base-libs)
 	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH ./obj/lint-targets
+	@echo "== markup parsing scale"
+	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ISource/Engine Tests/Engine/markup-scale.m \
+	  -o obj/markup-scale -L./obj -lTrellisEngine $(shell gnustep-config --base-libs)
+	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH ./obj/markup-scale
 	@echo "== .trellis files (syntax, styles, bindings)"
 	@$(LINT) Examples/TrellisDemo/AskDetail.trellis --owner Examples/TrellisDemo/AskDetailController.h
 	@$(LINT) Examples/TrellisDemo/Settings.trellis --owner Examples/TrellisDemo/SettingsController.h

@@ -145,6 +145,7 @@ static BOOL TRMatchFrom(NSArray *compounds, NSInteger idx, TRMarkupElement *e)
   NSString *_name;
   NSString *_src;
   NSUInteger _pos, _len;
+  NSUInteger _lcPos, _lcLine, _lcCol;   /* last lineCol: answer, to resume from */
   TRMarkupElement *_root;
   NSMutableDictionary *_templates;
   NSMutableArray *_rules;
@@ -356,14 +357,19 @@ static NSString *TRSubstituteVars(NSString *value, NSDictionary *vars, int depth
 
 /* ---- Errors with line:column ---- */
 
+/* Positions come in increasing order while parsing, so each call resumes
+   from the last one (scanning from the start every time made parsing
+   quadratic in the file's size); an earlier position starts over. */
 - (void)lineCol:(NSUInteger)pos line:(NSUInteger *)line col:(NSUInteger *)col
 {
-  NSUInteger l = 1, c = 1;
-  for (NSUInteger i = 0; i < pos && i < _len; i++)
+  NSUInteger i = 0, l = 1, c = 1;
+  if (_lcLine > 0 && pos >= _lcPos) { i = _lcPos; l = _lcLine; c = _lcCol; }
+  for (; i < pos && i < _len; i++)
     {
       if ([_src characterAtIndex: i] == '\n') { l++; c = 1; }
       else c++;
     }
+  _lcPos = i; _lcLine = l; _lcCol = c;
   *line = l; *col = c;
 }
 

@@ -35,7 +35,8 @@
 
 /* ---- Overlay ---- */
 
-/* The views in the root's key-view loop, in Tab order. */
+/* The views in the root's key-view loop that can take focus now, in Tab
+   order (disabled ones are skipped, as Tab skips them). */
 static NSArray<NSView *> *TPFocusOrder(TRBoxView *root)
 {
   NSMutableArray *a = [NSMutableArray array];
@@ -43,7 +44,7 @@ static NSArray<NSView *> *TPFocusOrder(TRBoxView *root)
   for (int i = 0; v != nil && i < 512; i++)
     {
       /* On GNUstep the chain wraps through a sentinel outside the tree. */
-      if ([v isDescendantOf: root] && ![a containsObject: v]) [a addObject: v];
+      if ([v isDescendantOf: root] && ![a containsObject: v] && [v canBecomeKeyView]) [a addObject: v];
       v = [v nextKeyView];
       if (v == first) break;
     }

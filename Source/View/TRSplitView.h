@@ -62,8 +62,18 @@ typedef NS_ENUM(NSInteger, TRSplitDirection) {
    "TRSplitView Panes <name>" (an array of pane sizes). */
 @property (nonatomic, copy) NSString *autosave;
 
-/* Sent to target after the user drags a divider (the positions are
-   already saved). */
+/* Keyboard: the split is a Tab stop after its first pane (on macOS only
+   with full keyboard access, like buttons). Left/Right (Up/Down when
+   stacked) move a divider 10pt, 1pt with Option; Home and End move it to
+   its limits; [ and ] pick the divider when there are several. */
+
+/* NO: the dividers can't be dragged or moved with the keyboard (markup:
+   disabled on the split, which also disables the controls in its panes;
+   TRSetEnabled does both). */
+@property (nonatomic, getter=isEnabled) BOOL enabled;
+
+/* Sent to target after the user drags a divider or moves one with the
+   keyboard (the positions are already saved). */
 @property (nonatomic, weak) id target;
 @property (nonatomic) SEL action;
 

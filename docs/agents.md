@@ -369,6 +369,12 @@ it a row. Lint reports this as `stretched`.
   - In code: `-dividerPositions`, `-setDividerPositions:` (clamped to the
     limits, saved under `autosave`), and `target`/`action`, sent after
     the user drags a divider.
+  - Keyboard: the split is a Tab stop after its first pane (on macOS
+    only with full keyboard access, like buttons). Left/Right (Up/Down
+    when stacked) move the divider 10pt, 1pt with Option; Home and End
+    move it to its limits; `[` and `]` pick the divider when there are
+    several. Keyboard moves are saved and send the action, like drags.
+    `disabled` on a split stops dragging and the keyboard too.
   - A pane can be hidden: `hidden` on it in markup, or
     `[split setHidden: YES forPane: pane]` in code (`-isPaneHidden:`).
     The pane and its divider leave and the other panes take its space;

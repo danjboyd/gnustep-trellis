@@ -1016,7 +1016,11 @@ void TRSetEnabled(NSView *view, BOOL enabled)
   NSArray *kids;
   if ([view isKindOfClass: [NSScrollView class]])
     kids = [(NSScrollView *)view documentView] ? @[[(NSScrollView *)view documentView]] : @[];
-  else if ([view isKindOfClass: [TRSplitView class]]) kids = [(TRSplitView *)view panes];
+  else if ([view isKindOfClass: [TRSplitView class]])
+    {
+      [(TRSplitView *)view setEnabled: enabled];
+      kids = [(TRSplitView *)view panes];
+    }
   else kids = [view subviews];
   for (NSView *k in kids) TRSetEnabled(k, enabled);
 }
@@ -1032,7 +1036,18 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
     }
   if ([v conformsToProtocol: @protocol(TRKeyViewProvider)])
     {
-      for (NSView *sub in [(id<TRKeyViewProvider>)v trellisKeyViewSubtrees]) TRCollectKeyViews(sub, out);
+      for (NSView *sub in [(id<TRKeyViewProvider>)v trellisKeyViewSubtrees])
+        {
+          /* A provider may list itself: it's a Tab stop at that place. */
+          if (sub == v)
+            {
+              /* Always in, like a disabled control: AppKit skips it while
+                 it can't take focus (disabled, or no full keyboard
+                 access on macOS), and no relayout is needed after. */
+              if (TRTabIndex(v) >= 0) [out addObject: v];
+            }
+          else TRCollectKeyViews(sub, out);
+        }
       return;
     }
   if ([v isKindOfClass: [NSScrollView class]])

@@ -44,6 +44,8 @@ static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
   BOOL _applying;       /* setting pane frames ourselves */
   BOOL _tracking;       /* the user is dragging a divider */
   BOOL _parking;        /* taking a hidden pane out of the subviews */
+  NSInteger _keyDivider; /* the divider the keyboard moves */
+  BOOL _disabled;        /* no dragging, no keyboard */
 }
 
 - (instancetype)initWithDirection:(TRSplitDirection)direction
@@ -137,7 +139,8 @@ static CGFloat TRClampPane(TRSplitPane *p, CGFloat s)
         {
           NSView *target = nil, *v = [fr nextKeyView];
           for (int i = 0; v != nil && v != fr && i < 256; i++, v = [v nextKeyView])
-            if (![v isDescendantOf: pane] && [v window] == w && [v canBecomeKeyView]) { target = v; break; }
+            if (v != self && ![v isDescendantOf: pane] && [v window] == w && [v canBecomeKeyView])
+              { target = v; break; }
           [w makeFirstResponder: target];
         }
       p->hidden = YES;
@@ -509,6 +512,7 @@ static CGFloat TRPoints(TRValue v, CGFloat unset)
 
 - (void)mouseDown:(NSEvent *)event
 {
+  if (_disabled) return;
   /* NSSplitView tracks the drag inside -mouseDown: on both platforms. */
   _tracking = YES;
   [super mouseDown: event];
@@ -523,11 +527,106 @@ static CGFloat TRPoints(TRValue v, CGFloat unset)
 
 /* ---- Trellis ---- */
 
+/* The split itself is a Tab stop after its first pane (the WAI-ARIA
+   window splitter): arrow keys move a divider. */
 - (NSArray<NSView *> *)trellisKeyViewSubtrees
 {
   NSMutableArray *a = [NSMutableArray array];
-  for (TRSplitPane *p in [self shown]) [a addObject: p->view];
+  for (TRSplitPane *p in [self shown])
+    {
+      [a addObject: p->view];
+      if ([a count] == 1 && [[self shown] count] > 1) [a addObject: self];
+    }
   return a;
+}
+
+/* ---- Keyboard ---- */
+
+- (BOOL)isEnabled { return !_disabled; }
+- (void)setEnabled:(BOOL)enabled
+{
+  _disabled = !enabled;
+  if (_disabled && [[self window] firstResponder] == self) [[self window] selectNextKeyView: self];
+  [self setNeedsDisplay: YES];
+}
+
+- (BOOL)acceptsFirstResponder
+{
+  if (_disabled || [[self shown] count] < 2) return NO;
+#ifdef GNUSTEP
+  return YES;
+#else
+  /* Like buttons: a Tab stop only with full keyboard access on. */
+  return [NSApp isFullKeyboardAccessEnabled];
+#endif
+}
+
+- (BOOL)becomeFirstResponder { [self setNeedsDisplay: YES]; return YES; }
+- (BOOL)resignFirstResponder { [self setNeedsDisplay: YES]; return YES; }
+
+- (NSRect)rectOfDivider:(NSInteger)i
+{
+  NSArray<TRSplitPane *> *shown = [self shown];
+  if (i < 0 || i + 1 >= (NSInteger)[shown count]) return NSZeroRect;
+  NSRect f = [shown[i]->view frame], b = [self bounds];
+  CGFloat t = [self dividerThickness];
+  return _direction == TRSplitDirectionRow ? NSMakeRect(NSMaxX(f), 0, t, NSHeight(b))
+                                           : NSMakeRect(0, NSMaxY(f), NSWidth(b), t);
+}
+
+- (void)drawRect:(NSRect)dirty
+{
+  [super drawRect: dirty];
+  if ([[self window] firstResponder] != self) return;
+  NSInteger n = (NSInteger)[[self shown] count] - 1;
+  if (n <= 0) return;
+  if (_keyDivider >= n) _keyDivider = n - 1;
+  /* The focused divider: a 3pt band in the selection colour. */
+  NSRect r = NSInsetRect([self rectOfDivider: _keyDivider],
+                         _direction == TRSplitDirectionRow ? -1 : 0,
+                         _direction == TRSplitDirectionRow ? 0 : -1);
+  [[NSColor keyboardFocusIndicatorColor] set];
+  NSRectFill(r);
+}
+
+/* Moves the keyboard's divider to `pos` (clamped), saves, tells target. */
+- (void)moveKeyDividerTo:(CGFloat)pos
+{
+  NSMutableArray *a = [[self dividerPositions] mutableCopy];
+  if (_keyDivider < 0 || _keyDivider >= (NSInteger)[a count]) return;
+  a[_keyDivider] = @(pos);
+  [self setDividerPositions: a];
+  [self setNeedsDisplay: YES];
+  if (_action && _target) [NSApp sendAction: _action to: _target from: self];
+}
+
+- (void)keyDown:(NSEvent *)event
+{
+  if (_disabled) { [super keyDown: event]; return; }
+  NSString *chars = [event charactersIgnoringModifiers];
+  NSArray *pos = [self dividerPositions];
+  NSInteger n = (NSInteger)[pos count];
+  if ([chars length] != 1 || n == 0) { [super keyDown: event]; return; }
+  if (_keyDivider >= n) _keyDivider = n - 1;
+  unichar c = [chars characterAtIndex: 0];
+  BOOL row = (_direction == TRSplitDirectionRow);
+  CGFloat step = ([event modifierFlags] & NSEventModifierFlagOption) ? 1 : 10;
+  CGFloat at = [pos[_keyDivider] doubleValue];
+  if ((row && c == NSLeftArrowFunctionKey) || (!row && c == NSUpArrowFunctionKey))
+    [self moveKeyDividerTo: at - step];
+  else if ((row && c == NSRightArrowFunctionKey) || (!row && c == NSDownArrowFunctionKey))
+    [self moveKeyDividerTo: at + step];
+  else if (c == NSHomeFunctionKey)
+    [self moveKeyDividerTo: 0];
+  else if (c == NSEndFunctionKey)
+    [self moveKeyDividerTo: CGFLOAT_MAX / 4];
+  else if (c == '[' || c == ']')
+    {
+      _keyDivider = (_keyDivider + (c == ']' ? 1 : n - 1)) % n;
+      [self setNeedsDisplay: YES];
+    }
+  else
+    [super keyDown: event];
 }
 
 static NSSize TRPaneNaturalSize(NSView *v, CGFloat width)

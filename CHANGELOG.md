@@ -5,6 +5,13 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Added:** keyboard resizing for `<split>`: the split is a Tab stop
+  after its first pane (macOS: with full keyboard access); arrows move
+  the divider 10pt (1pt with Option), Home/End go to the limits, `[`/`]`
+  pick the divider. `TRSplitView.enabled` (and `disabled` on a split)
+  stops dragging and the keyboard. A `TRKeyViewProvider` may list itself
+  to be a Tab stop. TrellisPreview's focus order skips views that can't
+  take focus.
 - **Added:** `disabled` on a control, or on a container to disable every
   control in it (labels are left alone), and `TRSetEnabled(view, YES|NO)`
   in code; `"disabled"` in sample files. Disabled controls stay in the

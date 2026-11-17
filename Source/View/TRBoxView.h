@@ -29,6 +29,9 @@
    (TRVirtualBox): Trellis collects key views from these subtrees, in
    this order, instead. */
 @protocol TRKeyViewProvider
+/* The subtrees whose controls join the key-view loop, in order. The
+   provider may list itself: it is then a Tab stop at that place (if it
+   accepts first responder), as a split is between its first two panes. */
 - (NSArray<NSView *> *)trellisKeyViewSubtrees;
 @end
 

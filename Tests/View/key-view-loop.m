@@ -3,8 +3,8 @@
    query; scrolled content joins the loop. Views hidden with the hidden
    attribute or -setHidden:forSubview: leave the loop and come back when
    shown, and hiding the focused view moves focus on. Tab and Shift-Tab,
-   sent as key events, walk through <split> panes and a <segmented>
-   control in order. Prints KEYVIEW OK. */
+   sent as key events, walk through <split> panes (the split itself is a
+   stop after its first pane) and a <segmented> control in order. Prints KEYVIEW OK. */
 #import <AppKit/AppKit.h>
 #import "TRBoxView.h"
 #import "TRLoader.h"
@@ -28,7 +28,7 @@ static NSString *const kSpec =
 static NSString *const kTabSpec =
   @"<column>\n"
   @"  <field id=\"t1\" a11y-label=\"One\"/>\n"
-  @"  <split class=\"sp\">\n"
+  @"  <split id=\"sp\" class=\"sp\">\n"
   @"    <column class=\"left\"><field id=\"t2\" a11y-label=\"Two\"/></column>\n"
   @"    <column><segmented id=\"seg\" a11y-label=\"View\" items=\"A, B\"/><field id=\"t3\" a11y-label=\"Three\"/></column>\n"
   @"  </split>\n"
@@ -159,7 +159,7 @@ int main(void)
         /* Whether a segmented control takes focus is a system setting on
            macOS (keyboard navigation); expect what it says. */
         NSMutableArray *want = [NSMutableArray array];
-        for (NSString *i in @[ @"t1", @"t2", @"seg", @"t3", @"t4" ])
+        for (NSString *i in @[ @"t1", @"t2", @"sp", @"seg", @"t3", @"t4" ])
           if ([[TRLoader viewWithIdentifier: i inView: tb] canBecomeKeyView]) [want addObject: i];
         NSString *fwd = [[want arrayByAddingObject: want[0]] componentsJoinedByString: @","];
         NSString *back = [[[[want reverseObjectEnumerator] allObjects] arrayByAddingObject: want[[want count] - 1]]

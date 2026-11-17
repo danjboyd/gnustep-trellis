@@ -167,7 +167,10 @@ int main(void)
       NSView *b2 = [TRLoader viewWithIdentifier: @"b2" inView: root];
       NSView *b3 = [TRLoader viewWithIdentifier: @"b3" inView: root];
       [root recalculateTrellisKeyViewLoop];
-      Expect("key loop: b1 -> b2 -> b3", root.firstKeyView == b1 && [b1 nextKeyView] == b2 && [b2 nextKeyView] == b3);
+      TRSplitView *mainSplit = (TRSplitView *)[TRLoader viewWithIdentifier: @"main" inView: root];
+      Expect("key loop: b1 -> main split -> b2 -> stack split -> b3",
+             root.firstKeyView == b1 && [b1 nextKeyView] == mainSplit && [mainSplit nextKeyView] == b2
+             && [b2 nextKeyView] == stack && [stack nextKeyView] == b3);
 
       /* A second load restores the saved position. */
       TRBoxView *root2 = Load(kSpec, &err);
@@ -235,6 +238,58 @@ int main(void)
         [hs setHidden: NO forPane: nav];
         Expect("first pane shown: first again", [[hs subviews] firstObject] == nav && NSWidth([nav frame]) == 150);
         [hw close];
+      }
+      /* Keyboard: arrows move the divider, Option for 1pt, Home/End to
+         the limits, [ and ] pick the divider. */
+      {
+        TRBoxView *kr = Load(@"<column><split id=\"ks\" class=\"ks\"><box class=\"a\"/><box/><box class=\"c\"/></split></column>"
+                             @"<style> .a { width: 200px; min-width: 100px; max-width: 300px; } .c { width: 150px; } </style>", &err);
+        NSWindow *kw = [[NSWindow alloc] initWithContentRect: NSMakeRect(0, 0, 800, 200)
+                                                   styleMask: NSWindowStyleMaskTitled
+                                                     backing: NSBackingStoreBuffered defer: NO];
+        [kw setReleasedWhenClosed: NO];
+        [kr setFrame: NSMakeRect(0, 0, 800, 200)];
+        [kw setContentView: kr];
+        [kw orderFront: nil];
+        [kr layoutTrellis];
+        TRSplitView *ks = (TRSplitView *)[TRLoader viewWithIdentifier: @"ks" inView: kr];
+        BOOL focusable = [ks acceptsFirstResponder];
+        if (focusable) [kw makeFirstResponder: ks];
+        printf("     split takes focus: %s\n", focusable ? "yes" : "no (macOS, full keyboard access off)");
+        if (focusable) Expect("the split has focus", [kw firstResponder] == ks);
+        void (^key)(unichar, NSEventModifierFlags) = ^(unichar c, NSEventModifierFlags mods) {
+          NSString *s = [NSString stringWithCharacters: &c length: 1];
+          NSEvent *e = [NSEvent keyEventWithType: NSEventTypeKeyDown location: NSZeroPoint modifierFlags: mods
+                                       timestamp: 0 windowNumber: [kw windowNumber] context: nil
+                                      characters: s charactersIgnoringModifiers: s isARepeat: NO keyCode: 0];
+          if (focusable) [kw sendEvent: e]; else [ks keyDown: e];
+        };
+        CGFloat d0 = [[ks dividerPositions][0] doubleValue];
+        key(NSRightArrowFunctionKey, 0);
+        Expect("Right moves the divider 10pt", [[ks dividerPositions][0] doubleValue] == d0 + 10);
+        key(NSLeftArrowFunctionKey, NSEventModifierFlagOption);
+        Expect("Option-Left moves it 1pt", [[ks dividerPositions][0] doubleValue] == d0 + 9);
+        key(NSHomeFunctionKey, 0);
+        Expect("Home: the first pane's minimum", [[ks dividerPositions][0] doubleValue] == 100);
+        key(NSEndFunctionKey, 0);
+        Expect("End: the first pane's maximum", [[ks dividerPositions][0] doubleValue] == 300);
+        CGFloat d1 = [[ks dividerPositions][1] doubleValue];
+        key(']', 0);
+        key(NSLeftArrowFunctionKey, 0);
+        printf("     second divider %.0f -> %.0f, first %.0f\n", d1, [[ks dividerPositions][1] doubleValue],
+               [[ks dividerPositions][0] doubleValue]);
+        Expect("] then Left moves the second divider", [[ks dividerPositions][1] doubleValue] == d1 - 10
+               && [[ks dividerPositions][0] doubleValue] == 300);
+        /* Disabled: no keyboard moves, no focus. */
+        ks.enabled = NO;
+        CGFloat before = [[ks dividerPositions][1] doubleValue];
+        [ks keyDown: [NSEvent keyEventWithType: NSEventTypeKeyDown location: NSZeroPoint modifierFlags: 0
+                                     timestamp: 0 windowNumber: [kw windowNumber] context: nil
+                                    characters: @"[" charactersIgnoringModifiers: @"[" isARepeat: NO keyCode: 0]];
+        key(NSLeftArrowFunctionKey, 0);
+        Expect("disabled split: keys don't move it, no focus",
+               [[ks dividerPositions][1] doubleValue] == before && ![ks acceptsFirstResponder]);
+        [kw close];
       }
       Expect("hidden=\"maybe\" on a pane is an error",
              Load(@"<column><split><box hidden=\"maybe\"/><box/></split></column>", &err) == nil);

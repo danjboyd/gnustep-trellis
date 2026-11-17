@@ -355,7 +355,7 @@ static TRFloat TRMinContentWidth(TRNode *node, const TRStyleStorage *s, TRFloat 
       TRFloat mnw = TRBoxSize(cs, cs->minWidth, TRUndefined, cpb), mxw = TRBoxSize(cs, cs->maxWidth, TRUndefined, cpb);
       TRFloat margins = TRDefault(TRResolve(cs->margin[TREdgeLeft], TRUndefined), 0) + TRDefault(TRResolve(cs->margin[TREdgeRight], TRUndefined), 0);
       TRFloat w;
-      if (!sum)
+      if (!sum && !row)
         {
           w = isnan(pref) ? TRMinContentWidth(c, cs, TRUndefined, TRUndefined, cd) : pref;
           w = TRMax(TRClamp(w, mnw, mxw), cpb);
@@ -374,6 +374,14 @@ static TRFloat TRMinContentWidth(TRNode *node, const TRStyleStorage *s, TRFloat 
       if (cs->flexGrow <= 0) con = TRMin(con, b);
       if (cs->flexShrink <= 0) con = TRMax(con, b);
       con = TRMax(TRClamp(con, mnw, mxw), cpb);
+      if (!sum)
+        {
+          /* A wrapping row: the largest outer contribution (gaps don't
+             count, one item per line). */
+          total = TRMax(total, con + margins);
+          count++;
+          continue;
+        }
       TRFloat d = con - b;
       if (d > 0) d = cs->flexGrow >= 1 ? d / cs->flexGrow : d * cs->flexGrow;
       else if (d < 0)

@@ -754,6 +754,11 @@ class Converter:
             disp = "block"   # flex items are blockified
         if "grid-lanes" in disp:
             self.requires.add("grid-lanes")
+        elif disp == "inline-grid" and (is_root or parent_display in CONTAINERS):
+            # A root inline-grid is a grid sized shrink-to-fit (handled with
+            # root_sizing), and a flex or grid item is blockified to grid.
+            # Only one sitting on a line in a block needs inline formatting.
+            pass
         elif disp in ("inline-flex", "inline-grid"):
             self.requires.add("display-" + disp)
         elif disp not in ("flex", "grid", "none", "block"):

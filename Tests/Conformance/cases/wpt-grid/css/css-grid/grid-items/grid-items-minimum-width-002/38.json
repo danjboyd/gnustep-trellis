@@ -59,8 +59,5 @@
    }
   ],
   "width": 74
- },
- "requires": [
-  "display-inline-grid"
- ]
+ }
 }

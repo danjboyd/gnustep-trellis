@@ -202,6 +202,30 @@ class AhemImportAndMarginCollapse(unittest.TestCase):
         self.assertFalse(W.margins_collapse({}, [kid(Top=5)], True))
 
 
+class InlineGrid(unittest.TestCase):
+    def requires(self, html):
+        d = tempfile.mkdtemp()
+        with open(os.path.join(d, "t.html"), "w") as f:
+            f.write('<!DOCTYPE html><body>%s</body>' % html)
+        p = W.Page(os.path.join(d, "t.html"))
+        root = p.dom.body.element_children()[0]
+        c = W.Converter(p)
+        c.build(root, "block", [])
+        return c.requires
+
+    def test_root_inline_grid_is_a_grid(self):
+        self.assertNotIn("display-inline-grid",
+                         self.requires('<div style="display: inline-grid"><div></div></div>'))
+
+    def test_inline_grid_on_a_line_needs_inline_formatting(self):
+        self.assertIn("display-inline-grid",
+                      self.requires('<div><div style="display: inline-grid"></div></div>'))
+
+    def test_inline_grid_item_is_blockified(self):
+        self.assertNotIn("display-inline-grid",
+                         self.requires('<div style="display: flex"><div style="display: inline-grid"></div></div>'))
+
+
 class Validation(unittest.TestCase):
     def test_left_right_not_valid_for_align(self):
         self.assertNotIn("right", W.VALID_KEYWORDS["align-content"])

@@ -5,6 +5,15 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+## 0.6.0 (2026-11-17)
+
+Changes layout behavior (a minor version, so pins on 0.5.x don't move):
+children of `display: block` no longer flex, and percentage heights
+resolve only against definite heights, as in CSS. Adds right-to-left
+support in the view layer (`dir="rtl"`, logical properties that follow
+`direction`) and `-[TRBoxView inheritedLayoutDirection]`; nothing is
+removed from docs/api.md. Conformance: 2977/2977.
+
 - **Behavior change:** children of `display: block` never grow or
   shrink, and their `flex-basis` is ignored, as in CSS block flow. A
   `height: 100px` child of a 50px block now overflows instead of being

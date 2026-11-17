@@ -14,7 +14,7 @@ The markup and CSS described in [agents.md](agents.md), sections 2 to 4,
 are public: element names, attributes (`id`, `class`, `action`,
 `no-outlet`, `default`, `wraps`, `placeholder`, `tabindex`, `a11y-label`,
 `label-for`, `role` (`group`, `none`), `items`, `type`, since 0.5
-`hidden`, since 0.5.1 `disabled`, ...), the
+`hidden`, since 0.5.1 `disabled`, since 0.6 `dir`, ...), the
 `<!-- owner: Class -->` comment, `<style>` with the listed properties,
 selectors and `@container` queries, and the `Screen.sample.json`
 convention. Unknown properties and bad values stay errors.

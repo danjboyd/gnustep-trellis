@@ -5,6 +5,12 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+## 0.7.1 (2026-11-17)
+
+Fixes, no API or layout-rule changes: split panes honour `display: none`,
+TrellisPreview's exit codes and appearance check, and a migration guide
+(docs/migration-0.7.md). Conformance 3152/3152 on Linux and macOS.
+
 - **Fixed:** a split pane whose resolved style is `display: none` (for
   example from a container query) leaves the split like a hidden pane, and
   comes back when the style changes; it used to keep its width. Frame dumps

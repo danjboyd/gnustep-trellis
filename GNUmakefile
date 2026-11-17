@@ -23,7 +23,7 @@ ifeq ($(shared),no)
 endif
 
 PACKAGE_NAME = Trellis
-VERSION = 0.7.0
+VERSION = 0.7.1
 
 LIBRARY_NAME = libTrellisEngine libTrellis
 

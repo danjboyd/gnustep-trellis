@@ -835,5 +835,39 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/grid_auto_fill_shrink_to_fit_max_width",
+  "note": "auto-fill columns in a shrink-to-fit grid count against its definite max-width (160: three 50px columns), not the 0px space (WPT grid-auto-repeat-max-size-001)",
+  "root": {
+   "style": "flex-direction: column; align-items: flex-start; width: 0px",
+   "children": [
+    {
+     "style": "display: grid; grid-template-columns: repeat(auto-fill, 50px); grid-template-rows: 10px; max-width: 160px",
+     "children": [
+      {
+       "style": "grid-column: -2"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "width": 0,
+   "height": 10,
+   "children": [
+    {
+     "x": 0,
+     "width": 150,
+     "height": 10,
+     "children": [
+      {
+       "x": 100,
+       "width": 50
+      }
+     ]
+    }
+   ]
+  }
  }
 ]

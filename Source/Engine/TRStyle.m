@@ -360,6 +360,9 @@ static int TREdgeFromSuffix(NSString *suffix)
 
 - (BOOL)setValue:(id)value forProperty:(NSString *)property error:(NSError **)error
 {
+  /* Custom properties (--name) are resolved by the markup layer; a style
+     set from code accepts and ignores them. */
+  if ([property hasPrefix: @"--"]) return YES;
   NSString *p = TRKebab(property);
   NSString *sv = [value isKindOfClass: [NSString class]]
     ? [(NSString *)value stringByTrimmingCharactersInSet:

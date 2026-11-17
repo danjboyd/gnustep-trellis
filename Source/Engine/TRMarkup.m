@@ -147,8 +147,89 @@ static BOOL TRMatchFrom(NSArray *compounds, NSInteger idx, TRMarkupElement *e)
   NSMutableArray *_rules;
   NSString *_owner;
   NSError *_error;
+  NSMapTable *_customCache;        /* element -> resolved custom properties */
 }
 @end
+
+/* ---- Custom properties (--name, var()) ---- */
+
+static NSDictionary *gBuiltinCustom;
+
+/* "a: b; c: d(e;f)" -> [[a, b], [c, d(e;f)]]: split on ';' outside
+   parentheses, then at the first ':'. Pieces without ':' are kept with
+   a nil value (TRStyle reports them). */
+static NSArray<NSArray<NSString *> *> *TRSplitDeclarations(NSString *decls)
+{
+  NSMutableArray *out = [NSMutableArray array];
+  NSUInteger n = [decls length], start = 0;
+  int depth = 0;
+  NSCharacterSet *ws = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+  for (NSUInteger i = 0; i <= n; i++)
+    {
+      unichar c = i < n ? [decls characterAtIndex: i] : ';';
+      if (c == '(') depth++;
+      else if (c == ')' && depth > 0) depth--;
+      else if (c == ';' && depth == 0)
+        {
+          NSString *piece = [[decls substringWithRange: NSMakeRange(start, i - start)] stringByTrimmingCharactersInSet: ws];
+          start = i + 1;
+          if ([piece length] == 0) continue;
+          NSRange colon = [piece rangeOfString: @":"];
+          if (colon.location == NSNotFound) { [out addObject: @[piece]]; continue; }
+          [out addObject: @[[[piece substringToIndex: colon.location] stringByTrimmingCharactersInSet: ws],
+                            [[piece substringFromIndex: NSMaxRange(colon)] stringByTrimmingCharactersInSet: ws]]];
+        }
+    }
+  return out;
+}
+
+static NSString *TRJoinDeclarations(NSArray<NSArray<NSString *> *> *pairs)
+{
+  NSMutableArray *parts = [NSMutableArray array];
+  for (NSArray *p in pairs)
+    [parts addObject: [p count] > 1 ? [NSString stringWithFormat: @"%@: %@", p[0], p[1]] : p[0]];
+  return [parts componentsJoinedByString: @"; "];
+}
+
+/* Replaces var(--name) and var(--name, fallback) in a value. Returns nil
+   and sets *missing when a variable is undefined and has no fallback. */
+static NSString *TRSubstituteVars(NSString *value, NSDictionary *vars, int depth, NSString **missing)
+{
+  if ([value rangeOfString: @"var("].location == NSNotFound) return value;
+  if (depth > 16) { if (missing) *missing = @"(a cycle)"; return nil; }
+  NSMutableString *out = [NSMutableString string];
+  NSUInteger n = [value length], i = 0;
+  while (i < n)
+    {
+      NSRange r = [value rangeOfString: @"var(" options: 0 range: NSMakeRange(i, n - i)];
+      if (r.location == NSNotFound) { [out appendString: [value substringFromIndex: i]]; break; }
+      [out appendString: [value substringWithRange: NSMakeRange(i, r.location - i)]];
+      /* the matching ')' and the first top-level ',' */
+      NSUInteger j = NSMaxRange(r), comma = NSNotFound;
+      int d = 1;
+      for (; j < n; j++)
+        {
+          unichar c = [value characterAtIndex: j];
+          if (c == '(') d++;
+          else if (c == ')' && --d == 0) break;
+          else if (c == ',' && d == 1 && comma == NSNotFound) comma = j;
+        }
+      if (j >= n) { if (missing) *missing = @"(an unclosed var())"; return nil; }
+      NSUInteger nameEnd = comma != NSNotFound ? comma : j;
+      NSString *name = [[value substringWithRange: NSMakeRange(NSMaxRange(r), nameEnd - NSMaxRange(r))]
+        stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+      NSString *rep = vars[name];
+      if (rep == nil && comma != NSNotFound)
+        rep = [[value substringWithRange: NSMakeRange(comma + 1, j - comma - 1)]
+          stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+      if (rep == nil) { if (missing) *missing = name; return nil; }
+      rep = TRSubstituteVars(rep, vars, depth + 1, missing);
+      if (rep == nil) return nil;
+      [out appendString: rep];
+      i = j + 1;
+    }
+  return out;
+}
 
 @implementation TRMarkupDocument
 
@@ -178,6 +259,96 @@ static BOOL TRMatchFrom(NSArray *compounds, NSInteger idx, TRMarkupElement *e)
 - (NSString *)name { return _name; }
 - (TRMarkupElement *)root { return _root; }
 - (NSDictionary *)templates { return _templates; }
+
++ (void)setBuiltinCustomProperties:(NSDictionary<NSString *, NSString *> *)properties
+{
+  gBuiltinCustom = [properties copy];
+}
+
++ (NSDictionary<NSString *, NSString *> *)builtinCustomProperties
+{
+  if (gBuiltinCustom == nil) gBuiltinCustom = [self defaultBuiltinCustomProperties];
+  return gBuiltinCustom;
+}
+
+/* Values for a typical desktop theme; the AppKit layer replaces the
+   metrics with the running theme's (TRLoader). */
++ (NSDictionary<NSString *, NSString *> *)defaultBuiltinCustomProperties
+{
+  return @{
+    @"--tr-font-size": @"13px", @"--tr-small-font-size": @"11px", @"--tr-label-font-size": @"10px",
+    @"--tr-title-font-size": @"17px",
+    @"--tr-control-height": @"22px", @"--tr-field-height": @"22px", @"--tr-scroller-width": @"15px",
+    @"--tr-space-xs": @"2px", @"--tr-space-s": @"4px", @"--tr-space-m": @"8px", @"--tr-space-l": @"12px",
+    @"--tr-space-xl": @"20px",
+    @"--tr-radius-s": @"4px", @"--tr-radius": @"6px", @"--tr-radius-l": @"10px",
+    @"--tr-text": @"CanvasText", @"--tr-surface": @"Canvas", @"--tr-window": @"-tr-window-background",
+    @"--tr-muted": @"GrayText", @"--tr-border": @"-tr-separator", @"--tr-accent": @"AccentColor",
+    @"--tr-accent-text": @"AccentColorText", @"--tr-link": @"LinkText", @"--tr-danger": @"-tr-error",
+    @"--tr-warning": @"-tr-warning-background", @"--tr-warning-text": @"-tr-warning-text",
+    @"--tr-highlight": @"Highlight", @"--tr-highlight-text": @"HighlightText",
+  };
+}
+
+/* The custom properties an element sees: its parent's (a top-level
+   template's root sees the document root's), then its own unconditional
+   declarations in cascade order, each resolved where it is defined. */
+- (NSDictionary<NSString *, NSString *> *)customPropertiesForElement:(TRMarkupElement *)e
+{
+  if (e == nil) return [TRMarkupDocument builtinCustomProperties];
+  if (_customCache == nil) _customCache = [NSMapTable strongToStrongObjectsMapTable];
+  NSDictionary *cached = [_customCache objectForKey: e];
+  if (cached) return cached;
+  TRMarkupElement *parent = e->_parent;
+  BOOL topTemplate = NO;
+  if (parent == nil && e != _root)
+    for (NSString *k in _templates) if (_templates[k] == e) topTemplate = YES;
+  NSMutableDictionary *vars = [(parent ? [self customPropertiesForElement: parent]
+                                : (topTemplate && _root ? [self customPropertiesForElement: _root]
+                                   : [TRMarkupDocument builtinCustomProperties])) mutableCopy];
+  for (TRMatchedDeclarations *m in [self rawDeclarationsForElement: e])
+    {
+      if (m->_condition != nil) continue;
+      for (NSArray *pair in TRSplitDeclarations(m->_declarations))
+        if ([pair count] > 1 && [pair[0] hasPrefix: @"--"])
+          {
+            NSString *v = TRSubstituteVars(pair[1], vars, 0, NULL);
+            if (v) vars[pair[0]] = v;
+          }
+    }
+  [_customCache setObject: vars forKey: e];
+  return vars;
+}
+
+/* Declarations with custom properties removed and var() replaced. nil
+   (and *missing) if a variable is undefined. A conditional block's own
+   custom properties apply inside it (they don't inherit). */
+- (NSString *)resolveDeclarations:(NSString *)decls vars:(NSDictionary *)vars missing:(NSString **)missing
+{
+  if ([decls rangeOfString: @"--"].location == NSNotFound && [decls rangeOfString: @"var("].location == NSNotFound)
+    return decls;
+  NSMutableDictionary *local = nil;
+  NSMutableArray *out = [NSMutableArray array];
+  for (NSArray *pair in TRSplitDeclarations(decls))
+    {
+      if ([pair count] > 1 && [pair[0] hasPrefix: @"--"])
+        {
+          if (local == nil) local = [vars mutableCopy];
+          NSString *v = TRSubstituteVars(pair[1], local, 0, NULL);
+          if (v) local[pair[0]] = v;
+          continue;
+        }
+      if ([pair count] > 1)
+        {
+          NSString *v = TRSubstituteVars(pair[1], local ?: vars, 0, missing);
+          if (v == nil) return nil;
+          [out addObject: @[pair[0], v]];
+        }
+      else
+        [out addObject: pair];
+    }
+  return TRJoinDeclarations(out);
+}
 - (NSString *)ownerClassName { return _owner; }
 
 /* ---- Errors with line:column ---- */
@@ -391,9 +562,31 @@ static NSString *TRDecodeEntities(NSString *s)
 {
   for (TRMarkupElement *e in [self allElements])
     {
+      /* var(): every use must resolve, to a valid value. */
+      for (TRMatchedDeclarations *m in [self rawDeclarationsForElement: e])
+        {
+          if ([m->_declarations rangeOfString: @"var("].location == NSNotFound) continue;
+          NSString *missing = nil;
+          NSString *r = [self resolveDeclarations: m->_declarations vars: [self customPropertiesForElement: e]
+                                          missing: &missing];
+          NSError *err = nil;
+          NSString *msg = nil;
+          if (r == nil)
+            msg = [missing hasPrefix: @"("] ? [NSString stringWithFormat: @"var(): %@", [missing substringWithRange: NSMakeRange(1, [missing length] - 2)]]
+                : [NSString stringWithFormat: @"var(%@) is not defined here (define it on this element or an ancestor, or give a fallback)", missing];
+          else if ([TRStyle styleWithDeclarations: r error: &err] == nil)
+            msg = [NSString stringWithFormat: @"after var(): %@", [err localizedDescription]];
+          if (msg)
+            {
+              _error = [NSError errorWithDomain: TRMarkupErrorDomain code: 3 userInfo: @{
+                NSLocalizedDescriptionKey: [NSString stringWithFormat: @"%@:%lu:%lu: <%@>: %@",
+                  _name, (unsigned long)e->_line, (unsigned long)e->_column, e->_name, msg]}];
+              return NO;
+            }
+        }
       NSString *st = e->_attributes[@"style"];
       NSError *err = nil;
-      if (st && [TRStyle styleWithDeclarations: st error: &err] == nil)
+      if (st && [st rangeOfString: @"var("].location == NSNotFound && [TRStyle styleWithDeclarations: st error: &err] == nil)
         {
           _error = [NSError errorWithDomain: TRMarkupErrorDomain code: 2 userInfo: @{
             NSLocalizedDescriptionKey: [NSString stringWithFormat: @"%@:%lu:%lu: <%@ style>: %@",
@@ -495,7 +688,13 @@ static NSString *TRDecodeEntities(NSString *s)
         {
           NSString *decls = [body stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
           NSError *err = nil;
-          if ([TRStyle styleWithDeclarations: decls error: &err] == nil)
+          /* Custom properties, and values with var(), are checked per
+             element once resolved (-validateStyles). */
+          NSMutableArray *plain = [NSMutableArray array];
+          for (NSArray *pair in TRSplitDeclarations(decls))
+            if (!([pair count] > 1 && ([pair[0] hasPrefix: @"--"] || [pair[1] rangeOfString: @"var("].location != NSNotFound)))
+              [plain addObject: pair];
+          if ([TRStyle styleWithDeclarations: TRJoinDeclarations(plain) error: &err] == nil)
             return [self failAt: bodyOffset message: @"in rule '%@': %@", prelude, [err localizedDescription]];
           for (NSString *selText in [prelude componentsSeparatedByString: @","])
             {
@@ -553,6 +752,30 @@ static NSInteger TRCompareRules(id x, id y, void *ctx)
 }
 
 - (NSArray<TRMatchedDeclarations *> *)declarationsForElement:(TRMarkupElement *)e
+{
+  NSArray *raw = [self rawDeclarationsForElement: e];
+  NSDictionary *vars = nil;
+  NSMutableArray *out = [NSMutableArray arrayWithCapacity: [raw count]];
+  for (__strong TRMatchedDeclarations *m in raw)
+    {
+      NSString *d = m->_declarations;
+      if ([d rangeOfString: @"--"].location != NSNotFound || [d rangeOfString: @"var("].location != NSNotFound)
+        {
+          if (vars == nil) vars = [self customPropertiesForElement: e];
+          TRMatchedDeclarations *r = [TRMatchedDeclarations new];
+          /* An undefined variable leaves var() in place: the style then
+             reports it (and -validateStyles names the element). */
+          r->_declarations = [self resolveDeclarations: d vars: vars missing: NULL] ?: d;
+          r->_condition = m->_condition;
+          r->_line = m->_line;
+          m = r;
+        }
+      [out addObject: m];
+    }
+  return out;
+}
+
+- (NSArray<TRMatchedDeclarations *> *)rawDeclarationsForElement:(TRMarkupElement *)e
 {
   NSMutableArray *out = [NSMutableArray array];
   NSString *def = TRElementDefaults(e->_name);

@@ -6,6 +6,7 @@
 
 #import "TRLoader.h"
 #import "TRVirtualBox.h"
+#import "TRViewMeasure.h"
 #import <objc/runtime.h>
 
 static NSError *TRLoadError(TRMarkupDocument *doc, TRMarkupElement *e, NSString *fmt, ...) NS_FORMAT_FUNCTION(3,4);
@@ -690,8 +691,40 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
 + (NSUInteger)reloadChangedFiles { return 0; }
 #endif
 
+/* The built-in tokens' metrics from the running theme (fonts, control
+   and field heights, scroller width), refreshed at each load. */
+static NSString *TRPxString(CGFloat v)
+{
+  return [NSString stringWithFormat: @"%gpx", round(v * 2) / 2];
+}
+
+void TRUpdateThemeTokens(void)
+{
+  NSMutableDictionary *t = [[TRMarkupDocument defaultBuiltinCustomProperties] mutableCopy];
+  t[@"--tr-font-size"] = TRPxString([NSFont systemFontSize]);
+  t[@"--tr-small-font-size"] = TRPxString([NSFont smallSystemFontSize]);
+  t[@"--tr-label-font-size"] = TRPxString([NSFont labelFontSize]);
+  t[@"--tr-title-font-size"] = TRPxString(round([NSFont systemFontSize] * 1.3));
+  NSButton *b = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 80, 20)];
+  [b setBezelStyle: NSRoundedBezelStyle];
+  [b setTitle: @"Ag"];
+  t[@"--tr-control-height"] = TRPxString(ceil(TRCellSize([b cell]).height));
+  NSTextField *f = [[NSTextField alloc] initWithFrame: NSMakeRect(0, 0, 80, 20)];
+  [f setStringValue: @"Ag"];
+  t[@"--tr-field-height"] = TRPxString(ceil(TRCellSize([f cell]).height));
+  CGFloat sw = 15;
+#ifdef GNUSTEP
+  sw = [NSScroller scrollerWidth];
+#else
+  sw = [NSScroller scrollerWidthForControlSize: NSControlSizeRegular scrollerStyle: [NSScroller preferredScrollerStyle]];
+#endif
+  t[@"--tr-scroller-width"] = TRPxString(sw);
+  [TRMarkupDocument setBuiltinCustomProperties: t];
+}
+
 + (TRBoxView *)loadDocument:(TRMarkupDocument *)doc owner:(id)owner error:(NSError **)error
 {
+  TRUpdateThemeTokens();
   TRMarkupElement *root = doc.root;
   if (![@[@"column", @"row", @"box"] containsObject: root.name])
     {

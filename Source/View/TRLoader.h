@@ -84,6 +84,11 @@
 
 extern NSString *const TRLoaderDidReloadNotification;
 
+/* Sets the built-in CSS tokens' metrics (--tr-font-size, --tr-control-
+   height, --tr-scroller-width, ...) from the running theme. Loading a
+   document does this; call it before resolving styles yourself. */
+void TRUpdateThemeTokens(void);
+
 /* The cell of <button bordered="no">: a title-only button that draws
    its (attributed) title itself, in the colour its style sets. */
 @interface TRFlatButtonCell : NSButtonCell

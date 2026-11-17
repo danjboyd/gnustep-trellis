@@ -1,0 +1,15 @@
+<column class="app">
+  <row class="bar"><label class="title">Inbox</label><spacer/><button class="go">Refresh</button></row>
+  <column class="card"><text class="muted">Three new items since this morning.</text></column>
+</column>
+<style>
+  .app   { --gap: var(--tr-space-m); --surface: var(--tr-surface); gap: var(--gap); padding: var(--tr-space-l); }
+  .bar   { gap: var(--gap); }
+  .title { font-size: var(--tr-title-font-size); font-weight: bold; }
+  .go    { min-height: var(--tr-control-height); }
+  .card  { --gap: var(--tr-space-s); gap: var(--gap); padding: var(--tr-space-m);
+           background-color: var(--surface); border: 1px; border-color: var(--tr-border);
+           border-radius: var(--tr-radius); }
+  .muted { color: var(--tr-muted); }
+  @container (max-width: 399px) { .app { --gap: var(--tr-space-s); gap: var(--gap); } }
+</style>

@@ -149,6 +149,33 @@ the user's settings. trellis-render refuses to run without it.
   `@container (min-width: 560px) { ... }` and `(max-width: ...)`. The
   condition tests the nearest ancestor with
   `container-type: inline-size`. Put that on your root.
+- **Custom properties and tokens:** declare `--name: value` on an element
+  (usually the root) and use `var(--name)` or `var(--name, fallback)` in
+  any value. They inherit down the tree, and a descendant can redefine
+  them. Built-in tokens are defined everywhere, and the metric ones come
+  from the running theme, so prefer them to hard-coded numbers:
+  - fonts: `--tr-font-size`, `--tr-small-font-size`,
+    `--tr-label-font-size`, `--tr-title-font-size`;
+  - controls: `--tr-control-height`, `--tr-field-height`,
+    `--tr-scroller-width`;
+  - spacing and corners: `--tr-space-xs` (2px), `-s` (4), `-m` (8),
+    `-l` (12), `-xl` (20); `--tr-radius-s` (4), `--tr-radius` (6),
+    `--tr-radius-l` (10);
+  - colours (aliases of the system colours above): `--tr-text`,
+    `--tr-surface`, `--tr-window`, `--tr-muted`, `--tr-border`,
+    `--tr-accent`, `--tr-accent-text`, `--tr-link`, `--tr-danger`,
+    `--tr-warning` / `--tr-warning-text`, `--tr-highlight` /
+    `--tr-highlight-text`.
+
+  ```css
+  .app  { --gap: var(--tr-space-m); gap: var(--gap); padding: var(--tr-space-l); }
+  .card { --gap: var(--tr-space-s); gap: var(--gap); border-radius: var(--tr-radius); }
+  @container (max-width: 399px) { .app { --gap: var(--tr-space-s); gap: var(--gap); } }
+  ```
+
+  An undefined `var()` without a fallback is an error at the element. A
+  custom property set inside `@container` applies only inside that block
+  (write the `var()` uses there too, as above). No `calc()` yet.
 - **Unknown properties and bad values are errors,** with `file:line:col`.
 
 ## 4. Where Trellis is not the browser

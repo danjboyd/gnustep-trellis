@@ -1,0 +1,7 @@
+<!-- expect: var(--card-gap) is not defined here -->
+<column>
+  <column class="card"><label>A</label></column>
+</column>
+<style>
+  .card { gap: var(--card-gap); }
+</style>

@@ -41,6 +41,11 @@ where an entry `{"_repeat": n, "items": [...]}` is a run, `"_template"`
 picks the template, and `{i}`, `{n}` and `{n:W}` number the items;
 `"scroll-to": index` scrolls there. Ids repeat freely across templates.
 
+Since 0.5 (unreleased), custom properties: `--name: value` declarations
+that inherit down the element tree, `var(--name[, fallback])` in any
+value, and the built-in `--tr-*` tokens listed in agents.md section 3
+(names and meanings are API; their values follow the theme).
+
 ## AppKit layer (libTrellis)
 
 | API | Header | What it is |
@@ -56,6 +61,7 @@ picks the template, and `{i}`, `{n}` and `{n:W}` number the items;
 | `TRSizeForWidth` protocol: `-trellisSizeForWidth:` | TRViewMeasure.h | Opt-in height-for-width measuring for custom views (CGFLOAT_MAX = max-content). |
 | `TRMeasureView`, `TRBaselineOfView` | TRViewMeasure.h | How Trellis measures a leaf view; usable from custom measure blocks. |
 | `TRColorFromCSS` | TRBoxView.h | CSS colour string to NSColor. |
+| `TRUpdateThemeTokens` (since 0.5) | TRLoader.h | Sets the built-in tokens' metrics from the running theme (loading a document does it). |
 | `TRApplyLeafStyle` (since 0.4) | TRBoxView.h | Text and colour declarations on a control outside any box. |
 | `TRKeyViewProvider` protocol (since 0.4): `-trellisKeyViewSubtrees` | TRBoxView.h | A view that supplies its focusable subtrees in order to the managed key-view loop. |
 | `TRSetTabIndex`, `TRTabIndex` (since 0.2) | TRBoxView.h | A view's tab index (markup `tabindex`). |
@@ -70,7 +76,7 @@ picks the template, and `{i}`, `{n}` and `{n:W}` number the items;
 | Container queries: `-addConditionalStyle:when:error:`, `matchedConditions` | TRNode.h | `@container`-style conditional declarations. |
 | `TRStyle`: `+style`, `+styleWithDeclarations:[error:]`, `+styleWithDictionary:error:`, `-applyDeclarations:error:`, `-applyDictionary:error:`, `-setValue:forProperty:error:`, the typed properties, the per-edge accessors, `-declarationString`, `otherDeclarations` | TRStyle.h | Layout properties by CSS name or typed. |
 | `TRTypes.h`: `TRValue`, `TRSize`, `TRRect`, `TRPoint`, `TREdge`, `TRMeasureMode`, the enums (`TRDisplay`, `TRAlign`, ...), `TRPx`, `TRAutoValue`, `TRNoneValue`, `TRUndefined` | TRTypes.h | Value types. New enum members may be added at the end. |
-| `TRMarkupDocument`, `TRMarkupElement`, `TRMatchedDeclarations` | TRMarkup.h | Parsed .trellis documents (read-only). |
+| `TRMarkupDocument`, `TRMarkupElement`, `TRMatchedDeclarations` | TRMarkup.h | Parsed .trellis documents (read-only). Since 0.5: `-customPropertiesForElement:`, `+setBuiltinCustomProperties:`, `+builtinCustomProperties`, `+defaultBuiltinCustomProperties`; `-declarationsForElement:` returns resolved declarations. |
 | `TRVirtualLayout` (since 0.4): `-initWithMode:`, `mode`, `-setContainerDeclarations:error:`, `width`, `itemCount`, `estimatedSize`, `spansFullRow`, `estimateForItem`, `-setMeasuredHeight:forItem:`, `-isMeasured:`, `-forgetMeasuredHeights`, `-insertItemsAtIndex:count:`, `-removeItemsAtIndex:count:`, `contentHeight`, `columnCount`, `-frameForItem:`, `-widthForItem:`, `-heightForItem:`, `-rowForItem:column:`, `-itemsForViewportOffset:height:overscan:`, the anchor methods; `TRVirtualMode`, `TRVirtualAnchor` | TRVirtualLayout.h | The window engine behind `<virtual>`: item heights only, no views. |
 | `TRLintFrameTree` | TRLint.h | Lint a frame dump (what trellis-render --lint and TrellisPreview use). |
 | `TRStyleErrorDomain`, `TRMarkupErrorDomain` | | Error domains. Error codes and messages may change; `file:line:col` stays in the message. |

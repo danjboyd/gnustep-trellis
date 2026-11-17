@@ -2084,5 +2084,247 @@
    ]
   },
   "note": "Same, centred with auto margins"
+ },
+ {
+  "id": "engine/pct_height_in_unstretched_item_is_auto",
+  "note": "css-flexbox 9.8: an align-self: flex-start item's height isn't definite, so 50% on its child acts as auto (WPT percentage-heights-001/2)",
+  "root": {
+   "style": {
+    "display": "flex",
+    "flex-wrap": "wrap",
+    "width": 50,
+    "height": 50
+   },
+   "children": [
+    {
+     "style": {
+      "align-self": "flex-start",
+      "min-height": 0
+     },
+     "children": [
+      {
+       "style": {
+        "height": "50%",
+        "overflow": "hidden"
+       },
+       "children": [
+        {
+         "style": {
+          "width": 50,
+          "height": 50
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 50,
+   "height": 50,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 50,
+     "height": 50,
+     "children": [
+      {
+       "x": 0,
+       "y": 0,
+       "width": 50,
+       "height": 50,
+       "children": [
+        {
+         "x": 0,
+         "y": 0,
+         "width": 50,
+         "height": 50
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/pct_height_in_stretched_item_resolves",
+  "note": "a stretched item's height is definite (9.8.1): 50% of 50",
+  "root": {
+   "style": {
+    "display": "flex",
+    "width": 50,
+    "height": 50
+   },
+   "children": [
+    {
+     "style": {
+      "flex-direction": "column",
+      "width": 50
+     },
+     "children": [
+      {
+       "style": {
+        "height": "50%"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 50,
+   "height": 50,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 50,
+     "height": 50,
+     "children": [
+      {
+       "x": 0,
+       "y": 0,
+       "width": 50,
+       "height": 25
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/pct_height_in_auto_column_item_is_auto",
+  "note": "in an auto-height column the items' heights aren't definite (9.8.2), so a grandchild's 50% acts as auto",
+  "root": {
+   "style": {
+    "width": 100,
+    "height": 200
+   },
+   "children": [
+    {
+     "style": {
+      "flex-direction": "column",
+      "align-self": "flex-start",
+      "width": 100
+     },
+     "children": [
+      {
+       "style": {
+        "flex-direction": "column"
+       },
+       "children": [
+        {
+         "style": {
+          "height": "50%",
+          "width": 10
+         },
+         "children": [
+          {
+           "style": {
+            "height": 30,
+            "width": 10
+           }
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 200,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 100,
+     "height": 30,
+     "children": [
+      {
+       "x": 0,
+       "y": 0,
+       "width": 100,
+       "height": 30,
+       "children": [
+        {
+         "x": 0,
+         "y": 0,
+         "width": 10,
+         "height": 30,
+         "children": [
+          {
+           "x": 0,
+           "y": 0,
+           "width": 10,
+           "height": 30
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/pct_height_in_definite_column_item_resolves",
+  "note": "a column with a definite height: its items' flexed heights are definite (9.8.2)",
+  "root": {
+   "style": {
+    "flex-direction": "column",
+    "width": 100,
+    "height": 200
+   },
+   "children": [
+    {
+     "style": {
+      "flex-grow": 1,
+      "flex-direction": "column"
+     },
+     "children": [
+      {
+       "style": {
+        "height": "50%"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 100,
+   "height": 200,
+   "children": [
+    {
+     "x": 0,
+     "y": 0,
+     "width": 100,
+     "height": 200,
+     "children": [
+      {
+       "x": 0,
+       "y": 0,
+       "width": 100,
+       "height": 100
+      }
+     ]
+    }
+   ]
+  }
  }
 ]

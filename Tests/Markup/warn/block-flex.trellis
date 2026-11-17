@@ -1,0 +1,2 @@
+<!-- expect: <row> flex-grow has no effect: its parent is display: block -->
+<column style="display: block; height: 200px"><row style="flex-grow: 1"><label>Notes</label></row></column>

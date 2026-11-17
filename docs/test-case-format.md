@@ -54,7 +54,7 @@ runner (`trellis-case`) reads both.
   `border-width`, `flex-flow`, `place-*`) are accepted.
 - CSS initial values apply, with two deliberate departures:
   `box-sizing` defaults to **border-box**, and `display` defaults to
-  `flex` (`display: block` means a column flex container). Otherwise
+  `flex` (`display: block` means a column whose children don't flex). Otherwise
   `flex-direction:row`, `flex-shrink:1`, `min-width/height:auto`.
   **WPT imports must set `"boxSizing": "content-box"` on every node.**
   Yoga imports need nothing (Yoga is border-box too).
@@ -111,6 +111,6 @@ and the skip reasons.
 
 The README's Conformance table is generated from recorded runs on Linux and
 macOS (`docs/conformance/*.json`, written by `make conformance-record`), so
-it's the one source of truth for pass rates. All 11 flexbox failures
-(`percentage-heights-001`, `percentage-size/2`) come from `display: block`
-being a column; see docs/agents.md section 4.
+it's the one source of truth for pass rates. Every case that runs passes
+(since 0.6; the last failures came from `display: block` children
+flexing, see docs/agents.md section 4).

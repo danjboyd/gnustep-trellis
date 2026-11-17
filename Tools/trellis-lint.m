@@ -275,6 +275,45 @@ static void TRLintAccessibility(TRMarkupDocument *doc, NSString *path)
     }
 }
 
+/* The element's unconditional declarations, later ones winning. */
+static NSDictionary *TRAllDecls(TRMarkupDocument *doc, TRMarkupElement *e)
+{
+  NSMutableDictionary *d = [NSMutableDictionary dictionary];
+  for (TRMatchedDeclarations *m in [doc declarationsForElement: e])
+    {
+      if (m.condition != nil) continue;
+      for (NSString *decl in [m.declarations componentsSeparatedByString: @";"])
+        {
+          NSRange colon = [decl rangeOfString: @":"];
+          if (colon.location == NSNotFound) continue;
+          NSString *k = [[[decl substringToIndex: colon.location] stringByTrimmingCharactersInSet:
+                           [NSCharacterSet whitespaceAndNewlineCharacterSet]] lowercaseString];
+          d[k] = [[decl substringFromIndex: NSMaxRange(colon)] stringByTrimmingCharactersInSet:
+                   [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        }
+    }
+  return d;
+}
+
+/* Children of display: block don't grow or shrink (since 0.6), so flex,
+   flex-grow, flex-shrink and flex-basis on them do nothing. */
+static void TRLintBlockChildren(TRMarkupDocument *doc, NSString *path)
+{
+  for (TRMarkupElement *e in [doc allElements])
+    {
+      if (e.parent == nil || ![TRAllDecls(doc, e.parent)[@"display"] isEqualToString: @"block"]) continue;
+      NSDictionary *d = TRAllDecls(doc, e);
+      for (NSString *k in @[@"flex", @"flex-grow", @"flex-shrink", @"flex-basis"])
+        if (d[k])
+          {
+            NSString *where = [NSString stringWithFormat: @"%@:%lu:%lu", path, (unsigned long)e.line, (unsigned long)e.column];
+            TRReport(where, @"warning", @"block-flex", [NSString stringWithFormat:
+              @"<%@> %@ has no effect: its parent is display: block, whose children don't grow or shrink", e.name, k]);
+            break;
+          }
+    }
+}
+
 static void TRLintTrellis(NSString *path, NSString *header)
 {
   NSError *err = nil;
@@ -393,6 +432,7 @@ static void TRLintTrellis(NSString *path, NSString *header)
     }
   TRLintColours(doc, path);
   TRLintAccessibility(doc, path);
+  TRLintBlockChildren(doc, path);
   if (header == nil) return;
   NSMutableSet *outlets = [NSMutableSet set], *actions = [NSMutableSet set];
   NSString *cls = nil;

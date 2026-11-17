@@ -127,9 +127,9 @@ static BOOL TRUsesOwnerSize(const TRStyleStorage *s)
 
 static BOOL TRCacheMatch(const TRCacheEntry *e, TRFloat aw, TRFloat ah,
                          TRMeasureMode wm, TRMeasureMode hm,
-                         TRFloat ow, TRFloat oh, TRDirection dir, BOOL ownerMatters)
+                         TRFloat ow, TRFloat oh, TRDirection dir, BOOL indefH, BOOL ownerMatters)
 {
-  if (e->wm != wm || e->hm != hm || e->dir != dir) return NO;
+  if (e->wm != wm || e->hm != hm || e->dir != dir || e->indefH != indefH) return NO;
   if (wm != TRMeasureModeUndefined && !TRFloatsEqual(e->aw, aw)) return NO;
   if (hm != TRMeasureModeUndefined && !TRFloatsEqual(e->ah, ah)) return NO;
   if (ownerMatters && (!TRFloatsEqual(e->ow, ow) || !TRFloatsEqual(e->oh, oh))) return NO;
@@ -142,7 +142,7 @@ static void TRCacheStore(TRNode *n, TRFloat aw, TRFloat ah,
 {
   TRCacheEntry *e = &n->_cache[n->_cacheNext];
   e->aw = aw; e->ah = ah; e->wm = wm; e->hm = hm;
-  e->ow = ow; e->oh = oh; e->dir = dir; e->result = result;
+  e->ow = ow; e->oh = oh; e->dir = dir; e->indefH = n->_pctIndefH; e->result = result;
   n->_cacheNext = (n->_cacheNext + 1) % TR_CACHE_SIZE;
   if (n->_cacheCount < TR_CACHE_SIZE) n->_cacheCount++;
 }
@@ -358,7 +358,7 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
      upper bound (fit-content) is indefinite, so percentages act as auto
      until the final, exact layout. */
   const TRFloat refW = wm == TRMeasureModeExactly ? innerW : TRUndefined;
-  const TRFloat refH = hm == TRMeasureModeExactly ? innerH : TRUndefined;
+  const TRFloat refH = hm == TRMeasureModeExactly && !node->_pctIndefH ? innerH : TRUndefined;
   const TRFloat refMain = isRow ? refW : refH, refCross = isRow ? refH : refW;
 
   const TRFloat mainGap = TRMax(0, TRDefault(TRResolve(isRow ? s->columnGap : s->rowGap, refMain), 0));
@@ -408,6 +408,22 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
       it->crossLead = it->margin[crossLeadE]; it->crossTrail = it->margin[crossTrailE];
       it->mainLeadAuto = it->marginAuto[mainLeadE]; it->mainTrailAuto = it->marginAuto[mainTrailE];
       it->crossLeadAuto = it->marginAuto[crossLeadE]; it->crossTrailAuto = it->marginAuto[crossTrailE];
+
+      /* Is the item's height definite for its own children's percentages
+         (css-flexbox 9.8)? A definite height style; in a row, a stretched
+         item (9.8.1, 9.8.3); in a column, the post-flexing size when the
+         column's height is definite (9.8.2), but not in a block, whose
+         children aren't flexed. */
+      {
+        BOOL def;
+        if (cs->height.unit == TRUnitPoint || (cs->height.unit == TRUnitPercent && !isnan(refH)))
+          def = YES;
+        else if (isRow)
+          def = TRResolveAlignSelf(cs, s) == TRAlignStretch && !it->crossLeadAuto && !it->crossTrailAuto;
+        else
+          def = !inBlock && !isnan(refH);
+        it->node->_pctIndefH = !def;
+      }
 
       TRFloat sw = TRBoxSize(cs, cs->width, refW, cpbW);
       TRFloat sh = TRBoxSize(cs, cs->height, refH, cpbH);
@@ -962,6 +978,7 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
           TRNode *c = children[ci];
           const TRStyleStorage *cs = TRChildStyle(c, dir);
           if (TRNodeIsNone(c) || cs->position != TRPositionAbsolute) continue;
+          c->_pctIndefH = NO;
           TREdges ce = TRResolveEdges(cs, cbW);
           TRFloat cpbW = TRPBHorizontal(&ce), cpbH = TRPBVertical(&ce);
           TRFloat m[4];
@@ -1071,16 +1088,16 @@ TRSize TRLayoutNode(TRNode *node, TRFloat aw, TRFloat ah,
   else if (perform)
     {
       if (node->_hasPerformEntry
-          && TRCacheMatch(&node->_performEntry, aw, ah, wm, hm, ow, oh, dir, ownerMatters))
+          && TRCacheMatch(&node->_performEntry, aw, ah, wm, hm, ow, oh, dir, node->_pctIndefH, ownerMatters))
         return node->_performEntry.result;
     }
   else
     {
       if (node->_hasPerformEntry
-          && TRCacheMatch(&node->_performEntry, aw, ah, wm, hm, ow, oh, dir, ownerMatters))
+          && TRCacheMatch(&node->_performEntry, aw, ah, wm, hm, ow, oh, dir, node->_pctIndefH, ownerMatters))
         return node->_performEntry.result;
       for (int i = 0; i < node->_cacheCount; i++)
-        if (TRCacheMatch(&node->_cache[i], aw, ah, wm, hm, ow, oh, dir, ownerMatters))
+        if (TRCacheMatch(&node->_cache[i], aw, ah, wm, hm, ow, oh, dir, node->_pctIndefH, ownerMatters))
           return node->_cache[i].result;
     }
 
@@ -1128,7 +1145,7 @@ TRSize TRLayoutNode(TRNode *node, TRFloat aw, TRFloat ah,
       node->_hasPerformEntry = YES;
       TRCacheEntry *pe = &node->_performEntry;
       pe->aw = aw; pe->ah = ah; pe->wm = wm; pe->hm = hm;
-      pe->ow = ow; pe->oh = oh; pe->dir = dir; pe->result = size;
+      pe->ow = ow; pe->oh = oh; pe->dir = dir; pe->indefH = node->_pctIndefH; pe->result = size;
     }
   else if (!unclampW && !unclampH)
     TRCacheStore(node, aw, ah, wm, hm, ow, oh, dir, size);

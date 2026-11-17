@@ -76,7 +76,7 @@
 /* The direction this box's layout tree inherits: the enclosing box's at
    this point (across split panes and scroll views), else the app's user
    interface layout direction, else ltr. `direction` in a style overrides
-   it. (since 0.5.2) */
+   it. (since 0.6) */
 - (TRDirection)inheritedLayoutDirection;
 /* Layout transitions (opt-in). A box whose style has
    `-tr-layout-transition: 200ms [ease-out | linear | ease-in-out]`

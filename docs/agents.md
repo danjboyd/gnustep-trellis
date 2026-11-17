@@ -104,7 +104,7 @@ the user's settings. trellis-render refuses to run without it.
   virtual box's items aren't reached: set them up from the data source.
   In a sample file, `"disabled": true` does the same. Lint warns on
   `disabled` on a label, text, image, spacer, separator or progress bar.
-- **Right-to-left (since 0.5.2):** `dir="rtl"` on an element (as in HTML)
+- **Right-to-left (since 0.6):** `dir="rtl"` on an element (as in HTML)
   sets `direction: rtl` for it and its content; style rules and inline
   styles can still override it. Rows run right to left, and logical sides
   (`margin-inline-start` ...) swap. Split panes and scroll views keep the
@@ -273,30 +273,31 @@ collapses as in HTML, and the runs follow the label's `color`,
 | Every element | block or inline | a **flex container** (default `flex-direction: row`) |
 | `<row>` | n/a | `flex-direction: row; align-items: center` |
 | `<column>` | n/a | `flex-direction: column` (items stretch to full width) |
-| `display: block` | block flow | a column |
+| `display: block` | block flow | a column whose children don't flex (since 0.6) |
 | `box-sizing` | `content-box` | **`border-box`**: `width` includes padding and border |
 | `position: absolute` | relative to the nearest positioned ancestor | relative to the **parent** |
 | `last baseline` | aligns last baselines | aligns as `end` (its fallback) |
 | No block or inline flow, floats or tables | | use rows and columns |
 
-**`display: block` is a column, and that has three visible effects.**
-Trellis keeps this on purpose: one layout model (flex) is predictable,
-fast, and what responsive app UI wants. Browser block flow exists for
-documents. The effects:
+**`display: block` is a column whose children don't flex.** Trellis has
+no block flow: a block stacks its children top to bottom and stretches
+them across, like a column, so the whole engine stays one layout model.
+Since 0.6 it matches the browser where a column used to differ:
 
-1. **Children shrink instead of overflowing.** Items default to
-   `flex-shrink: 1`, so a `height: 100px` child in a 50px-tall block is
-   squeezed down to its content. In a browser it would overflow. Set
-   `flex-shrink: 0` on children that must keep their size.
-2. **Percentage heights resolve.** A child of a definite-height block has a
-   definite height after flexing, so `height: 50%` on a grandchild works.
-   In a browser, an auto-height block makes it `auto`.
-3. **Margins never collapse**, between siblings or through a parent.
+1. **Children keep their size.** They never grow or shrink, and
+   `flex`, `flex-grow`, `flex-shrink` and `flex-basis` on them do nothing
+   (trellis-lint warns). A `height: 100px` child in a 50px-tall block
+   overflows, as in a browser. Use a `<column>` when children should flex.
+2. **Percentage heights follow CSS.** A child's `height: 50%` resolves
+   only against a definite height: a fixed height, a stretched flex item,
+   or a flexed item of a column with a definite height (css-flexbox 9.8).
+   Against an auto height it acts as `auto`. This holds for every box,
+   not only blocks.
+3. **Margins never collapse**, between siblings or through a parent. This
+   is still a difference from the browser.
 
 The WPT importer tags cases that rely on block flow `requires: block-layout`.
-The runner still runs them: most pass, because a column usually lays
-out a block the same way. The divergence itself shows in
-`percentage-heights-001` (effect 1) and `percentage-size` (effect 2).
+The runner still runs them, and all of them pass.
 
 **The most common mistake:** `flex-basis` (and the third value of
 `flex`) applies to the *main* axis. `flex: 1 1 160px` means 160px wide in

@@ -5,6 +5,18 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Behavior change:** children of `display: block` never grow or
+  shrink, and their `flex-basis` is ignored, as in CSS block flow. A
+  `height: 100px` child of a 50px block now overflows instead of being
+  squeezed. Use a `<column>` (or `display: flex; flex-direction: column`)
+  where children should flex. trellis-lint warns on `flex`, `flex-grow`,
+  `flex-shrink` and `flex-basis` on a block's children.
+- **Behavior change:** a percentage height resolves only against a
+  definite height (css-flexbox 9.8): a fixed height, a stretched item,
+  or a flexed item of a column whose height is definite. Inside an item
+  aligned `flex-start` in a row, or an item of an auto-height column,
+  `height: 50%` now acts as `auto` (it took half of the laid-out height).
+  With these two, every conformance case that runs passes (2977/2977).
 - **Fixed:** logical properties follow `direction`: in a right-to-left box
   `margin-inline-start`, `padding-inline-start`, `border-inline-start`
   and `inset-inline-start` are the right edge (they were always the left).

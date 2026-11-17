@@ -101,10 +101,7 @@ leaves out or does differently on purpose (`position: static`,
 keywords, per-axis overflow, `flex-wrap: balance`, `-webkit-box`, named
 grid lines, subgrid, masonry, `position: sticky`, `calc()`, ancestor
 containing blocks for abspos); `trellis-case --all`
-runs them anyway. The 11 flexbox failures are the documented consequence
-of `display: block` meaning a column flex container (percentage heights
-against a block, a fixed-height child shrinking inside a shorter block).
-Every grid case that runs passes.
+runs them anyway. Every case that runs passes.
 `make conformance-record` (or `make -f Makefile.macos conformance-record`)
 re-records a platform and regenerates the table.
 

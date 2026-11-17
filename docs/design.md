@@ -246,7 +246,7 @@ Agents must not assume browser behaviour in these cases:
 | Topic | Browser CSS | Trellis |
 |---|---|---|
 | Default `display` | `inline` / `block` by element | `flex` for every box |
-| `display: block` | block flow | a **column** flex container (`align-items: stretch`) |
+| `display: block` | block flow | a **column** (`align-items: stretch`) whose children never grow or shrink (since 0.6) |
 | `box-sizing` | `content-box` | **`border-box`** |
 | Block and inline flow, floats, tables | yes | no; boxes are flex (v1) or grid (v1.1) containers |
 | `position: absolute` | relative to the nearest *positioned* ancestor | relative to the **parent's** padding box |
@@ -392,7 +392,9 @@ for `.trellis` files. Its rules:
 ## 8. Decided questions (project lead, 2026-11-13; the maintainer may override)
 
 1. `display: block` is a column flex container with `align-items: stretch`.
-   **Implemented.**
+   **Implemented.** Amended for 0.6 (project lead, 2026-11-17): its
+   children never grow or shrink and flex-basis is ignored, as in block
+   flow.
 2. `box-sizing` defaults to `border-box`, as a deliberate departure from
    CSS. WPT imports set `content-box` explicitly. **Implemented.**
 3. No subgrid in v1.1. Grid comes first; subgrid in v1.2 if form label

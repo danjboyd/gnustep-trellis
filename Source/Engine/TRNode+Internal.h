@@ -13,6 +13,7 @@ typedef struct {
   TRMeasureMode wm, hm;
   TRFloat ow, oh;
   TRDirection dir;
+  BOOL indefH;                   /* the node's _pctIndefH at the time */
   TRSize result;
 } TRCacheEntry;
 
@@ -27,6 +28,10 @@ typedef struct {
   TRBaselineBlock _baselineFn;
   BOOL _dirty;
   BOOL _hidden;                  /* like display: none, independent of the style */
+  /* Set by a flex parent: this node's height is not definite (css-flexbox
+     9.8), so its children's percentage heights act as auto even when it
+     is laid out at an exact height. */
+  BOOL _pctIndefH;
 
   /* Results. _rawFrame is unrounded; _frame is what clients see. */
   TRRect _rawFrame;

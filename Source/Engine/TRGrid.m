@@ -869,6 +869,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       TRNode *c = children[i];
       const TRStyleStorage *cs = TRChildStyle(c, dir);
       if (TRNodeIsNone(c)) continue;
+      c->_pctIndefH = NO;   /* a grid area is definite */
       if (cs->position == TRPositionAbsolute) continue;
       items[n].node = c; items[n].s = cs; items[n].docOrder = (NSInteger)i;
       n++;

@@ -232,7 +232,8 @@ collapses as in HTML, and the runs follow the label's `color`,
 - **Units:** `px`, `%` and `auto`. `width`, `height`, their `min-`/`max-`
   forms and `flex-basis` also take `min-content`, `max-content`,
   `fit-content` and `stretch` (since 0.8; `flex-basis: stretch` acts as
-  `content`, as in Yoga).
+  `content`, as in Yoga), and `initial` (their initial value: `auto`, or
+  `none` for `max-*`).
 - **Selectors:** `type`, `.class`, `#id`, `a b`, `a > b`, and comma
   lists. **Not supported:** `:hover` and other pseudo-classes, attribute
   selectors, `+`, `~`, and `!important` ordering.

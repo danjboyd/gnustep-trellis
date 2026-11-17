@@ -16,7 +16,7 @@ version may change the API listed in docs/api.md, and says so here.
   size and its width, bounded by its flex base size when it can't grow or
   shrink. The largest desired flex fraction then decides each item's share.
   `width: min-content` (and fit-content in a narrow space) on a flex row
-  gives the browser's width.
+  gives the browser's width. max-content is never below min-content.
 - **Conformance:** the WPT importer passes an abspos root's containing
   block whatever its insets (trellis-case now shrinks such a root to fit),
   and writes a `position: fixed` root as `absolute` against the 800×600

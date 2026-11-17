@@ -711,5 +711,59 @@
     }
    ]
   }
+ },
+ {
+  "id": "engine/kw_row_item_no_shrink_height_fit_content",
+  "note": "height: fit-content on a row item that can't shrink is measured at its max-content width (one 140px line), not wrapped into the 100px line (WPT keyword-sizes-on-flex-item-001/4)",
+  "root": {
+   "style": "width: 100px; align-items: flex-start",
+   "children": [
+    {
+     "style": "flex-shrink: 0; height: fit-content",
+     "measure": {
+      "text": "XXX XXX",
+      "charWidth": 20,
+      "lineHeight": 20
+     }
+    }
+   ]
+  },
+  "expected": {
+   "width": 100,
+   "children": [
+    {
+     "x": 0,
+     "width": 140,
+     "height": 20
+    }
+   ]
+  }
+ },
+ {
+  "id": "engine/kw_column_item_height_stretch_indefinite",
+  "note": "height: stretch on a column item has nothing to fill when the column's height is indefinite (only a max-height): it acts as auto (WPT keyword-sizes-on-flex-item-002/3)",
+  "root": {
+   "style": "flex-direction: column; width: 100px; max-height: 100px",
+   "children": [
+    {
+     "style": "height: stretch",
+     "children": [
+      {
+       "style": "height: 20px"
+      }
+     ]
+    }
+   ]
+  },
+  "expected": {
+   "width": 100,
+   "height": 20,
+   "children": [
+    {
+     "y": 0,
+     "height": 20
+    }
+   ]
+  }
  }
 ]

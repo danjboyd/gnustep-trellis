@@ -838,7 +838,29 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
       if (TRStorageHasSizeKeyword(cs))
         {
           if (kwBufs == NULL) kwBufs = malloc((nChildren ? nChildren : 1) * sizeof(TRStyleStorage));
-          it->s = TRResolveSizeKeywords(child, cs, &kwBufs[n - 1], innerW, innerH, refW, refH, isRow, dir);
+          /* In a column whose height is indefinite, stretch on the main
+             axis (height) has nothing to fill and acts as the initial
+             value. */
+          TRStyleStorage colBuf;
+          const TRStyleStorage *src = cs;
+          if (!isRow && hm != TRMeasureModeExactly && (cs->height.unit == TRUnitStretch || cs->minHeight.unit == TRUnitStretch
+                         || cs->maxHeight.unit == TRUnitStretch))
+            {
+              colBuf = *cs;
+              if (colBuf.height.unit == TRUnitStretch) colBuf.height = TRAuto;
+              if (colBuf.minHeight.unit == TRUnitStretch) colBuf.minHeight = TRAuto;
+              if (colBuf.maxHeight.unit == TRUnitStretch) colBuf.maxHeight = TRNone;
+              src = &colBuf;
+            }
+          /* A row item that can't shrink and is sized by its content keeps
+             its max-content width, so its height keywords are measured
+             there rather than in the line's width. */
+          BOOL ownWidth = isRow && cs->flexShrink <= 0 && cs->width.unit == TRUnitAuto
+            && (cs->flexBasis.unit == TRUnitAuto || cs->flexBasis.unit == TRUnitMaxContent)
+            && !TRUnitIsIntrinsic(cs->minWidth.unit) && !TRUnitIsIntrinsic(cs->maxWidth.unit);
+          it->s = TRResolveSizeKeywords(child, src, &kwBufs[n - 1], ownWidth ? TRUndefined : innerW, innerH,
+                                        refW, refH, isRow, dir);
+          if (it->s == &colBuf) { kwBufs[n - 1] = colBuf; it->s = &kwBufs[n - 1]; }
         }
       it->line = (NSInteger)ci;   /* document order, for the stable sort */
     }

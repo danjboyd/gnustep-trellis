@@ -1,7 +1,7 @@
 {
- "commit": "e473fac",
+ "commit": "cfdddca",
  "conformance": {
-  "pass": 2960,
+  "pass": 2966,
   "skipped": 1188,
   "total": 2977
  },
@@ -14,7 +14,7 @@
   },
   "wpt": {
    "cases": 977,
-   "pass": 827,
+   "pass": 833,
    "total": 844
   },
   "wpt-grid": {

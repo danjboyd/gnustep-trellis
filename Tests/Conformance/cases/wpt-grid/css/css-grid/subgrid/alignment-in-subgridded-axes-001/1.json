@@ -195,7 +195,6 @@
   0
  ],
  "requires": [
-  "display-inline-grid",
   "subgrid"
  ],
  "droppedChecks": 2

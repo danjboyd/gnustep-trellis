@@ -52,7 +52,6 @@
  },
  "requires": [
   "block-layout",
-  "display-inline-grid",
   "intrinsic-size-keyword"
  ]
 }

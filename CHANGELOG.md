@@ -5,25 +5,11 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
-- **Added:** CSS custom properties in .trellis files: `--name: value`
-  inherits down the element tree, and `var(--name)` /
-  `var(--name, fallback)` works in any value (custom properties may use
-  others; a cycle is an error). An undefined `var()` is an error at the
-  element, so trellis-lint reports it. A custom property set inside an
-  `@container` block applies within it.
-- **Added:** built-in tokens, defined in every document: font sizes,
-  control and field heights, scroller width (from the running theme via
-  `TRUpdateThemeTokens`, at each load), spacing and radius steps, and
-  aliases of the system colours (`--tr-accent`, `--tr-muted`, ...).
-  Tests/Engine/custom-properties.m runs in `make check`.
-- **Changed:** `-[TRMarkupDocument declarationsForElement:]` returns
-  declarations with custom properties resolved, and TRStyle ignores
-  `--name` declarations set from code.
-
 ## 0.4.0 (2026-11-17)
 
 Adds API (listed in docs/api.md, nothing removed): virtualized lists and
-grids (docs/design-virtualization.md).
+grids (docs/design-virtualization.md), and CSS custom properties with
+built-in theme tokens.
 
 - **Added:** `<virtual layout="list|grid">` and `TRVirtualBox`, a scroll
   view that builds views only for the items on screen (plus overscan):
@@ -62,6 +48,24 @@ grids (docs/design-virtualization.md).
   on), `trellis-bench --virtual N`.
 - **Dogfood:** dogfood/work/Work-virtual.trellis, the Work wall with
   2,000 made-up agents.
+- **Keyboard on Cocoa:** where AppKit can't Tab to an item's controls
+  (buttons without full keyboard access), Tab and Shift-Tab step from the
+  focused item, one at a time (found by the macOS check; a test simulates
+  it on Linux).
+- **Added:** CSS custom properties in .trellis files: `--name: value`
+  inherits down the element tree, and `var(--name)` /
+  `var(--name, fallback)` works in any value (custom properties may use
+  others; a cycle is an error). An undefined `var()` is an error at the
+  element, so trellis-lint reports it. A custom property set inside an
+  `@container` block applies within it.
+- **Added:** built-in tokens, defined in every document: font sizes,
+  control and field heights, scroller width (from the running theme via
+  `TRUpdateThemeTokens`, at each load), spacing and radius steps, and
+  aliases of the system colours (`--tr-accent`, `--tr-muted`, ...).
+  Tests/Engine/custom-properties.m runs in `make check`.
+- **Changed:** `-[TRMarkupDocument declarationsForElement:]` returns
+  declarations with custom properties resolved, and TRStyle ignores
+  `--name` declarations set from code.
 
 ## 0.3.0 (2026-11-16)
 

@@ -42,7 +42,9 @@
 - (BOOL)becomeFirstResponder
 {
   direction = [[self window] keyViewSelectionDirection];
-  /* Not from here: AppKit sets the first responder after this returns. */
+  /* Move focus on from the run loop, not from inside -makeFirstResponder:
+     (GNUstep records the sentinel as first responder only after this
+     returns; Cocoa already has, but nesting focus changes is unsafe). */
   [self performSelector: @selector(forward) withObject: nil afterDelay: 0];
   return YES;
 }
@@ -84,6 +86,7 @@
   BOOL _needsReload, _updating, _hasKeyViews, _keyLoopDirty;
   NSRange _visible, _loopVisible;
   __weak NSView *_lastFocused;
+  NSInteger _focusIndex;   /* the item that last held focus, or NSNotFound */
 }
 
 - (instancetype)initWithMode:(TRVirtualMode)mode
@@ -98,6 +101,7 @@
       _realized = [NSMutableDictionary dictionary];
       _viewKinds = [NSMapTable weakToStrongObjectsMapTable];
       _doc = [[TRVirtualDocView alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)];
+      _focusIndex = NSNotFound;
       _head = [[TRVirtualSentinel alloc] initWithFrame: NSZeroRect];
       _head->box = self;
       _tail = [[TRVirtualSentinel alloc] initWithFrame: NSZeroRect];
@@ -346,6 +350,7 @@ static void TRShiftRealized(NSMutableDictionary *realized, NSInteger from, NSInt
     NSInteger at = (NSInteger)r.location, n = (NSInteger)r.length;
     [self withAnchor: ^{
       TRShiftRealized(_realized, at, n);
+      if (_focusIndex != NSNotFound && _focusIndex >= at) _focusIndex += n;
       _keyLoopDirty = YES;
       [_layout insertItemsAtIndex: at count: n];
     } adjust: ^TRVirtualAnchor (TRVirtualAnchor a) {
@@ -369,6 +374,11 @@ static void TRShiftRealized(NSMutableDictionary *realized, NSInteger from, NSInt
           if (v) { [self recycleView: v]; [_realized removeObjectForKey: @(i)]; }
         }
       TRShiftRealized(_realized, at + n, -n);
+      if (_focusIndex != NSNotFound)
+        {
+          if (_focusIndex >= at + n) _focusIndex -= n;
+          else if (_focusIndex >= at) _focusIndex = NSNotFound;
+        }
       _keyLoopDirty = YES;
       [_layout removeItemsAtIndex: at count: n];
     } adjust: ^TRVirtualAnchor (TRVirtualAnchor a) {
@@ -487,6 +497,7 @@ static void TRShiftRealized(NSMutableDictionary *realized, NSInteger from, NSInt
   /* Recycle what left the range, except the focused item. */
   NSView *focused = [self focusedItemView];
   if (focused != _lastFocused) { _lastFocused = focused; _keyLoopDirty = YES; }
+  if (focused != nil) _focusIndex = [self indexOfItemView: focused];
   for (NSNumber *k in [_realized allKeys])
     {
       NSInteger i = [k integerValue];
@@ -620,6 +631,19 @@ static void TRAddKeyViews(NSView *v, NSMutableArray *out)
   return NO;
 }
 
+/* Whether AppKit itself can move focus between the items' controls. */
+- (BOOL)itemKeyViewsAreValid
+{
+  for (NSNumber *k in _realized)
+    {
+      NSMutableArray *a = [NSMutableArray array];
+      TRAddKeyViews(_realized[k], a);
+      for (NSView *v in a) if ([v canBecomeKeyView]) return YES;
+      if ([a count]) return NO;
+    }
+  return NO;
+}
+
 - (BOOL)sentinelsActive
 {
   return _hasKeyViews && _layout.itemCount > 0;
@@ -638,6 +662,7 @@ static void TRAddKeyViews(NSView *v, NSMutableArray *out)
   /* The loop follows the focused item (an off-screen one stays in it). */
   [self relinkKeyViews];
   _lastFocused = v;
+  _focusIndex = index;
   return ok;
 }
 
@@ -647,6 +672,19 @@ static void TRAddKeyViews(NSView *v, NSMutableArray *out)
   NSInteger n = _layout.itemCount;
   NSInteger first = _visible.length ? (NSInteger)_visible.location : 0;
   NSInteger last = _visible.length ? (NSInteger)NSMaxRange(_visible) - 1 : -1;
+  /* Leaving through an edge. When the items' controls are valid key views
+     (GNUstep; Cocoa with full keyboard access), AppKit moves focus between
+     them itself and reaches a sentinel only from the edge item, so step
+     from the edge. When they aren't (Cocoa buttons without full keyboard
+     access), every Tab lands on a sentinel straight from the focused item,
+     and only Trellis moves focus, so _focusIndex is current: step from
+     there, or the visible items in between would be skipped. */
+  NSInteger from = _focusIndex;
+  if (from != NSNotFound && from < n && _realized[@(from)] != nil && ![self itemKeyViewsAreValid])
+    {
+      if (!s->tail && backward) first = from;
+      if (s->tail && !backward) last = from;
+    }
   if (!s->tail)
     {
       if (!backward)

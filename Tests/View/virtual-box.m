@@ -37,6 +37,25 @@ static NSString *const kGrid =
   @"  </style>\n"
   @"</column>\n";
 
+/* A button AppKit's Tab skips, as Cocoa buttons are without full
+   keyboard access: it takes focus only when made first responder. */
+@interface NoKeyButton : NSButton
+@end
+@implementation NoKeyButton
+- (BOOL)canBecomeKeyView { return NO; }
+- (BOOL)acceptsFirstResponder { return YES; }
+@end
+
+static NSString *const kNoKey =
+  @"<column>\n"
+  @"  <button id=\"before\">Before</button>\n"
+  @"  <virtual id=\"list\" template=\"row\" estimated-size=\"30\">\n"
+  @"    <template id=\"row\"><row><text id=\"t\"/><view id=\"nk\" type=\"NoKeyButton\"/></row></template>\n"
+  @"  </virtual>\n"
+  @"  <button id=\"after\">After</button>\n"
+  @"  <style> #t { flex: 1; } #nk { min-width: 60px; min-height: 22px; } </style>\n"
+  @"</column>\n";
+
 static int gFail = 0;
 static void Expect(const char *what, BOOL ok)
 {
@@ -219,7 +238,7 @@ int main(void)
           if (k != NSNotFound && k > reached) reached = k;
         }
       printf("     tab: last visible was %ld, reached %ld, offset %.0f\n", (long)lastVisible, (long)reached, Offset(box));
-      Expect("Tab reaches items past the first screen", reached > lastVisible);
+      Expect("Tab walks one item at a time, past the first screen", reached == 39 && reached > lastVisible);
       Expect("the list scrolled to follow focus", Offset(box) > 0);
       NSInteger fi = [box indexOfItemView: LogicalFocus(win)];
       Expect("the focused item is visible", fi != NSNotFound && NSLocationInRange((NSUInteger)fi, box.visibleRange));
@@ -247,6 +266,55 @@ int main(void)
       [win makeFirstResponder: nil];
       ScrollTo(box, L.contentHeight / 2 + 10);
       Expect("once focus leaves, it is recycled", [box viewForItemAtIndex: 20] == nil);
+
+      /* Controls AppKit can't Tab to (Cocoa without full keyboard access):
+         every Tab goes through a sentinel, and must still step one item
+         at a time (0.4.0 macOS check). */
+      {
+        TRMarkupDocument *ndoc = [TRMarkupDocument documentWithString: kNoKey name: @"nokey.trellis" error: &err];
+        TRBoxView *nroot = ndoc ? [TRLoader loadDocument: ndoc owner: nil error: &err] : nil;
+        if (nroot == nil) { printf("nokey load failed: %s\n", [[err localizedDescription] UTF8String]); return 2; }
+        TRVirtualBox *nbox = (TRVirtualBox *)[TRLoader viewWithIdentifier: @"list" inView: nroot];
+        NSWindow *nwin = [[NSWindow alloc] initWithContentRect: NSMakeRect(0, 0, 400, 300)
+                                                     styleMask: NSWindowStyleMaskTitled
+                                                       backing: NSBackingStoreBuffered defer: YES];
+        [nwin setReleasedWhenClosed: NO];
+        [nwin setContentView: nroot];
+        ListData *ndata = [ListData new];
+        ndata->count = 500;
+        nbox.dataSource = ndata;
+        [nroot layoutTrellis];
+        [nbox updateVirtualContent];
+        [nbox focusItemAtIndex: 0 last: NO];
+        NSMutableString *seq = [NSMutableString string];
+        BOOL stepwise = YES;
+        NSInteger prev = 0;
+        for (int i = 0; i < 12; i++)
+          {
+            [nwin selectKeyViewFollowingView: LogicalFocus(nwin)];
+            Spin();
+            NSInteger k = [nbox indexOfItemView: LogicalFocus(nwin)];
+            [seq appendFormat: @" %ld", (long)k];
+            if (k != prev + 1) stepwise = NO;
+            prev = k;
+          }
+        printf("     no-key tab:%s\n", [seq UTF8String]);
+        Expect("Tab steps one item at a time when items aren't key views", stepwise);
+        [seq setString: @""];
+        BOOL back = YES;
+        for (int i = 0; i < 5; i++)
+          {
+            [nwin selectKeyViewPrecedingView: LogicalFocus(nwin)];
+            Spin();
+            NSInteger k = [nbox indexOfItemView: LogicalFocus(nwin)];
+            [seq appendFormat: @" %ld", (long)k];
+            if (k != prev - 1) back = NO;
+            prev = k;
+          }
+        printf("     no-key shift-tab:%s\n", [seq UTF8String]);
+        Expect("and Shift-Tab steps back one at a time", back);
+        [nwin close];
+      }
 
       /* Grid with full-row headers. */
       TRMarkupDocument *gdoc = [TRMarkupDocument documentWithString: kGrid name: @"wall.trellis" error: &err];

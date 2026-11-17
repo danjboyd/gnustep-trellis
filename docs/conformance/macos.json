@@ -1,31 +1,31 @@
 {
- "commit": "6308efb",
+ "commit": "62dc14f",
  "conformance": {
-  "pass": 3599,
-  "skipped": 584,
-  "total": 3599
+  "pass": 3659,
+  "skipped": 524,
+  "total": 3659
  },
  "date": "2026-11-17",
  "platform": "macos",
  "suites": {
   "engine": {
-   "pass": 176,
-   "total": 176
+   "pass": 192,
+   "total": 192
   },
   "wpt": {
    "cases": 995,
-   "pass": 912,
-   "total": 912
+   "pass": 914,
+   "total": 914
   },
   "wpt-grid": {
    "cases": 1977,
-   "pass": 1561,
-   "total": 1561
+   "pass": 1611,
+   "total": 1611
   },
   "wpt-sizing": {
    "cases": 125,
-   "pass": 82,
-   "total": 82
+   "pass": 90,
+   "total": 90
   },
   "yoga": {
    "cases": 1086,

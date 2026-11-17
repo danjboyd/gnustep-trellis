@@ -18,10 +18,31 @@ version may change the API listed in docs/api.md, and says so here.
   for its percentage columns before resolving them, and its
   `repeat(auto-fill/auto-fit)` columns count against a definite
   `max-width` rather than the space.
+- **Changed (layout):** size keywords on flex items. A row item that
+  can't shrink keeps its max-content width, so `height: fit-content`
+  (min-content, max-content) is measured there, not wrapped into the
+  line. In a column with an indefinite height, `stretch` on height,
+  min-height or max-height acts as auto/auto/none. A `stretch` width
+  (height in a row) fills the item's flex line, which in a wrapping
+  container may be wider than the container.
+- **Changed (layout):** size keywords on an abspos box resolve against
+  the containing block less its non-auto insets, so `width: stretch`
+  with `left`/`right` fills between them.
+- **Changed (layout):** a root with no available width and a
+  `max-width` now uses a larger `min-width` as its bound (the min wins),
+  so content that grows, such as `fr` columns, fills it.
+- **Changed (layout):** grids. `justify-items: auto` computes to normal,
+  so auto-width items stretch (they got 0 width). Under a max-content
+  width, spanning items' max-content contributions grow `auto`-minimum
+  tracks. A shrink-to-fit grid's auto-fill/auto-fit columns count
+  against its `min-width` when it has no `max-width`.
+- **Changed (layout):** with `aspect-ratio`, a definite `min-height`
+  gives a minimum width that `min-content`/`max-content` widths include.
 - **Fixed:** `justify-self`/`justify-items: left` and `right` in an rtl
   grid were mirrored like start/end; they are physical edges.
-- The two layout changes are in docs/migration-0.10.md. Known gaps 73 to
-  25.
+- The layout changes are in docs/migration-0.10.md. Known gaps 73 to 13;
+  the 13 left use syntax Trellis doesn't support (`initial`, `safe` /
+  `unsafe` alignment, `display: flow-root`).
 
 ## 0.9.0 (2026-11-17)
 

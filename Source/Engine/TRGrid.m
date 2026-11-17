@@ -480,6 +480,82 @@ static BOOL TRResolveLine(TRLine l, NSString *name, NSInteger explicitCount, NSD
   return NO;
 }
 
+/* "Distribute extra space" (CSS Grid 2, 12.5.1) into the base sizes of
+   tracks a..b-1, for one item: up to limits (each track's growth limit,
+   capped by a fit-content() argument) among the affected tracks; then into
+   the spanned tracks that aren't affected, up to their limits (CSSWG
+   #3648); then beyond limits, into the affected tracks with an intrinsic
+   max (maxContent: a max-content max; fit-content counts as max-content),
+   or all affected tracks if none has one. */
+static void TRDistributeBase(TRTrack *tr, const BOOL *limitSet, NSInteger a, NSInteger b,
+                             double space, const BOOL *affected, BOOL maxContent)
+{
+  if (space <= 0) return;
+  NSInteger n = b - a;
+  double inc[n ? n : 1];
+  for (NSInteger j = 0; j < n; j++) inc[j] = 0;
+  double (^limitOf)(NSInteger) = ^double(NSInteger i) {
+      double L = (limitSet[i] && !isinf(tr[i].limit)) ? tr[i].limit : INFINITY;
+      if (tr[i].size.max.kind == TRBreadthFitContent) L = MIN(L, tr[i].size.max.value);
+      return L;
+  };
+  double rem = space;
+  for (int round = 0; round < 2 && rem > 0.0001; round++)
+    {
+      /* round 0: affected tracks; round 1: the spanned tracks that aren't. */
+      BOOL any = NO;
+      for (NSInteger i = a; i < b; i++)
+        if (!tr[i].collapsed && (affected[i - a] == (round == 0))) any = YES;
+      if (!any) continue;
+      if (round == 1)
+        {
+          BOOL anyAffected = NO;
+          for (NSInteger i = a; i < b; i++) if (affected[i - a]) anyAffected = YES;
+          if (!anyAffected) continue;
+        }
+      for (int guard = 0; guard < 64 && rem > 0.0001; guard++)
+        {
+          int open = 0;
+          for (NSInteger i = a; i < b; i++)
+            if (!tr[i].collapsed && affected[i - a] == (round == 0)
+                && tr[i].base + inc[i - a] < limitOf(i) - 0.0001) open++;
+          if (open == 0) break;
+          double share = rem / open;
+          for (NSInteger i = a; i < b; i++)
+            {
+              if (tr[i].collapsed || affected[i - a] != (round == 0)) continue;
+              double room = limitOf(i) - tr[i].base - inc[i - a];
+              if (room <= 0.0001) continue;
+              double add = MIN(share, room);
+              inc[i - a] += add;
+              rem -= add;
+            }
+        }
+    }
+  if (rem > 0.0001)
+    {
+      BOOL take[n ? n : 1];
+      int nt = 0, na = 0;
+      for (NSInteger i = a; i < b; i++)
+        {
+          take[i - a] = NO;
+          if (!affected[i - a] || tr[i].collapsed) continue;
+          na++;
+          TRBreadthKind xk = tr[i].size.max.kind;
+          take[i - a] = xk == TRBreadthMaxContent || xk == TRBreadthAuto || TRIsFitContent(xk)
+                        || (!maxContent && xk == TRBreadthMinContent);
+          if (take[i - a]) nt++;
+        }
+      for (NSInteger i = a; i < b; i++)
+        {
+          if (!affected[i - a] || tr[i].collapsed) continue;
+          if (nt > 0 && take[i - a]) inc[i - a] += rem / nt;
+          else if (nt == 0) inc[i - a] += rem / na;
+        }
+    }
+  for (NSInteger i = a; i < b; i++) tr[i].base += inc[i - a];
+}
+
 static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
                          TRGridItem *items, NSInteger nItems, BOOL columns,
                          TRAlign contentAlign, double minAvail, double maxAvail)
@@ -576,37 +652,25 @@ static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
                     minC = MIN(minC - mg - pb, MAX(0, fixedSum - mg - pb)) + mg + pb;
                   }
               }
-            /* 1. Intrinsic minimums take its min-content contribution. */
+            /* 1. Intrinsic minimums take its minimum contribution. */
+            BOOL aff[span];
             double have = gapsS;
-            int intrinsic = 0;
             for (NSInteger i = a; i < b; i++)
               {
                 have += tr[i].base;
                 TRBreadthKind mk = tr[i].size.min.kind;
-                if (mk == TRBreadthAuto || mk == TRBreadthMinContent || mk == TRBreadthMaxContent) intrinsic++;
+                aff[i - a] = (mk == TRBreadthAuto || mk == TRBreadthMinContent || mk == TRBreadthMaxContent);
               }
-            double extra = minC - have;
-            if (intrinsic > 0 && extra > 0)
-              for (NSInteger i = a; i < b; i++)
-                {
-                  TRBreadthKind mk = tr[i].size.min.kind;
-                  if (mk == TRBreadthAuto || mk == TRBreadthMinContent || mk == TRBreadthMaxContent)
-                    tr[i].base += extra / intrinsic;
-                }
+            TRDistributeBase(tr, limitSet, a, b, minC - have, aff, NO);
             /* 2. Max-content minimums take its max-content contribution. */
             {
-              int mcTracks = 0;
               double haveB = gapsS;
               for (NSInteger i = a; i < b; i++)
                 {
                   haveB += tr[i].base;
-                  if (tr[i].size.min.kind == TRBreadthMaxContent) mcTracks++;
+                  aff[i - a] = (tr[i].size.min.kind == TRBreadthMaxContent);
                 }
-              double extraM = maxC - haveB;
-              if (mcTracks > 0 && extraM > 0)
-                for (NSInteger i = a; i < b; i++)
-                  if (tr[i].size.min.kind == TRBreadthMaxContent)
-                    tr[i].base += extraM / mcTracks;
+              TRDistributeBase(tr, limitSet, a, b, maxC - haveB, aff, YES);
             }
             /* 3. Growth limits, from the bases as they are now; a limit is
                never below its base. Intrinsic maximums take the min-content

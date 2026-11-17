@@ -1,0 +1,324 @@
+{
+ "appearance": "light",
+ "lint": [],
+ "root": {
+  "children": [
+   {
+    "baseline": 16.435546875,
+    "class": "NSTextField",
+    "height": 20,
+    "intrinsic": {
+     "height": 20,
+     "width": 103
+    },
+    "needed": {
+     "height": 20,
+     "width": 103
+    },
+    "style": "margin-bottom: 4px; font-size: 17px; font-weight: bold",
+    "text": "Preferences",
+    "textColor": "#000000d8",
+    "width": 300,
+    "x": 20,
+    "y": 20
+   },
+   {
+    "children": [
+     {
+      "baseline": 12.9130859375,
+      "class": "NSTextField",
+      "height": 16,
+      "intrinsic": {
+       "height": 16,
+       "width": 85
+      },
+      "needed": {
+       "height": 16,
+       "width": 85
+      },
+      "text": "Display name",
+      "textColor": "#000000d8",
+      "width": 300,
+      "x": 0,
+      "y": 0
+     },
+     {
+      "baseline": 15.9130859375,
+      "class": "NSTextField",
+      "editable": true,
+      "height": 21,
+      "id": "displayName",
+      "interactive": true,
+      "intrinsic": {
+       "height": 21,
+       "width": 38
+      },
+      "needed": {
+       "height": 21,
+       "width": 38
+      },
+      "style": "max-width: 360px",
+      "text": "Alice",
+      "width": 300,
+      "x": 0,
+      "y": 20
+     }
+    ],
+    "class": "TRBoxView",
+    "height": 41,
+    "style": "flex-direction: column; align-items: stretch; row-gap: 4px; column-gap: 4px",
+    "width": 300,
+    "x": 20,
+    "y": 56
+   },
+   {
+    "children": [
+     {
+      "baseline": 12.9130859375,
+      "class": "NSTextField",
+      "height": 16,
+      "intrinsic": {
+       "height": 16,
+       "width": 46
+      },
+      "needed": {
+       "height": 16,
+       "width": 46
+      },
+      "text": "Theme",
+      "textColor": "#000000d8",
+      "width": 300,
+      "x": 0,
+      "y": 0
+     },
+     {
+      "baseline": 16.568359375,
+      "class": "NSPopUpButton",
+      "height": 25,
+      "id": "theme",
+      "interactive": true,
+      "intrinsic": {
+       "height": 25,
+       "width": 124
+      },
+      "style": "max-width: 360px",
+      "title": "Adwaita",
+      "width": 300,
+      "x": 0,
+      "y": 20
+     }
+    ],
+    "class": "TRBoxView",
+    "height": 45,
+    "style": "flex-direction: column; align-items: stretch; row-gap: 4px; column-gap: 4px",
+    "width": 300,
+    "x": 20,
+    "y": 109
+   },
+   {
+    "children": [
+     {
+      "baseline": 12.9130859375,
+      "class": "NSTextField",
+      "height": 16,
+      "intrinsic": {
+       "height": 16,
+       "width": 50
+      },
+      "needed": {
+       "height": 16,
+       "width": 50
+      },
+      "text": "Density",
+      "textColor": "#000000d8",
+      "width": 300,
+      "x": 0,
+      "y": 0
+     },
+     {
+      "baseline": 16.568359375,
+      "class": "NSPopUpButton",
+      "height": 25,
+      "id": "density",
+      "interactive": true,
+      "intrinsic": {
+       "height": 25,
+       "width": 143
+      },
+      "style": "max-width: 360px",
+      "title": "Comfortable",
+      "width": 300,
+      "x": 0,
+      "y": 20
+     }
+    ],
+    "class": "TRBoxView",
+    "height": 45,
+    "style": "flex-direction: column; align-items: stretch; row-gap: 4px; column-gap: 4px",
+    "width": 300,
+    "x": 20,
+    "y": 166
+   },
+   {
+    "children": [
+     {
+      "baseline": 12.9130859375,
+      "class": "NSTextField",
+      "height": 16,
+      "intrinsic": {
+       "height": 16,
+       "width": 56
+      },
+      "needed": {
+       "height": 16,
+       "width": 56
+      },
+      "text": "Updates",
+      "textColor": "#000000d8",
+      "width": 300,
+      "x": 0,
+      "y": 0
+     },
+     {
+      "baseline": 13.568359375,
+      "class": "NSButton",
+      "height": 18,
+      "id": "autoUpdate",
+      "interactive": true,
+      "intrinsic": {
+       "height": 18,
+       "width": 222
+      },
+      "style": "max-width: 360px",
+      "textColor": "#000000d8",
+      "title": "Check for updates automatically",
+      "width": 300,
+      "x": 0,
+      "y": 20
+     }
+    ],
+    "class": "TRBoxView",
+    "height": 38,
+    "style": "flex-direction: column; align-items: stretch; row-gap: 4px; column-gap: 4px",
+    "width": 300,
+    "x": 20,
+    "y": 223
+   },
+   {
+    "children": [
+     {
+      "baseline": 12.9130859375,
+      "class": "NSTextField",
+      "height": 16,
+      "intrinsic": {
+       "height": 16,
+       "width": 59
+      },
+      "needed": {
+       "height": 16,
+       "width": 59
+      },
+      "text": "Font size",
+      "textColor": "#000000d8",
+      "width": 300,
+      "x": 0,
+      "y": 0
+     },
+     {
+      "baseline": 28,
+      "class": "NSSlider",
+      "height": 28,
+      "id": "fontSize",
+      "interactive": true,
+      "intrinsic": {
+       "height": 28,
+       "width": 0
+      },
+      "style": "max-width: 360px",
+      "width": 300,
+      "x": 0,
+      "y": 20
+     }
+    ],
+    "class": "TRBoxView",
+    "height": 48,
+    "style": "flex-direction: column; align-items: stretch; row-gap: 4px; column-gap: 4px",
+    "width": 300,
+    "x": 20,
+    "y": 273
+   },
+   {
+    "baseline": 1,
+    "class": "NSBox",
+    "height": 1,
+    "style": "align-self: stretch; flex-shrink: 0; min-width: 1px; min-height: 1px",
+    "width": 300,
+    "x": 20,
+    "y": 333
+   },
+   {
+    "children": [
+     {
+      "baseline": 0,
+      "class": "NSView",
+      "height": 0,
+      "style": "flex-grow: 1; flex-basis: 0%",
+      "width": 144,
+      "x": 0,
+      "y": 16
+     },
+     {
+      "baseline": 18.568359375,
+      "class": "NSButton",
+      "height": 32,
+      "interactive": true,
+      "intrinsic": {
+       "height": 32,
+       "width": 76
+      },
+      "title": "Cancel",
+      "width": 76,
+      "x": 152,
+      "y": 0
+     },
+     {
+      "baseline": 18.568359375,
+      "class": "NSButton",
+      "height": 32,
+      "interactive": true,
+      "intrinsic": {
+       "height": 32,
+       "width": 64
+      },
+      "title": "Save",
+      "width": 64,
+      "x": 236,
+      "y": 0
+     }
+    ],
+    "class": "TRBoxView",
+    "height": 32,
+    "style": "align-items: center; row-gap: 8px; column-gap: 8px",
+    "width": 300,
+    "x": 20,
+    "y": 346
+   }
+  ],
+  "class": "TRBoxView",
+  "height": 680,
+  "id": "settings",
+  "style": "flex-direction: column; padding-left: 20px; padding-top: 20px; padding-right: 20px; padding-bottom: 20px; row-gap: 12px; column-gap: 12px; container-type: inline-size",
+  "width": 340,
+  "windowBackground": "#ececec",
+  "x": 0,
+  "y": 0
+ },
+ "source": "Examples/TrellisDemo/Settings.trellis",
+ "theme": "default",
+ "trellis": "0.1",
+ "viewport": {
+  "height": 680,
+  "scale": 1,
+  "width": 340
+ }
+}

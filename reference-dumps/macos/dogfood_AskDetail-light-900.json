@@ -1,0 +1,844 @@
+{
+ "appearance": "light",
+ "lint": [],
+ "root": {
+  "background": "#ffffff",
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "baseline": 12.568359375,
+              "class": "NSTextField",
+              "height": 16,
+              "id": "context",
+              "intrinsic": {
+               "height": 16,
+               "width": 151
+              },
+              "needed": {
+               "height": 16,
+               "width": 151
+              },
+              "style": "color: GrayText",
+              "text": "example-team \u203a agent-a",
+              "textColor": "#0000007f",
+              "width": 528,
+              "x": 0,
+              "y": 0
+             },
+             {
+              "baseline": 15.46875,
+              "class": "NSTextField",
+              "height": 38,
+              "id": "title",
+              "intrinsic": {
+               "height": 19,
+               "width": 623
+              },
+              "needed": {
+               "height": 38,
+               "width": 516
+              },
+              "style": "font-size: 16px; font-weight: bold",
+              "text": "Ship the Windows MSI with per-user install as the default, or keep per-machine?",
+              "textColor": "#000000d8",
+              "width": 528,
+              "x": 0,
+              "y": 20
+             },
+             {
+              "baseline": 12.568359375,
+              "class": "NSTextField",
+              "height": 16,
+              "id": "meta",
+              "intrinsic": {
+               "height": 16,
+               "width": 402
+              },
+              "needed": {
+               "height": 16,
+               "width": 402
+              },
+              "style": "color: GrayText",
+              "text": "choice \u00b7 blocks: the 0.4 installer build and the beta packaging test",
+              "textColor": "#0000007f",
+              "width": 528,
+              "x": 0,
+              "y": 62
+             },
+             {
+              "baseline": 12.9130859375,
+              "class": "NSTextField",
+              "height": 16,
+              "id": "delivery",
+              "intrinsic": {
+               "height": 16,
+               "width": 209
+              },
+              "needed": {
+               "height": 16,
+               "width": 209
+              },
+              "style": "color: GrayText",
+              "text": "Delivered 9 min ago \u00b7 not yet read",
+              "textColor": "#0000007f",
+              "width": 528,
+              "x": 0,
+              "y": 82
+             },
+             {
+              "children": [
+               {
+                "baseline": 18.568359375,
+                "class": "NSButton",
+                "height": 32,
+                "interactive": true,
+                "intrinsic": {
+                 "height": 32,
+                 "width": 113
+                },
+                "title": "MSI build log",
+                "width": 113,
+                "x": 0,
+                "y": 0
+               },
+               {
+                "baseline": 18.568359375,
+                "class": "NSButton",
+                "height": 32,
+                "interactive": true,
+                "intrinsic": {
+                 "height": 32,
+                 "width": 83
+                },
+                "title": "WiX diff",
+                "width": 83,
+                "x": 121,
+                "y": 0
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 32,
+              "id": "links",
+              "style": "flex-wrap: wrap; align-items: center; row-gap: 8px; column-gap: 8px",
+              "width": 528,
+              "x": 0,
+              "y": 102
+             }
+            ],
+            "class": "TRBoxView",
+            "height": 134,
+            "style": "flex-direction: column; row-gap: 4px; column-gap: 4px",
+            "width": 528,
+            "x": 16,
+            "y": 16
+           },
+           {
+            "baseline": 12.568359375,
+            "class": "NSTextField",
+            "height": 176,
+            "id": "body",
+            "intrinsic": {
+             "height": 80,
+             "width": 1287
+            },
+            "needed": {
+             "height": 176,
+             "width": 528
+            },
+            "style": "min-height: 70px",
+            "text": "The MSI currently installs per-machine, which needs an administrator prompt. Most of our users' machines are single-user, and the WiX per-user mode avoids the prompt entirely. Upgrades still work in place.\n\nWhat changes: the install goes to %LOCALAPPDATA%\\Programs instead of Program Files. Shortcuts are per-user. A machine-wide install stays available with an MSIINSTALLPERUSER=0 property for lab machines.\n\nI tested both modes on the Windows 11 VM: clean install, upgrade from 0.3, and uninstall. Both passed. The per-user build is 2 MB smaller because it skips the service registration we don't use.",
+            "textColor": "#000000d8",
+            "width": 528,
+            "x": 16,
+            "y": 168
+           },
+           {
+            "class": "TRBoxView",
+            "height": 100,
+            "hidden": true,
+            "id": "terminalStrip",
+            "style": "display: none",
+            "width": 100,
+            "x": 0,
+            "y": 0
+           },
+           {
+            "children": [
+             {
+              "baseline": 12.9130859375,
+              "class": "NSTextField",
+              "height": 16,
+              "id": "threadLabel",
+              "intrinsic": {
+               "height": 16,
+               "width": 158
+              },
+              "needed": {
+               "height": 16,
+               "width": 158
+              },
+              "style": "color: GrayText; font-weight: bold",
+              "text": "Thread with agent-a (3)",
+              "textColor": "#0000007f",
+              "width": 528,
+              "x": 0,
+              "y": 0
+             },
+             {
+              "baseline": 12.568359375,
+              "class": "NSTextField",
+              "height": 144,
+              "id": "thread",
+              "intrinsic": {
+               "height": 128,
+               "width": 616
+              },
+              "needed": {
+               "height": 144,
+               "width": 527
+              },
+              "text": "agent-a \u00b7 10:02\nFiled this ask with both builds attached.\n\nagent-lead \u00b7 10:05\nPer-user matches what the Linux AppImage does. I'd lean that way unless a lab needs machine-wide.\n\nagent-a \u00b7 10:07\nAdded the MSIINSTALLPERUSER=0 escape hatch so labs can still do it.",
+              "textColor": "#000000d8",
+              "width": 528,
+              "x": 0,
+              "y": 22
+             }
+            ],
+            "class": "TRBoxView",
+            "height": 166,
+            "style": "flex-direction: column; row-gap: 6px; column-gap: 6px",
+            "width": 528,
+            "x": 16,
+            "y": 362
+           }
+          ],
+          "class": "TRBoxView",
+          "height": 544,
+          "style": "flex-direction: column; padding-left: 16px; padding-top: 16px; padding-right: 16px; padding-bottom: 16px; row-gap: 18px; column-gap: 18px",
+          "width": 560,
+          "x": 0,
+          "y": 0
+         }
+        ],
+        "class": "TRBoxView",
+        "height": 625,
+        "style": "flex-direction: column",
+        "width": 560,
+        "x": 0,
+        "y": 0
+       }
+      ],
+      "class": "TRScrollBox",
+      "container": {
+       "matched": [
+        "(min-width: 760px)"
+       ]
+      },
+      "height": 625,
+      "overflow": "scroll",
+      "style": "flex-grow: 1; flex-basis: 0px; min-width: 0px; min-height: 0px",
+      "width": 560,
+      "x": 0,
+      "y": 0
+     },
+     {
+      "background": "#ececec",
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "children": [
+               {
+                "baseline": 12.9130859375,
+                "class": "NSTextField",
+                "height": 16,
+                "id": "pickLabel",
+                "intrinsic": {
+                 "height": 16,
+                 "width": 101
+                },
+                "needed": {
+                 "height": 16,
+                 "width": 101
+                },
+                "style": "color: GrayText; font-weight: bold",
+                "text": "Recommended",
+                "textColor": "#0000007f",
+                "width": 308,
+                "x": 0,
+                "y": 0
+               },
+               {
+                "baseline": 12.568359375,
+                "class": "NSTextField",
+                "height": 16,
+                "id": "pickTitle",
+                "intrinsic": {
+                 "height": 16,
+                 "width": 301
+                },
+                "needed": {
+                 "height": 16,
+                 "width": 301
+                },
+                "style": "font-weight: bold",
+                "text": "Per-user by default, machine-wide on request",
+                "textColor": "#000000d8",
+                "width": 308,
+                "x": 0,
+                "y": 22
+               },
+               {
+                "baseline": 12.568359375,
+                "class": "NSTextField",
+                "height": 32,
+                "id": "pickDetail",
+                "intrinsic": {
+                 "height": 16,
+                 "width": 484
+                },
+                "needed": {
+                 "height": 32,
+                 "width": 300
+                },
+                "style": "color: GrayText",
+                "text": "No administrator prompt for normal installs; labs pass MSIINSTALLPERUSER=0.",
+                "textColor": "#0000007f",
+                "width": 308,
+                "x": 0,
+                "y": 44
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 76,
+              "id": "pick",
+              "style": "flex-direction: column; row-gap: 6px; column-gap: 6px",
+              "width": 308,
+              "x": 16,
+              "y": 12
+             },
+             {
+              "children": [
+               {
+                "baseline": 12.9130859375,
+                "class": "NSTextField",
+                "height": 16,
+                "intrinsic": {
+                 "height": 16,
+                 "width": 51
+                },
+                "needed": {
+                 "height": 16,
+                 "width": 51
+                },
+                "style": "color: GrayText; font-weight: bold",
+                "text": "Or pick",
+                "textColor": "#0000007f",
+                "width": 308,
+                "x": 0,
+                "y": 0
+               },
+               {
+                "children": [
+                 {
+                  "baseline": 18.568359375,
+                  "class": "NSButton",
+                  "height": 32,
+                  "interactive": true,
+                  "intrinsic": {
+                   "height": 32,
+                   "width": 145
+                  },
+                  "title": "Keep per-machine",
+                  "width": 145,
+                  "x": 0,
+                  "y": 0
+                 },
+                 {
+                  "baseline": 18.568359375,
+                  "class": "NSButton",
+                  "height": 32,
+                  "interactive": true,
+                  "intrinsic": {
+                   "height": 32,
+                   "width": 222
+                  },
+                  "title": "Per-user only, no escape hatch",
+                  "width": 222,
+                  "x": 0,
+                  "y": 40
+                 }
+                ],
+                "class": "TRBoxView",
+                "height": 72,
+                "id": "optionButtons",
+                "style": "flex-wrap: wrap; align-items: center; row-gap: 8px; column-gap: 8px",
+                "width": 308,
+                "x": 0,
+                "y": 22
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 94,
+              "id": "otherOptions",
+              "style": "flex-direction: column; row-gap: 6px; column-gap: 6px",
+              "width": 308,
+              "x": 16,
+              "y": 102
+             },
+             {
+              "children": [
+               {
+                "baseline": 12.9130859375,
+                "class": "NSTextField",
+                "height": 16,
+                "id": "replyLabel",
+                "intrinsic": {
+                 "height": 16,
+                 "width": 161
+                },
+                "needed": {
+                 "height": 16,
+                 "width": 161
+                },
+                "style": "color: GrayText; font-weight: bold",
+                "text": "Your reply (Enter sends)",
+                "textColor": "#0000007f",
+                "width": 308,
+                "x": 0,
+                "y": 0
+               },
+               {
+                "background": "#ffffff",
+                "children": [
+                 {
+                  "children": [
+                   {
+                    "children": [
+                     {
+                      "baseline": 48,
+                      "class": "NSTextView",
+                      "height": 48,
+                      "id": "reply",
+                      "style": "min-height: 48px",
+                      "width": 298,
+                      "x": 0,
+                      "y": 0
+                     }
+                    ],
+                    "class": "TRBoxView",
+                    "height": 56,
+                    "style": "flex-direction: column",
+                    "width": 298,
+                    "x": 0,
+                    "y": 0
+                   }
+                  ],
+                  "class": "TRScrollBox",
+                  "height": 56,
+                  "overflow": "scroll",
+                  "style": "flex-grow: 1; flex-basis: 0%; min-width: 0px; min-height: 56px",
+                  "width": 298,
+                  "x": 5,
+                  "y": 5
+                 }
+                ],
+                "class": "TRBoxView",
+                "height": 66,
+                "style": "padding-left: 4px; border-left-width: 1px; padding-top: 4px; border-top-width: 1px; padding-right: 4px; border-right-width: 1px; padding-bottom: 4px; border-bottom-width: 1px; background-color: Canvas; border-color: -tr-separator; border-radius: 6px",
+                "width": 308,
+                "x": 0,
+                "y": 22
+               },
+               {
+                "children": [
+                 {
+                  "baseline": 12.568359375,
+                  "class": "NSTextField",
+                  "height": 0,
+                  "id": "attachmentName",
+                  "intrinsic": {
+                   "height": 16,
+                   "width": 94
+                  },
+                  "needed": {
+                   "height": 16,
+                   "width": 94
+                  },
+                  "style": "flex-grow: 1; flex-basis: 100px; color: GrayText",
+                  "text": "No attachment",
+                  "textColor": "#0000007f",
+                  "width": 0,
+                  "x": 0,
+                  "y": 0
+                 },
+                 {
+                  "children": [
+                   {
+                    "baseline": 12.568359375,
+                    "class": "NSButton",
+                    "height": 0,
+                    "interactive": true,
+                    "intrinsic": {
+                     "height": 32,
+                     "width": 78
+                    },
+                    "title": "Open\u2026",
+                    "width": 0,
+                    "x": 0,
+                    "y": 0
+                   },
+                   {
+                    "baseline": 12.568359375,
+                    "class": "NSButton",
+                    "height": 0,
+                    "interactive": true,
+                    "intrinsic": {
+                     "height": 32,
+                     "width": 66
+                    },
+                    "title": "Clear",
+                    "width": 0,
+                    "x": 0,
+                    "y": 0
+                   }
+                  ],
+                  "class": "TRBoxView",
+                  "height": 0,
+                  "style": "align-items: center; flex-shrink: 0; row-gap: 8px; column-gap: 8px",
+                  "width": 0,
+                  "x": 0,
+                  "y": 0
+                 }
+                ],
+                "class": "TRBoxView",
+                "height": 100,
+                "hidden": true,
+                "id": "attachments",
+                "style": "display: none; flex-wrap: wrap; align-items: center; row-gap: 8px; column-gap: 8px",
+                "width": 100,
+                "x": 0,
+                "y": 0
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 88,
+              "style": "flex-direction: column; row-gap: 6px; column-gap: 6px",
+              "width": 308,
+              "x": 16,
+              "y": 210
+             },
+             {
+              "children": [
+               {
+                "baseline": 4.568359375,
+                "class": "NSPopUpButton",
+                "height": 0,
+                "interactive": true,
+                "intrinsic": {
+                 "height": 25,
+                 "width": 128
+                },
+                "title": "Snooze",
+                "width": 0,
+                "x": 0,
+                "y": 0
+               },
+               {
+                "baseline": 12.568359375,
+                "class": "NSButton",
+                "height": 0,
+                "interactive": true,
+                "intrinsic": {
+                 "height": 32,
+                 "width": 81
+                },
+                "title": "Dismiss",
+                "width": 0,
+                "x": 0,
+                "y": 0
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 100,
+              "hidden": true,
+              "style": "display: none; flex-wrap: wrap; align-items: center; row-gap: 8px; column-gap: 8px",
+              "width": 100,
+              "x": 0,
+              "y": 0
+             },
+             {
+              "children": [
+               {
+                "baseline": 18.568359375,
+                "class": "NSButton",
+                "height": 32,
+                "id": "resumeAgent",
+                "interactive": true,
+                "intrinsic": {
+                 "height": 32,
+                 "width": 121
+                },
+                "title": "Resume agent",
+                "width": 121,
+                "x": 0,
+                "y": 0
+               },
+               {
+                "baseline": 18.568359375,
+                "class": "NSButton",
+                "height": 32,
+                "interactive": true,
+                "intrinsic": {
+                 "height": 32,
+                 "width": 120
+                },
+                "title": "Open terminal",
+                "width": 120,
+                "x": 129,
+                "y": 0
+               },
+               {
+                "baseline": 18.568359375,
+                "class": "NSButton",
+                "height": 32,
+                "interactive": true,
+                "intrinsic": {
+                 "height": 32,
+                 "width": 122
+                },
+                "title": "Agent settings",
+                "width": 122,
+                "x": 0,
+                "y": 40
+               }
+              ],
+              "class": "TRBoxView",
+              "height": 72,
+              "style": "flex-wrap: wrap; align-items: center; row-gap: 8px; column-gap: 8px",
+              "width": 308,
+              "x": 16,
+              "y": 312
+             }
+            ],
+            "class": "TRBoxView",
+            "height": 392,
+            "style": "flex-direction: column; padding-left: 16px; padding-top: 12px; padding-right: 16px; padding-bottom: 8px; row-gap: 14px; column-gap: 14px",
+            "width": 340,
+            "x": 0,
+            "y": 0
+           }
+          ],
+          "class": "TRBoxView",
+          "height": 535,
+          "style": "flex-direction: column",
+          "width": 340,
+          "x": 0,
+          "y": 0
+         }
+        ],
+        "class": "TRScrollBox",
+        "height": 535,
+        "overflow": "scroll",
+        "style": "flex-grow: 1; flex-basis: 0%; min-width: 0px; min-height: 0px",
+        "width": 340,
+        "x": 0,
+        "y": 0
+       },
+       {
+        "children": [
+         {
+          "baseline": 18.568359375,
+          "class": "NSButton",
+          "height": 32,
+          "id": "doIt",
+          "interactive": true,
+          "intrinsic": {
+           "height": 32,
+           "width": 63
+          },
+          "title": "Do it",
+          "width": 63,
+          "x": 16,
+          "y": 8
+         },
+         {
+          "baseline": 18.568359375,
+          "class": "NSButton",
+          "height": 32,
+          "id": "sendReply",
+          "interactive": true,
+          "intrinsic": {
+           "height": 32,
+           "width": 99
+          },
+          "title": "Send reply",
+          "width": 99,
+          "x": 87,
+          "y": 8
+         },
+         {
+          "baseline": 16.568359375,
+          "class": "NSPopUpButton",
+          "height": 25,
+          "id": "snooze",
+          "interactive": true,
+          "intrinsic": {
+           "height": 25,
+           "width": 128
+          },
+          "title": "Snooze",
+          "width": 128,
+          "x": 194,
+          "y": 11
+         },
+         {
+          "baseline": 18.568359375,
+          "class": "NSButton",
+          "height": 32,
+          "id": "dismiss",
+          "interactive": true,
+          "intrinsic": {
+           "height": 32,
+           "width": 81
+          },
+          "title": "Dismiss",
+          "width": 81,
+          "x": 16,
+          "y": 48
+         },
+         {
+          "baseline": 12.9130859375,
+          "class": "NSTextField",
+          "height": 16,
+          "id": "status",
+          "intrinsic": {
+           "height": 16,
+           "width": 94
+          },
+          "needed": {
+           "height": 16,
+           "width": 94
+          },
+          "style": "flex-grow: 1; flex-basis: 100px; color: GrayText",
+          "text": "Waiting on you",
+          "textColor": "#0000007f",
+          "width": 219,
+          "x": 105,
+          "y": 56
+         }
+        ],
+        "class": "TRBoxView",
+        "height": 90,
+        "style": "flex-wrap: wrap; align-items: center; padding-left: 16px; padding-top: 8px; padding-right: 16px; padding-bottom: 10px; row-gap: 8px; column-gap: 8px",
+        "width": 340,
+        "x": 0,
+        "y": 535
+       }
+      ],
+      "class": "TRBoxView",
+      "container": {
+       "matched": [
+        "(min-width: 760px)"
+       ]
+      },
+      "height": 625,
+      "style": "flex-direction: column; flex-shrink: 0; width: 340px; min-height: 0px; background-color: -tr-window-background",
+      "width": 340,
+      "x": 560,
+      "y": 0
+     }
+    ],
+    "class": "TRBoxView",
+    "container": {
+     "matched": [
+      "(min-width: 760px)"
+     ]
+    },
+    "height": 625,
+    "style": "flex-grow: 1; flex-basis: 0%; min-height: 0px",
+    "width": 900,
+    "x": 0,
+    "y": 0
+   },
+   {
+    "baseline": 1,
+    "class": "NSBox",
+    "height": 1,
+    "style": "align-self: stretch; flex-shrink: 0; min-width: 1px; min-height: 1px",
+    "width": 900,
+    "x": 0,
+    "y": 625
+   },
+   {
+    "children": [
+     {
+      "baseline": 15.9130859375,
+      "class": "NSTextField",
+      "editable": true,
+      "height": 21,
+      "id": "followUp",
+      "interactive": true,
+      "intrinsic": {
+       "height": 21,
+       "width": 167
+      },
+      "style": "flex-grow: 1; flex-basis: 0%; min-width: 0px",
+      "width": 795,
+      "x": 16,
+      "y": 15
+     },
+     {
+      "baseline": 18.568359375,
+      "class": "NSButton",
+      "height": 32,
+      "interactive": true,
+      "intrinsic": {
+       "height": 32,
+       "width": 65
+      },
+      "title": "Send",
+      "width": 65,
+      "x": 819,
+      "y": 10
+     }
+    ],
+    "class": "TRBoxView",
+    "height": 54,
+    "style": "align-items: center; padding-left: 16px; padding-top: 10px; padding-right: 16px; padding-bottom: 12px; row-gap: 8px; column-gap: 8px",
+    "width": 900,
+    "x": 0,
+    "y": 626
+   }
+  ],
+  "class": "TRBoxView",
+  "height": 680,
+  "id": "askDetail",
+  "style": "flex-direction: column; background-color: Canvas; container-type: inline-size",
+  "width": 900,
+  "windowBackground": "#ececec",
+  "x": 0,
+  "y": 0
+ },
+ "source": "dogfood/AskDetail.trellis",
+ "theme": "default",
+ "trellis": "0.1",
+ "viewport": {
+  "height": 680,
+  "scale": 1,
+  "width": 900
+ }
+}

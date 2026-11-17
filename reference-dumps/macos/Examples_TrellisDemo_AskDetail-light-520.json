@@ -1,0 +1,281 @@
+{
+ "appearance": "light",
+ "lint": [],
+ "root": {
+  "background": "#ffffff",
+  "children": [
+   {
+    "children": [
+     {
+      "baseline": 12.9130859375,
+      "class": "NSTextField",
+      "height": 16,
+      "id": "kind",
+      "intrinsic": {
+       "height": 16,
+       "width": 57
+      },
+      "needed": {
+       "height": 16,
+       "width": 57
+      },
+      "style": "flex-shrink: 0; color: LinkText; font-weight: bold",
+      "text": "approve",
+      "textColor": "#0068da",
+      "width": 57,
+      "x": 0,
+      "y": 1
+     },
+     {
+      "baseline": 14.501953125,
+      "class": "NSTextField",
+      "height": 38,
+      "id": "title",
+      "intrinsic": {
+       "height": 19,
+       "width": 414
+      },
+      "needed": {
+       "height": 38,
+       "width": 315
+      },
+      "style": "flex-grow: 1; flex-basis: 0%; font-size: 15px",
+      "text": "Tag example-cli v0.1.8 as rc2 and publish the release notes?",
+      "textColor": "#000000d8",
+      "width": 345,
+      "x": 65,
+      "y": 0
+     },
+     {
+      "baseline": 12.9130859375,
+      "class": "NSTextField",
+      "height": 16,
+      "id": "age",
+      "intrinsic": {
+       "height": 16,
+       "width": 70
+      },
+      "needed": {
+       "height": 16,
+       "width": 70
+      },
+      "style": "flex-shrink: 0; color: GrayText",
+      "text": "12 min ago",
+      "textColor": "#0000007f",
+      "width": 70,
+      "x": 418,
+      "y": 1
+     }
+    ],
+    "class": "TRBoxView",
+    "height": 38,
+    "style": "align-items: baseline; row-gap: 8px; column-gap: 8px",
+    "width": 488,
+    "x": 16,
+    "y": 16
+   },
+   {
+    "children": [
+     {
+      "baseline": 12.9130859375,
+      "class": "NSTextField",
+      "height": 16,
+      "id": "agent",
+      "intrinsic": {
+       "height": 16,
+       "width": 52
+      },
+      "needed": {
+       "height": 16,
+       "width": 52
+      },
+      "style": "flex-shrink: 0; color: GrayText",
+      "text": "agent-a",
+      "textColor": "#0000007f",
+      "width": 52,
+      "x": 0,
+      "y": 0
+     },
+     {
+      "baseline": 12.9130859375,
+      "class": "NSTextField",
+      "height": 16,
+      "intrinsic": {
+       "height": 16,
+       "width": 8
+      },
+      "needed": {
+       "height": 16,
+       "width": 8
+      },
+      "style": "flex-shrink: 0; color: GrayText",
+      "text": "\u00b7",
+      "textColor": "#0000007f",
+      "width": 8,
+      "x": 58,
+      "y": 0
+     },
+     {
+      "baseline": 12.568359375,
+      "class": "NSTextField",
+      "height": 16,
+      "id": "blocks",
+      "intrinsic": {
+       "height": 16,
+       "width": 268
+      },
+      "needed": {
+       "height": 16,
+       "width": 268
+      },
+      "style": "flex-grow: 1; flex-basis: 0%; color: GrayText",
+      "text": "blocks the rc2 tag and the packager update",
+      "textColor": "#0000007f",
+      "width": 416,
+      "x": 72,
+      "y": 0
+     }
+    ],
+    "class": "TRBoxView",
+    "height": 16,
+    "style": "align-items: baseline; row-gap: 6px; column-gap: 6px",
+    "width": 488,
+    "x": 16,
+    "y": 64
+   },
+   {
+    "baseline": 12.568359375,
+    "class": "NSTextField",
+    "height": 48,
+    "id": "body",
+    "intrinsic": {
+     "height": 16,
+     "width": 1279
+    },
+    "needed": {
+     "height": 48,
+     "width": 488
+    },
+    "style": "min-height: 48px",
+    "text": "All tests pass on Linux and Windows. The macOS job is still flaky on the notarization step; I re-ran it twice and it passed the second time. If you approve, I'll tag rc2 now and post the release notes draft for review.",
+    "textColor": "#000000d8",
+    "width": 488,
+    "x": 16,
+    "y": 90
+   },
+   {
+    "children": [
+     {
+      "baseline": 18.568359375,
+      "class": "NSButton",
+      "height": 32,
+      "id": "approve",
+      "interactive": true,
+      "intrinsic": {
+       "height": 32,
+       "width": 164
+      },
+      "title": "Approve: tag rc2 now",
+      "width": 488,
+      "x": 0,
+      "y": 0
+     },
+     {
+      "baseline": 18.568359375,
+      "class": "NSButton",
+      "height": 32,
+      "id": "alternative",
+      "interactive": true,
+      "intrinsic": {
+       "height": 32,
+       "width": 196
+      },
+      "title": "Re-run the macOS job first",
+      "width": 488,
+      "x": 0,
+      "y": 38
+     },
+     {
+      "baseline": 18.568359375,
+      "class": "NSButton",
+      "height": 32,
+      "id": "defer",
+      "interactive": true,
+      "intrinsic": {
+       "height": 32,
+       "width": 135
+      },
+      "title": "Defer to Monday",
+      "width": 488,
+      "x": 0,
+      "y": 76
+     }
+    ],
+    "class": "TRBoxView",
+    "height": 108,
+    "id": "options",
+    "style": "flex-direction: column; row-gap: 6px; column-gap: 6px",
+    "width": 488,
+    "x": 16,
+    "y": 148
+   },
+   {
+    "children": [
+     {
+      "baseline": 15.9130859375,
+      "class": "NSTextField",
+      "editable": true,
+      "height": 21,
+      "id": "reply",
+      "interactive": true,
+      "intrinsic": {
+       "height": 21,
+       "width": 129
+      },
+      "style": "flex-grow: 1; flex-basis: 0%",
+      "width": 415,
+      "x": 0,
+      "y": 5
+     },
+     {
+      "baseline": 18.568359375,
+      "class": "NSButton",
+      "height": 32,
+      "id": "send",
+      "interactive": true,
+      "intrinsic": {
+       "height": 32,
+       "width": 65
+      },
+      "title": "Send",
+      "width": 65,
+      "x": 423,
+      "y": 0
+     }
+    ],
+    "class": "TRBoxView",
+    "height": 32,
+    "style": "align-items: center; margin-top: 4px; row-gap: 8px; column-gap: 8px",
+    "width": 488,
+    "x": 16,
+    "y": 270
+   }
+  ],
+  "class": "TRBoxView",
+  "height": 680,
+  "id": "ask",
+  "style": "flex-direction: column; padding-left: 16px; padding-top: 16px; padding-right: 16px; padding-bottom: 16px; row-gap: 10px; column-gap: 10px; background-color: Canvas; container-type: inline-size",
+  "width": 520,
+  "windowBackground": "#ececec",
+  "x": 0,
+  "y": 0
+ },
+ "source": "Examples/TrellisDemo/AskDetail.trellis",
+ "theme": "default",
+ "trellis": "0.1",
+ "viewport": {
+  "height": 680,
+  "scale": 1,
+  "width": 520
+ }
+}

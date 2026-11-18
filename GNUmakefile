@@ -151,6 +151,12 @@ check-reference: all
 	LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH python3 -I scripts/check-reference.py replay --runner ./obj/trellis-case
 	LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH python3 -I scripts/check-reference.py selftest --runner ./obj/trellis-case
 
+# The platform parity matrix (docs/windows.md): TrellisPreview open,
+# resize, reload, render fidelity and isolation on a synthetic fixture.
+# Results go to a new obj/parity-<time> folder (make clean removes obj).
+check-parity: all
+	bash Tests/Parity/run.sh "$(CURDIR)/obj/parity-$$(date +%Y%m%d-%H%M%S)"
+
 # The 0.5.x to 0.7 migration fixture (scripts/check-migration.py): renders
 # Tests/Reference/migration.trellis headless and checks the frames that
 # moved. Needs Xvfb (scripts/run-headless.sh).

@@ -1,0 +1,76 @@
+<!-- owner: ParityController -->
+<!-- Platform parity fixture (Tests/Parity, docs/windows.md): obviously fake data. -->
+<column id="page" class="page">
+  <row class="toolbar">
+    <label id="title" class="title" no-outlet="yes">Parity sample</label>
+    <spacer/>
+    <segmented id="filter" a11y-label="Filter" items="All, Open, Done" selected="All"/>
+    <field id="search" class="search" placeholder="Search sample rows"/>
+  </row>
+  <box id="cards" class="cards">
+    <column class="card">
+      <label class="head" no-outlet="yes">Sample count A</label>
+      <label id="countA" class="big">7</label>
+    </column>
+    <column class="card">
+      <label class="head" no-outlet="yes">Sample count B</label>
+      <label id="countB" class="big">12</label>
+    </column>
+    <column class="card">
+      <label class="head" no-outlet="yes">Sample count C</label>
+      <label id="countC" class="big">3</label>
+    </column>
+  </box>
+  <row class="settings">
+    <label class="head" no-outlet="yes" label-for="size">Text size</label>
+    <slider id="size" min="9" max="24" value="13"/>
+    <popup id="density" a11y-label="Density" items="Comfortable, Compact"/>
+    <checkbox id="refresh" state="on">Refresh sample data</checkbox>
+  </row>
+  <scroll class="list">
+    <column class="rows">
+      <row class="item">
+        <label id="row1" class="item-title" wraps="yes">DEMO-1 Example row one</label>
+        <button action="openRow:">Open</button>
+      </row>
+      <row class="item">
+        <label id="row2" class="item-title" wraps="yes">DEMO-2 Example row two</label>
+        <button action="openRow:">Open</button>
+      </row>
+      <row class="item">
+        <label id="row3" class="item-title" wraps="yes">DEMO-3 Example row three</label>
+        <button action="openRow:">Open</button>
+      </row>
+    </column>
+  </scroll>
+  <row class="footer">
+    <spacer/>
+    <button action="cancel:">Cancel</button>
+    <button action="apply:" default="yes">Apply</button>
+  </row>
+</column>
+
+<style>
+  .page     { container-type: inline-size; padding: 16px; gap: 12px; }
+  .toolbar  { gap: 8px; align-items: center; }
+  .title    { font-size: 17px; font-weight: bold; }
+  .search   { width: 180px; min-width: 120px; }
+  .cards    { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .card     { padding: 10px; gap: 2px; border-width: 1px; border-radius: 6px; }
+  .head     { color: GrayText; }
+  .big      { font-size: 22px; font-weight: bold; }
+  .settings { gap: 8px; align-items: center; }
+  #size     { width: 160px; }
+  .list     { flex: 1; min-height: 100px; }
+  .rows     { gap: 6px; }
+  .item     { gap: 8px; align-items: center; }
+  .item-title { flex: 1; min-width: 0; }
+  .footer   { gap: 8px; align-items: center; }
+
+  @container (max-width: 520px) {
+    .toolbar  { flex-wrap: wrap; }
+    .search   { flex: 1; width: auto; }
+    .cards    { grid-template-columns: 1fr; }
+    .settings { flex-wrap: wrap; }
+  }
+</style>

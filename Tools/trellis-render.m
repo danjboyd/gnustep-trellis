@@ -21,7 +21,16 @@
 #import "TRIsolation.h"
 #ifdef GNUSTEP
 #ifdef _WIN32
-#include <shlobj.h>
+/* The one shell32 call, declared here: <shlobj.h> pulls in COM headers
+   that need Windows' `interface` macro, which gnustep-base undefines so
+   that @interface works. */
+HRESULT WINAPI SHGetFolderPathW(HWND hwnd, int csidl, HANDLE token, DWORD flags, LPWSTR path);
+#ifndef CSIDL_PROFILE
+#define CSIDL_PROFILE 0x0028
+#endif
+#ifndef SHGFP_TYPE_CURRENT
+#define SHGFP_TYPE_CURRENT 0
+#endif
 #else
 #import <pwd.h>
 #endif

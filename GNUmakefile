@@ -67,9 +67,12 @@ trellis-render_TOOL_LIBS = -lTrellis -lTrellisEngine
 trellis-render_NEEDS_GUI = yes
 # Windows (MSYS2 CLANG64): trellis-render reads the profile folder through
 # shell32 (its isolation check); trellis-bench reads peak memory through psapi.
+# Both libraries use dispatch_once, and a DLL has to name libdispatch.
 ifneq ($(findstring mingw,$(GNUSTEP_TARGET_OS))$(findstring windows,$(GNUSTEP_TARGET_OS)),)
   trellis-render_TOOL_LIBS += -lshell32
   trellis-bench_TOOL_LIBS += -lpsapi
+  libTrellisEngine_LIBRARIES_DEPEND_UPON += -ldispatch
+  libTrellis_LIBRARIES_DEPEND_UPON += -ldispatch
 endif
 
 # --- Trellis Preview app -----------------------------------------------------

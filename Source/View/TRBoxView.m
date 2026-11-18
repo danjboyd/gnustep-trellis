@@ -427,7 +427,10 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
    shift. That happens when the host places the root box at a fraction
    of a pixel. Each scroll view is nudged by less than one device pixel
    so its origin lands on the grid. Only scroll views move; the layout
-   (node frames, exported JSON) and every other view keep their place. */
+   (node frames, exported JSON) and every other view keep their place.
+   Not covered (docs/migration-0.11.md): scroll views inside split panes
+   or virtual boxes, and a host moving an ancestor of the root (it should
+   call -layoutTrellis on the root). */
 
 /* GNUstep's window base space is already in device pixels; AppKit's is
    in points. */

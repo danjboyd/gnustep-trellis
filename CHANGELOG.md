@@ -22,6 +22,12 @@ version may change the API listed in docs/api.md, and says so here.
   grid were mirrored like start/end; they are physical edges.
 - The two layout changes are in docs/migration-0.10.md. Known gaps 73 to
   25.
+- **Changed (rendering, DRAFT for the next minor):** scroll views in a
+  Trellis box are placed on whole device pixels in window space, so their
+  content stays sharp when the host puts the root at a fraction of a
+  pixel. A scroll view moves by less than one device pixel; layout frames
+  and other views don't move. See docs/migration-0.11.md, including what
+  it doesn't cover yet.
 
 ## 0.9.0 (2026-11-17)
 

@@ -115,6 +115,8 @@ check:: all
 	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ISource/Engine Tests/Engine/markup-scale.m \
 	  -o obj/markup-scale -L./obj -lTrellisEngine $(shell gnustep-config --base-libs)
 	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH ./obj/markup-scale
+	@echo "== scripts/env.sh keeps the caller's variables"
+	@Tests/Scripts/env-sh-vars.sh
 	@echo "== logical sides in styles"
 	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ISource/Engine Tests/Engine/logical-style.m \
 	  -o obj/logical-style -L./obj -lTrellisEngine $(shell gnustep-config --base-libs)
@@ -226,4 +228,6 @@ check-gui:: all
 	  Tests/View/appearance.sh || status=1; \
 	  Tests/View/scroll-container-query.sh || status=1; \
 	  Tests/View/preview-export.sh || status=1; \
+	  bash Tests/Scripts/headless-long-tmpdir.sh > obj/gui-tests/headless-tmpdir.log 2>&1 || status=1; \
+	  grep -E "^FAIL|OK$$" obj/gui-tests/headless-tmpdir.log; \
 	  exit $$status

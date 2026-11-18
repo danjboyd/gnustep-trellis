@@ -5,6 +5,16 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Fixed (GNUstep):** with a theme whose scrollers overlay the content
+  (Adwaita), a `<scroll>` drew a thin vertical line over its content's
+  right edge even when there was nothing to scroll: GNUstep's theme
+  draws an inner border beside the vertical scroller. Trellis now gives
+  such a scroll view a vertical scroller only while its content
+  overflows, as AppKit does with overlay scrollers. The content width is
+  unchanged. `-hasVerticalScroller` on that scroll view now reports
+  whether the content overflows. Themes with legacy scrollers (the
+  default, Gumdrop) are unchanged.
+
 ## 0.10.1 (2026-11-18)
 
 A bug fix; no layout changes.

@@ -174,6 +174,7 @@ check-gui:: all
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/segmented.m -o obj/gui-tests/segmented $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/disabled.m -o obj/gui-tests/disabled $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/direction.m -o obj/gui-tests/direction $(GUI_TEST_LIBS)
+	@$(CC) $(GUI_TEST_FLAGS) Tests/View/scroll-overlay.m -o obj/gui-tests/scroll-overlay $(GUI_TEST_LIBS)
 	@echo "== view checks (headless)"
 	@export LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH; status=0; \
 	  timeout 60 scripts/run-headless.sh obj/gui-tests/size-for-width > obj/gui-tests/hook.log 2>&1 || status=1; \
@@ -222,4 +223,8 @@ check-gui:: all
 	  Tests/View/appearance.sh || status=1; \
 	  Tests/View/scroll-container-query.sh || status=1; \
 	  Tests/View/preview-export.sh || status=1; \
+	  timeout 60 scripts/run-headless.sh obj/gui-tests/scroll-overlay > obj/gui-tests/scroll-overlay.log 2>&1 || status=1; \
+	  grep -v _NET_WORKAREA obj/gui-tests/scroll-overlay.log | tail -1; \
+	  timeout 60 scripts/run-headless.sh obj/gui-tests/scroll-overlay -GSTheme Adwaita > obj/gui-tests/scroll-overlay-adwaita.log 2>&1 || status=1; \
+	  grep -v _NET_WORKAREA obj/gui-tests/scroll-overlay-adwaita.log | tail -1; \
 	  exit $$status

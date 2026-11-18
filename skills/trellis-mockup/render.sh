@@ -4,29 +4,39 @@
 #
 #   skills/trellis-mockup/render.sh Screen.trellis OUTDIR [--widths 340,520,900]
 #                                   [--height 640] [--theme Adwaita|Gumdrop|...]
+#                                   [--no-preview]
 #
+# Linux/GNUstep only for now (macOS builds put the tools elsewhere).
 # Uses the Trellis install at TRELLIS_PREFIX (a scripts/trellis-update.sh
 # prefix), else the tools built in this checkout.
+# OUTDIR must be new or empty, so every file checked is from this run.
+# TrellisPreview is required: without it the run fails, unless
+# --no-preview says to skip the app check (the run then says so).
 # Every GUI run goes through scripts/run-headless.sh (private display and
-# throwaway GNUSTEP_HOME); on macOS the tools run directly.
+# throwaway GNUSTEP_HOME).
 # Exit status: 0 clean, 1 lint errors or a render failed, 2 bad usage.
 set -euo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
 repo="$(cd "$here/../.." && pwd)"
-[ $# -ge 2 ] || { sed -n '2,13p' "$0"; exit 2; }
+[ $# -ge 2 ] || { sed -n '2,18p' "$0"; exit 2; }
+[ "$(uname)" != Darwin ] || { echo "render.sh: Linux/GNUstep only for now; on macOS run build/trellis-render directly" >&2; exit 2; }
 spec="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
 out="$2"; shift 2
-widths="340,520,900" height=640 theme="Adwaita"
+widths="340,520,900" height=640 theme="Adwaita" noPreview=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --widths) widths="${2:?}"; shift 2 ;;
     --height) height="${2:?}"; shift 2 ;;
     --theme) theme="${2:?}"; shift 2 ;;
+    --no-preview) noPreview=1; shift ;;
     *) echo "render.sh: unknown argument $1" >&2; exit 2 ;;
   esac
 done
 [ -f "$spec" ] || { echo "render.sh: no such file: $spec" >&2; exit 2; }
+if [ -e "$out" ] && [ -n "$(ls -A "$out" 2>/dev/null)" ]; then
+  echo "render.sh: $out is not empty; use a new or empty directory so only this run's files are checked" >&2; exit 2
+fi
 mkdir -p "$out"
 out="$(cd "$out" && pwd)"
 name="$(basename "$spec" .trellis)"
@@ -41,8 +51,9 @@ render="$bin/trellis-render" lint="$bin/trellis-lint"
 for t in "$render" "$lint"; do [ -x "$t" ] || { echo "render.sh: missing $t (build Trellis or set TRELLIS_PREFIX)" >&2; exit 2; }; done
 export LD_LIBRARY_PATH="$lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
-if [ "$(uname)" = Darwin ]; then headless=(); else headless=("$repo/scripts/run-headless.sh"); fi
+headless=("$repo/scripts/run-headless.sh")
 status=0
+expected=()
 
 echo "== lint"
 owner="$(dirname "$spec")/$(sed -n 's/.*owner: *\([A-Za-z0-9_]*\).*/\1/p' "$spec" | head -1).h"
@@ -54,13 +65,21 @@ for appearance in light dark; do
   "${headless[@]}" "$render" "$spec" --widths "$widths" --height "$height" ${theme:+--theme "$theme"} \
     --appearance "$appearance" --png "$out/$name-$appearance.png" --json "$out/$name-$appearance.json" --lint \
     || status=1
+  # trellis-render adds a -WIDTH suffix only when it renders several widths.
+  case "$widths" in
+    *,*) for w in ${widths//,/ }; do
+           expected+=("$out/$name-$appearance-$w.png" "$out/$name-$appearance-$w.json")
+         done ;;
+    *) expected+=("$out/$name-$appearance.png" "$out/$name-$appearance.json") ;;
+  esac
 done
 
-if [ -x "$preview" ]; then
+if [ "$noPreview" = 1 ]; then
+  echo "== TrellisPreview skipped (--no-preview): the app check was NOT done"
+elif [ -x "$preview" ]; then
   for appearance in light dark; do
     echo "== TrellisPreview snapshot ($appearance, ${widths##*,}x$height)"
     png="$out/$name-preview-$appearance.png" json="$out/$name-preview-$appearance.json"
-    rm -f -- "$png" "$json"
     if ! "${headless[@]}" "$preview" "$spec" --snapshot "$png" --export-json "$json" \
            --appearance "$appearance" --width "${widths##*,}" --height "$height" -GSTheme "${theme:-Adwaita}" \
          || [ ! -s "$json" ]; then
@@ -68,11 +87,19 @@ if [ -x "$preview" ]; then
       # window: keep it aside so the image check can't pass it.
       [ -f "$png" ] && mv -f -- "$png" "$out/$name-preview-$appearance.load-error.png"
       echo "FAIL TrellisPreview didn't load $spec ($appearance)"; status=1
+    else
+      expected+=("$png" "$json")
     fi
   done
 else
-  echo "== TrellisPreview not built; skipping its snapshots"
+  echo "FAIL TrellisPreview is missing ($preview): build it, or pass --no-preview to skip the app check"
+  status=1
 fi
+
+echo "== check outputs"
+for f in "${expected[@]}"; do
+  [ -s "$f" ] || { echo "FAIL missing or empty: $f"; status=1; }
+done
 
 echo "== check images"
 for png in "$out/$name"-*.png; do

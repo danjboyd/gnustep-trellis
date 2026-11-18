@@ -1,0 +1,8 @@
+{
+ "expect": "",
+ "viewport": {"width": 200, "height": 40},
+ "root": {"class": "TRBoxView", "x": 0, "y": 0, "width": 200, "height": 40, "children": [
+  {"id": "search", "class": "NSTextField", "editable": true, "x": 0, "y": 0, "width": 150, "height": 21,
+   "intrinsic": {"width": 18, "height": 21}}
+ ]}
+}

@@ -115,10 +115,16 @@ check:: all
 	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ISource/Engine Tests/Engine/markup-scale.m \
 	  -o obj/markup-scale -L./obj -lTrellisEngine $(shell gnustep-config --base-libs)
 	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH ./obj/markup-scale
+	@echo "== scripts/env.sh keeps the caller's variables"
+	@Tests/Scripts/env-sh-vars.sh
 	@echo "== logical sides in styles"
 	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ISource/Engine Tests/Engine/logical-style.m \
 	  -o obj/logical-style -L./obj -lTrellisEngine $(shell gnustep-config --base-libs)
 	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH ./obj/logical-style
+	@echo "== trellis-render isolation rule (synthetic stand-in tree)"
+	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ITools Tests/View/isolation-verdict.m \
+	  -o obj/isolation-verdict $(shell gnustep-config --base-libs)
+	@./obj/isolation-verdict
 	@echo "== .trellis files (syntax, styles, bindings)"
 	@$(LINT) Examples/TrellisDemo/AskDetail.trellis --owner Examples/TrellisDemo/AskDetailController.h
 	@$(LINT) Examples/TrellisDemo/Settings.trellis --owner Examples/TrellisDemo/SettingsController.h

@@ -1,0 +1,2 @@
+<!-- A title attribute is a title, like text content: no unlabeled warning. -->
+<column><radio title="Daily"/><radio>Weekly</radio><checkbox title="Notify me"/><button title="Save" action="save:"/></column>

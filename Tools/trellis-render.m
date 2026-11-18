@@ -1,9 +1,10 @@
 /* trellis-render - lays out a Trellis screen offscreen and writes a PNG and
    a JSON frame dump (docs/design.md section 5).
 
-   On GNUstep it refuses to run unless GNUSTEP_HOME points at a private
-   directory and the user defaults resolve inside it, so it can never touch
-   a real user's settings. Use scripts/run-headless.sh.
+   On GNUstep it refuses to run unless the home directory and the
+   effective user defaults and Library all resolve inside a private
+   GNUSTEP_HOME (Tools/TRIsolation.h), so it can never touch a real
+   user's settings. Use scripts/run-headless.sh.
 
    Copyright (C) 2026 Dan Boyd
    Licensed under the GNU LGPL, version 2.1 or later; see COPYING.LIB.
@@ -17,6 +18,11 @@
 #import "TRVirtualBox.h"
 #import "TRSplitView.h"
 #import "TRAppKitCompat.h"
+#import "TRIsolation.h"
+#ifdef GNUSTEP
+#import <pwd.h>
+#import <unistd.h>
+#endif
 
 extern TRBoxView *TRSampleScreen(NSString *name);
 extern NSArray<NSString *> *TRSampleScreenNames(void);
@@ -37,16 +43,20 @@ static void TRCheckIsolation(void)
 {
 #ifdef GNUSTEP
   NSDictionary *env = [[NSProcessInfo processInfo] environment];
-  NSString *gh = env[@"GNUSTEP_HOME"];
-  if ([gh length] == 0)
-    TRDie(3, @"GNUSTEP_HOME is not set; refusing to run (use scripts/run-headless.sh)");
-  gh = [gh stringByStandardizingPath];
-  NSString *home = [NSHomeDirectory() stringByStandardizingPath];
+  /* The real home from the password database: HOME and GNUSTEP_HOME can
+     both be changed, and gnustep-base itself may use this one. */
+  struct passwd *pw = getpwuid(getuid());
+  if (pw == NULL || pw->pw_dir == NULL) TRDie(3, @"can't find the real home directory; refusing to run");
+  NSString *realHome = [NSString stringWithUTF8String: pw->pw_dir];
+  NSString *gh = env[@"GNUSTEP_HOME"] ?: @"";
+  NSString *home = NSHomeDirectory();
   NSArray *lib = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-  NSString *userLib = [[lib firstObject] stringByStandardizingPath];
-  if (![home hasPrefix: gh] || userLib == nil || ![userLib hasPrefix: gh])
-    TRDie(3, @"user home (%@) or Library (%@) is outside GNUSTEP_HOME (%@); refusing to run",
-          home, userLib, gh);
+  NSString *userLib = [lib firstObject];
+  /* The effective defaults directory, as gnustep-base resolves it
+     (GNUSTEP_CONFIG_FILE included). */
+  NSString *defaults = GSDefaultsRootForUser(NSUserName());
+  NSString *why = TRIsolationProblem(realHome, gh, home, userLib, defaults);
+  if (why) TRDie(3, @"%@; refusing to run (use scripts/run-headless.sh)", why);
   NSString *display = env[@"DISPLAY"];
   if ([display length] == 0 || [display isEqualToString: @":0"] || [display isEqualToString: @":0.0"])
     TRDie(3, @"DISPLAY is %@; trellis-render only runs on a private Xvfb display",

@@ -1,11 +1,11 @@
 {
- "commit": "62dc14f",
+ "commit": "4ea11c9",
  "conformance": {
   "pass": 3659,
   "skipped": 524,
   "total": 3659
  },
- "date": "2026-11-17",
+ "date": "2026-11-18",
  "platform": "macos",
  "suites": {
   "engine": {

@@ -49,11 +49,19 @@ make check                # engine and conformance suites; should all pass
   `TRELLIS_GNUSTEP_HOME` (59 bytes or less, e.g. under `/tmp`). Point
   any GNUstep configuration inside that tree, never at your real
   `~/GNUstep`. Changing `HOME` doesn't move the toolchain.
-- The renders use the Adwaita theme (`--theme` to change). It must be
-  installed in the toolchain's Local library, or in your private
-  GNUstep home's `GNUstep/Library/Themes`. A new private home starts
-  empty, so the toolchain is the better place. render.sh stops with a
-  clear message if the theme is missing.
+- The renders use the Adwaita theme (`--theme` to change). A new private
+  GNUstep home starts with no themes, so copy an Adwaita.theme you
+  already have into it before rendering:
+
+  ```sh
+  mkdir -p "$TRELLIS_GNUSTEP_HOME/GNUstep/Library/Themes"
+  cp -a /path/to/Adwaita.theme "$TRELLIS_GNUSTEP_HOME/GNUstep/Library/Themes/"
+  ```
+
+  render.sh stops with a clear message, listing where it looked, if the
+  theme is missing. Installing the theme into the toolchain instead is
+  optional and a separate change to that toolchain; don't do it as part
+  of a mockup.
 
 ## The loop
 

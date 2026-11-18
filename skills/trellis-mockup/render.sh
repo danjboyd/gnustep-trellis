@@ -45,7 +45,7 @@ while IFS= read -r d; do [ -d "$d/$theme.theme" ] && { found="$d"; break; }; don
 if [ -z "$found" ]; then
   echo "render.sh: the $theme theme isn't installed; GNUstep would fall back to its default theme. Looked in:" >&2
   sed 's/^/  /' <<< "$themeDirs" >&2
-  echo "Install $theme.theme in one of these (the toolchain's Local library suits every private home), or pass --theme." >&2
+  echo "Copy an existing $theme.theme into the first folder (your private GNUstep home), or pass --theme. See SKILL.md, Setup." >&2
   exit 2
 fi
 if [ -e "$out" ] && [ -n "$(ls -A "$out" 2>/dev/null)" ]; then

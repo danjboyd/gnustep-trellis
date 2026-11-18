@@ -2,6 +2,11 @@ name: package-trellis-preview
 
 on:
   workflow_dispatch:
+  # workflow_dispatch only reaches files on the default branch, so the scratch
+  # run is started by the push to this branch (once, ask #8631).
+  push:
+    branches:
+      - packaging/scratch
 
 jobs:
   package:

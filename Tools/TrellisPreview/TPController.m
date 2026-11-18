@@ -315,7 +315,10 @@ static NSDate *TPModDate(NSString *path)
 
   if (_appearance) [self applyAppearance: _appearance];
   if (_path) [self reload: nil];
-  else [self openDocument: nil];
+  else if (_snapshot) [self showError: @"no .trellis file given"];
+  /* No file: ask for one once launching has finished (the window is up and
+     the run loop running), not in a modal panel inside this method. */
+  else [self performSelector: @selector(openDocument:) withObject: nil afterDelay: 0];
 
   if (_snapshot)
     {

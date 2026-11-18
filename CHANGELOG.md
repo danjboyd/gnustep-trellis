@@ -5,6 +5,12 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Fixed (tooling):** `scripts/run-headless.sh` hung when the caller's
+  `TMPDIR` was long (over about 60 bytes): GNUstep's message-port socket
+  paths went past the 108-byte limit and the app waited forever. It now
+  sets `TMPDIR` to a short `tmp` folder inside the private GNUstep home,
+  and fails at once if that path would be too long.
+
 ## 0.10.1 (2026-11-18)
 
 A bug fix; no layout changes.

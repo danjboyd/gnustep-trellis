@@ -40,6 +40,14 @@ export TMPDIR="$RH_TMP"
 # and GNUstep there takes its temporary directory from TEMP/TMP.
 case "$(uname -s)" in
   MINGW*|MSYS*|CYGWIN*)
+    # gnustep-base writes message-port names to the user's registry (HKCU)
+    # on every launch, whatever the private home: run only as a dedicated
+    # test user, named in TRELLIS_TEST_USER.
+    tu=${TRELLIS_TEST_USER:-} me=${USERNAME:-}
+    if [ -z "$tu" ] || [ "${tu,,}" != "${me,,}" ]; then
+      echo "run-headless: on Windows, run as the dedicated test user named in TRELLIS_TEST_USER (set: ${TRELLIS_TEST_USER:-no}; running as: ${USERNAME:-unknown}): GNUstep writes to the user's registry" >&2
+      exit 3
+    fi
     GNUSTEP_HOME="$(cygpath -w "$PRIV")" HOME="$(cygpath -w "$PRIV")"
     TEMP="$(cygpath -w "$RH_TMP")" TMP="$(cygpath -w "$RH_TMP")"
     export GNUSTEP_HOME HOME TEMP TMP GNUSTEP_NO_GDNC=1

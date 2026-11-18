@@ -75,9 +75,19 @@ static void TRCheckIsolation(void)
     TRDie(3, @"DISPLAY is %@; trellis-render only runs on a private Xvfb display",
           display ?: @"unset");
 #endif
+#ifdef _WIN32
   /* Windows has no X display to keep private: trellis-render never orders
-     its window on screen (it draws the view tree into a bitmap), so the
-     settings checks above are the isolation there. */
+     its window on screen (it draws the view tree into a bitmap). But
+     gnustep-base writes message-port names to the user's registry
+     (HKCU\Software\GNUstepNSMessagePort) on every launch, whatever the
+     private home, so a run must also be a dedicated test user's: named
+     in TRELLIS_TEST_USER, and the user this process runs as. */
+  NSString *testUser = env[@"TRELLIS_TEST_USER"];
+  if ([testUser length] == 0 || [testUser caseInsensitiveCompare: NSUserName()] != NSOrderedSame)
+    TRDie(3, @"on Windows trellis-render runs only as the dedicated test user named in "
+          @"TRELLIS_TEST_USER (set: %@; running as: %@), because GNUstep writes to the user's "
+          @"registry; refusing to run", [testUser length] ? testUser : @"no", NSUserName());
+#endif
 #endif
 }
 

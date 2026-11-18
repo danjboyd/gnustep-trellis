@@ -16,7 +16,15 @@
    - Load errors (with file:line:col) replace the screen until fixed.
 
    --snapshot out.png [--width W --height H] [--inspector] renders once and
-   exits (used for headless checks).
+   exits (used for headless checks). Two more headless checks, for the
+   platform parity matrix (docs/windows.md):
+     --resize W1xH1,W2xH2,...  after the first snapshot, resizes the window
+       to each size (the live resize path, not a fresh launch) and writes
+       out-W1xH1.png (and the JSON likewise) for each;
+     --watch N [--watch-timeout S]  keeps polling the file and its sample
+       as the open window does, and writes out-reload1.png, ... after each
+       of N reloads; exits 1 if fewer than N happen within S seconds
+       (default 30). The window is never shown in either.
 
    Copyright (C) 2026 Dan Boyd
    Licensed under the GNU LGPL, version 2.1 or later; see COPYING.LIB.
@@ -188,6 +196,7 @@ static NSView *TPViewAtPath(NSView *root, NSString *path)
   NSString *_appearance;   /* nil (theme default), "light" or "dark" */
   NSString *_exportJSON;   /* headless: write the frames JSON here */
   BOOL _loadFailed;        /* the spec (or its sample) didn't load */
+  NSUInteger _reloads;     /* reload: calls, the first load included */
 }
 @end
 
@@ -195,6 +204,8 @@ static NSView *TPViewAtPath(NSView *root, NSString *path)
 
 - (void)setExportJSON:(NSString *)path { _exportJSON = [path copy]; }
 - (BOOL)loadFailed { return _loadFailed; }
+- (NSUInteger)reloadCount { return _reloads; }
+- (NSString *)exportJSONPath { return _exportJSON; }
 - (void)setShowsFocusOrder:(BOOL)yn { _focusOrder = yn; }
 
 /* The overlay is up while it has something to draw. */
@@ -382,6 +393,7 @@ static NSDate *TPModDate(NSString *path)
 
 - (void)reload:(id)sender
 {
+  _reloads++;
   _mtime = TPModDate(_path);
   _sampleMtime = TPModDate([self samplePath]);
   NSError *err = nil;
@@ -735,12 +747,36 @@ static NSString *TPThemeName(void)
 
 - (void)snapshotTo:(NSString *)path
 {
+  [self snapshotTo: path json: _exportJSON];
+}
+
+- (void)snapshotTo:(NSString *)path json:(NSString *)json
+{
+  [_content display];
   [[self pngData] writeToFile: path atomically: YES];
-  if (_exportJSON) [[self framesJSON] writeToFile: _exportJSON atomically: YES];
+  if (json) [[self framesJSON] writeToFile: json atomically: YES];
   printf("%s\n", [[_window title] UTF8String]);
 }
 
+/* Headless resize: the window's content size, as a user's drag would set
+   it, then the relayout windowDidResize: does (an unshown window may not
+   get the notification). */
+- (void)resizeContentTo:(NSSize)size
+{
+  [_window setContentSize: size];
+  [self relayoutAndLint];
+}
+
 @end
+
+/* out.png + "-reload1" -> out-reload1.png (nil stays nil). */
+static NSString *TPSuffixed(NSString *path, NSString *suffix)
+{
+  if (path == nil) return nil;
+  NSString *ext = [path pathExtension];
+  NSString *base = [path stringByDeletingPathExtension];
+  return [[base stringByAppendingString: suffix] stringByAppendingPathExtension: ext];
+}
 
 int main(int argc, const char **argv)
 {
@@ -749,7 +785,9 @@ int main(int argc, const char **argv)
       NSString *path = nil, *snapshot = nil;
       NSSize size = NSMakeSize(640, 480);
       BOOL inspector = NO, focusOrder = NO;
-      NSString *exportJSON = nil, *appearance = nil;
+      NSString *exportJSON = nil, *appearance = nil, *resize = nil;
+      NSInteger watch = 0;
+      double watchTimeout = 30;
       for (int i = 1; i < argc; i++)
         {
           NSString *a = [NSString stringWithUTF8String: argv[i]];
@@ -761,6 +799,9 @@ int main(int argc, const char **argv)
           else if ([a isEqualToString: @"--focus-order"]) focusOrder = YES;
           else if ([a isEqualToString: @"--export-json"] && next) { exportJSON = next; i++; }
           else if ([a isEqualToString: @"--appearance"] && next) { appearance = next; i++; }
+          else if ([a isEqualToString: @"--resize"] && next) { resize = next; i++; }
+          else if ([a isEqualToString: @"--watch"] && next) { watch = [next integerValue]; i++; }
+          else if ([a isEqualToString: @"--watch-timeout"] && next) { watchTimeout = [next doubleValue]; i++; }
           else if ([[a pathExtension] isEqualToString: @"trellis"]) path = [a stringByStandardizingPath];
           else if ([a hasPrefix: @"-"] && next && ![next hasPrefix: @"-"]) i++;   /* NSUserDefaults args, e.g. -GSTheme X */
         }
@@ -787,7 +828,41 @@ int main(int argc, const char **argv)
               fprintf(stderr, "TrellisPreview: %s did not load\n", [path ?: @"(no file)" UTF8String]);
               return 1;
             }
-          return 0;
+          for (NSString *wh in resize ? [resize componentsSeparatedByString: @","] : @[])
+            {
+              NSArray *p = [wh componentsSeparatedByString: @"x"];
+              if ([p count] != 2 || [p[0] doubleValue] <= 0 || [p[1] doubleValue] <= 0)
+                {
+                  fprintf(stderr, "TrellisPreview: --resize takes WxH,WxH,... (got \"%s\")\n", [wh UTF8String]);
+                  return 2;
+                }
+              NSString *tag = [NSString stringWithFormat: @"-%@", wh];
+              [c resizeContentTo: NSMakeSize([p[0] doubleValue], [p[1] doubleValue])];
+              [c snapshotTo: TPSuffixed(snapshot, tag) json: TPSuffixed([c exportJSONPath], tag)];
+            }
+          /* Live reload without a window: poll as the open window's timer
+             does, and snapshot after each reload. */
+          NSUInteger seen = [c reloadCount];
+          NSDate *deadline = [NSDate dateWithTimeIntervalSinceNow: watchTimeout];
+          for (NSInteger n = 1; n <= watch; )
+            {
+              if ([deadline timeIntervalSinceNow] < 0)
+                {
+                  fprintf(stderr, "TrellisPreview: only %ld of %ld reloads within %g s\n",
+                          (long)(n - 1), (long)watch, watchTimeout);
+                  return 1;
+                }
+              [NSThread sleepForTimeInterval: 0.1];
+              [c poll: nil];
+              if ([c reloadCount] > seen)
+                {
+                  seen = [c reloadCount];
+                  NSString *tag = [NSString stringWithFormat: @"-reload%ld", (long)n];
+                  [c snapshotTo: TPSuffixed(snapshot, tag) json: TPSuffixed([c exportJSONPath], tag)];
+                  n++;
+                }
+            }
+          return [c loadFailed] ? 1 : 0;
         }
       [NSApp setDelegate: c];
       [NSApp run];

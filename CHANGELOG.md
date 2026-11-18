@@ -5,6 +5,19 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+## 0.10.1 (2026-11-18)
+
+A bug fix; no layout changes.
+
+- **Fixed:** looking up a view by id (`+[TRLoader viewWithIdentifier:inView:]`,
+  `TRFindView`) threw "Tried to init array with nil object" when it
+  walked past a custom scroll view (`<view type="...">` naming an
+  `NSScrollView` subclass) that had no document view. TrellisPreview's
+  outline overlay had the same problem. Both now treat a missing document
+  view as having no children. Present since 0.1.0. If you wrapped such
+  views in `<scroll><column/></scroll>` to avoid the crash, you can drop
+  the wrapper.
+
 ## 0.10.0 (2026-11-18)
 
 Layout corner cases brought closer to the browser, mostly size keywords

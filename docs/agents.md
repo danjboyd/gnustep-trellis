@@ -36,6 +36,7 @@ obj/trellis-lint Screen.trellis --owner ScreenController.h
    - `leaf-box-style`: a background or border on a label or control,
      which draws nothing. Only boxes draw them: wrap it in a `<row>`.
    - `items`: `items="A|B"` is one item. Separate items with commas.
+   - `element`: an element Trellis doesn't have (the screen won't load).
 4. **Check at least three widths:** narrow (about 340), medium (about 520)
    and wide (800 or more).
 

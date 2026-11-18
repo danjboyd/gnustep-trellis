@@ -340,6 +340,23 @@ static void TRLintLeafBoxStyles(TRMarkupDocument *doc, NSString *path)
     }
 }
 
+/* Elements the loader knows (TRLoader.m); anything else fails to load. */
+static void TRLintElements(TRMarkupDocument *doc, NSString *path)
+{
+  NSSet *known = [NSSet setWithObjects:
+    @"column", @"row", @"box", @"scroll", @"split", @"virtual", @"template",
+    @"label", @"text", @"field", @"button", @"checkbox", @"radio", @"popup", @"segmented", @"item",
+    @"slider", @"progress", @"image", @"separator", @"spacer", @"view",
+    @"a", @"b", @"strong", @"i", @"em", @"code", @"br", nil];
+  for (TRMarkupElement *e in [doc allElements])
+    if (![known containsObject: e.name])
+      {
+        NSString *where = [NSString stringWithFormat: @"%@:%lu:%lu", path, (unsigned long)e.line, (unsigned long)e.column];
+        TRReport(where, @"error", @"element", [NSString stringWithFormat:
+          @"unknown element <%@>; see docs/agents.md section 2 for the elements Trellis has", e.name]);
+      }
+}
+
 static void TRLintTrellis(NSString *path, NSString *header)
 {
   NSError *err = nil;
@@ -460,6 +477,7 @@ static void TRLintTrellis(NSString *path, NSString *header)
   TRLintAccessibility(doc, path);
   TRLintBlockChildren(doc, path);
   TRLintLeafBoxStyles(doc, path);
+  TRLintElements(doc, path);
   if (header == nil) return;
   NSMutableSet *outlets = [NSMutableSet set], *actions = [NSMutableSet set];
   NSString *cls = nil;

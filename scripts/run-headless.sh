@@ -1,7 +1,8 @@
 #!/bin/bash
 # Runs a GNUstep GUI command (trellis-render, GUI tests) isolated from the
-# real user: a private Xvfb display and a throwaway GNUSTEP_HOME/HOME.
-# Fails closed if isolation cannot be set up.
+# real user: a private Xvfb display and a throwaway GNUSTEP_HOME/HOME (on
+# Windows/MSYS2, the private home only; see below). Fails closed if
+# isolation cannot be set up.
 #
 #   scripts/run-headless.sh obj/trellis-render --screen ask --png ask.png
 set -euo pipefail
@@ -31,6 +32,22 @@ RH_TMP="$(cd "$PRIV" && pwd -P)/tmp"
 [ ! -L "$RH_TMP" ] || { echo "run-headless: $RH_TMP is a symlink" >&2; exit 3; }
 mkdir -p -m 700 "$RH_TMP"
 export TMPDIR="$RH_TMP"
+
+# Windows (MSYS2): no X server to keep private. The GUI tools never order a
+# window on screen in their headless modes (trellis-render draws into a
+# bitmap; TrellisPreview --snapshot has no run loop), and trellis-render
+# checks the settings isolation itself. Native programs get Windows paths,
+# and GNUstep there takes its temporary directory from TEMP/TMP.
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*)
+    GNUSTEP_HOME="$(cygpath -w "$PRIV")" HOME="$(cygpath -w "$PRIV")"
+    TEMP="$(cygpath -w "$RH_TMP")" TMP="$(cygpath -w "$RH_TMP")"
+    export GNUSTEP_HOME HOME TEMP TMP GNUSTEP_NO_GDNC=1
+    unset DISPLAY || true
+    "$@"
+    exit $?
+    ;;
+esac
 
 command -v Xvfb >/dev/null || { echo "run-headless: Xvfb not installed" >&2; exit 3; }
 for n in $(seq 90 120); do

@@ -24,7 +24,7 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "scripts"))
+sys.dont_write_bytecode = True   # loading png-check.py must not leave __pycache__ in scripts/
 
 
 def read_png(path):

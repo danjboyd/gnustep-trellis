@@ -34,6 +34,20 @@ while [ $# -gt 0 ]; do
   esac
 done
 [ -f "$spec" ] || { echo "render.sh: no such file: $spec" >&2; exit 2; }
+# The theme must be installed where the headless run will look: the
+# private GNUstep home, or the toolchain's Local/System/Network library.
+# Without it GNUstep silently falls back to its default grey theme.
+themeDirs="$(set +eu; . "$repo/scripts/env.sh" >/dev/null 2>&1
+  echo "${TRELLIS_GNUSTEP_HOME:-$HOME/.cache/trellis-gnustep-home}/GNUstep/Library/Themes"
+  for v in LOCAL SYSTEM NETWORK; do echo "$(gnustep-config --variable=GNUSTEP_${v}_LIBRARY 2>/dev/null)/Themes"; done)"
+found=""
+while IFS= read -r d; do [ -d "$d/$theme.theme" ] && { found="$d"; break; }; done <<< "$themeDirs"
+if [ -z "$found" ]; then
+  echo "render.sh: the $theme theme isn't installed; GNUstep would fall back to its default theme. Looked in:" >&2
+  sed 's/^/  /' <<< "$themeDirs" >&2
+  echo "Install $theme.theme in one of these (the toolchain's Local library suits every private home), or pass --theme." >&2
+  exit 2
+fi
 if [ -e "$out" ] && [ -n "$(ls -A "$out" 2>/dev/null)" ]; then
   echo "render.sh: $out is not empty; use a new or empty directory so only this run's files are checked" >&2; exit 2
 fi

@@ -59,9 +59,16 @@ done
 if [ -x "$preview" ]; then
   for appearance in light dark; do
     echo "== TrellisPreview snapshot ($appearance, ${widths##*,}x$height)"
-    "${headless[@]}" "$preview" "$spec" --snapshot "$out/$name-preview-$appearance.png" \
-      --export-json "$out/$name-preview-$appearance.json" --appearance "$appearance" \
-      --width "${widths##*,}" --height "$height" -GSTheme "${theme:-Adwaita}" || status=1
+    png="$out/$name-preview-$appearance.png" json="$out/$name-preview-$appearance.json"
+    rm -f -- "$png" "$json"
+    if ! "${headless[@]}" "$preview" "$spec" --snapshot "$png" --export-json "$json" \
+           --appearance "$appearance" --width "${widths##*,}" --height "$height" -GSTheme "${theme:-Adwaita}" \
+         || [ ! -s "$json" ]; then
+      # A file that doesn't load still leaves a snapshot of the error
+      # window: keep it aside so the image check can't pass it.
+      [ -f "$png" ] && mv -f -- "$png" "$out/$name-preview-$appearance.load-error.png"
+      echo "FAIL TrellisPreview didn't load $spec ($appearance)"; status=1
+    fi
   done
 else
   echo "== TrellisPreview not built; skipping its snapshots"
@@ -69,6 +76,7 @@ fi
 
 echo "== check images"
 for png in "$out/$name"-*.png; do
+  case "$png" in *.load-error.png) continue ;; esac
   case "$png" in *dark*) ap=dark ;; *) ap=light ;; esac
   python3 -I "$repo/scripts/png-check.py" "$png" --appearance "$ap" || status=1
 done

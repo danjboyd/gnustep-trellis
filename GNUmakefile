@@ -228,4 +228,6 @@ check-gui:: all
 	  Tests/View/appearance.sh || status=1; \
 	  Tests/View/scroll-container-query.sh || status=1; \
 	  Tests/View/preview-export.sh || status=1; \
+	  bash Tests/Scripts/headless-long-tmpdir.sh > obj/gui-tests/headless-tmpdir.log 2>&1 || status=1; \
+	  grep -E "^FAIL|OK$$" obj/gui-tests/headless-tmpdir.log; \
 	  exit $$status

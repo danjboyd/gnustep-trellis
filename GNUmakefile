@@ -119,7 +119,7 @@ check:: all
 	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ISource/Engine Tests/Engine/logical-style.m \
 	  -o obj/logical-style -L./obj -lTrellisEngine $(shell gnustep-config --base-libs)
 	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH ./obj/logical-style
-	@echo "== trellis-render isolation rule (synthetic paths)"
+	@echo "== trellis-render isolation rule (synthetic stand-in tree)"
 	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ITools Tests/View/isolation-verdict.m \
 	  -o obj/isolation-verdict $(shell gnustep-config --base-libs)
 	@./obj/isolation-verdict

@@ -1,6 +1,8 @@
-/* The isolation rule trellis-render enforces (Tools/TRIsolation.h), on
-   synthetic paths only: no GNUstep defaults are read or written. Prints
-   ISOLATION OK. */
+/* The isolation rule trellis-render enforces (Tools/TRIsolation.h), on a
+   synthetic stand-in tree built in a fresh temporary directory: a fake
+   "real home" with its own GNUstep/Defaults, private trees, and symlinks
+   that try to escape. No real home or GNUstep defaults are read or
+   written. Prints ISOLATION OK. */
 #import <Foundation/Foundation.h>
 #import "TRIsolation.h"
 
@@ -16,42 +18,79 @@ int main(void)
 {
   @autoreleasepool
     {
-      NSString *real = @"/home/user";
-      NSString *priv = @"/home/user/.cache/trellis-gnustep-home";
-      /* scripts/run-headless.sh: GNUSTEP_HOME and HOME private, defaults default. */
-      Expect("run-headless layout", YES,
+      NSFileManager *fm = [NSFileManager defaultManager];
+      char tmpl[] = "/tmp/trellis-isolation-XXXXXX";
+      if (mkdtemp(tmpl) == NULL) { printf("ISOLATION FAIL: mkdtemp\n"); return 1; }
+      NSString *T = TRResolvedPath([NSString stringWithUTF8String: tmpl]);
+      NSString *(^P)(NSString *) = ^NSString *(NSString *rel) { return [T stringByAppendingPathComponent: rel]; };
+      void (^mk)(NSString *) = ^(NSString *rel) {
+        [fm createDirectoryAtPath: P(rel) withIntermediateDirectories: YES attributes: nil error: NULL];
+      };
+      void (^ln)(NSString *, NSString *) = ^(NSString *rel, NSString *target) {
+        [fm createDirectoryAtPath: [P(rel) stringByDeletingLastPathComponent] withIntermediateDirectories: YES
+                       attributes: nil error: NULL];
+        [fm createSymbolicLinkAtPath: P(rel) withDestinationPath: P(target) error: NULL];
+      };
+
+      /* The stand-in real home, its real-looking defaults, and private trees. */
+      mk(@"home/GNUstep/Defaults");
+      mk(@"home/GNUstep/Library");
+      mk(@"home/.cache/priv");
+      mk(@"probe/gs/defaults");
+      mk(@"probe/gs/lib");
+      mk(@"priv");
+      mk(@"priv2/Library");
+      mk(@"elsewhere/defaults");
+      mk(@"other");
+      ln(@"esc1/gs/defaults", @"home/GNUstep/Defaults");     /* link into the real defaults */
+      mk(@"esc1/gs/lib");
+      ln(@"esc2/gs/lib", @"other");                          /* link out of the private tree */
+      mk(@"esc2/gs/defaults");
+      ln(@"sneaky", @"home/GNUstep");                        /* GNUSTEP_HOME that is really ~/GNUstep */
+      ln(@"homelink", @"home");                              /* GNUSTEP_HOME that is really the home */
+
+      NSString *real = P(@"home");
+      NSString *priv = P(@"home/.cache/priv");
+      Expect("run-headless layout (private dir under the real home)", YES,
              TRIsolationProblem(real, priv, priv, [priv stringByAppendingString: @"/GNUstep/Library"],
-                                [priv stringByAppendingString: @"/GNUstep/Defaults"], NO));
-      /* AIManager's harness: HOME and GNUSTEP_HOME real, config file moves defaults and Library. */
-      Expect("config file, real HOME, private gs dir", YES,
-             TRIsolationProblem(real, @"", real, @"/tmp/probe/gs/lib", @"/tmp/probe/gs/defaults", YES));
-      /* ...and the same config under run-headless (GNUSTEP_HOME private but elsewhere). */
-      Expect("config file under run-headless", YES,
-             TRIsolationProblem(real, priv, priv, @"/tmp/probe/gs/lib", @"/tmp/probe/gs/defaults", YES));
-      /* Refusals. */
-      Expect("nothing set: real home and real defaults", NO,
-             TRIsolationProblem(real, @"", real, @"/home/user/GNUstep/Library", @"/home/user/GNUstep/Defaults", NO));
+                                [priv stringByAppendingString: @"/GNUstep/Defaults"]));
+      Expect("private HOME and GNUSTEP_HOME, config file moves defaults and Library inside", YES,
+             TRIsolationProblem(real, P(@"probe"), P(@"probe"), P(@"probe/gs/lib"), P(@"probe/gs/defaults")));
+
+      Expect("GNUSTEP_HOME unset", NO, TRIsolationProblem(real, @"", real, P(@"probe/gs/lib"), P(@"probe/gs/defaults")));
       Expect("only HOME changed: defaults still real (the 2026-11-11 case)", NO,
-             TRIsolationProblem(real, @"", @"/tmp/h", @"/tmp/h/GNUstep/Library", @"/home/user/GNUstep/Defaults", NO));
+             TRIsolationProblem(real, priv, priv, [priv stringByAppendingString: @"/GNUstep/Library"],
+                                P(@"home/GNUstep/Defaults")));
+      Expect("config sends the defaults outside the private tree", NO,
+             TRIsolationProblem(real, P(@"probe"), P(@"probe"), P(@"probe/gs/lib"), P(@"elsewhere/defaults")));
+      Expect("config sends the Library outside the private tree", NO,
+             TRIsolationProblem(real, P(@"probe"), P(@"probe"), P(@"other"), P(@"probe/gs/defaults")));
+      Expect("HOME outside the private tree (real home)", NO,
+             TRIsolationProblem(real, P(@"probe"), real, P(@"probe/gs/lib"), P(@"probe/gs/defaults")));
+      Expect("sibling prefix: priv2 is not inside priv", NO,
+             TRIsolationProblem(real, P(@"priv"), P(@"priv"), P(@"priv2/Library"), P(@"priv/Defaults")));
+      Expect("symlink escape: defaults link into the real ~/GNUstep/Defaults", NO,
+             TRIsolationProblem(real, P(@"esc1"), P(@"esc1"), P(@"esc1/gs/lib"), P(@"esc1/gs/defaults")));
+      Expect("symlink escape: Library links out of the private tree", NO,
+             TRIsolationProblem(real, P(@"esc2"), P(@"esc2"), P(@"esc2/gs/lib"), P(@"esc2/gs/defaults")));
+      Expect("GNUSTEP_HOME is a link to the real ~/GNUstep", NO,
+             TRIsolationProblem(real, P(@"sneaky"), P(@"sneaky"), P(@"sneaky/Library"), P(@"sneaky/Defaults")));
+      Expect("GNUSTEP_HOME is a link to the real home", NO,
+             TRIsolationProblem(real, P(@"homelink"), P(@"homelink"), P(@"homelink/x/Library"), P(@"homelink/x/Defaults")));
       Expect("GNUSTEP_HOME is the real home", NO,
-             TRIsolationProblem(real, real, real, @"/home/user/GNUstep/Library", @"/home/user/GNUstep/Defaults", NO));
+             TRIsolationProblem(real, real, real, P(@"home/GNUstep/Library"), P(@"home/GNUstep/Defaults")));
+      Expect("GNUSTEP_HOME is an ancestor of the real home", NO,
+             TRIsolationProblem(real, T, T, P(@"probe/gs/lib"), P(@"probe/gs/defaults")));
       Expect("GNUSTEP_HOME is /", NO,
-             TRIsolationProblem(real, @"/", @"/tmp/x", @"/tmp/x/GNUstep/Library", @"/tmp/x/GNUstep/Defaults", NO));
-      Expect("config file keeps real defaults", NO,
-             TRIsolationProblem(real, @"", real, @"/tmp/probe/gs/lib", @"/home/user/GNUstep/Defaults", YES));
-      Expect("config file keeps real Library", NO,
-             TRIsolationProblem(real, @"", real, @"/home/user/GNUstep/Library", @"/tmp/probe/gs/defaults", YES));
-      Expect("config file: common directory is the real home", NO,
-             TRIsolationProblem(real, @"", real, @"/home/user/a/lib", @"/home/user/b/defaults", YES));
-      Expect("config file: common directory is /", NO,
-             TRIsolationProblem(real, @"", real, @"/tmp/lib", @"/var/defaults", YES));
-      Expect("private dir inside real ~/GNUstep", NO,
-             TRIsolationProblem(real, @"/home/user/GNUstep/private", @"/home/user/GNUstep/private",
-                                @"/home/user/GNUstep/private/GNUstep/Library",
-                                @"/home/user/GNUstep/private/GNUstep/Defaults", NO));
-      Expect("a sibling with a common prefix isn't inside", NO,
-             TRIsolationProblem(real, @"/tmp/priv", @"/tmp/priv", @"/tmp/priv2/Library", @"/tmp/priv/Defaults", NO));
-      Expect("missing Library", NO, TRIsolationProblem(real, priv, priv, nil, @"/x", NO));
+             TRIsolationProblem(real, @"/", P(@"probe"), P(@"probe/gs/lib"), P(@"probe/gs/defaults")));
+      Expect("'..' through a missing directory can't be resolved safely", NO,
+             TRIsolationProblem(real, P(@"probe"), P(@"probe"), P(@"probe/gs/lib"),
+                                P(@"probe/missing/../../home/GNUstep/Defaults")));
+      Expect("a relative path can't be resolved safely", NO,
+             TRIsolationProblem(real, P(@"probe"), P(@"probe"), @"gs/lib", P(@"probe/gs/defaults")));
+      Expect("missing Library", NO, TRIsolationProblem(real, P(@"probe"), P(@"probe"), nil, P(@"probe/gs/defaults")));
+
+      [fm removeItemAtPath: T error: NULL];
       printf("%s\n", gFail ? "ISOLATION FAIL" : "ISOLATION OK");
     }
   return gFail ? 1 : 0;

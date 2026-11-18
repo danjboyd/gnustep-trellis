@@ -418,7 +418,75 @@ static void TRApplyTextStyle(NSView *view, NSDictionary *decls)
 
 @interface TRBoxView ()
 - (void)animationTick;
+- (void)snapScrollViewsToDevicePixels;
 @end
+
+/* ---- Scroll views on device pixels (prototype) ----
+   A scroll view whose origin falls between device pixels in window
+   space draws its content resampled: 1px lines blur and pinstripes
+   shift. That happens when the host places the root box at a fraction
+   of a pixel. Each scroll view is nudged by less than one device pixel
+   so its origin lands on the grid. Only scroll views move; the layout
+   (node frames, exported JSON) and every other view keep their place. */
+
+/* GNUstep's window base space is already in device pixels; AppKit's is
+   in points. */
+static NSPoint TRWindowToDevice(NSWindow *w, NSPoint p)
+{
+#ifdef GNUSTEP
+  (void)w;
+  return p;
+#else
+  return [w convertRectToBacking: NSMakeRect(p.x, p.y, 0, 0)].origin;
+#endif
+}
+
+static NSPoint TRDeviceToWindow(NSWindow *w, NSPoint p)
+{
+#ifdef GNUSTEP
+  (void)w;
+  return p;
+#else
+  return [w convertRectFromBacking: NSMakeRect(p.x, p.y, 0, 0)].origin;
+#endif
+}
+
+/* Places scroll view v at its layout origin o (superview coordinates),
+   moved to the nearest device pixel in window space. */
+static void TRSnapScrollView(NSView *v, NSPoint o)
+{
+  NSView *sup = [v superview];
+  NSWindow *w = [v window];
+  NSPoint target = o;
+  if (sup != nil && w != nil)
+    {
+      NSPoint dev = TRWindowToDevice(w, [sup convertPoint: o toView: nil]);
+      NSPoint snapped = NSMakePoint(floor(dev.x + 0.5), floor(dev.y + 0.5));
+      if (fabs(snapped.x - dev.x) > 1e-6 || fabs(snapped.y - dev.y) > 1e-6)
+        target = [sup convertPoint: TRDeviceToWindow(w, snapped) fromView: nil];
+    }
+  if (!NSEqualPoints([v frame].origin, target)) [v setFrameOrigin: target];
+  /* GNUstep's clip view rounds a scroll point to device pixels relative
+     to its current bounds, so a fractional bounds origin, once set while
+     the scroll view sat off the grid, keeps itself fractional. Put it
+     back on the device grid. */
+  NSClipView *clip = [(NSScrollView *)v contentView];
+  if (w != nil && clip != nil)
+    {
+      CGFloat s = fabs([clip convertSize: NSMakeSize(1, 1) toView: nil].width);
+#ifndef GNUSTEP
+      s = [w backingScaleFactor];
+#endif
+      if (s <= 0) s = 1;
+      NSPoint b = [clip bounds].origin;
+      NSPoint bb = NSMakePoint(floor(b.x * s + 0.5) / s, floor(b.y * s + 0.5) / s);
+      if (!NSEqualPoints(b, bb))
+        {
+          [clip setBoundsOrigin: bb];
+          [(NSScrollView *)v reflectScrolledClipView: clip];
+        }
+    }
+}
 
 @implementation TRAnimationTicker
 - (void)tick:(NSTimer *)timer
@@ -562,6 +630,7 @@ static double TREase(double t, int easing)
       if (v) [v setFrame: a->to];
     }
   _animations = nil;
+  [self snapScrollViewsToDevicePixels];
 }
 
 - (void)animationTick
@@ -903,6 +972,20 @@ static NSView *TRFocusedViewIn(NSView *box)
   return h;
 }
 
+- (void)snapScrollViewsToDevicePixels
+{
+  if (_animationTimer != nil) return;   /* the animation's last frame snaps */
+  for (TRNode *c in _node.children)
+    {
+      NSView *v = c.context;
+      if (v == nil || [v isHidden]) continue;
+      if ([v isKindOfClass: [NSScrollView class]])
+        TRSnapScrollView(v, NSMakePoint(c.layoutFrame.x, c.layoutFrame.y));
+      else if ([v isKindOfClass: [TRBoxView class]] && [(TRBoxView *)v isNestedBox])
+        [(TRBoxView *)v snapScrollViewsToDevicePixels];
+    }
+}
+
 - (void)layoutTrellis
 {
   TRBoxView *root = [self rootBox];
@@ -979,6 +1062,7 @@ static NSView *TRFocusedViewIn(NSView *box)
       [[NSRunLoop currentRunLoop] addTimer: _animationTimer forMode: NSDefaultRunLoopMode];
       [[NSRunLoop currentRunLoop] addTimer: _animationTimer forMode: NSModalPanelRunLoopMode];
     }
+  [self snapScrollViewsToDevicePixels];
   [self recalculateTrellisKeyViewLoop];
   /* GNUstep moves focus itself when a view holding it is hidden (to the
      next valid key view); AppKit leaves it on the hidden view. */
@@ -1245,6 +1329,22 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
   [super setFrame: frame];
   if (![self isNestedBox] && !NSEqualSizes(old, frame.size))
     [self layoutTrellis];
+  else if (![self isNestedBox])
+    [self snapScrollViewsToDevicePixels];
+}
+
+/* A host that moves the root (without resizing it) moves its scroll
+   views off the grid too. */
+- (void)setFrameOrigin:(NSPoint)origin
+{
+  [super setFrameOrigin: origin];
+  if (![self isNestedBox]) [self snapScrollViewsToDevicePixels];
+}
+
+- (void)viewDidMoveToWindow
+{
+  [super viewDidMoveToWindow];
+  if ([self window] != nil && ![self isNestedBox]) [self snapScrollViewsToDevicePixels];
 }
 
 - (void)resizeSubviewsWithOldSize:(NSSize)oldSize

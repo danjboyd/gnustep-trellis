@@ -25,6 +25,15 @@ layout frame by up to half a device pixel (0.5pt at 1x, 0.25pt at 2x).
 Code that compares a scroll view's frame with its node's `layoutFrame`
 should allow for that.
 
+**Platforms.** GNUstep's clip view rounds every scroll offset to device
+pixels. AppKit keeps the offset you set (3.5, say) and aligns to the
+backing store when it draws. So on macOS a document's window position can
+stay fractional after scrolling while its pixels are still sharp. The
+snap doesn't round scroll offsets your app sets later.
+
+Tested: Linux/GNUstep at 1x and 2x (`-GSScaleFactor 2`); macOS at 1x. The
+2x (Retina) path on macOS hasn't run yet.
+
 **Not covered yet.**
 
 - Scroll views inside a split view pane or a virtual box (`TRSplitView`,

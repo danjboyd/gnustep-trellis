@@ -1284,8 +1284,15 @@ void TRUpdateThemeTokens(void)
 static NSView *TRFindView(NSString *identifier, NSView *root)
 {
   if ([[root identifier] isEqualToString: identifier]) return root;
-  NSArray *subs = [root isKindOfClass: [TRVirtualBox class]] ? @[]
-    : ([root isKindOfClass: [NSScrollView class]] ? @[[(NSScrollView *)root documentView]] : [root subviews]);
+  NSArray *subs;
+  if ([root isKindOfClass: [TRVirtualBox class]]) subs = @[];
+  else if ([root isKindOfClass: [NSScrollView class]])
+    {
+      /* A scroll view may have no document view (a custom NSScrollView). */
+      NSView *doc = [(NSScrollView *)root documentView];
+      subs = doc ? @[doc] : @[];
+    }
+  else subs = [root subviews];
   for (NSView *s in subs)
     {
       NSView *f = TRFindView(identifier, s);

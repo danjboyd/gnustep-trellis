@@ -20,19 +20,27 @@
 #import <Foundation/Foundation.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <errno.h>
+#include <sys/stat.h>
 
 /* path with symlinks resolved: the deepest existing ancestor through
    realpath(3), then the components that don't exist yet (which can hold
    no links). nil if path is empty or relative, if a missing component is
-   "." or "..", or if realpath fails. */
+   "." or "..", if any component is a dangling symlink or can't be
+   examined (anything but ENOENT), or if realpath fails. */
 static inline NSString *TRResolvedPath(NSString *path)
 {
   if ([path length] == 0 || ![path isAbsolutePath]) return nil;
   NSMutableArray *rest = [NSMutableArray array];
   NSString *cur = path;
   NSFileManager *fm = [NSFileManager defaultManager];
-  while (![fm fileExistsAtPath: cur])
+  struct stat st;
+  while (stat([cur fileSystemRepresentation], &st) != 0)
     {
+      /* Only a component that doesn't exist at all counts as missing. A
+         dangling symlink (lstat succeeds) could be created through later,
+         and an inaccessible path can't be checked: both fail. */
+      if (errno != ENOENT || lstat([cur fileSystemRepresentation], &st) == 0) return nil;
       NSString *last = [cur lastPathComponent];
       if ([last isEqualToString: @".."] || [last isEqualToString: @"."]) return nil;
       [rest insertObject: last atIndex: 0];

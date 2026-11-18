@@ -5,6 +5,8 @@
    written. Prints ISOLATION OK. */
 #import <Foundation/Foundation.h>
 #import "TRIsolation.h"
+#include <unistd.h>
+#include <sys/stat.h>
 
 static int gFail = 0;
 static void Expect(const char *what, BOOL isolated, NSString *why)
@@ -48,6 +50,11 @@ int main(void)
       mk(@"esc2/gs/defaults");
       ln(@"sneaky", @"home/GNUstep");                        /* GNUSTEP_HOME that is really ~/GNUstep */
       ln(@"homelink", @"home");                              /* GNUSTEP_HOME that is really the home */
+      mk(@"dang/gs/lib");
+      ln(@"dang/gs/defaults", @"home/GNUstep/NotYetDefaults"); /* dangling: created through later */
+      ln(@"dang2/gs", @"nowhere/gs");                        /* dangling link above a missing leaf */
+      mk(@"locked/inner");
+      chmod([P(@"locked") fileSystemRepresentation], 0);     /* can't be examined */
 
       NSString *real = P(@"home");
       NSString *priv = P(@"home/.cache/priv");
@@ -88,8 +95,18 @@ int main(void)
                                 P(@"probe/missing/../../home/GNUstep/Defaults")));
       Expect("a relative path can't be resolved safely", NO,
              TRIsolationProblem(real, P(@"probe"), P(@"probe"), @"gs/lib", P(@"probe/gs/defaults")));
+      Expect("dangling symlink into the real ~/GNUstep (missing target)", NO,
+             TRIsolationProblem(real, P(@"dang"), P(@"dang"), P(@"dang/gs/lib"), P(@"dang/gs/defaults")));
+      Expect("dangling symlink above a missing component", NO,
+             TRIsolationProblem(real, P(@"dang2"), P(@"dang2"), P(@"dang2/gs/lib"), P(@"dang2/gs/defaults")));
+      Expect("a missing component that isn't a link is fine", YES,
+             TRIsolationProblem(real, P(@"probe"), P(@"probe"), P(@"probe/gs/lib/new/deeper"), P(@"probe/gs/not-yet")));
+      if (getuid() != 0)
+        Expect("an inaccessible directory can't be examined", NO,
+               TRIsolationProblem(real, P(@"locked"), P(@"locked"), P(@"locked/inner/lib"), P(@"locked/inner/defaults")));
       Expect("missing Library", NO, TRIsolationProblem(real, P(@"probe"), P(@"probe"), nil, P(@"probe/gs/defaults")));
 
+      chmod([P(@"locked") fileSystemRepresentation], 0755);
       [fm removeItemAtPath: T error: NULL];
       printf("%s\n", gFail ? "ISOLATION FAIL" : "ISOLATION OK");
     }

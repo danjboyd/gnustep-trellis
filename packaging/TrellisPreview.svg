@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- TrellisPreview icon: original artwork (Copyright (C) 2026 Dan Boyd, LGPL-2.1-or-later). -->
+  <rect x="64" y="64" width="896" height="896" rx="180" fill="#2b6fc2"/>
+  <!-- a window-like layout: a header bar, three cards, a list, a button -->
+  <rect x="192" y="200" width="640" height="88" rx="28" fill="#ffffff"/>
+  <rect x="192" y="328" width="192" height="176" rx="28" fill="#ffffff" fill-opacity="0.92"/>
+  <rect x="416" y="328" width="192" height="176" rx="28" fill="#ffffff" fill-opacity="0.92"/>
+  <rect x="640" y="328" width="192" height="176" rx="28" fill="#ffffff" fill-opacity="0.92"/>
+  <rect x="192" y="544" width="640" height="56" rx="20" fill="#ffffff" fill-opacity="0.75"/>
+  <rect x="192" y="624" width="640" height="56" rx="20" fill="#ffffff" fill-opacity="0.75"/>
+  <rect x="192" y="704" width="420" height="56" rx="20" fill="#ffffff" fill-opacity="0.75"/>
+  <rect x="656" y="704" width="176" height="96" rx="30" fill="#ffb648"/>
+  <!-- layout guides: the dashed outline Preview's inspector draws -->
+  <rect x="160" y="168" width="704" height="664" rx="40" fill="none" stroke="#ffffff" stroke-opacity="0.55"
+        stroke-width="10" stroke-dasharray="28 22"/>
+</svg>

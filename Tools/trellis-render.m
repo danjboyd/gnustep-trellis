@@ -20,7 +20,11 @@
 #import "TRAppKitCompat.h"
 #import "TRIsolation.h"
 #ifdef GNUSTEP
+#ifdef _WIN32
+#include <shlobj.h>
+#else
 #import <pwd.h>
+#endif
 #import <unistd.h>
 #endif
 
@@ -45,9 +49,17 @@ static void TRCheckIsolation(void)
   NSDictionary *env = [[NSProcessInfo processInfo] environment];
   /* The real home from the password database: HOME and GNUSTEP_HOME can
      both be changed, and gnustep-base itself may use this one. */
+#ifdef _WIN32
+  /* Windows: the profile folder the shell reports, not USERPROFILE. */
+  WCHAR prof[MAX_PATH];
+  if (SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, SHGFP_TYPE_CURRENT, prof) != S_OK)
+    TRDie(3, @"can't find the real profile folder; refusing to run");
+  NSString *realHome = [NSString stringWithCharacters: (const unichar *)prof length: wcslen(prof)];
+#else
   struct passwd *pw = getpwuid(getuid());
   if (pw == NULL || pw->pw_dir == NULL) TRDie(3, @"can't find the real home directory; refusing to run");
   NSString *realHome = [NSString stringWithUTF8String: pw->pw_dir];
+#endif
   NSString *gh = env[@"GNUSTEP_HOME"] ?: @"";
   NSString *home = NSHomeDirectory();
   NSArray *lib = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
@@ -57,10 +69,15 @@ static void TRCheckIsolation(void)
   NSString *defaults = GSDefaultsRootForUser(NSUserName());
   NSString *why = TRIsolationProblem(realHome, gh, home, userLib, defaults);
   if (why) TRDie(3, @"%@; refusing to run (use scripts/run-headless.sh)", why);
+#ifndef _WIN32
   NSString *display = env[@"DISPLAY"];
   if ([display length] == 0 || [display isEqualToString: @":0"] || [display isEqualToString: @":0.0"])
     TRDie(3, @"DISPLAY is %@; trellis-render only runs on a private Xvfb display",
           display ?: @"unset");
+#endif
+  /* Windows has no X display to keep private: trellis-render never orders
+     its window on screen (it draws the view tree into a bitmap), so the
+     settings checks above are the isolation there. */
 #endif
 }
 

@@ -10,7 +10,8 @@
    containment is checked component by component, so /tmp/priv2 is not
    inside /tmp/priv. A private directory is not /, not the real home or
    an ancestor of it, and not inside the real ~/GNUstep, the real home
-   coming from the password database. A path that can't be resolved
+   coming from the password database (on Windows, the user's profile
+   folder from the shell; paths compare without case there). A path that can't be resolved
    safely fails the check.
 
    Copyright (C) 2026 Dan Boyd
@@ -22,12 +23,56 @@
 #include <limits.h>
 #include <errno.h>
 #include <sys/stat.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 /* path with symlinks resolved: the deepest existing ancestor through
    realpath(3), then the components that don't exist yet (which can hold
    no links). nil if path is empty or relative, if a missing component is
    "." or "..", if any component is a dangling symlink or can't be
    examined (anything but ENOENT), or if realpath fails. */
+#ifdef _WIN32
+/* Windows: the same contract. A component that GetFileAttributesW can't
+   find (file or path not found) counts as missing; anything else that
+   fails, and an existing component that can't be opened while following
+   links (a dangling symlink or junction, or no access), fails. The
+   deepest existing ancestor is resolved with GetFinalPathNameByHandleW,
+   which follows symlinks and junctions. */
+static inline NSString *TRResolvedPath(NSString *path)
+{
+  if ([path length] == 0 || ![path isAbsolutePath]) return nil;
+  NSMutableArray *rest = [NSMutableArray array];
+  NSString *cur = path;
+  for (;;)
+    {
+      const unichar *w = (const unichar *)[cur fileSystemRepresentation];
+      DWORD a = GetFileAttributesW((LPCWSTR)w);
+      if (a != INVALID_FILE_ATTRIBUTES) break;
+      DWORD e = GetLastError();
+      if (e != ERROR_FILE_NOT_FOUND && e != ERROR_PATH_NOT_FOUND) return nil;
+      NSString *last = [cur lastPathComponent];
+      if ([last isEqualToString: @".."] || [last isEqualToString: @"."]) return nil;
+      [rest insertObject: last atIndex: 0];
+      NSString *up = [cur stringByDeletingLastPathComponent];
+      if ([up isEqualToString: cur] || [up length] == 0) return nil;
+      cur = up;
+    }
+  HANDLE h = CreateFileW((LPCWSTR)[cur fileSystemRepresentation], 0,
+                         FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
+                         OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+  if (h == INVALID_HANDLE_VALUE) return nil;
+  WCHAR buf[32768];
+  DWORD n = GetFinalPathNameByHandleW(h, buf, (DWORD)(sizeof buf / sizeof buf[0]), FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
+  CloseHandle(h);
+  if (n == 0 || n >= sizeof buf / sizeof buf[0]) return nil;
+  NSString *r = [NSString stringWithCharacters: (const unichar *)buf length: n];
+  if ([r hasPrefix: @"\\\\?\\UNC\\"]) r = [@"\\\\" stringByAppendingString: [r substringFromIndex: 8]];
+  else if ([r hasPrefix: @"\\\\?\\"]) r = [r substringFromIndex: 4];
+  for (NSString *c in rest) r = [r stringByAppendingPathComponent: c];
+  return r;
+}
+#else
 static inline NSString *TRResolvedPath(NSString *path)
 {
   if ([path length] == 0 || ![path isAbsolutePath]) return nil;
@@ -54,6 +99,7 @@ static inline NSString *TRResolvedPath(NSString *path)
   for (NSString *c in rest) r = [r stringByAppendingPathComponent: c];
   return r;
 }
+#endif
 
 /* YES if path is root or inside it, comparing whole components. */
 static inline BOOL TRPathInside(NSString *path, NSString *root)
@@ -62,7 +108,11 @@ static inline BOOL TRPathInside(NSString *path, NSString *root)
   NSArray *p = [path pathComponents], *r = [root pathComponents];
   if ([r count] > [p count]) return NO;
   for (NSUInteger i = 0; i < [r count]; i++)
+#ifdef _WIN32
+    if ([p[i] caseInsensitiveCompare: r[i]] != NSOrderedSame) return NO;   /* NTFS names */
+#else
     if (![p[i] isEqualToString: r[i]]) return NO;
+#endif
   return YES;
 }
 
@@ -81,7 +131,8 @@ static inline NSString *TRIsolationProblem(NSString *realHomeIn, NSString *gnust
                      userLibraryIn, defaultsDirIn];
   NSString *realGS = TRResolvedPath([realHome stringByAppendingPathComponent: @"GNUstep"]);
   if (!realGS) return @"can't resolve the real ~/GNUstep safely";
-  if ([gh isEqualToString: @"/"] || TRPathInside(realHome, gh) || TRPathInside(gh, realGS))
+  if ([[gh pathComponents] count] <= 1 || [[gh stringByDeletingLastPathComponent] isEqualToString: gh]
+      || TRPathInside(realHome, gh) || TRPathInside(gh, realGS))
     return [NSString stringWithFormat: @"GNUSTEP_HOME (%@) is not a private directory: it is /, the real "
                      @"home or above it, or inside the real %@", gh, realGS];
   if (TRPathInside(defaults, realGS) || TRPathInside(lib, realGS))

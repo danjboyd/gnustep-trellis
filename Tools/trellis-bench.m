@@ -19,7 +19,12 @@
 #import "TRNode.h"
 #import "TRVirtualLayout.h"
 #include <time.h>
+#ifdef _WIN32
+#include <windows.h>
+#include <psapi.h>
+#else
 #include <sys/resource.h>
+#endif
 
 static long gMeasures = 0;
 
@@ -46,12 +51,18 @@ static TRNode *TextLeaf(NSString *text)
 
 static long PeakRSSKiB(void)
 {
+#if defined(_WIN32)
+  PROCESS_MEMORY_COUNTERS pmc;   /* peak working set, the nearest to max RSS */
+  if (!GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof pmc)) return 0;
+  return (long)(pmc.PeakWorkingSetSize / 1024);
+#else
   struct rusage ru;
   getrusage(RUSAGE_SELF, &ru);
 #ifdef __APPLE__
   return ru.ru_maxrss / 1024;   /* bytes there */
 #else
   return ru.ru_maxrss;
+#endif
 #endif
 }
 

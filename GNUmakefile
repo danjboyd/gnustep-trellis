@@ -65,6 +65,12 @@ trellis-lint_TOOL_LIBS = -lTrellisEngine
 trellis-render_OBJC_FILES = Tools/trellis-render.m Tools/TRSamples.m
 trellis-render_TOOL_LIBS = -lTrellis -lTrellisEngine
 trellis-render_NEEDS_GUI = yes
+# Windows (MSYS2 CLANG64): trellis-render reads the profile folder through
+# shell32 (its isolation check); trellis-bench reads peak memory through psapi.
+ifneq ($(findstring mingw,$(GNUSTEP_TARGET_OS))$(findstring windows,$(GNUSTEP_TARGET_OS)),)
+  trellis-render_TOOL_LIBS += -lshell32
+  trellis-bench_TOOL_LIBS += -lpsapi
+endif
 
 # --- Trellis Preview app -----------------------------------------------------
 APP_NAME = TrellisPreview

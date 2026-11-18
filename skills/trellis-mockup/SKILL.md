@@ -66,15 +66,23 @@ version, plus the rules for showing a mockup to people.
 
    ```sh
    . scripts/env.sh                      # in the Trellis checkout
-   skills/trellis-mockup/render.sh path/to/Screen.trellis /tmp/mockup
+   skills/trellis-mockup/render.sh path/to/Screen.trellis "$(mktemp -d)"
    ```
 
    This runs trellis-lint, then trellis-render at 340, 520 and 900 wide,
    in light and dark. It takes a TrellisPreview snapshot at the widest
    size in both appearances, checks every PNG, and lists what it wrote.
-   It exits 0 only when lint and every render are clean.
+   It exits 0 only when lint, every render and the TrellisPreview check
+   are clean, and every expected file was written.
+   - The output directory must be new or empty, so nothing from an
+     earlier run can pass the checks. Use a fresh one for each run.
+   - TrellisPreview is required. If it isn't built, render.sh fails;
+     `--no-preview` skips the app check, and then you must say the
+     mockup wasn't checked in the app.
+   - Linux/GNUstep only for now. On macOS, run `build/trellis-render`
+     directly.
    - Flags: `--widths 340,520,900`, `--height 640`,
-     `--theme Adwaita|Gumdrop`.
+     `--theme Adwaita|Gumdrop`, `--no-preview`.
    - To use an installed stable Trellis instead of a checkout, set
      `TRELLIS_PREFIX` to a prefix made by `scripts/trellis-update.sh`.
 4. **Fix and repeat.** Read lint's findings: `clipped-text` means give

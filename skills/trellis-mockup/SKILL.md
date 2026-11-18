@@ -49,6 +49,17 @@ version, plus the rules for showing a mockup to people.
      `@container (max-width: 520px) { ... }` for narrow layouts.
    - Colours: use system colours (`GrayText`, `CanvasText`) or set a
      background too, so dark mode stays readable. Lint warns otherwise.
+   - The table below covers the things that most often go wrong.
+
+   | You want | Write | Not |
+   |---|---|---|
+   | A segmented control or popup | `items="Now, Today, All"` (commas) | `items="Now\|Today\|All"`, which is one item |
+   | A radio, checkbox or button title | `<radio>Daily</radio>` (or `title="Daily"`) | an empty element |
+   | A badge or pill (background, border, radius) | `<row class="badge"><label>Urgent</label></row>`, styled on the row | styles on the `<label>`: only boxes draw backgrounds and borders |
+   | A search field in a row | `flex: 1` or a `width`/`min-width` on the field | nothing: a field has no useful natural width and shrinks to a sliver |
+   | Text that wraps | `<text>` or `<label wraps="yes">` | a plain `<label>`, which clips |
+   | Cards that fill the width when stacked | `align-items: stretch` on the stacking row | the row default, which centres |
+
 2. **Write `Screen.sample.json`** next to it: `{"id": "text"}` for each id
    whose text you want to show. Make one string long, to show wrapping.
 3. **Render and lint:**
@@ -72,6 +83,13 @@ version, plus the rules for showing a mockup to people.
    need numbers. Then look at the PNGs again.
 5. **Show it.** Use the light and dark PNGs at the widths that matter,
    plus the TrellisPreview snapshot. Say what is fake.
+
+The TrellisPreview snapshot is the "what the app shows" check: it loads
+the screen the way an app does (the same loader and views). It should
+match the trellis-render PNG at the same width and appearance pixel for
+pixel. If they differ, report it to the Trellis maintainers, because
+that's a bug. If TrellisPreview can't load the file, render.sh fails and
+keeps its error snapshot aside as `*.load-error.png`.
 
 ## What a mockup can't show
 

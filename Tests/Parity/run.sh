@@ -35,6 +35,8 @@ mkdir -p "$OUT/work" && OUT=$(cd "$OUT" && pwd)
 . scripts/env.sh >/dev/null 2>&1
 case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) PLATFORM=windows; EXE=.exe ;; *) PLATFORM=linux; EXE= ;; esac
 export LD_LIBRARY_PATH="$PWD/obj${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" PATH="$PWD/obj:$PATH"
+PY=$(command -v python3 || command -v python || true)   # Windows: the runner's python is fine
+[ -n "$PY" ] || { echo "run.sh: needs python3 (or python) for the pixel check and the manifest" >&2; exit 2; }
 RUN=scripts/run-headless.sh
 PREVIEW=./TrellisPreview.app/TrellisPreview$EXE
 RENDER=./obj/trellis-render$EXE
@@ -73,7 +75,7 @@ for theme in $THEMES; do
     if timeout 120 $RUN "$RENDER" "$FIX" --sample Tests/Parity/Parity.sample.json --widths 900 --height 640 \
          --theme "$theme" --appearance "$ap" --png "$OUT/render-$tag.png" --json "$OUT/render-$tag.json" \
          > "$OUT/render-$tag.log" 2>&1; then
-      if python3 -I Tests/Parity/compare.py --pixels "$OUT/render-$tag.png" "$OUT/open-$tag.png" > "$OUT/pixels-$tag.txt" 2>&1; then
+      if "$PY" -I Tests/Parity/compare.py --pixels "$OUT/render-$tag.png" "$OUT/open-$tag.png" > "$OUT/pixels-$tag.txt" 2>&1; then
         add "render $tag" PASS "$(cat "$OUT/pixels-$tag.txt")"
       else add "render $tag" FAIL "$(tail -1 "$OUT/pixels-$tag.txt")"; fi
     else add "render $tag" FAIL "see render-$tag.log"; fi
@@ -109,7 +111,7 @@ if [ "$reg_before" = n/a ]; then add "registry" INFO "not Windows"
 elif [ "$reg_before" = "$reg_after" ]; then add "registry" INFO "HKCU GNUstep keys unchanged"
 else add "registry" INFO "HKCU GNUstep keys changed (registry.txt has before and after; ask #8624)"; fi
 
-python3 -I - "$OUT/manifest.json" "$PLATFORM" "$(git rev-parse HEAD 2>/dev/null)" "$THEMES" "${cases[@]}" <<'PY'
+"$PY" -I - "$OUT/manifest.json" "$PLATFORM" "$(git rev-parse HEAD 2>/dev/null)" "$THEMES" "${cases[@]}" <<'PY'
 import json, sys
 out, platform, commit, themes, *cases = sys.argv[1:]
 rows = [dict(zip(("case", "status", "detail"), c.split("|", 2))) for c in cases]

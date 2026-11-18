@@ -70,7 +70,7 @@ trellis-render_NEEDS_GUI = yes
 # Both libraries use dispatch_once, and a DLL has to name libdispatch.
 ifneq ($(findstring mingw,$(GNUSTEP_TARGET_OS))$(findstring windows,$(GNUSTEP_TARGET_OS)),)
   trellis-render_TOOL_LIBS += -lshell32
-  trellis-bench_TOOL_LIBS += -lpsapi
+  trellis-bench_TOOL_LIBS += -lpsapi -lpthread   # clock_gettime64 is in winpthreads
   libTrellisEngine_LIBRARIES_DEPEND_UPON += -ldispatch
   libTrellis_LIBRARIES_DEPEND_UPON += -ldispatch
 endif

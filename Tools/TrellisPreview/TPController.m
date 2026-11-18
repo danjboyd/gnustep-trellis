@@ -73,7 +73,8 @@ static void TPOutline(NSView *v, NSView *overlay)
   [(box ? [NSColor colorWithCalibratedRed: 0.1 green: 0.45 blue: 0.85 alpha: 0.7]
         : [NSColor colorWithCalibratedRed: 0.9 green: 0.35 blue: 0.1 alpha: 0.6]) set];
   NSFrameRectWithWidth(r, 1);
-  NSArray *subs = [v isKindOfClass: [NSScrollView class]] ? @[[(NSScrollView *)v documentView]] : [v subviews];
+  NSView *doc = [v isKindOfClass: [NSScrollView class]] ? [(NSScrollView *)v documentView] : nil;
+  NSArray *subs = [v isKindOfClass: [NSScrollView class]] ? (doc ? @[doc] : @[]) : [v subviews];
   if (box || [v isKindOfClass: [NSScrollView class]])
     for (NSView *c in subs) TPOutline(c, overlay);
 }

@@ -31,6 +31,25 @@ version, plus the rules for showing a mockup to people.
   description. Through AIManager, attach them with `laptop.open` (images
   only) and name the files in your ask.
 
+## Setup (once per checkout)
+
+```sh
+git clone https://github.com/danjboyd/gnustep-trellis.git trellis && cd trellis
+. scripts/env.sh          # first, before you set variables of your own
+make -j4                  # top level: builds the tools and ./TrellisPreview.app
+make check                # engine and conformance suites; should all pass
+```
+
+- `scripts/env.sh` finds the GNUstep toolchain in `TRELLIS_TOOLCHAIN`,
+  by default `~/opt/trellis-toolchain` in your account's real home. If
+  yours is elsewhere, export `TRELLIS_TOOLCHAIN` before sourcing it.
+- There is no separate TrellisPreview build: check that
+  `./TrellisPreview.app/TrellisPreview` exists after `make`.
+- For isolation, run with your own private `HOME` and a short
+  `TRELLIS_GNUSTEP_HOME` (59 bytes or less, e.g. under `/tmp`). Point
+  any GNUstep configuration inside that tree, never at your real
+  `~/GNUstep`. Changing `HOME` doesn't move the toolchain.
+
 ## The loop
 
 1. **Write `Screen.trellis`** (start from

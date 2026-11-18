@@ -35,4 +35,18 @@ for f in Tests/Markup/warn/*.trellis; do
   fi
 done
 echo "markup warning cases: $((w-wfail))/$w"
-[ $fail -eq 0 ] && [ $gfail -eq 0 ] && [ $wfail -eq 0 ]
+# Each frames/*.json (a frames dump) must lint with the finding in its
+# "expect" key, or with no findings when "expect" is empty.
+fr=0; frfail=0
+for f in Tests/Markup/frames/*.json; do
+  fr=$((fr+1))
+  want=$(python3 -I -c 'import json, sys; print(json.load(open(sys.argv[1]))["expect"])' "$f")
+  out=$($LINT "$f" 2>&1)
+  if [ -z "$want" ]; then
+    grep -qE "(error|warning) \[" <<<"$out" && { echo "FAIL $f: wanted no findings, got: $out"; frfail=$((frfail+1)); }
+  elif ! grep -qF -- "$want" <<<"$out"; then
+    echo "FAIL $f: wanted '$want', got: $out"; frfail=$((frfail+1))
+  fi
+done
+echo "frame lint cases: $((fr-frfail))/$fr"
+[ $fail -eq 0 ] && [ $gfail -eq 0 ] && [ $wfail -eq 0 ] && [ $frfail -eq 0 ]

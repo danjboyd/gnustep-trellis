@@ -219,6 +219,12 @@ static void TRLintAccessibility(TRMarkupDocument *doc, NSString *path)
             TRReport(where, @"warning", @"unlabeled", [NSString stringWithFormat:
               @"<segmented> has %lu item(s) with no title: every segment needs text", (unsigned long)blank]);
         }
+      /* items="A, B" is comma-separated; "A|B" or "A; B" makes one item. */
+      if (([e.name isEqualToString: @"segmented"] || [e.name isEqualToString: @"popup"]) && a[@"items"]
+          && [a[@"items"] rangeOfString: @","].location == NSNotFound
+          && ([a[@"items"] rangeOfString: @"|"].location != NSNotFound || [a[@"items"] rangeOfString: @";"].location != NSNotFound))
+        TRReport(where, @"warning", @"items", [NSString stringWithFormat:
+          @"<%@ items=\"%@\"> is one item: separate items with commas, items=\"A, B, C\"", e.name, a[@"items"]]);
       /* tabindex: an integer; a positive one in a template is shared by
          every copy, so all the copies jump ahead of the rest of the
          screen (and of each other's order). */
@@ -267,10 +273,10 @@ static void TRLintAccessibility(TRMarkupDocument *doc, NSString *path)
         }
       else if ([titled containsObject: n])
         {
-          NSString *t = [e.text stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+          NSString *t = [(a[@"title"] ?: e.text ?: @"") stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
           if ([t length] == 0)
             TRReport(where, @"warning", @"unlabeled", [NSString stringWithFormat:
-              @"<%@> has no title: give it text or a11y-label=\"...\"", n]);
+              @"<%@> has no title: put it in the element's text, <%@>Title</%@>, or use a11y-label=\"...\"", n, n, n]);
         }
     }
 }
@@ -311,6 +317,26 @@ static void TRLintBlockChildren(TRMarkupDocument *doc, NSString *path)
               @"<%@> %@ has no effect: its parent is display: block, whose children don't grow or shrink", e.name, k]);
             break;
           }
+    }
+}
+
+/* Only boxes (column, row, box) and scroll views draw a background or a
+   border; on a control or a label those declarations draw nothing. */
+static void TRLintLeafBoxStyles(TRMarkupDocument *doc, NSString *path)
+{
+  NSSet *boxes = [NSSet setWithObjects: @"column", @"row", @"box", @"scroll", @"split", @"virtual", @"template", nil];
+  for (TRMarkupElement *e in [doc allElements])
+    {
+      if ([boxes containsObject: e.name] || [e.name isEqualToString: @"item"]) continue;
+      NSDictionary *d = TRAllDecls(doc, e);
+      NSMutableArray *found = [NSMutableArray array];
+      for (NSString *k in @[@"background", @"background-color", @"border", @"border-color", @"border-style", @"border-radius"])
+        if (d[k] && !([e.name isEqualToString: @"scroll"] && [k hasPrefix: @"background"])) [found addObject: k];
+      if ([found count] == 0) continue;
+      NSString *where = [NSString stringWithFormat: @"%@:%lu:%lu", path, (unsigned long)e.line, (unsigned long)e.column];
+      TRReport(where, @"warning", @"leaf-box-style", [NSString stringWithFormat:
+        @"<%@> doesn't draw %@: only boxes draw backgrounds and borders; wrap it in a <row> and style the row", e.name,
+        [found componentsJoinedByString: @", "]]);
     }
 }
 
@@ -433,6 +459,7 @@ static void TRLintTrellis(NSString *path, NSString *header)
   TRLintColours(doc, path);
   TRLintAccessibility(doc, path);
   TRLintBlockChildren(doc, path);
+  TRLintLeafBoxStyles(doc, path);
   if (header == nil) return;
   NSMutableSet *outlets = [NSMutableSet set], *actions = [NSMutableSet set];
   NSString *cls = nil;

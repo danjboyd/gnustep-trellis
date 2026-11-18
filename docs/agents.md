@@ -31,6 +31,11 @@ obj/trellis-lint Screen.trellis --owner ScreenController.h
    - `offscreen`: a view is outside the viewport.
    - `outlet` / `action`: an id or action= doesn't match the owner class.
    - `unitless`: a length has no `px`.
+   - `narrow-field`: an editable field is under 40px wide. Fields have no
+     useful intrinsic width: give them a `width`, `min-width` or `flex`.
+   - `leaf-box-style`: a background or border on a label or control,
+     which draws nothing. Only boxes draw them: wrap it in a `<row>`.
+   - `items`: `items="A|B"` is one item. Separate items with commas.
 4. **Check at least three widths:** narrow (about 340), medium (about 520)
    and wide (800 or more).
 

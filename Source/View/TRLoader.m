@@ -83,12 +83,14 @@ static BOOL TRFlag(NSString *v, NSString *name, BOOL *on)
 @implementation TRScrollBox
 {
   TRBoxView *_box;
+  int _overlay;            /* -1 not known yet, 0 legacy, 1 overlay scrollers */
 }
 
 - (instancetype)initWithFrame:(NSRect)frame
 {
   if ((self = [super initWithFrame: frame]) != nil)
     {
+      _overlay = -1;
       _box = [TRBoxView boxWithStyle: @"flex-direction: column"];
       [self setHasVerticalScroller: YES];
       [self setHasHorizontalScroller: NO];
@@ -112,7 +114,34 @@ static BOOL TRFlag(NSString *v, NSString *name, BOOL *on)
   if ([sv isKindOfClass: [TRBoxView class]])
     _box.node.containerQueryParent = [(TRBoxView *)sv nodeForSubview: self];
   NSSize cs = [self contentSize];
+#ifdef GNUSTEP
+  /* A theme with overlay scrollers (Adwaita) gives the content the full
+     width and draws the scroller over it. The style is read once, while
+     the scroller is still on: a scroll view without one always has the
+     full width. Legacy scrollers keep their column and stay on (turning
+     them off would change the content width). */
+  if (_overlay < 0 && [self hasVerticalScroller] && [self frame].size.width > 0)
+    _overlay = fabs(cs.width - [self frame].size.width) < 0.5 ? 1 : 0;
+#endif
   [_box.node layoutWithAvailableSize: TRSizeMake(cs.width, NAN) direction: [_box inheritedLayoutDirection]];
+#ifdef GNUSTEP
+  /* Overlay scrollers: like AppKit's overlay style, have one only when
+     there is something to scroll. -autohidesScrollers isn't enough: the
+     theme still draws its inner border beside a hidden scroller, a line
+     over the content's right edge. The content width doesn't change. */
+  if (_overlay == 1)
+    {
+      BOOL needs = ceil(_box.node.layoutFrame.height) > cs.height + 0.5;
+      if (needs != [self hasVerticalScroller])
+        {
+          CGFloat w = cs.width;
+          [self setHasVerticalScroller: needs];
+          cs = [self contentSize];
+          if (fabs(cs.width - w) > 0.5)   /* not overlay after all: lay out again */
+            [_box.node layoutWithAvailableSize: TRSizeMake(cs.width, NAN) direction: [_box inheritedLayoutDirection]];
+        }
+    }
+#endif
   CGFloat h = MAX(ceil(_box.node.layoutFrame.height), cs.height);
   [_box setFrame: NSMakeRect(0, 0, cs.width, h)];
   [_box layoutTrellis];

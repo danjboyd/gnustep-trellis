@@ -23,6 +23,15 @@ version may change the API listed in docs/api.md, and says so here.
   paths went past the 108-byte limit and the app waited forever. It now
   sets `TMPDIR` to a short `tmp` folder inside the private GNUstep home,
   and fails at once if that path would be too long.
+- **Fixed (GNUstep):** with a theme whose scrollers overlay the content
+  (Adwaita), a `<scroll>` drew a thin vertical line over its content's
+  right edge even when there was nothing to scroll: GNUstep's theme
+  draws an inner border beside the vertical scroller. Trellis now gives
+  such a scroll view a vertical scroller only while its content
+  overflows, as AppKit does with overlay scrollers. The content width is
+  unchanged. `-hasVerticalScroller` on that scroll view now reports
+  whether the content overflows. Themes with legacy scrollers (the
+  default, Gumdrop) are unchanged.
 
 ## 0.10.1 (2026-11-18)
 

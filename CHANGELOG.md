@@ -143,27 +143,52 @@ version may change the API listed in docs/api.md, and says so here.
   mode. Put the flag before the file: `TrellisPreview --untrusted
   Screen.trellis`. In this mode:
   - `<image src>` must name a regular file inside the document's own
-    folder. Absolute, `..`, `~`, UNC or backslash, drive or colon, device
-    name (`NUL`, `COM1`, ...) and empty-component paths, symlinks that
-    lead out, components ending in a dot or space, FIFOs and devices, and
-    files over 32 MB fail the load with
-    a message. A missing file still just shows no image.
-  - `<image name>` takes a plain name only.
+    folder, reached without any symbolic link (or, on Windows, junction or
+    other reparse point). The file is opened component by component with
+    no link-following, then checked and read through that same
+    descriptor, so it can't be swapped in between.
+  - Path rules: absolute, `..`, `~`, UNC or backslash, drive or colon,
+    device name (`NUL`, `COM1`, `COM¹`, ...), empty, `.` and
+    trailing-dot-or-space components are refused.
+  - The image must be a PNG, JPEG or GIF of at most 16384 px a side and
+    40 megapixels (read from its header before decoding), and the file at
+    most 32 MB.
+  - A broken rule fails the load with a message. A missing file still
+    just shows no image. `<image name>` takes a plain name only.
   - `<view type>` builds only standard AppKit and Trellis view classes
     from a fixed list. Any other name, including the app's own classes,
     becomes a placeholder and is never instantiated.
   - Controls get no target or action, `<a action>` links send nothing,
-    links open no URL, and no outlets are set. Before, Preview wired
+    links open no URL and carry no link attribute, no outlets are set,
+    and `<split autosave>` writes no user defaults. Before, Preview wired
     `action=` to the responder chain, so a click on a crafted button
     could send `terminate:` or Preview's own menu actions.
-  The mode stays on for files opened from File > Open and across the
-  appearance relaunch, and the window title says "untrusted". The same
-  mode is available to apps as `TRMarkupDocument.untrusted` (set it before
-  `+[TRLoader loadDocument:owner:error:]`; templates built later from
-  that document are hardened too), with `TRRichLabel.untrusted` for
-  links. Trusted loading is unchanged. A Preview older than this one
-  reads `--untrusted <file>` as an unknown option with a value and opens
-  no file, so the flag before the path fails safe.
+  - `Name.sample.json` is read under the same file rules (at most 4 MB,
+    nesting at most 64 levels).
+
+  The mode stays on for files opened from File > Open, on reload, and
+  across the appearance relaunch, and the window title starts with
+  "[untrusted]". Apps get the same mode by setting
+  `TRMarkupDocument.untrusted` before `+[TRLoader loadDocument:owner:error:]`.
+  Templates built later from that document are hardened too.
+  `TRRichLabel.untrusted` covers links, and
+  `+[TRLoader untrustedContentsOfFile:inFolder:maxLength:error:]` reads
+  side files under the same rules. Trusted loading is unchanged.
+
+  A Preview older than this one reads `--untrusted <file>` as an unknown
+  option with a value and opens no file, so the flag before the path
+  fails safe. A document's folder is its trust boundary: open each sent
+  file in a folder of its own, not in Downloads or the home folder.
+- **Fixed:** a sample JSON value of the wrong type (a number for a
+  `title`, a number in popup `items`, an array for `repeat`) was stored,
+  then raised during layout. In TrellisPreview that left a modal error
+  panel up, which hangs a `--snapshot`. Sample values are now
+  type-checked: a wrong type is a load error naming the key, and a
+  `<virtual>` entry that isn't an object counts as `{}`.
+- **Fixed:** `var()` substitution stops at 64 KB per value. Before,
+  custom properties built from ten uses of the one before, sixteen
+  levels deep, could grow without bound. Sample data for a `<virtual>`
+  is capped at a million rows.
 
 ## 0.10.1 (2026-11-18)
 

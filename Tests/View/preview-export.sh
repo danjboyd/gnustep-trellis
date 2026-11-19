@@ -61,5 +61,24 @@ if [ $rc_out -eq 1 ] && [ $rc_in -eq 0 ] && [ -s "$out/u/in.png" ] && [ $rc_t -e
 else
   echo "FAIL --untrusted: exits out=$rc_out in=$rc_in trusted=$rc_t ($(grep -v _NET_WORKAREA "$out/u/out.log" | tail -1))"; fail=1
 fi
+# The sample JSON: untrusted, a symlinked or over-deep sample fails the
+# load; in either mode a wrong-typed value is a load error, not a crash.
+mkdir -p "$out/s"
+printf '<column><button id="b">Go</button></column>\n' > "$out/s/a.trellis"
+cp "$out/s/a.trellis" "$out/s/b.trellis"; cp "$out/s/a.trellis" "$out/s/c.trellis"
+printf '{"b": "Outside"}' > "$out/outside.json"
+ln -s "$out/outside.json" "$out/s/a.sample.json"
+printf '{"b": {"title": 5}}' > "$out/s/b.sample.json"
+python3 -I -c 'import sys; open(sys.argv[1], "w").write("{\"b\": " + "[" * 200 + "]" * 200 + "}")' "$out/s/c.sample.json"
+$APP --untrusted "$out/s/a.trellis" --snapshot "$out/s/a.png" >"$out/s/a.log" 2>&1; rc_a=$?
+$APP "$out/s/a.trellis" --snapshot "$out/s/a2.png" >"$out/s/a2.log" 2>&1; rc_a2=$?
+$APP --untrusted "$out/s/b.trellis" --snapshot "$out/s/b.png" >"$out/s/b.log" 2>&1; rc_b=$?
+$APP "$out/s/b.trellis" --snapshot "$out/s/b2.png" >"$out/s/b2.log" 2>&1; rc_b2=$?
+$APP --untrusted "$out/s/c.trellis" --snapshot "$out/s/c.png" >"$out/s/c.log" 2>&1; rc_c=$?
+if [ $rc_a -eq 1 ] && [ $rc_a2 -eq 0 ] && [ $rc_b -eq 1 ] && [ $rc_b2 -eq 1 ] && [ $rc_c -eq 1 ]; then
+  echo "ok   sample JSON: symlink and deep nesting refused untrusted; a wrong type fails cleanly in both modes"
+else
+  echo "FAIL sample JSON: exits link=$rc_a link-trusted=$rc_a2 type=$rc_b type-trusted=$rc_b2 deep=$rc_c"; fail=1
+fi
 rm -rf "${out:?}"
 [ $fail -eq 0 ] && echo "PREVIEWEXPORT OK" || { echo "PREVIEWEXPORT FAIL"; exit 1; }

@@ -19,6 +19,8 @@
 #import <objc/runtime.h>
 #import "TRBoxView.h"
 #import "TRLoader.h"
+#import "TRSplitView.h"
+#import "TRVirtualBox.h"
 #import "TRAppKitCompat.h"
 
 static int gFail = 0;
@@ -120,15 +122,25 @@ int main(void)
               [[gDir stringByAppendingPathComponent: @"link.png"] fileSystemRepresentation]);
       symlink("img/ok.png", [[gDir stringByAppendingPathComponent: @"inner.png"] fileSystemRepresentation]);
       mkfifo([[gDir stringByAppendingPathComponent: @"fifo.png"] fileSystemRepresentation], 0600);
+      /* A folder link out (the Windows-junction / failed-realpath case). */
+      symlink([root fileSystemRepresentation], [[gDir stringByAppendingPathComponent: @"pics"] fileSystemRepresentation]);
 #endif
+      [@"not an image" writeToFile: [gDir stringByAppendingPathComponent: @"notes.png"] atomically: YES
+                          encoding: NSUTF8StringEncoding error: NULL];
+      {
+        /* A 60000 x 60000 PNG header: a tiny file that would decode to gigabytes. */
+        unsigned char bomb[33] = { 0x89, 'P', 'N', 'G', 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 13, 'I', 'H', 'D', 'R',
+                                   0, 0, 0xea, 0x60, 0, 0, 0xea, 0x60, 8, 6, 0, 0, 0, 0, 0, 0, 0 };
+        [[NSData dataWithBytes: bomb length: sizeof bomb] writeToFile: [gDir stringByAppendingPathComponent: @"bomb.png"]
+                                                           atomically: YES];
+      }
 
       /* Images: what passes. */
       NSImageView *iv = nil;
       NSString *e = LoadImage(@"src", @"img/ok.png", YES, &iv);
       Expect(@"untrusted src inside the folder loads", e == nil && [iv image] != nil);
 #ifndef TR_NO_POSIX_LINKS
-      e = LoadImage(@"src", @"inner.png", YES, &iv);
-      Expect(@"untrusted src via a symlink that stays inside loads", e == nil && [iv image] != nil);
+      ExpectRejected(@"inner.png", @"symbolic link");   /* no links at all, even inside */
 #endif
       e = LoadImage(@"src", @"missing.png", YES, &iv);
       Expect(@"untrusted src of a missing file loads, with no image", e == nil && [iv image] == nil);
@@ -148,10 +160,14 @@ int main(void)
       ExpectRejected(@".../secret.png", @"ending in '.'");
       ExpectRejected(@"img/ok.png.", @"ending in '.'");
       ExpectRejected(@"img /ok.png", @"space");
+      ExpectRejected(@"notes.png", @"not a PNG, JPEG or GIF");
+      ExpectRejected(@"bomb.png", @"too large");
+      ExpectRejected(@"COM\u00b9.png", @"device");
       ExpectRejected(@"NUL", @"device");
       ExpectRejected(@"img/com1.png", @"device");
 #ifndef TR_NO_POSIX_LINKS
-      ExpectRejected(@"link.png", @"outside");
+      ExpectRejected(@"link.png", @"symbolic link");
+      ExpectRejected(@"pics/secret.png", @"symbolic link");
       ExpectRejected(@"fifo.png", @"regular");
 #endif
       e = LoadImage(@"name", @"../secret", YES, NULL);
@@ -205,6 +221,85 @@ int main(void)
       Expect([NSString stringWithFormat: @"trusted, no owner: the action is still wired (unchanged) (box %d, action %@)",
               box != nil, NSStringFromSelector([(NSButton *)First(box) action])],
              sel_isEqual([(NSButton *)First(box) action], @selector(terminate:)));
+
+      /* No link attribute (AppKit could open it), no autosave defaults. */
+      box = [TRLoader loadDocument: Doc(@"<label id=\"lk\">x <a href=\"https://example.invalid/\">y</a></label>"
+                                        @"<split id=\"sp\" autosave=\"TRUntrustedTest\"><column/><column/></split>", YES)
+                             owner: nil error: &err];
+      rl = (TRRichLabel *)[TRLoader viewWithIdentifier: @"lk" inView: box];
+      NSAttributedString *as = [rl attributedStringValue];
+      BOOL anyLink = NO;
+      for (NSUInteger i = 0; i < [as length]; i++)
+        if ([as attribute: NSLinkAttributeName atIndex: i effectiveRange: NULL]) anyLink = YES;
+      Expect(@"untrusted: link text carries no NSLinkAttributeName", rl != nil && !anyLink);
+      TRSplitView *sp = (TRSplitView *)[TRLoader viewWithIdentifier: @"sp" inView: box];
+      Expect(@"untrusted: <split autosave> is ignored", sp != nil && sp.autosave == nil);
+
+      /* var() growth is capped. */
+      NSMutableString *css = [NSMutableString stringWithString: @"<style>.c { --a0: xxxxxxxxxx; "];
+      for (int l = 1; l <= 7; l++)
+        {
+          [css appendFormat: @"--a%d:", l];
+          for (int k = 0; k < 10; k++) [css appendFormat: @" var(--a%d)", l - 1];
+          [css appendString: @"; "];
+        }
+      [css appendString: @"width: var(--a7); }</style><label class=\"c\">x</label>"];
+      err = nil;
+      NSDate *t0 = [NSDate date];
+      TRMarkupDocument *bd = [TRMarkupDocument documentWithString: [NSString stringWithFormat: @"<column>%@</column>", css]
+                                                             name: [gDir stringByAppendingPathComponent: @"bomb.trellis"]
+                                                            error: &err];
+      if (bd) { bd.untrusted = YES; box = [TRLoader loadDocument: bd owner: nil error: &err]; }
+      else box = nil;
+      Expect([NSString stringWithFormat: @"var() expansion bomb fails fast (%.2fs: %@)", -[t0 timeIntervalSinceNow],
+              [err localizedDescription]],
+             /* Over the cap, the custom property is dropped where it is
+                defined (so the use reports it undefined), or the use itself
+                fails: either way, fast. */
+             box == nil && ([[err localizedDescription] rangeOfString: @"64 KB"].location != NSNotFound
+                            || [[err localizedDescription] rangeOfString: @"is not defined"].location != NSNotFound)
+             && -[t0 timeIntervalSinceNow] < 5);
+
+      /* Sample row counts are capped. */
+      box = [TRLoader loadDocument: Doc(@"<virtual id=\"list\" template=\"row\" estimated-size=\"30\">"
+                                        @"<template id=\"row\"><row><label id=\"t\">x</label></row></template></virtual>", YES)
+                             owner: nil error: &err];
+      BOOL applied = [TRLoader applySample: @{@"list": @{@"items": @[@{@"_repeat": @1000000000, @"items": @[@{}]}],
+                                                         @"repeat": @1000000000000}} toView: box error: &err];
+      TRVirtualBox *vb = (TRVirtualBox *)[TRLoader viewWithIdentifier: @"list" inView: box];
+      NSInteger rows = [[vb dataSource] numberOfItemsInVirtualBox: vb];
+      Expect([NSString stringWithFormat: @"sample repeat is capped at a million rows (%ld)", (long)rows],
+             applied && rows == 1000000);
+
+      /* Wrong-typed sample values are load errors, not exceptions later. */
+      box = [TRLoader loadDocument: Doc(@"<button id=\"b\">Go</button><popup id=\"p\"/>"
+                                        @"<virtual id=\"list\" template=\"row\" estimated-size=\"30\">"
+                                        @"<template id=\"row\"><row><label id=\"t\">x</label></row></template></virtual>", YES)
+                             owner: nil error: &err];
+      BOOL threw = NO, ok1 = YES, ok2 = YES, ok3 = YES;
+      @try
+        {
+          err = nil;
+          ok1 = [TRLoader applySample: @{@"b": @{@"title": @5}} toView: box error: &err];
+          ok2 = [TRLoader applySample: @{@"p": @[@"one", @2]} toView: box error: &err];
+          ok3 = [TRLoader applySample: @{@"list": @{@"items": @[@"x", @5, @{@"_template": @7, @"_repeat": @[]}],
+                                                    @"repeat": @[], @"scroll-to": @{}}} toView: box error: &err];
+          vb = (TRVirtualBox *)[TRLoader viewWithIdentifier: @"list" inView: box];
+          [vb setFrame: NSMakeRect(0, 0, 200, 200)];
+          [box setFrame: NSMakeRect(0, 0, 200, 300)];
+          [box layoutTrellis];
+        }
+      @catch (NSException *ex) { threw = YES; NSLog(@"threw: %@", ex); }
+      Expect(@"wrong-typed sample values are refused without an exception", !threw && !ok1 && !ok2 && ok3);
+
+      /* The sample reader keeps the same rules. */
+      NSError *rerr = nil;
+      NSData *sd = [TRLoader untrustedContentsOfFile: @"link.png" inFolder: gDir maxLength: 1 << 20 error: &rerr];
+      Expect(@"untrustedContentsOfFile: refuses a symbolic link", sd == nil && rerr != nil);
+      sd = [TRLoader untrustedContentsOfFile: @"nope.json" inFolder: gDir maxLength: 1 << 20 error: &rerr];
+      Expect(@"untrustedContentsOfFile: a missing file is nil with no error", sd == nil && rerr == nil);
+      sd = [TRLoader untrustedContentsOfFile: @"img/ok.png" inFolder: gDir maxLength: 10 error: &rerr];
+      Expect(@"untrustedContentsOfFile: over the limit is refused", sd == nil && rerr != nil);
 
       /* Templates built later from an untrusted document. */
       NSString *tsrc = @"<column><label>x</label></column>"

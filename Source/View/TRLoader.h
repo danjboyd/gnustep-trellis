@@ -56,6 +56,14 @@
    "items"|"state"|"value"|"hidden": ...}}. Unknown ids are errors. */
 + (BOOL)applySample:(NSDictionary *)sample toView:(NSView *)root error:(NSError **)error;
 
+/* The bytes of `name` (a plain relative path) inside `folder`, read under
+   the untrusted-document rules: no symbolic links or reparse points, a
+   regular file, at most `max` bytes, checked and read through the same
+   descriptors. nil with *error nil when it doesn't exist; nil with *error
+   set when a rule is broken. Since 0.10.2. */
++ (NSData *)untrustedContentsOfFile:(NSString *)name inFolder:(NSString *)folder
+                         maxLength:(unsigned long long)max error:(NSError **)error;
+
 /* Finds a view by its identifier in a tree. */
 + (NSView *)viewWithIdentifier:(NSString *)identifier inView:(NSView *)root;
 

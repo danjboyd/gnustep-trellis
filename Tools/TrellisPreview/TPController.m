@@ -208,6 +208,29 @@ static NSView *TPViewAtPath(NSView *root, NSString *path)
 }
 @end
 
+/* YES if the JSON nests arrays/objects deeper than max (strings skipped),
+   checked before parsing so a deep file can't exhaust the stack. */
+static BOOL TPJSONTooDeep(NSData *d, int max)
+{
+  const unsigned char *b = [d bytes];
+  NSUInteger n = [d length];
+  int depth = 0;
+  BOOL inString = NO;
+  for (NSUInteger i = 0; i < n; i++)
+    {
+      unsigned char c = b[i];
+      if (inString)
+        {
+          if (c == '\\') i++;
+          else if (c == '"') inString = NO;
+        }
+      else if (c == '"') inString = YES;
+      else if (c == '[' || c == '{') { if (++depth > max) return YES; }
+      else if (c == ']' || c == '}') depth--;
+    }
+  return NO;
+}
+
 @implementation TPController
 
 - (void)setExportJSON:(NSString *)path { _exportJSON = [path copy]; }
@@ -400,8 +423,8 @@ static NSDate *TPModDate(NSString *path)
   [_errorLabel setStringValue: msg];
   [_errorLabel setFrame: NSInsetRect([_content bounds], 16, 16)];
   [_content addSubview: _errorLabel];
-  [_window setTitle: [NSString stringWithFormat: @"%@ — error%@", [_path lastPathComponent],
-                       _untrusted ? @" — untrusted" : @""]];
+  [_window setTitle: [NSString stringWithFormat: @"%@%@ — error", _untrusted ? @"[untrusted] " : @"",
+                       [_path lastPathComponent]]];
 }
 
 - (void)reload:(id)sender
@@ -413,12 +436,40 @@ static NSDate *TPModDate(NSString *path)
   TRMarkupDocument *doc = [TRMarkupDocument documentWithContentsOfFile: _path error: &err];
   doc.untrusted = _untrusted;
   TRBoxView *screen = doc ? [TRLoader loadDocument: doc owner: nil error: &err] : nil;
-  if (screen && [[NSFileManager defaultManager] fileExistsAtPath: [self samplePath]])
+  NSData *d = nil;
+  if (screen && _untrusted)
     {
-      NSData *d = [NSData dataWithContentsOfFile: [self samplePath]];
-      NSDictionary *sample = d ? [NSJSONSerialization JSONObjectWithData: d options: 0 error: &err] : nil;
-      if (![sample isKindOfClass: [NSDictionary class]] || ![TRLoader applySample: sample toView: screen error: &err])
-        screen = nil;
+      /* The sample under the same rules as images: a regular file in the
+         document's folder, no links, at most 4 MB, nesting at most 64. */
+      NSString *folder = [_path stringByDeletingLastPathComponent];
+      d = [TRLoader untrustedContentsOfFile: [[self samplePath] lastPathComponent]
+                                   inFolder: [folder length] ? folder : @"."
+                                  maxLength: 4 * 1024 * 1024 error: &err];
+      if (d == nil && err) screen = nil;
+      if (d && TPJSONTooDeep(d, 64))
+        {
+          err = [NSError errorWithDomain: @"TrellisPreview" code: 1 userInfo: @{
+            NSLocalizedDescriptionKey: @"untrusted: the sample JSON nests more than 64 levels"}];
+          screen = nil;
+        }
+    }
+  else if (screen && [[NSFileManager defaultManager] fileExistsAtPath: [self samplePath]])
+    d = [NSData dataWithContentsOfFile: [self samplePath]];
+  if (screen && d)
+    {
+      NSDictionary *sample = [NSJSONSerialization JSONObjectWithData: d options: 0 error: &err];
+      @try
+        {
+          if (![sample isKindOfClass: [NSDictionary class]] || ![TRLoader applySample: sample toView: screen error: &err])
+            screen = nil;
+        }
+      @catch (NSException *e)
+        {
+          /* A value of the wrong type (a number for a title, ...). */
+          err = [NSError errorWithDomain: @"TrellisPreview" code: 2 userInfo: @{
+            NSLocalizedDescriptionKey: [NSString stringWithFormat: @"sample: %@", [e reason]]}];
+          screen = nil;
+        }
     }
   if (screen == nil)
     {
@@ -445,10 +496,9 @@ static NSDate *TPModDate(NSString *path)
   _findings = [self lintScreen];
   NSUInteger errors = 0;
   for (NSDictionary *f in _findings) if ([f[@"severity"] isEqualToString: @"error"]) errors++;
-  [_window setTitle: [NSString stringWithFormat: @"%@ — %g × %g — %lu lint (%lu errors)%@",
-                       [_path lastPathComponent], s.width, s.height,
-                       (unsigned long)[_findings count], (unsigned long)errors,
-                       _untrusted ? @" — untrusted" : @""]];
+  [_window setTitle: [NSString stringWithFormat: @"%@%@ — %g × %g — %lu lint (%lu errors)",
+                       _untrusted ? @"[untrusted] " : @"", [_path lastPathComponent], s.width, s.height,
+                       (unsigned long)[_findings count], (unsigned long)errors]];
   _overlay.target = _screen;
   _overlay.findings = _findings;
   [_overlay setFrame: [_content bounds]];

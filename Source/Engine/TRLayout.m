@@ -1502,7 +1502,11 @@ TRSize TRLayoutNode(TRNode *node, TRFloat aw, TRFloat ah,
      which is covered by aw/ah. */
   BOOL ownerMatters = TRUsesOwnerSize(s);
   const BOOL unclampW = TRIgnoresOwnMinMax(node, YES), unclampH = TRIgnoresOwnMinMax(node, NO);
-  if (unclampW || unclampH)
+  /* A subgrid laid out on its parent's tracks: the tracks aren't part of
+     the cache key, so it is neither read nor stored. */
+  const BOOL inheritedTracks = node->_subgridRows != nil || node->_subgridCols != nil;
+  if (inheritedTracks) node->_hasPerformEntry = NO;
+  if (unclampW || unclampH || inheritedTracks)
     ;   /* an unclamped basis measure: neither read nor stored in the cache */
   else if (perform)
     {
@@ -1563,12 +1567,12 @@ TRSize TRLayoutNode(TRNode *node, TRFloat aw, TRFloat ah,
           node->_lborder[k] = e.border[k];
         }
       if (!hasInFlowOrAbs) node->_contentSize = size;
-      node->_hasPerformEntry = YES;
+      node->_hasPerformEntry = !inheritedTracks;
       TRCacheEntry *pe = &node->_performEntry;
       pe->aw = aw; pe->ah = ah; pe->wm = wm; pe->hm = hm;
       pe->ow = ow; pe->oh = oh; pe->dir = dir; pe->indefH = node->_pctIndefH; pe->result = size;
     }
-  else if (!unclampW && !unclampH)
+  else if (!unclampW && !unclampH && !inheritedTracks)
     TRCacheStore(node, aw, ah, wm, hm, ow, oh, dir, size);
   return size;
 }

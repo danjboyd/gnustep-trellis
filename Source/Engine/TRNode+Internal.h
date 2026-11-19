@@ -35,6 +35,10 @@ typedef struct {
   /* The node -layoutWithAvailableSize: was called on: a containing block
      for abspos descendants even when it is position: static. */
   BOOL _isLayoutRoot;
+  /* Set by a grid parent around a subgrid's layout: the parent's tracks
+     the subgrid spans, as (start, size) double pairs, starts relative to
+     the subgrid's border box along that axis (logical). nil otherwise. */
+  NSData *_subgridRows, *_subgridCols;
 
   /* Results. _rawFrame is unrounded; _frame is what clients see. */
   TRRect _rawFrame;

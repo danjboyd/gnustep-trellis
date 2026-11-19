@@ -202,8 +202,31 @@ static BOOL TRParseTrackList(NSString *v, TRTrackList *out, BOOL singleOnly)
   return YES;
 }
 
+/* "subgrid [names]*" (CSS Grid 2, 9): the line names that follow, or nil
+   when the value isn't a subgrid. */
+static NSArray<NSArray<NSString *> *> *TRSubgridLineNames(NSString *tmpl)
+{
+  if (tmpl == nil) return nil;
+  NSArray *toks = TRTokenizeTracks(tmpl);
+  if ([toks count] == 0 || ![[toks[0] lowercaseString] isEqualToString: @"subgrid"]) return nil;
+  NSMutableArray *out = [NSMutableArray array];
+  for (NSUInteger i = 1; i < [toks count]; i++)
+    {
+      NSArray *names = TRLineNamesToken(toks[i]);
+      if (names == nil) return nil;
+      [out addObject: names];
+    }
+  return out;
+}
+
+static BOOL TRIsSubgrid(NSString *tmpl)
+{
+  return TRSubgridLineNames(tmpl) != nil;
+}
+
 BOOL TRGridValidateTrackList(NSString *value, BOOL singleTracksOnly)
 {
+  if (!singleTracksOnly && TRIsSubgrid(value)) return YES;
   TRTrackList l;
   BOOL ok = TRParseTrackList(value, &l, singleTracksOnly);
   free(l.entries);
@@ -1045,6 +1068,55 @@ static int TRCompareItemOrder(const void *x, const void *y)
   return a->docOrder < b->docOrder ? -1 : (a->docOrder > b->docOrder ? 1 : 0);
 }
 
+/* Clips inherited tracks to a subgrid's content box [0, inner]: the first
+   track starts no earlier than 0 and the last ends no later than inner. */
+static void TRGClipToContent(TRTrack *tr, NSInteger n, double inner)
+{
+  if (n == 0) return;
+  if (tr[0].pos < 0) { tr[0].base = MAX(0, tr[0].base + tr[0].pos); tr[0].pos = 0; }
+  if (!isnan(inner))
+    {
+      TRTrack *l = &tr[n - 1];
+      if (l->pos > inner) l->pos = inner;
+      if (l->pos + l->base > inner) l->base = MAX(0, inner - l->pos);
+    }
+}
+
+/* How many tracks a subgrid spans in its parent, from its own placement,
+   for laying it out on its own (no parent tracks given): an explicit
+   span, or the distance between two numbered lines; else 1. */
+static NSInteger TRSubgridSpan(TRStyle *st, BOOL rows)
+{
+  TRLine a, b;
+  NSString *an = nil, *bn = nil;
+  TRParseLine(rows ? st->_gridRowStart : st->_gridColumnStart, &a, &an);
+  TRParseLine(rows ? st->_gridRowEnd : st->_gridColumnEnd, &b, &bn);
+  if (a.kind == TRLineSpan && an == nil) return a.n;
+  if (b.kind == TRLineSpan && bn == nil) return b.n;
+  if (a.kind == TRLineNumber && b.kind == TRLineNumber && an == nil && bn == nil
+      && a.n > 0 && b.n > 0 && a.n != b.n)
+    return labs((long)(b.n - a.n));
+  return 1;
+}
+
+/* The track list a subgrid lays out with in one axis: the parent's track
+   sizes as px when given (inherited: start/size pairs), else one auto
+   track per spanned track; with the subgrid's own line names. */
+static NSString *TRSubgridTemplate(NSData *inherited, NSArray<NSArray<NSString *> *> *names, NSInteger span)
+{
+  NSInteger n = inherited ? (NSInteger)([inherited length] / (2 * sizeof(double))) : MAX(span, 1);
+  const double *p = [inherited bytes];
+  NSMutableString *t = [NSMutableString string];
+  for (NSInteger i = 0; i <= n; i++)
+    {
+      if (i < (NSInteger)[names count] && [names[i] count])
+        [t appendFormat: @"[%@] ", [names[i] componentsJoinedByString: @" "]];
+      if (i < n)
+        [t appendString: inherited ? [NSString stringWithFormat: @"%.6fpx ", MAX(0, p[2 * i + 1])] : @"auto "];
+    }
+  return t;
+}
+
 TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFloat border[4],
                     TRFloat aw, TRFloat ah, TRMeasureMode wm, TRMeasureMode hm,
                     TRFloat ow, TRFloat oh, BOOL perform, TRDirection dir);
@@ -1077,8 +1149,15 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
      that (7.2.3.2). */
   const double repInnerW = (wm == TRMeasureModeAtMost && (!isnan(maxInnerW) || !isnan(minInnerW))) ? NAN : innerW;
   int autoRepsC = 0, autoRepsR = 0;
-  TRTrack *colsT = TRBuildTracks(st->_gridTemplateColumns, repInnerW, colGap, &nCols, &fitStartC, &fitLenC, minInnerW, maxInnerW, &autoRepsC);
-  TRTrack *rowsT = TRBuildTracks(st->_gridTemplateRows, innerH, rowGap, &nRows, &fitStartR, &fitLenR, minInnerH, maxInnerH, &autoRepsR);
+  /* A subgrid axis (CSS Grid 2, 9) uses the parent's tracks: their sizes,
+     and below, their positions; no implicit tracks. */
+  NSArray *subNamesC = TRSubgridLineNames(st->_gridTemplateColumns), *subNamesR = TRSubgridLineNames(st->_gridTemplateRows);
+  const BOOL subC = subNamesC != nil, subR = subNamesR != nil;
+  NSData *inhC = subC ? node->_subgridCols : nil, *inhR = subR ? node->_subgridRows : nil;
+  NSString *tmplC = subC ? TRSubgridTemplate(inhC, subNamesC, TRSubgridSpan(st, NO)) : st->_gridTemplateColumns;
+  NSString *tmplR = subR ? TRSubgridTemplate(inhR, subNamesR, TRSubgridSpan(st, YES)) : st->_gridTemplateRows;
+  TRTrack *colsT = TRBuildTracks(tmplC, repInnerW, colGap, &nCols, &fitStartC, &fitLenC, minInnerW, maxInnerW, &autoRepsC);
+  TRTrack *rowsT = TRBuildTracks(tmplR, innerH, rowGap, &nRows, &fitStartR, &fitLenR, minInnerH, maxInnerH, &autoRepsR);
   NSArray *areas = st->_gridTemplateAreas;
   NSInteger areaRows = [areas count], areaCols = areaRows ? [areas[0] count] : 0;
   NSInteger explicitCols = MAX(nCols, areaCols), explicitRows = MAX(nRows, areaRows);
@@ -1092,8 +1171,8 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
         colAreas[nm] = @[@(cl ? MIN([cl[0] integerValue], c) : c), @(cl ? MAX([cl[1] integerValue], c + 1) : c + 1)];
         rowAreas[nm] = @[@(rl ? MIN([rl[0] integerValue], r) : r), @(rl ? MAX([rl[1] integerValue], r + 1) : r + 1)];
       }
-  NSDictionary *colLines = TRLineNameMap(st->_gridTemplateColumns, autoRepsC, colAreas);
-  NSDictionary *rowLines = TRLineNameMap(st->_gridTemplateRows, autoRepsR, rowAreas);
+  NSDictionary *colLines = TRLineNameMap(tmplC, autoRepsC, colAreas);
+  NSDictionary *rowLines = TRLineNameMap(tmplR, autoRepsR, rowAreas);
 
   /* ---- Items and placement ---- */
   NSArray *children = node->_children;
@@ -1307,6 +1386,23 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       gridRows = MAX(gridRows, items[k].r1);
       gridCols = MAX(gridCols, items[k].c1);
     }
+  /* A subgrid axis has no implicit tracks: undo the shift for lines before
+     the grid and clamp every item into the spanned tracks. */
+  if (subC || subR)
+    {
+      for (NSInteger k = 0; k < n; k++)
+        for (int axis = 0; axis < 2; axis++)
+          {
+            if (!(axis == 0 ? subR : subC)) continue;
+            NSInteger cnt = axis == 0 ? nRows : nCols, off = axis == 0 ? offR : offC;
+            NSInteger *a0 = axis == 0 ? &items[k].r0 : &items[k].c0, *a1 = axis == 0 ? &items[k].r1 : &items[k].c1;
+            NSInteger span = *a1 - *a0;
+            *a0 = MIN(MAX(*a0 - off, 0), MAX(cnt - 1, 0));
+            *a1 = MIN(*a0 + MAX(span, 1), MAX(cnt, 1));
+          }
+      if (subC) { gridCols = nCols; offC = 0; }
+      if (subR) { gridRows = nRows; offR = 0; }
+    }
   free(pl);
   #undef OCC
 
@@ -1424,6 +1520,18 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
   else if (colAlign == TRAlignRight) colAlign = rtl ? TRAlignStart : TRAlignEnd;
   double colsTotal = TRPlaceTracks(colsT, nCols, colGap, isnan(contentW) ? innerW : contentW, colAlign, s->justifyContentSafe);
   if (!isnan(contentW)) colsTotal = contentW;
+  /* Subgrid: the parent's positions, rebased to this content box (its
+     content distribution doesn't apply here). */
+  if (inhC)
+    {
+      const double *p = [inhC bytes];
+      double startPB = rtl ? pad[TREdgeRight] + border[TREdgeRight] : pad[TREdgeLeft] + border[TREdgeLeft];
+      for (NSInteger i = 0; i < nCols; i++) { colsT[i].pos = p[2 * i] - startPB; colsT[i].base = MAX(0, p[2 * i + 1]); }
+      /* The subgrid's margin, border and padding inset its edge tracks:
+         its items start at its content edge (CSS Grid 2, 9). */
+      TRGClipToContent(colsT, nCols, wm == TRMeasureModeExactly ? MAX(0, aw - pbW) : NAN);
+      if (nCols) colsTotal = MAX(colsTotal, colsT[nCols - 1].pos + colsT[nCols - 1].base);
+    }
 
   /* Percentage margins, against each item's grid-area width (CSS Grid 6.5). */
   for (NSInteger k = 0; k < n; k++)
@@ -1489,6 +1597,15 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       rowsTotal = TRPlaceTracks(rowsT, nRows, g, contentH, s->alignContent, s->alignContentSafe);
     }
 
+  if (inhR)
+    {
+      const double *p = [inhR bytes];
+      double startPB = pad[TREdgeTop] + border[TREdgeTop];
+      for (NSInteger i = 0; i < nRows; i++) { rowsT[i].pos = p[2 * i] - startPB; rowsT[i].base = MAX(0, p[2 * i + 1]); }
+      TRGClipToContent(rowsT, nRows, hm == TRMeasureModeExactly ? MAX(0, ah - pbH) : NAN);
+      if (nRows) { rowsTotal = MAX(rowsTotal, rowsT[nRows - 1].pos + rowsT[nRows - 1].base); contentH = MAX(contentH, rowsTotal); }
+    }
+
   /* ---- Container size ---- */
   double W = wm == TRMeasureModeExactly ? aw : colsTotal + pbW;
   /* Shrink-to-fit: the tracks never shrink below their bases, so a grid
@@ -1536,6 +1653,12 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           const BOOL asSafe = cs->alignSelf == TRAlignAuto ? s->alignItemsSafe : cs->alignSelfSafe;
           double sw = TRGBox(cs, cs->width, areaW, YES, areaW), sh = TRGBox(cs, cs->height, areaH, NO, areaW);
           double ar = cs->aspectRatio;
+          /* A subgrid always stretches in a subgridded axis: its
+             self-alignment and its own size there are ignored (CSS Grid 2, 9). */
+          if (it->s->display == TRDisplayGrid && TRIsSubgrid(it->node->_style->_gridTemplateColumns))
+            { js = TRAlignStretch; sw = NAN; ar = NAN; }
+          if (it->s->display == TRDisplayGrid && TRIsSubgrid(it->node->_style->_gridTemplateRows))
+            { as = TRAlignStretch; sh = NAN; ar = NAN; }
           if (isnan(sw) && !isnan(sh) && !isnan(ar)) sw = sh * ar;
           if (isnan(sh) && !isnan(sw) && !isnan(ar)) sh = sw / ar;
           BOOL autoL = it->marginAuto[TREdgeLeft], autoR = it->marginAuto[TREdgeRight];
@@ -1599,7 +1722,32 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
               else if (!isnan(r)) x -= r;
               y += !isnan(t) ? t : (!isnan(b) ? -b : 0);
             }
+          /* A subgrid child gets the tracks it spans, starts relative to its
+             own border box (logical: from the inline start in rtl). */
+          TRStyle *cst = it->node->_style;
+          const BOOL childGrid = it->s->display == TRDisplayGrid;
+          if (childGrid && TRIsSubgrid(cst->_gridTemplateColumns))
+            {
+              NSMutableData *d = [NSMutableData dataWithLength: (it->c1 - it->c0) * 2 * sizeof(double)];
+              double *q = [d mutableBytes];
+              double startX = rtl ? innerFinalW - (x - pad[TREdgeLeft] - border[TREdgeLeft]) - w
+                                  : x - pad[TREdgeLeft] - border[TREdgeLeft];
+              for (NSInteger i = it->c0; i < it->c1; i++)
+                { q[2 * (i - it->c0)] = colsT[i].pos - startX; q[2 * (i - it->c0) + 1] = colsT[i].base; }
+              it->node->_subgridCols = d;
+            }
+          if (childGrid && TRIsSubgrid(cst->_gridTemplateRows))
+            {
+              NSMutableData *d = [NSMutableData dataWithLength: (it->r1 - it->r0) * 2 * sizeof(double)];
+              double *q = [d mutableBytes];
+              double startY = y - pad[TREdgeTop] - border[TREdgeTop];
+              for (NSInteger i = it->r0; i < it->r1; i++)
+                { q[2 * (i - it->r0)] = rowsT[i].pos - startY; q[2 * (i - it->r0) + 1] = rowsT[i].base; }
+              it->node->_subgridRows = d;
+            }
           TRLayoutNode(it->node, w, h, TRMeasureModeExactly, TRMeasureModeExactly, areaW, areaH, YES, dir);
+          it->node->_subgridCols = nil;
+          it->node->_subgridRows = nil;
           TRNode *c = it->node;
           c->_rawFrame = TRRectMake(x, y, w, h);
           c->_lineIndex = it->r0 == 0 ? 0 : 1;

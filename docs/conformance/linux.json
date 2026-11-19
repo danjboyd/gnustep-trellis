@@ -1,9 +1,9 @@
 {
- "commit": "68994a9",
+ "commit": "0e2be5a+dirty",
  "conformance": {
-  "pass": 3964,
-  "skipped": 388,
-  "total": 3964
+  "pass": 4020,
+  "skipped": 396,
+  "total": 4020
  },
  "date": "2026-11-19",
  "platform": "linux",
@@ -18,9 +18,9 @@
    "total": 964
   },
   "wpt-grid": {
-   "cases": 2096,
-   "pass": 1859,
-   "total": 1859
+   "cases": 2160,
+   "pass": 1915,
+   "total": 1915
   },
   "wpt-sizing": {
    "cases": 125,

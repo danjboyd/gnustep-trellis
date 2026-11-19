@@ -139,6 +139,9 @@ int main(void)
       ExpectRejected(@"~/x.png", @"~");
       ExpectRejected(@"img//ok.png", @"empty");
       ExpectRejected(@"./img/ok.png", @"'.'");
+      ExpectRejected(@".../secret.png", @"ending in '.'");
+      ExpectRejected(@"img/ok.png.", @"ending in '.'");
+      ExpectRejected(@"img /ok.png", @"space");
       ExpectRejected(@"NUL", @"device");
       ExpectRejected(@"img/com1.png", @"device");
       ExpectRejected(@"link.png", @"outside");

@@ -609,7 +609,7 @@ static NSString *const TRRunAttributeName = @"TRRunIndex";
 
 /* A path rule broken by an untrusted <image src>, or nil. Only a plain
    relative path of forward-slash components passes: no absolute, "~",
-   "..", empty or "." components, backslashes (UNC, Windows separators),
+   "..", empty or "." components, components ending in "." or a space, backslashes (UNC, Windows separators),
    colons (drives, URLs, NTFS streams), control characters or Windows
    device names (CON, NUL, COM1, ...). */
 static NSString *TRUntrustedSrcProblem(NSString *src)
@@ -636,6 +636,9 @@ static NSString *TRUntrustedSrcProblem(NSString *src)
     {
       if ([c length] == 0 || [c isEqualToString: @"."]) return @"has an empty or '.' component";
       if ([c isEqualToString: @".."]) return @"goes up with '..'";
+      /* Windows drops trailing dots and spaces ("..." can act as "..",
+         "x.png." as "x.png"). */
+      if ([c hasSuffix: @"."] || [c hasSuffix: @" "]) return @"has a component ending in '.' or a space";
       NSString *base = [[[c componentsSeparatedByString: @"."] firstObject] lowercaseString];
       base = [base stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
       if ([devices containsObject: base]) return @"names a device";

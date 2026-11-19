@@ -69,6 +69,7 @@ synthetic fixture (`Tests/Parity/Parity.trellis` and its sample), and
 | refuse | trellis-render without a private `GNUSTEP_HOME` (stand-in `HOME`) | exit 3, nothing written |
 | settings | the real `~/GNUstep` (`%USERPROFILE%\GNUstep` on Windows) | unchanged by the whole run |
 | deps | Windows: every DLL `TrellisPreview.exe` loads, recursively (`Tests/Parity/pe-deps.py`, import and delay-import tables) | each one is found in the app folder, `obj/` or `PATH`; `deps.json` lists the ones to ship and the system ones |
+| defaults | the private home's `GNUstep/Defaults` (the `.lck` lock folder aside) | unchanged: theme and appearance stay in the argument domain |
 | registry | Windows: `HKCU\Software\GNUstep*` of the user running it | reported (INFO), for the record |
 
 Each case runs for every entry in `THEMES` (default `Adwaita`). An entry

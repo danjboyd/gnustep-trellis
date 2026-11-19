@@ -1,0 +1,178 @@
+{
+ "id": "wpt-grid/css/css-grid/subgrid/subgrid-baseline-013",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/subgrid/subgrid-baseline-013.html",
+  "commit": "34bdce16413b56bcc6c90c42ad1ed051769bbe2b",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "inline-grid",
+   "boxSizing": "content-box",
+   "position": "relative",
+   "gridTemplateColumns": "repeat(4, auto)",
+   "gridTemplateRows": "[top-start] min-content [top-end middle-start] min-content [middle-end bottom-start] min-content [bottom-end]",
+   "borderTopWidth": 2,
+   "borderRightWidth": 2,
+   "borderBottomWidth": 2,
+   "borderLeftWidth": 2
+  },
+  "children": [
+   {
+    "style": {
+     "display": "grid",
+     "boxSizing": "content-box",
+     "alignItems": "baseline",
+     "gridTemplateColumns": "subgrid",
+     "gridColumn": "1 / -1",
+     "gridRow": "middle",
+     "gridTemplateRows": "[top-start] min-content [top-end middle-start] min-content [middle-end bottom-start] min-content [bottom-end]",
+     "borderTopWidth": 2,
+     "borderRightWidth": 2,
+     "borderBottomWidth": 2,
+     "borderLeftWidth": 2
+    },
+    "children": [
+     {
+      "style": {
+       "display": "grid",
+       "boxSizing": "content-box",
+       "alignItems": "baseline",
+       "gridTemplateColumns": "subgrid",
+       "gridColumn": "1 / -1",
+       "gridRow": "middle",
+       "gridTemplateRows": "[top-start] min-content [top-end middle-start] min-content [middle-end bottom-start] min-content [bottom-end]",
+       "borderTopWidth": 2,
+       "borderRightWidth": 2,
+       "borderBottomWidth": 2,
+       "borderLeftWidth": 2
+      },
+      "children": [
+       {
+        "style": {
+         "display": "grid",
+         "boxSizing": "content-box",
+         "gridTemplateColumns": "subgrid",
+         "gridColumn": "1 / -1",
+         "gridTemplateRows": "minmax(32px, auto) auto",
+         "borderTopWidth": 2,
+         "borderRightWidth": 2,
+         "borderBottomWidth": 2,
+         "borderLeftWidth": 2
+        },
+        "children": [
+         {
+          "style": {
+           "display": "grid",
+           "boxSizing": "content-box",
+           "width": 40,
+           "gridTemplateRows": "subgrid",
+           "gridRow": "1 / -1"
+          },
+          "measure": {
+           "text": "1",
+           "charWidth": 15,
+           "lineHeight": 15
+          }
+         },
+         {
+          "style": {
+           "display": "grid",
+           "boxSizing": "content-box",
+           "width": 40,
+           "gridTemplateRows": "subgrid",
+           "gridRow": "1 / -1"
+          },
+          "measure": {
+           "text": "2",
+           "charWidth": 15,
+           "lineHeight": 15
+          }
+         },
+         {
+          "style": {
+           "display": "grid",
+           "boxSizing": "content-box",
+           "width": 40,
+           "gridTemplateRows": "subgrid",
+           "gridRow": "1 / -1"
+          },
+          "measure": {
+           "text": "3",
+           "charWidth": 15,
+           "lineHeight": 15
+          }
+         },
+         {
+          "style": {
+           "display": "grid",
+           "boxSizing": "content-box",
+           "width": 40,
+           "gridTemplateRows": "subgrid",
+           "gridRow": "1 / -1"
+          },
+          "measure": {
+           "text": "4",
+           "charWidth": 15,
+           "lineHeight": 15
+          }
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "x": 8,
+          "y": 8,
+          "relativeTo": 4
+         },
+         {
+          "x": 48,
+          "y": 8,
+          "relativeTo": 4
+         },
+         {
+          "x": 88,
+          "y": 8,
+          "relativeTo": 4
+         },
+         {
+          "x": 128,
+          "y": 8,
+          "relativeTo": 4
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "requires": [
+  "grid-named-lines",
+  "measure",
+  "subgrid"
+ ]
+}

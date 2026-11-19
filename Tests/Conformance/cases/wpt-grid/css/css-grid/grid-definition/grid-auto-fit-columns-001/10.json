@@ -1,0 +1,55 @@
+{
+ "id": "wpt-grid/css/css-grid/grid-definition/grid-auto-fit-columns-001/10",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/grid-definition/grid-auto-fit-columns-001.html",
+  "commit": "34bdce16413b56bcc6c90c42ad1ed051769bbe2b",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "grid",
+   "boxSizing": "content-box",
+   "width": 200,
+   "position": "relative",
+   "justifyContent": "start",
+   "gridAutoColumns": 157,
+   "gridAutoRows": 25,
+   "gridTemplateColumns": "10px [foo] 20% [bar] repeat(auto-fit, [autofoo] 35px)",
+   "borderTopWidth": 2,
+   "borderRightWidth": 2,
+   "borderBottomWidth": 2,
+   "borderLeftWidth": 2
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "gridColumn": "bar / 5 autofoo"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 297,
+    "height": 25,
+    "x": 52,
+    "y": 2
+   }
+  ]
+ },
+ "requires": [
+  "grid-named-lines"
+ ]
+}

@@ -40,6 +40,12 @@ VIEWPORT = (800, 600)             # WPT's viewport: the initial containing block
 WPT_ROOT = "."
 SUITE = "wpt"
 DEFAULT_FONT_SIZE = 16
+# The root element's font size, for rem. Page() sets it for the page being
+# converted (pages are converted one at a time).
+ROOT_FONT_SIZE = DEFAULT_FONT_SIZE
+# CSS absolute units in px (CSS Values 4: 1in = 96px = 2.54cm).
+ABS_UNITS = {"in": 96.0, "cm": 96 / 2.54, "mm": 96 / 25.4, "q": 96 / 101.6,
+             "pt": 96 / 72, "pc": 16.0}
 
 VISUAL_PROPS = re.compile(
     r"^(background.*|color|outline.*|box-shadow|cursor|opacity|z-index|"
@@ -240,10 +246,15 @@ COMPOUND_RE = re.compile(r"^(\*|[a-zA-Z][\w-]*)?((?:[.#][\w-]+|\[[\w-]+(?:=(?:\"
 
 def parse_selector(sel):
     """Return list of (combinator, compound) from left to right."""
-    sel = re.sub(r"\s*>\s*", " > ", sel.strip())
+    # Inside (...) (An+B, :not()), whitespace and + aren't combinators:
+    # squeeze them out and hide + until the compounds are split.
+    sel = re.sub(r"\(([^)]*)\)",
+                 lambda m: "(" + re.sub(r"\s+", "", m.group(1)).replace("+", "\0") + ")",
+                 sel.strip())
+    sel = re.sub(r"\s*>\s*", " > ", sel)
     sel = re.sub(r"\s*\+\s*", " + ", sel)
     sel = re.sub(r"\s*~\s*", " ~ ", sel)
-    toks = sel.split()
+    toks = [t.replace("\0", "+") for t in sel.split()]
     parts = []
     comb = None
     for t in toks:
@@ -261,13 +272,48 @@ def parse_selector(sel):
         ids = re.findall(r"#([\w-]+)", rest)
         pseudo = re.findall(r":([\w-]+(?:\([^)]*\))?)", pseudos)
         for p in pseudo:
-            if not re.match(r"^(first-child|last-child|nth-child\(\d+\)|nth-child\((odd|even)\)|nth-of-type\(\d+\)|first-of-type|last-of-type|only-child|not\(\.[\w-]+\))$", p):
+            m = NTH_RE.match(p)
+            if m:
+                if parse_an_b(m.group(2)) is None:
+                    raise Skip("pseudo :" + p)
+            elif not re.match(r"^(first-child|last-child|first-of-type|last-of-type|only-child|only-of-type|not\(\.[\w-]+\))$", p):
                 raise Skip("pseudo :" + p)
         parts.append((comb or " ", {"tag": None if tag in (None, "*") else tag.lower(),
                                      "classes": classes, "ids": ids, "pseudo": pseudo,
                                      "attrs": attrs}))
         comb = None
     return parts
+
+
+NTH_RE = re.compile(r"^(nth-child|nth-last-child|nth-of-type|nth-last-of-type)\((.*)\)$")
+
+
+def parse_an_b(arg):
+    """Parse an An+B argument (odd, even, 3, 2n, -n+3, 2n + 1, ...) into
+    (a, b), or None if it isn't one (e.g. the 'of S' form)."""
+    t = re.sub(r"\s+", "", arg.strip().lower())
+    if t == "odd":
+        return (2, 1)
+    if t == "even":
+        return (2, 0)
+    m = re.match(r"^([-+]?\d+)$", t)
+    if m:
+        return (0, int(m.group(1)))
+    m = re.match(r"^([-+]?)(\d*)n([-+]\d+)?$", t)
+    if not m:
+        return None
+    a = int(m.group(2)) if m.group(2) else 1
+    if m.group(1) == "-":
+        a = -a
+    return (a, int(m.group(3)) if m.group(3) else 0)
+
+
+def an_b_matches(a, b, idx):
+    """True if idx (1-based) is a*n + b for some integer n >= 0."""
+    if a == 0:
+        return idx == b
+    n, r = divmod(idx - b, a)
+    return r == 0 and n >= 0
 
 
 def specificity(parts):
@@ -311,18 +357,15 @@ def match_compound(el, comp):
             return False
         if p == "last-of-type" and tidx != len(typed):
             return False
-        m = re.match(r"nth-child\((\d+|odd|even)\)", p)
-        if m:
-            n = m.group(1)
-            if n == "odd" and idx % 2 != 1:
-                return False
-            if n == "even" and idx % 2 != 0:
-                return False
-            if n.isdigit() and idx != int(n):
-                return False
-        m = re.match(r"nth-of-type\((\d+)\)", p)
-        if m and tidx != int(m.group(1)):
+        if p == "only-of-type" and len(typed) != 1:
             return False
+        m = NTH_RE.match(p)
+        if m:
+            a, b = parse_an_b(m.group(2))
+            pos = {"nth-child": idx, "nth-last-child": len(sib) - idx + 1,
+                   "nth-of-type": tidx, "nth-last-of-type": len(typed) - tidx + 1}[m.group(1)]
+            if not an_b_matches(a, b, pos):
+                return False
         m = re.match(r"not\(\.([\w-]+)\)", p)
         if m and m.group(1) in el.classes:
             return False
@@ -360,9 +403,23 @@ def match_selector(el, parts):
 LEN_RE = re.compile(r"^([-+]?\d*\.?\d+)(px|em|%)?$")
 
 
+FIXED_UNIT_RE = re.compile(r"(?<![\w.-])([-+]?\d*\.?\d+)(rem|in|cm|mm|q|pt|pc)\b",
+                           re.IGNORECASE)
+
+
+def fixed_units_to_px(v):
+    """Rewrite rem and absolute lengths (in, cm, mm, Q, pt, pc) as px.
+    They don't depend on the element, so they translate exactly."""
+    def repl(m):
+        n, unit = float(m.group(1)), m.group(2).lower()
+        n *= ROOT_FONT_SIZE if unit == "rem" else ABS_UNITS[unit]
+        return "%spx" % fmt(n)
+    return FIXED_UNIT_RE.sub(repl, v)
+
+
 def to_px(v, font_size):
     """Convert a single length token. Returns number (px), '<n>%' or None."""
-    v = v.strip()
+    v = fixed_units_to_px(v.strip())
     if v == "0":
         return 0
     m = LEN_RE.match(v)
@@ -385,12 +442,12 @@ def fmt(n):
 
 def norm_value(v, font_size, requires):
     """Turn a declared value into a number (px) or a cleaned CSS string."""
-    v = re.sub(r"\s+", " ", v.strip())
+    v = fixed_units_to_px(re.sub(r"\s+", " ", v.strip()))
     # CSS math functions; the lookbehind keeps minmax() (a grid track
     # function, supported) from matching max(.
     if re.search(r"(?<![\w-])(calc|min|max|clamp)\(", v):
         requires.add("css-calc")
-    if re.search(r"\d(vw|vh|vmin|vmax|ch|ex|rem|lh|cqw|cqh|in|cm|mm|pt|pc|q)\b", v):
+    if re.search(r"\d(vw|vh|vmin|vmax|ch|ex|lh|rlh|cqw|cqh|cqi|cqb|cqmin|cqmax)\b", v, re.IGNORECASE):
         raise Skip("unit in " + v)
     p = to_px(v, font_size)
     if isinstance(p, (int, float)):
@@ -636,6 +693,14 @@ class Page:
                     self.rules.append((parts, specificity(parts), order, decls))
                     order += 1
         self.cache = {}
+        # rem: the root element's font size. A rem in the root's own
+        # font-size refers to the initial value.
+        global ROOT_FONT_SIZE
+        ROOT_FONT_SIZE = DEFAULT_FONT_SIZE
+        root = next((e for e in b.doc.element_children() if e.tag == "html"), None)
+        if root is not None:
+            ROOT_FONT_SIZE = self.font(root)[0]
+            self.cache = {}
 
     @staticmethod
     def walk(el):

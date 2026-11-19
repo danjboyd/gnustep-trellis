@@ -341,5 +341,68 @@ class Validation(unittest.TestCase):
         self.assertIn("right", W.VALID_KEYWORDS["justify-content"])
 
 
+
+class FixedUnits(unittest.TestCase):
+    def page(self, src):
+        d = tempfile.mkdtemp()
+        with open(os.path.join(d, "t.html"), "w") as f:
+            f.write(src)
+        return W.Page(os.path.join(d, "t.html"))
+
+    def test_absolute_units(self):
+        self.assertEqual(W.norm_value("1in", 16, set()), 96)
+        self.assertEqual(W.norm_value("12pt", 16, set()), 16)
+        self.assertEqual(W.norm_value("2pc", 16, set()), 32)
+        self.assertEqual(W.norm_value("2.54cm", 16, set()), 96)
+        self.assertEqual(W.norm_value("40Q", 16, set()), 37.7953)
+
+    def test_rem_uses_the_root_font_size(self):
+        self.page('<!DOCTYPE html><body></body>')
+        self.assertEqual(W.norm_value("minmax(2rem, auto) auto", 10, set()),
+                         "minmax(32px, auto) auto")
+        self.page('<!DOCTYPE html><html style="font-size: 10px"><body></body></html>')
+        self.assertEqual(W.to_px("2rem", 99), 20)
+        # A rem in the root's own font-size is relative to the initial 16px.
+        self.page('<!DOCTYPE html><html style="font-size: 2rem"><body></body></html>')
+        self.assertEqual(W.to_px("1rem", 99), 32)
+
+    def test_identifiers_are_left_alone(self):
+        self.assertEqual(W.fixed_units_to_px('"a1in b" item2pt'), '"a1in b" item2pt')
+
+    def test_font_relative_units_still_skip(self):
+        for v in ("2ch", "1ex", "3vw", "1lh"):
+            with self.assertRaises(W.Skip):
+                W.norm_value(v, 16, set())
+
+
+class NthChild(unittest.TestCase):
+    def test_an_b(self):
+        self.assertEqual(W.parse_an_b("odd"), (2, 1))
+        self.assertEqual(W.parse_an_b("2n + 1"), (2, 1))
+        self.assertEqual(W.parse_an_b("-n+3"), (-1, 3))
+        self.assertEqual(W.parse_an_b("n"), (1, 0))
+        self.assertEqual(W.parse_an_b("4"), (0, 4))
+        self.assertIsNone(W.parse_an_b("2n of .x"))
+
+    def test_matching(self):
+        d = tempfile.mkdtemp()
+        with open(os.path.join(d, "t.html"), "w") as f:
+            f.write('<!DOCTYPE html><style>div:nth-child(2n) { width: 1px }'
+                    ' span:nth-last-child(-n + 2) { height: 2px }'
+                    ' span:nth-of-type(3n+1) { order: 3 }</style><body>'
+                    + "<div></div>" * 5 + "<span></span>" * 4 + '</body>')
+        p = W.Page(os.path.join(d, "t.html"))
+        kids = p.dom.body.element_children()
+        self.assertEqual([("width" in p.declared(k)) for k in kids[:5]],
+                         [False, True, False, True, False])
+        self.assertEqual([("height" in p.declared(k)) for k in kids[5:]],
+                         [False, False, True, True])
+        self.assertEqual([("order" in p.declared(k)) for k in kids[5:]],
+                         [True, False, False, True])
+
+    def test_of_selector_skips(self):
+        with self.assertRaises(W.Skip):
+            W.parse_selector("div:nth-child(2n of .x)")
+
 if __name__ == "__main__":
     unittest.main(verbosity=1)

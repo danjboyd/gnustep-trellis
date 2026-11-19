@@ -31,6 +31,12 @@ version may change the API listed in docs/api.md, and says so here.
   open, resize, reload, render, path, isolation and dependency cases on
   Linux and Windows, compared by structure across platforms and pixel
   for pixel within one (`make check-parity` on Linux).
+- **Added (tooling):** the WPT importer translates `rem` (from the root's
+  font size) and the absolute units (`in`, `cm`, `mm`, `Q`, `pt`, `pc`) to
+  px, and matches `:nth-child`, `:nth-last-child`, `:nth-of-type` and
+  `:nth-last-of-type` with any An+B argument. At the same WPT commit this
+  imports 74 more css-grid cases: 9 run and pass, and 65 wait on grid
+  named lines.
 - **Changed (tools):** trellis-render's isolation guard is stricter: the
   home, the user Library and the user defaults directory must all resolve,
   symlinks followed, inside the private `GNUSTEP_HOME`, and a dangling or

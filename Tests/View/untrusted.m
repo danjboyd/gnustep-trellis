@@ -13,6 +13,9 @@
 #import <AppKit/AppKit.h>
 #import <sys/stat.h>
 #import <unistd.h>
+#ifdef _WIN32
+#define TR_NO_POSIX_LINKS 1   /* no symlink()/mkfifo() on MinGW */
+#endif
 #import <objc/runtime.h>
 #import "TRBoxView.h"
 #import "TRLoader.h"
@@ -113,17 +116,21 @@ int main(void)
     withIntermediateDirectories: YES attributes: nil error: NULL];
       WritePNG([gDir stringByAppendingPathComponent: @"img/ok.png"]);
       WritePNG([root stringByAppendingPathComponent: @"secret.png"]);
+#ifndef TR_NO_POSIX_LINKS
       symlink([[root stringByAppendingPathComponent: @"secret.png"] fileSystemRepresentation],
               [[gDir stringByAppendingPathComponent: @"link.png"] fileSystemRepresentation]);
       symlink("img/ok.png", [[gDir stringByAppendingPathComponent: @"inner.png"] fileSystemRepresentation]);
       mkfifo([[gDir stringByAppendingPathComponent: @"fifo.png"] fileSystemRepresentation], 0600);
+#endif
 
       /* Images: what passes. */
       NSImageView *iv = nil;
       NSString *e = LoadImage(@"src", @"img/ok.png", YES, &iv);
       Expect(@"untrusted src inside the folder loads", e == nil && [iv image] != nil);
+#ifndef TR_NO_POSIX_LINKS
       e = LoadImage(@"src", @"inner.png", YES, &iv);
       Expect(@"untrusted src via a symlink that stays inside loads", e == nil && [iv image] != nil);
+#endif
       e = LoadImage(@"src", @"missing.png", YES, &iv);
       Expect(@"untrusted src of a missing file loads, with no image", e == nil && [iv image] == nil);
 
@@ -144,8 +151,10 @@ int main(void)
       ExpectRejected(@"img /ok.png", @"space");
       ExpectRejected(@"NUL", @"device");
       ExpectRejected(@"img/com1.png", @"device");
+#ifndef TR_NO_POSIX_LINKS
       ExpectRejected(@"link.png", @"outside");
       ExpectRejected(@"fifo.png", @"regular");
+#endif
       e = LoadImage(@"name", @"../secret", YES, NULL);
       Expect(@"untrusted <image name> with a path rejected", e != nil);
       e = LoadImage(@"name", @"NSApplicationIcon", YES, NULL);

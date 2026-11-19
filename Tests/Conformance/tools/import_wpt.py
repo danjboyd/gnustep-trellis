@@ -907,9 +907,14 @@ class Converter:
             if k == "position" and v == "sticky":
                 self.requires.add("position-sticky")
             if k == "direction":
-                if not is_root:
-                    raise Skip("direction set below case root")
-                self.direction = v.strip()
+                if v.strip() not in ("ltr", "rtl"):
+                    continue
+                if is_root:
+                    self.direction = v.strip()
+                    continue
+                # Below the root: the engine takes direction per node and
+                # its descendants inherit it, as in CSS.
+                style["direction"] = v.strip()
                 continue
             if k == "float":
                 if parent_display in CONTAINERS and not is_root:

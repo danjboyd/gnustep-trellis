@@ -1,7 +1,7 @@
 # wpt 34bdce16413b56bcc6c90c42ad1ed051769bbe2b css/css-grid wpt-grid
 imported	css/css-grid/abspos/absolute-positioning-definite-sizes-001.html	1 case(s)
 imported	css/css-grid/abspos/absolute-positioning-grid-container-containing-block-001.html	10 case(s)
-imported	css/css-grid/abspos/absolute-positioning-grid-container-parent-001.html	9 case(s)
+imported	css/css-grid/abspos/absolute-positioning-grid-container-parent-001.html	12 case(s)
 skipped	css/css-grid/abspos/empty-grid-001.html	script mutates page
 imported	css/css-grid/abspos/grid-container-min-max-height-abspos-descendant-001.html	1 case(s)
 imported	css/css-grid/abspos/grid-positioned-items-and-autofit-tracks-001.html	1 case(s)
@@ -96,12 +96,12 @@ skipped	css/css-grid/alignment/grid-align-content-vertical-rl.html	writing-mode
 imported	css/css-grid/alignment/grid-align-content.html	13 case(s)
 skipped	css/css-grid/alignment/grid-align-justify-margin-border-padding-vertical-lr.html	writing-mode
 skipped	css/css-grid/alignment/grid-align-justify-margin-border-padding-vertical-rl.html	writing-mode
-imported	css/css-grid/alignment/grid-align-justify-margin-border-padding.html	10 case(s)
+imported	css/css-grid/alignment/grid-align-justify-margin-border-padding.html	18 case(s)
 imported	css/css-grid/alignment/grid-align-justify-overflow.html	8 case(s)
 skipped	css/css-grid/alignment/grid-align-justify-stretch-with-orthogonal-flows.html	writing-mode
-imported	css/css-grid/alignment/grid-align-justify-stretch.html	10 case(s)
+imported	css/css-grid/alignment/grid-align-justify-stretch.html	12 case(s)
 skipped	css/css-grid/alignment/grid-align-stretching-replaced-items.html	non-Ahem text
-imported	css/css-grid/alignment/grid-align.html	4 case(s)
+imported	css/css-grid/alignment/grid-align.html	8 case(s)
 skipped	css/css-grid/alignment/grid-alignment-implies-size-change-001.html	no static checkLayout call
 skipped	css/css-grid/alignment/grid-alignment-implies-size-change-002.html	no static checkLayout call
 skipped	css/css-grid/alignment/grid-alignment-implies-size-change-003.html	no static checkLayout call
@@ -171,13 +171,13 @@ imported	css/css-grid/alignment/grid-column-axis-alignment-positioned-items-006.
 imported	css/css-grid/alignment/grid-column-axis-alignment-positioned-items-007.html	2 case(s)
 imported	css/css-grid/alignment/grid-column-axis-alignment-positioned-items-008.html	2 case(s)
 imported	css/css-grid/alignment/grid-column-axis-alignment-positioned-items-009.html	2 case(s)
-skipped	css/css-grid/alignment/grid-column-axis-alignment-positioned-items-010.html	direction set below case root
-skipped	css/css-grid/alignment/grid-column-axis-alignment-positioned-items-011.html	direction set below case root
+imported	css/css-grid/alignment/grid-column-axis-alignment-positioned-items-010.html	2 case(s)
+imported	css/css-grid/alignment/grid-column-axis-alignment-positioned-items-011.html	2 case(s)
 imported	css/css-grid/alignment/grid-column-axis-alignment-positioned-items-012.html	2 case(s)
 imported	css/css-grid/alignment/grid-column-axis-alignment-positioned-items-013.html	2 case(s)
 imported	css/css-grid/alignment/grid-column-axis-alignment-positioned-items-014.html	2 case(s)
-skipped	css/css-grid/alignment/grid-column-axis-alignment-positioned-items-015.html	direction set below case root
-skipped	css/css-grid/alignment/grid-column-axis-alignment-positioned-items-016.html	direction set below case root
+imported	css/css-grid/alignment/grid-column-axis-alignment-positioned-items-015.html	2 case(s)
+imported	css/css-grid/alignment/grid-column-axis-alignment-positioned-items-016.html	2 case(s)
 imported	css/css-grid/alignment/grid-column-axis-alignment-positioned-items-017.html	2 case(s)
 skipped	css/css-grid/alignment/grid-column-axis-alignment-sticky-positioned-items-001.html	ancestor inline insets
 skipped	css/css-grid/alignment/grid-column-axis-alignment-sticky-positioned-items-002.html	ancestor inline insets
@@ -200,7 +200,7 @@ skipped	css/css-grid/alignment/grid-content-alignment-with-span-vertical-lr-001.
 skipped	css/css-grid/alignment/grid-content-alignment-with-span-vertical-rl-001.html	writing-mode
 skipped	css/css-grid/alignment/grid-content-distribution-stretch-different-sized-tracks-001.html	non-Ahem text
 imported	css/css-grid/alignment/grid-fit-content-tracks-dont-stretch-001.html	36 case(s)
-imported	css/css-grid/alignment/grid-gutters-and-alignment.html	17 case(s)
+imported	css/css-grid/alignment/grid-gutters-and-alignment.html	20 case(s)
 skipped	css/css-grid/alignment/grid-inline-axis-alignment-auto-margins-001.html	script mutates page
 skipped	css/css-grid/alignment/grid-inline-axis-alignment-auto-margins-002.html	script mutates page
 skipped	css/css-grid/alignment/grid-inline-axis-alignment-auto-margins-003.html	script mutates page
@@ -210,14 +210,14 @@ skipped	css/css-grid/alignment/grid-inline-axis-alignment-auto-margins-006.html	
 skipped	css/css-grid/alignment/grid-inline-axis-alignment-auto-margins-007.html	script mutates page
 skipped	css/css-grid/alignment/grid-item-alignment-with-orthogonal-flows-vertical-lr.html	writing-mode
 skipped	css/css-grid/alignment/grid-item-alignment-with-orthogonal-flows-vertical-rl.html	writing-mode
-skipped	css/css-grid/alignment/grid-item-alignment-with-orthogonal-flows.html	direction set below case root
+skipped	css/css-grid/alignment/grid-item-alignment-with-orthogonal-flows.html	writing-mode
 imported	css/css-grid/alignment/grid-item-aspect-ratio-justify-self-001.html	1 case(s)
 imported	css/css-grid/alignment/grid-item-aspect-ratio-justify-self-002.html	1 case(s)
 skipped	css/css-grid/alignment/grid-item-auto-margins-alignment-vertical-lr.html	writing-mode
 skipped	css/css-grid/alignment/grid-item-auto-margins-alignment-vertical-rl.html	writing-mode
-imported	css/css-grid/alignment/grid-item-auto-margins-alignment.html	4 case(s)
+imported	css/css-grid/alignment/grid-item-auto-margins-alignment.html	8 case(s)
 imported	css/css-grid/alignment/grid-item-auto-margins-and-specified-margins-001.html	7 case(s)
-imported	css/css-grid/alignment/grid-item-auto-margins-and-stretch-001.html	1 case(s)
+imported	css/css-grid/alignment/grid-item-auto-margins-and-stretch-001.html	2 case(s)
 skipped	css/css-grid/alignment/grid-item-stretch-dynamic-size-margin-change-001.html	script mutates page
 imported	css/css-grid/alignment/grid-item-stretch-margin-border-padding-001.html	12 case(s)
 skipped	css/css-grid/alignment/grid-item-stretch-margin-border-padding-vertical-lr-001.html	writing-mode
@@ -232,7 +232,7 @@ skipped	css/css-grid/alignment/grid-justify-content-distribution-vertical-lr-001
 skipped	css/css-grid/alignment/grid-justify-content-distribution-vertical-rl-001.html	writing-mode
 skipped	css/css-grid/alignment/grid-justify-content-vertical-lr-001.html	writing-mode
 skipped	css/css-grid/alignment/grid-justify-content-vertical-rl-001.html	writing-mode
-imported	css/css-grid/alignment/grid-justify-self-cell-001.html	4 case(s)
+imported	css/css-grid/alignment/grid-justify-self-cell-001.html	8 case(s)
 imported	css/css-grid/alignment/grid-place-content-001.html	20 case(s)
 imported	css/css-grid/alignment/grid-row-axis-alignment-positioned-items-001.html	2 case(s)
 imported	css/css-grid/alignment/grid-row-axis-alignment-positioned-items-002.html	2 case(s)
@@ -243,13 +243,13 @@ imported	css/css-grid/alignment/grid-row-axis-alignment-positioned-items-006.htm
 imported	css/css-grid/alignment/grid-row-axis-alignment-positioned-items-007.html	2 case(s)
 imported	css/css-grid/alignment/grid-row-axis-alignment-positioned-items-008.html	2 case(s)
 imported	css/css-grid/alignment/grid-row-axis-alignment-positioned-items-009.html	2 case(s)
-skipped	css/css-grid/alignment/grid-row-axis-alignment-positioned-items-010.html	direction set below case root
-skipped	css/css-grid/alignment/grid-row-axis-alignment-positioned-items-011.html	direction set below case root
+imported	css/css-grid/alignment/grid-row-axis-alignment-positioned-items-010.html	2 case(s)
+imported	css/css-grid/alignment/grid-row-axis-alignment-positioned-items-011.html	2 case(s)
 imported	css/css-grid/alignment/grid-row-axis-alignment-positioned-items-012.html	2 case(s)
 imported	css/css-grid/alignment/grid-row-axis-alignment-positioned-items-013.html	2 case(s)
 imported	css/css-grid/alignment/grid-row-axis-alignment-positioned-items-014.html	2 case(s)
-skipped	css/css-grid/alignment/grid-row-axis-alignment-positioned-items-015.html	direction set below case root
-skipped	css/css-grid/alignment/grid-row-axis-alignment-positioned-items-016.html	direction set below case root
+imported	css/css-grid/alignment/grid-row-axis-alignment-positioned-items-015.html	2 case(s)
+imported	css/css-grid/alignment/grid-row-axis-alignment-positioned-items-016.html	2 case(s)
 imported	css/css-grid/alignment/grid-row-axis-alignment-positioned-items-017.html	2 case(s)
 imported	css/css-grid/alignment/grid-row-axis-alignment-sticky-positioned-items-001.html	2 case(s)
 imported	css/css-grid/alignment/grid-row-axis-alignment-sticky-positioned-items-002.html	2 case(s)
@@ -559,7 +559,7 @@ imported	css/css-grid/subgrid/subgrid-baseline-005.html	1 case(s)
 skipped	css/css-grid/subgrid/subgrid-baseline-006.html	writing-mode
 imported	css/css-grid/subgrid/subgrid-baseline-007.html	1 case(s)
 skipped	css/css-grid/subgrid/subgrid-baseline-008.html	writing-mode
-skipped	css/css-grid/subgrid/subgrid-baseline-009.html	direction set below case root
+skipped	css/css-grid/subgrid/subgrid-baseline-009.html	writing-mode
 imported	css/css-grid/subgrid/subgrid-baseline-010.html	1 case(s)
 imported	css/css-grid/subgrid/subgrid-baseline-011.html	1 case(s)
 imported	css/css-grid/subgrid/subgrid-baseline-013.html	1 case(s)

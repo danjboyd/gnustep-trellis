@@ -113,7 +113,7 @@ TIMEOUT    := perl -e 'alarm shift; exec @ARGV or die'
 check-view: gui
 	@mkdir -p $(B)/view-tests
 	@for t in $(VIEW_TESTS); do \
-	  $(CC) $(CFLAGS) -Wno-deprecated-declarations -ISource/View Tests/View/$$t.m -framework AppKit \
+	  $(CC) $(CFLAGS) -Wno-deprecated-declarations -ISource/View -ITools Tests/View/$$t.m -framework AppKit \
 	    -L$(B) -lTrellis -lTrellisEngine -Wl,-rpath,$(CURDIR)/$(B) -o $(B)/view-tests/$$t || exit 1; \
 	done
 	@status=0; for t in $(VIEW_TESTS); do \

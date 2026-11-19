@@ -5,3 +5,4 @@ derived_src/
 *.o
 .DS_Store
 *.app/
+__pycache__/

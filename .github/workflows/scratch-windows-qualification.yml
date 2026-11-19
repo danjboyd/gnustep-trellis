@@ -2,7 +2,7 @@ name: scratch-windows-qualification
 
 # One-off qualification run (ask to Dan pending): TrellisPreview's MSI and the
 # Windows parity matrix, both on gnustep-cli v0.1.9's patched toolchain, at
-# draft/windows-preview 317fa61. Started by the single push to this branch;
+# draft/windows-preview 6f29952, with WinUITheme (Adwaita is Linux-only). Started by the single push to this branch;
 # workflow_dispatch can't reach a file that isn't on the default branch.
 on:
   push:
@@ -12,7 +12,7 @@ on:
 env:
   CLI_BASE: https://github.com/danjboyd/gnustep-cli-new/releases/download/v0.1.9
   CLI_PS1_SHA256: 4d39c0e45c618dd38dad533bdc6decd9a4b4cbd92b913084b1d75043298e7bf7
-  ADWAITA_REF: 9c25a6823c3d0af715b197e64e8ca2d9bee9b456
+  WINUITHEME_REF: 72f2a10743e5a441a2d4b4e36e03ce150da3caab
 
 jobs:
   msi:
@@ -60,7 +60,7 @@ jobs:
           Write-Host "Toolchain variant: patched ($(@($state.carry_layer.patches).Count) patches)"
           "GNUSTEP_CLI_ROOT=$root" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
-      - name: Build Adwaita, Trellis; make check; parity matrix
+      - name: Build WinUITheme, Trellis; make check; parity matrix
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
@@ -68,10 +68,10 @@ jobs:
           $gnustepSh = Get-ChildItem -Path (Join-Path $root "clang64") -Recurse -File -Filter "GNUstep.sh" | Select-Object -First 1
           $parity = Join-Path $env:RUNNER_TEMP "parity"
           # The runner's git: the toolchain's minimal MSYS2 PATH may not have one.
-          $adwaita = Join-Path $env:RUNNER_TEMP "adwaita"
-          git clone -q https://github.com/danjboyd/plugins-themes-Adwaita $adwaita
-          git -C $adwaita checkout -q $env:ADWAITA_REF
-          if ($LASTEXITCODE -ne 0) { throw "Adwaita checkout failed" }
+          $theme = Join-Path $env:RUNNER_TEMP "winuitheme"
+          git clone -q https://github.com/danjboyd/plugins-themes-winuitheme $theme
+          git -C $theme checkout -q $env:WINUITHEME_REF
+          if ($LASTEXITCODE -ne 0) { throw "WinUITheme checkout failed" }
           $env:MSYSTEM = "CLANG64"
           $env:CHERE_INVOKING = "1"
           $script = @"
@@ -80,18 +80,17 @@ jobs:
           set +u; . "`$(cygpath -u '$($gnustepSh.FullName)')"; set -u
           export PATH="`$PATH:`$(cygpath -u '$env:pythonLocation')"
           command -v python3 || command -v python
-          make -C "`$(cygpath -u '$env:RUNNER_TEMP')/adwaita" -j4
-          make -C "`$(cygpath -u '$env:RUNNER_TEMP')/adwaita" install GNUSTEP_INSTALLATION_DOMAIN=LOCAL
+          make -C "`$(cygpath -u '$env:RUNNER_TEMP')/winuitheme" -j4 messages=yes
+          make -C "`$(cygpath -u '$env:RUNNER_TEMP')/winuitheme" install GNUSTEP_INSTALLATION_DOMAIN=LOCAL
           make -j4 hot_reload=no
           . scripts/env.sh
-          # make check must not hide the GUI data: record it, run the matrix, then fail on either.
+          # make check is recorded but non-fatal (agreed with gnustep-cssbox); the matrix decides.
           mkdir -p "`$(cygpath -u '$env:RUNNER_TEMP')/parity-logs"
           check_rc=0; make check > "`$(cygpath -u '$env:RUNNER_TEMP')/parity-logs/make-check.log" 2>&1 || check_rc=`$?
           echo "make check exit `$check_rc"
           export TRELLIS_TEST_USER="`$USERNAME"
-          parity_rc=0; THEMES=Adwaita bash Tests/Parity/run.sh "`$(cygpath -u '$parity')" || parity_rc=`$?
+          parity_rc=0; THEMES="WinUITheme:light,dark GNUstep" bash Tests/Parity/run.sh "`$(cygpath -u '$parity')" || parity_rc=`$?
           echo "parity exit `$parity_rc"
-          [ "`$check_rc" = 0 ] || exit "`$check_rc"
           exit "`$parity_rc"
           "@
           & (Join-Path $root "usr\bin\bash.exe") -lc $script

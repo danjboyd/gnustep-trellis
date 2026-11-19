@@ -28,6 +28,9 @@
 #            themselves are tested on stand-in trees in make check
 #            (Tests/View/isolation-verdict.m), never on the real home
 #   settings the real ~/GNUstep is unchanged by the whole run
+#   deps     (Windows) every DLL TrellisPreview.exe loads, recursively, is
+#            found (Tests/Parity/pe-deps.py, in the app folder, obj/, then
+#            PATH); deps.json lists the ones an installer must ship
 #   registry (Windows) whether HKCU\Software\GNUstep or
 #            HKCU\Software\GNUstepNSMessagePort changed. Reported as INFO,
 #            not a failure: gnustep-base writes message-port names there on
@@ -134,6 +137,16 @@ env -u GNUSTEP_HOME -u DISPLAY HOME="$SIH" USERPROFILE="$SIH" timeout 30 "$RENDE
 if [ $r = 3 ] && [ ! -e "$OUT/refuse.png" ] && grep -q 'refusing to run' "$OUT/refuse.log"; then
   add "refuse" PASS "exit 3 without a private GNUSTEP_HOME; nothing written"
 else add "refuse" FAIL "exit $r (want 3); see refuse.log"; fi
+
+# deps: the DLLs the installer must carry (the packaging contract)
+if [ $PLATFORM = windows ]; then
+  pyp() { if [ "$("$PY" -c 'import os; print(os.sep)')" = '\' ]; then cygpath -w "$1"; else echo "$1"; fi; }
+  dirs=("$(pyp "$PWD/obj")"); IFS=: read -ra pdirs <<< "$PATH"
+  for d in "${pdirs[@]}"; do [ -d "$d" ] && dirs+=("$(pyp "$d")"); done
+  if "$PY" -I Tests/Parity/pe-deps.py --json "$(pyp "$OUT/deps.json")" "$(pyp "$PWD/$PREVIEW")" "${dirs[@]}" \
+       > "$OUT/deps.txt" 2>&1; then add "deps" PASS "$(tail -1 "$OUT/deps.txt" | sed 's/^== //')"
+  else add "deps" FAIL "$(tail -1 "$OUT/deps.txt" | sed 's/^== //') (deps.txt)"; fi
+else add "deps" INFO "not Windows"; fi
 
 after=$(settings_state); reg_after=$(registry_state)
 [ "$before" = "$after" ] && add "settings" PASS "the real $REALGS is unchanged" \

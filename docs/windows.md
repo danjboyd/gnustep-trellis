@@ -67,6 +67,7 @@ synthetic fixture (`Tests/Parity/Parity.trellis` and its sample), and
 | render | trellis-render at 900x640, same theme and appearance | its PNG equals the Preview snapshot, 0 differing pixels |
 | refuse | trellis-render without a private `GNUSTEP_HOME` (stand-in `HOME`) | exit 3, nothing written |
 | settings | the real `~/GNUstep` (`%USERPROFILE%\GNUstep` on Windows) | unchanged by the whole run |
+| deps | Windows: every DLL `TrellisPreview.exe` loads, recursively (`Tests/Parity/pe-deps.py`, import and delay-import tables) | each one is found in the app folder, `obj/` or `PATH`; `deps.json` lists the ones to ship and the system ones |
 | registry | Windows: `HKCU\Software\GNUstep*` of the user running it | reported (INFO), for the record |
 
 Each case runs for every entry in `THEMES` (default `Adwaita`). An entry
@@ -98,7 +99,10 @@ On Linux: `make check-parity` (needs Xvfb and Adwaita).
 ## Runtime contract (for packaging)
 
 - Ship: `TrellisPreview.app` (executable and Resources), `libTrellis` and
-  `libTrellisEngine`; not the tools (trellis-render refuses to run outside
+  `libTrellisEngine`, and every DLL the parity run's `deps.json` classes
+  `ship` (the toolchain's DLLs `TrellisPreview.exe` really loads; check an
+  installer's file list against it with `pe-deps.py` on the installed
+  copy, without PATH); not the tools (trellis-render refuses to run outside
   an isolated setup, and trellis-lint is for agents).
 - Runtime: the gnustep-cli v0.1.9 patched stack above, with its
   `GNUstep.conf` (point `GNUSTEP_CONFIG_FILE` at it, or the host's is

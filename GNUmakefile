@@ -128,6 +128,8 @@ check:: all
 	@Tests/Scripts/env-sh-vars.sh
 	@echo "== parity compare.py (synthetic folders)"
 	@$$(command -v python3 || command -v python) -I Tests/Scripts/parity-compare-regress.py
+	@echo "== pe-deps.py (synthetic PE files)"
+	@$$(command -v python3 || command -v python) -I Tests/Scripts/pe-deps-regress.py
 	@echo "== logical sides in styles"
 	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ISource/Engine Tests/Engine/logical-style.m \
 	  -o obj/logical-style -L./obj -lTrellisEngine $(shell gnustep-config --base-libs)

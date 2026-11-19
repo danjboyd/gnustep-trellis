@@ -47,6 +47,9 @@ typedef struct {
      overflows, align as start. */
   BOOL justifyContentSafe, alignContentSafe;
   BOOL justifyItemsSafe, justifySelfSafe, alignItemsSafe, alignSelfSafe;
+  /* self-start / self-end: start and end in the item's own direction
+     (stored as TRAlignStart/End with this flag set). */
+  BOOL justifyItemsSelf, justifySelfSelf, alignItemsSelf, alignSelfSelf;
 } TRStyleStorage;
 /* TRStyleStorage is internal (docs/api.md): its layout changes between
    versions. Use TRStyle's properties. */

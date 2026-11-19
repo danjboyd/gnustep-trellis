@@ -1,0 +1,84 @@
+{
+ "id": "wpt-grid/css/css-grid/abspos/absolute-positioning-grid-container-parent-001/6",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/abspos/absolute-positioning-grid-container-parent-001.html",
+  "commit": "34bdce16413b56bcc6c90c42ad1ed051769bbe2b",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "width": 500,
+   "height": 400,
+   "position": "relative"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "grid",
+     "boxSizing": "content-box",
+     "direction": "rtl",
+     "gridTemplateColumns": "50px 100px 150px",
+     "gridTemplateRows": "25px 50px 100px",
+     "width": 300,
+     "height": 200,
+     "marginTop": 20,
+     "marginRight": 30,
+     "marginBottom": 20,
+     "marginLeft": 30,
+     "paddingTop": 5,
+     "paddingRight": 15,
+     "paddingBottom": 5,
+     "paddingLeft": 15,
+     "borderTopWidth": 5,
+     "borderRightWidth": 5,
+     "borderBottomWidth": 5,
+     "borderLeftWidth": 5,
+     "position": "static"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "gridColumn": "auto",
+       "gridRow": "auto",
+       "width": "100%",
+       "height": "100%",
+       "position": "absolute"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "width": 500,
+      "height": 400,
+      "x": -150,
+      "y": 10,
+      "relativeTo": 2
+     }
+    ]
+   }
+  ]
+ },
+ "requires": [
+  "block-layout",
+  "margin-collapse"
+ ]
+}

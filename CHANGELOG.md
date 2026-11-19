@@ -66,6 +66,14 @@ version may change the API listed in docs/api.md, and says so here.
 - **Changed (lint):** an element the loader doesn't know (`<bogus>`) is
   an error. Before, trellis-lint passed it and only the loader rejected
   it, so a file that linted clean can fail lint now.
+- **Fixed (layout):** `self-start` and `self-end` (on `justify-items`,
+  `justify-self`, and on `align-items`/`align-self` in a column flex
+  container) follow the item's own `direction`: an `rtl` item in an `ltr`
+  container puts `self-start` at its right edge. Before, they were plain
+  `start`/`end` of the container.
+- **Added (tooling):** the WPT importer carries `direction` set on a node
+  below the case root into the case (Trellis takes it per node), instead
+  of skipping the test: 95 more cases.
 - **Changed (tools):** trellis-render's isolation guard is stricter: the
   home, the user Library and the user defaults directory must all resolve,
   symlinks followed, inside the private `GNUSTEP_HOME`, and a dangling or

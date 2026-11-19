@@ -76,6 +76,19 @@ static inline const TRStyleStorage *TRChildStyle(TRNode *c, TRDirection parentDi
   return TRStyleStorageForDirection(c->_style, d);
 }
 
+/* self-start / self-end (css-align-3): start and end in the item's own
+   direction. In the inline axis an item whose direction differs from its
+   container's swaps them; in the block axis they equal start and end.
+   item is the item's storage (its direction field, or inherit). */
+static inline TRAlign TRSelfAlignFlip(TRAlign a, BOOL isSelf, BOOL inlineAxis,
+                                      const TRStyleStorage *item, TRDirection containerDir)
+{
+  if (!isSelf || !inlineAxis) return a;
+  TRDirection d = item->direction == TRDirectionInherit ? containerDir : item->direction;
+  if (d == containerDir) return a;
+  return a == TRAlignStart ? TRAlignEnd : (a == TRAlignEnd ? TRAlignStart : a);
+}
+
 /* Places the abspos boxes inside cur's static descendants against a
    containing block's padding box (cbX, cbY, cbW, cbH); (ox, oy) is cur's
    origin in the containing block's border-box coordinates (TRLayout.m).

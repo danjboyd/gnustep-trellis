@@ -206,6 +206,11 @@ static const TRKeyword kAlign[] = {
   {"space-between", TRAlignSpaceBetween},
   {"space-around", TRAlignSpaceAround},
   {"space-evenly", TRAlignSpaceEvenly}, {NULL, 0}};
+static BOOL TRIsSelfAlign(NSString *kw)
+{
+  return [[kw lowercaseString] hasPrefix: @"self-"];
+}
+
 /* justify-* also accept the physical left/right. */
 static const TRKeyword kJustify[] = {
   {"auto", TRAlignAuto}, {"normal", TRAlignNormal},
@@ -562,9 +567,11 @@ static NSString *TRStripOverflowAlign(NSString *v, BOOL *safe)
   if ([p isEqualToString: @"align-items"] || [p isEqualToString: @"align-self"])
     {
       BOOL safe;
-      if (!TRLookup(TRStripOverflowAlign(v, &safe), kAlign, &k)) return NO;
-      if ([p isEqualToString: @"align-items"]) { _s.alignItems = (TRAlign)k; _s.alignItemsSafe = safe; }
-      else { _s.alignSelf = (TRAlign)k; _s.alignSelfSafe = safe; }
+      NSString *kw = TRStripOverflowAlign(v, &safe);
+      if (!TRLookup(kw, kAlign, &k)) return NO;
+      BOOL isSelf = TRIsSelfAlign(kw);
+      if ([p isEqualToString: @"align-items"]) { _s.alignItems = (TRAlign)k; _s.alignItemsSafe = safe; _s.alignItemsSelf = isSelf; }
+      else { _s.alignSelf = (TRAlign)k; _s.alignSelfSafe = safe; _s.alignSelfSelf = isSelf; }
       return YES;
     }
   KEYWORD(@"overflow", kOverflow, overflow, TROverflow)
@@ -810,9 +817,11 @@ static NSString *TRStripOverflowAlign(NSString *v, BOOL *safe)
   if ([p isEqualToString: @"justify-items"] || [p isEqualToString: @"justify-self"])
     {
       BOOL safe;
-      if (!TRLookup(TRStripOverflowAlign(v, &safe), kJustify, &k)) return 0;
-      if ([p isEqualToString: @"justify-items"]) { _s.justifyItems = (TRAlign)k; _s.justifyItemsSafe = safe; }
-      else { _s.justifySelf = (TRAlign)k; _s.justifySelfSafe = safe; }
+      NSString *kw = TRStripOverflowAlign(v, &safe);
+      if (!TRLookup(kw, kJustify, &k)) return 0;
+      BOOL isSelf = TRIsSelfAlign(kw);
+      if ([p isEqualToString: @"justify-items"]) { _s.justifyItems = (TRAlign)k; _s.justifyItemsSafe = safe; _s.justifyItemsSelf = isSelf; }
+      else { _s.justifySelf = (TRAlign)k; _s.justifySelfSafe = safe; _s.justifySelfSelf = isSelf; }
       return 1;
     }
   if ([p isEqualToString: @"grid-template-columns"] || [p isEqualToString: @"grid-template-rows"]
@@ -1002,6 +1011,14 @@ static NSString *TRKeywordString(const TRKeyword *table, int value)
   return @"?";
 }
 
+/* The keyword to write back: self-start/self-end keep their name. */
+static NSString *TRSelfAlignName(const TRKeyword *table, TRAlign a, BOOL isSelf)
+{
+  if (isSelf && a == TRAlignStart) return @"self-start";
+  if (isSelf && a == TRAlignEnd) return @"self-end";
+  return TRKeywordString(table, a);
+}
+
 - (NSString *)declarationString
 {
   TRStyleStorage d = TRStyleStorageInitial();
@@ -1018,10 +1035,10 @@ static NSString *TRKeywordString(const TRKeyword *table, int value)
   if (_s.justifyContent != d.justifyContent || _s.justifyContentSafe)
     [out addObject: [NSString stringWithFormat: @"justify-content: %@%@", _s.justifyContentSafe ? @"safe " : @"",
                      TRKeywordString(kJustify, _s.justifyContent)]];
-  if (_s.alignItems != d.alignItems || _s.alignItemsSafe)
-    [out addObject: [NSString stringWithFormat: @"align-items: %@%@", _s.alignItemsSafe ? @"safe " : @"", TRKeywordString(kAlign, _s.alignItems)]];
-  if (_s.alignSelf != d.alignSelf || _s.alignSelfSafe)
-    [out addObject: [NSString stringWithFormat: @"align-self: %@%@", _s.alignSelfSafe ? @"safe " : @"", TRKeywordString(kAlign, _s.alignSelf)]];
+  if (_s.alignItems != d.alignItems || _s.alignItemsSafe || _s.alignItemsSelf)
+    [out addObject: [NSString stringWithFormat: @"align-items: %@%@", _s.alignItemsSafe ? @"safe " : @"", TRSelfAlignName(kAlign, _s.alignItems, _s.alignItemsSelf)]];
+  if (_s.alignSelf != d.alignSelf || _s.alignSelfSafe || _s.alignSelfSelf)
+    [out addObject: [NSString stringWithFormat: @"align-self: %@%@", _s.alignSelfSafe ? @"safe " : @"", TRSelfAlignName(kAlign, _s.alignSelf, _s.alignSelfSelf)]];
   if (_s.alignContent != d.alignContent || _s.alignContentSafe)
     [out addObject: [NSString stringWithFormat: @"align-content: %@%@", _s.alignContentSafe ? @"safe " : @"",
                      TRKeywordString(kAlign, _s.alignContent)]];
@@ -1068,10 +1085,10 @@ static NSString *TRKeywordString(const TRKeyword *table, int value)
   LEN(@"row-gap", rowGap)
   LEN(@"column-gap", columnGap)
   if (_s.order != 0) [out addObject: [NSString stringWithFormat: @"order: %ld", (long)_s.order]];
-  if (_s.justifyItems != d.justifyItems || _s.justifyItemsSafe)
-    [out addObject: [NSString stringWithFormat: @"justify-items: %@%@", _s.justifyItemsSafe ? @"safe " : @"", TRKeywordString(kJustify, _s.justifyItems)]];
-  if (_s.justifySelf != d.justifySelf || _s.justifySelfSafe)
-    [out addObject: [NSString stringWithFormat: @"justify-self: %@%@", _s.justifySelfSafe ? @"safe " : @"", TRKeywordString(kJustify, _s.justifySelf)]];
+  if (_s.justifyItems != d.justifyItems || _s.justifyItemsSafe || _s.justifyItemsSelf)
+    [out addObject: [NSString stringWithFormat: @"justify-items: %@%@", _s.justifyItemsSafe ? @"safe " : @"", TRSelfAlignName(kJustify, _s.justifyItems, _s.justifyItemsSelf)]];
+  if (_s.justifySelf != d.justifySelf || _s.justifySelfSafe || _s.justifySelfSelf)
+    [out addObject: [NSString stringWithFormat: @"justify-self: %@%@", _s.justifySelfSafe ? @"safe " : @"", TRSelfAlignName(kJustify, _s.justifySelf, _s.justifySelfSelf)]];
   if (_s.gridAutoFlowColumn || _s.gridAutoFlowDense)
     [out addObject: [NSString stringWithFormat: @"grid-auto-flow: %@%@",
                      _s.gridAutoFlowColumn ? @"column" : @"row", _s.gridAutoFlowDense ? @" dense" : @""]];

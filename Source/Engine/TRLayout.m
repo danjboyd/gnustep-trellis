@@ -627,6 +627,9 @@ static void TRStaticPosition(const TRStyleStorage *ps, TRDirection pdir, TRFloat
       default: break;
     }
   TRAlign a = TRResolveAlignSelf(cs, ps);
+  /* In a column the cross axis is the inline axis. */
+  a = TRSelfAlignFlip(a, cs->alignSelf == TRAlignAuto ? ps->alignItemsSelf : cs->alignSelfSelf,
+                      !isRow, cs, pdir);
   /* An abspos box has no baseline set to join: CSS Align falls back to
      'start' (not 'flex-start'), which ignores wrap-reverse. */
   if (a == TRAlignBaseline) a = TRAlignStart;
@@ -936,7 +939,9 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
           if (isRow) sh = it->styleCross; else sw = it->styleCross;
         }
 
-      it->align = TRResolveAlignSelf(cs, s);
+      it->align = TRSelfAlignFlip(TRResolveAlignSelf(cs, s),
+                                  cs->alignSelf == TRAlignAuto ? s->alignItemsSelf : cs->alignSelfSelf,
+                                  !isRow, cs, dir);
       /* In a column the cross axis is the inline axis, so items have no
          baseline there: css-align-3 synthesizes one from the border box's
          start edge. The items still share a baseline group, so their

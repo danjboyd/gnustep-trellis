@@ -1,0 +1,126 @@
+{
+ "id": "wpt-grid/css/css-grid/alignment/grid-column-axis-alignment-positioned-items-015/1",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/alignment/grid-column-axis-alignment-positioned-items-015.html",
+  "commit": "34bdce16413b56bcc6c90c42ad1ed051769bbe2b",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "rtl",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "inline-grid",
+   "boxSizing": "content-box",
+   "position": "relative",
+   "gridTemplateColumns": "100px 150px",
+   "gridTemplateRows": "150px 100px",
+   "justifyItems": "start",
+   "alignContent": "center",
+   "height": 450
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "direction": "ltr",
+     "gridRow": "auto / 1",
+     "gridColumn": "1 / 2",
+     "alignSelf": "self-start",
+     "position": "absolute"
+    },
+    "measure": {
+     "text": "X XX X",
+     "charWidth": 10,
+     "lineHeight": 10
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "direction": "ltr",
+     "gridRow": "1 / 2",
+     "gridColumn": "2 / 3",
+     "alignSelf": "self-start",
+     "position": "absolute"
+    },
+    "measure": {
+     "text": "XX X\nX XXX X\nXX XXX",
+     "charWidth": 10,
+     "lineHeight": 10
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "direction": "ltr",
+     "gridRow": "2 / auto",
+     "gridColumn": "1 / 2",
+     "alignSelf": "self-start",
+     "position": "absolute"
+    },
+    "measure": {
+     "text": "X XX X",
+     "charWidth": 10,
+     "lineHeight": 10
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "direction": "ltr",
+     "gridRow": "auto / auto",
+     "gridColumn": "2 / 3",
+     "alignSelf": "self-start",
+     "position": "absolute"
+    },
+    "measure": {
+     "text": "XX X\nX XXX\nX\nXX XXX",
+     "charWidth": 10,
+     "lineHeight": 10
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 60,
+    "height": 10,
+    "x": 190,
+    "y": 0
+   },
+   {
+    "width": 70,
+    "height": 30,
+    "x": 80,
+    "y": 100
+   },
+   {
+    "width": 60,
+    "height": 10,
+    "x": 190,
+    "y": 250
+   },
+   {
+    "width": 60,
+    "height": 40,
+    "x": 90,
+    "y": 0
+   }
+  ]
+ },
+ "requires": [
+  "measure"
+ ]
+}

@@ -10,9 +10,9 @@ imported	css/css-flexbox/abspos/flex-abspos-staticpos-align-self-006.html	24 cas
 imported	css/css-flexbox/abspos/flex-abspos-staticpos-align-self-007.html	24 case(s)
 imported	css/css-flexbox/abspos/flex-abspos-staticpos-align-self-008.html	24 case(s)
 imported	css/css-flexbox/abspos/flex-abspos-staticpos-align-self-rtl-001.html	24 case(s)
-skipped	css/css-flexbox/abspos/flex-abspos-staticpos-align-self-rtl-002.html	direction set below case root
+imported	css/css-flexbox/abspos/flex-abspos-staticpos-align-self-rtl-002.html	24 case(s)
 imported	css/css-flexbox/abspos/flex-abspos-staticpos-align-self-rtl-003.html	24 case(s)
-skipped	css/css-flexbox/abspos/flex-abspos-staticpos-align-self-rtl-004.html	direction set below case root
+imported	css/css-flexbox/abspos/flex-abspos-staticpos-align-self-rtl-004.html	24 case(s)
 skipped	css/css-flexbox/abspos/flex-abspos-staticpos-align-self-vertWM-001.html	writing-mode
 skipped	css/css-flexbox/abspos/flex-abspos-staticpos-align-self-vertWM-002.html	writing-mode
 skipped	css/css-flexbox/abspos/flex-abspos-staticpos-align-self-vertWM-003.html	writing-mode
@@ -128,7 +128,7 @@ imported	css/css-flexbox/flex-container-max-content-002.tentative.html	24 case(s
 imported	css/css-flexbox/flex-container-min-content-002.tentative.html	24 case(s)
 skipped	css/css-flexbox/flex-direction-column-overlap-001.html	script mutates page
 imported	css/css-flexbox/flex-factor-less-than-one.html	14 case(s)
-imported	css/css-flexbox/flex-flow-013.html	6 case(s)
+imported	css/css-flexbox/flex-flow-013.html	8 case(s)
 skipped	css/css-flexbox/flex-item-compressible-001.html	replaced element <input>
 skipped	css/css-flexbox/flex-item-compressible-002.html	replaced element <input>
 skipped	css/css-flexbox/flex-item-contains-strict.html	contain

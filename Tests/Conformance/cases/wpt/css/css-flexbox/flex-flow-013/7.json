@@ -1,0 +1,122 @@
+{
+ "id": "wpt/css/css-flexbox/flex-flow-013/7",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/flex-flow-013.html",
+  "commit": "34bdce16413b56bcc6c90c42ad1ed051769bbe2b",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 800,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "block",
+   "boxSizing": "content-box",
+   "position": "relative"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "flex",
+     "boxSizing": "content-box",
+     "width": 600,
+     "direction": "rtl",
+     "height": 600,
+     "flexDirection": "column-reverse"
+    },
+    "children": [
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "height": 20,
+       "width": 20,
+       "flexGrow": "1",
+       "flexShrink": 0,
+       "flexBasis": 0,
+       "marginTop": "auto",
+       "marginRight": 100,
+       "marginBottom": "auto",
+       "marginLeft": 50
+      }
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "height": 20,
+       "width": 20,
+       "flexGrow": "2",
+       "flexShrink": 0,
+       "flexBasis": 0,
+       "paddingInlineStart": 200
+      },
+      "children": [
+       {
+        "style": {
+         "display": "block",
+         "boxSizing": "content-box",
+         "height": 10
+        }
+       }
+      ]
+     },
+     {
+      "style": {
+       "display": "block",
+       "boxSizing": "content-box",
+       "height": 20,
+       "width": 20,
+       "flexGrow": "1",
+       "flexShrink": 0,
+       "flexBasis": 0,
+       "marginInlineEnd": 100
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "children": [
+     {
+      "height": 150,
+      "x": 480,
+      "y": 450,
+      "relativeTo": 2
+     },
+     {
+      "children": [
+       {
+        "x": 380,
+        "y": 150,
+        "relativeTo": 3
+       }
+      ],
+      "height": 300,
+      "y": 150,
+      "relativeTo": 2
+     },
+     {
+      "height": 150,
+      "x": 580,
+      "y": 0,
+      "relativeTo": 2
+     }
+    ]
+   }
+  ]
+ },
+ "requires": [
+  "block-layout",
+  "logical-properties"
+ ]
+}

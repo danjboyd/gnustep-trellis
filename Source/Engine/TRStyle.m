@@ -134,10 +134,31 @@ static BOOL TRCalcFactor(const char *s, size_t *i, TRCalcTerm *out)
       (*i)++;
       return YES;
     }
-  char *end = NULL;
-  double v = strtod(s + *i, &end);
-  if (end == s + *i) return NO;
-  *i = (size_t)(end - s);
+  /* A CSS number, read by hand: strtod follows the C locale, which an
+     app may have set to one with a decimal comma. */
+  size_t j = *i;
+  double sign = 1, v = 0;
+  if (s[j] == '+' || s[j] == '-') { if (s[j] == '-') sign = -1; j++; }
+  BOOL digits = NO;
+  while (isdigit((unsigned char)s[j])) { v = v * 10 + (s[j] - '0'); j++; digits = YES; }
+  if (s[j] == '.' && isdigit((unsigned char)s[j + 1]))
+    {
+      double f = 0.1;
+      for (j++; isdigit((unsigned char)s[j]); j++, f /= 10) v += (s[j] - '0') * f;
+      digits = YES;
+    }
+  if (!digits) return NO;
+  if ((s[j] == 'e' || s[j] == 'E') && (isdigit((unsigned char)s[j + 1])
+      || ((s[j + 1] == '+' || s[j + 1] == '-') && isdigit((unsigned char)s[j + 2]))))
+    {
+      j++;
+      int es = 1, e = 0;
+      if (s[j] == '+' || s[j] == '-') { if (s[j] == '-') es = -1; j++; }
+      while (isdigit((unsigned char)s[j])) { e = e * 10 + (s[j] - '0'); j++; }
+      v *= pow(10, es * e);
+    }
+  v *= sign;
+  *i = j;
   out->px = out->pct = 0; out->num = NO;
   if (s[*i] == '%') { out->pct = v; (*i)++; }
   else if (strncmp(s + *i, "px", 2) == 0) { out->px = v; *i += 2; }

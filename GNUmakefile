@@ -126,6 +126,8 @@ check:: all
 	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH ./obj/markup-scale
 	@echo "== scripts/env.sh keeps the caller's variables"
 	@Tests/Scripts/env-sh-vars.sh
+	@echo "== parity compare.py (synthetic folders)"
+	@$$(command -v python3 || command -v python) -I Tests/Scripts/parity-compare-regress.py
 	@echo "== logical sides in styles"
 	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ISource/Engine Tests/Engine/logical-style.m \
 	  -o obj/logical-style -L./obj -lTrellisEngine $(shell gnustep-config --base-libs)

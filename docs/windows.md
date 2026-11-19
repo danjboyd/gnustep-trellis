@@ -60,7 +60,8 @@ synthetic fixture (`Tests/Parity/Parity.trellis` and its sample), and
 
 | Case | What | Pass when |
 |---|---|---|
-| open | TrellisPreview `--snapshot` + `--export-json`, 900x640 | PNG and frames JSON written |
+| theme | each theme in `THEMES`, before its cases | `NAME.theme` is in the private home's `Library/Themes` or the toolchain's Local, Network or System `Themes` (otherwise that theme's cases are skipped) |
+| open | TrellisPreview `--snapshot` + `--export-json`, 900x640 | PNG and frames JSON written, and the JSON names the requested theme |
 | resize | the same window resized live (`--resize 520x640,340x640`) | a snapshot and JSON at each size |
 | reload | `--watch 2` while the fixture, then its sample, are edited | each reload's JSON shows the edit |
 | render | trellis-render at 900x640, same theme and appearance | its PNG equals the Preview snapshot, 0 differing pixels |
@@ -68,14 +69,29 @@ synthetic fixture (`Tests/Parity/Parity.trellis` and its sample), and
 | settings | the real `~/GNUstep` (`%USERPROFILE%\GNUstep` on Windows) | unchanged by the whole run |
 | registry | Windows: `HKCU\Software\GNUstep*` of the user running it | reported (INFO), for the record |
 
-Each case runs for every theme in `THEMES` (default `Adwaita`) and, for
-Adwaita, in light and dark.
+Each case runs for every entry in `THEMES` (default `Adwaita`). An entry
+is `NAME` or `NAME:APPEARANCES`: `THEMES="Adwaita WinUITheme:light"`.
+Without a list, Adwaita runs in light and dark and any other theme in
+light only. The theme check catches a missing bundle and a fallback to
+GNUstep's default theme; it can't tell whether a bundle that loads draws
+correctly, which is what the snapshots are for.
 
 Across platforms pixels aren't comparable (fonts and their metrics
 differ), so `compare.py` checks structure for every frames JSON both runs
 wrote: the same view tree (classes, ids, nesting), the same Tab order, and
 every frame within 24 px (`--tolerance`); lint findings that differ are
 listed as warnings. Within one platform the pixel check is exact.
+
+Themes that exist on one platform only are paired with `--theme-map`:
+
+```sh
+# Linux: THEMES="Adwaita GNUstep"; Windows: THEMES="WinUITheme GNUstep"
+python3 -I Tests/Parity/compare.py LINUX_OUT WINDOWS_OUT --theme-map Adwaita=WinUITheme
+```
+
+GNUstep's default theme builds everywhere, so `GNUstep` gives a
+same-theme comparison on both platforms. The reload case uses the first
+theme in `THEMES`.
 
 On Linux: `make check-parity` (needs Xvfb and Adwaita).
 
@@ -91,7 +107,11 @@ On Linux: `make check-parity` (needs Xvfb and Adwaita).
 - Settings: TrellisPreview writes nothing to the user's defaults (the
   appearance switch uses the argument domain and relaunches itself).
 - Build with `make hot_reload=no`.
-- Themes: Adwaita only for now; the appearance switch needs it. Others
-  (WinUITheme) wait until this matrix covers them.
+- Themes: Adwaita (danjboyd/plugins-themes-Adwaita at 9c25a68) doesn't
+  build on Windows: its GNOME adapters (X11 window manager, portal file
+  chooser and print dialog) are Linux-only. On Windows the candidate is
+  WinUITheme (danjboyd/plugins-themes-winuitheme), which the appearance
+  switch also drives (`WinUIThemeColorScheme` 1 or 2, argument domain
+  only). It ships once the matrix has passed with it on Windows.
 - File association (`.trellis` opens TrellisPreview): Dan's decision, in
   the release proposal.

@@ -5,7 +5,7 @@
         Same platform and build: the two PNGs must be identical (exit 0),
         e.g. a TrellisPreview snapshot and trellis-render's PNG.
 
-    compare.py LINUX_OUT WINDOWS_OUT [--tolerance PX]
+    compare.py LINUX_OUT WINDOWS_OUT [--tolerance PX] [--theme-map A=B]...
         Two run.sh output folders from different platforms. Pixels aren't
         comparable there (fonts differ), so for every frames JSON both have
         (open, resize, render, reload):
@@ -17,6 +17,10 @@
             are listed);
           - lint findings that differ (rule and id) are listed as WARN:
             text that fits on one platform can clip on the other.
+        --theme-map A=B pairs theme A's files in the first folder with
+        theme B's in the second (open-A-light.json with open-B-light.json),
+        for a theme that exists on one platform only (Adwaita on Linux,
+        WinUITheme on Windows); files with the same name are paired too.
         Both manifests' cases must have passed. Exit 0 when nothing FAILs.
 """
 import json
@@ -69,7 +73,7 @@ def compare_json(name, a, b, tol):
     if sa != sb:
         first = next((k for k in range(min(len(sa), len(sb))) if sa[k] != sb[k]), min(len(sa), len(sb)))
         fails.append("view tree differs (%d vs %d views; first difference at %s: %s vs %s)"
-                     % (len(sa), len(sb), (sa + sb)[first][0] if first < len(sa) else "end",
+                     % (len(sa), len(sb), (sa[first] if first < len(sa) else sb[first])[0],
                         sa[first] if first < len(sa) else "-", sb[first] if first < len(sb) else "-"))
     else:
         worst = []
@@ -106,6 +110,15 @@ def main(argv):
         i = args.index("--tolerance")
         tol = float(args[i + 1])
         del args[i:i + 2]
+    tmap = []
+    while "--theme-map" in args:
+        i = args.index("--theme-map")
+        a, _, b = args[i + 1].partition("=")
+        if not a or not b:
+            print(__doc__, file=sys.stderr)
+            return 2
+        tmap.append((a, b))
+        del args[i:i + 2]
     if len(args) != 2:
         print(__doc__, file=sys.stderr)
         return 2
@@ -117,14 +130,20 @@ def main(argv):
         print("%s %s (%s at %s): %d case(s)%s" % ("FAIL" if bad else "ok  ", d, m["platform"], (m["commit"] or "?")[:12],
                                                 len(m["cases"]), ", failed: " + ", ".join(bad) if bad else ""))
         fails += bool(bad)
-    names = sorted(n for n in os.listdir(A) if n.endswith(".json") and n != "manifest.json"
-                   and os.path.exists(os.path.join(B, n)))
-    if not names:
+    pairs = []
+    for n in sorted(os.listdir(A)):
+        if not n.endswith(".json") or n == "manifest.json":
+            continue
+        for m in [n] + [n.replace("-%s-" % a, "-%s-" % b, 1) for a, b in tmap if "-%s-" % a in n]:
+            if os.path.exists(os.path.join(B, m)):
+                pairs.append((n, m))
+    if not pairs:
         print("FAIL no frames JSON in common")
         return 1
-    for n in names:
-        fails += compare_json(n, json.load(open(os.path.join(A, n))), json.load(open(os.path.join(B, n))), tol)
-    print("== %d file(s) compared, %s" % (len(names), "no failures" if not fails else "%d failure(s)" % fails))
+    for n, m in pairs:
+        fails += compare_json(n if n == m else "%s ~ %s" % (n, m),
+                              json.load(open(os.path.join(A, n))), json.load(open(os.path.join(B, m))), tol)
+    print("== %d file(s) compared, %s" % (len(pairs), "no failures" if not fails else "%d failure(s)" % fails))
     return 0 if fails == 0 else 1
 
 

@@ -244,7 +244,10 @@ collapses as in HTML, and the runs follow the label's `color`,
   circle reaches another control (WCAG 2.2, 2.5.8). Desktop controls about
   22 px tall pass with a normal gap; tight rows of small icon buttons
   don't. Give them `min-width`/`min-height: 24px` or a `gap`.
-- **Units:** `px`, `%` and `auto`. `width`, `height`, their `min-`/`max-`
+- **Units:** `px`, `%` and `auto`, and `calc()` mixing them anywhere a
+  length goes (`width: calc(100% - 24px)`, `margin: calc(5% + 4px) 8px`;
+  `+ - * /` and parentheses; not in grid track lists, and no `min()`,
+  `max()` or `clamp()`). `width`, `height`, their `min-`/`max-`
   forms and `flex-basis` also take `min-content`, `max-content`,
   `fit-content` and `stretch` (since 0.8; `flex-basis: stretch` acts as
   `content`, as in Yoga), and `initial` (their initial value: `auto`, or

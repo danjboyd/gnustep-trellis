@@ -30,6 +30,7 @@ static inline TRFloat TRResolve(TRValue v, TRFloat ref)
     {
       case TRUnitPoint: return v.value;
       case TRUnitPercent: return isnan(ref) ? TRUndefined : v.value * ref / 100.0;
+      case TRUnitCalc: return isnan(ref) ? TRUndefined : v.value + v.pct * ref / 100.0;
       default: return TRUndefined;
     }
 }
@@ -120,9 +121,9 @@ static inline BOOL TRIsInFlow(TRNode *child)
 static BOOL TRUsesOwnerSize(const TRStyleStorage *s)
 {
   for (int i = 0; i < 4; i++)
-    if (s->padding[i].unit == TRUnitPercent) return YES;
-  return s->minWidth.unit == TRUnitPercent || s->maxWidth.unit == TRUnitPercent
-      || s->minHeight.unit == TRUnitPercent || s->maxHeight.unit == TRUnitPercent;
+    if (TRIsPct(s->padding[i].unit)) return YES;
+  return TRIsPct(s->minWidth.unit) || TRIsPct(s->maxWidth.unit)
+      || TRIsPct(s->minHeight.unit) || TRIsPct(s->maxHeight.unit);
 }
 
 static BOOL TRCacheMatch(const TRCacheEntry *e, TRFloat aw, TRFloat ah,
@@ -941,7 +942,7 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
          children aren't flexed. */
       {
         BOOL def;
-        if (cs->height.unit == TRUnitPoint || (cs->height.unit == TRUnitPercent && !isnan(refH)))
+        if (cs->height.unit == TRUnitPoint || (TRIsPct(cs->height.unit) && !isnan(refH)))
           def = YES;
         else if (isRow)
           def = TRResolveAlignSelf(cs, s) == TRAlignStretch && !it->crossLeadAuto && !it->crossTrailAuto;
@@ -996,7 +997,7 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
 
       /* flex-basis */
       TRFloat basis = TRUndefined;
-      if (!inBlock && (cs->flexBasis.unit == TRUnitPoint || cs->flexBasis.unit == TRUnitPercent))
+      if (!inBlock && (cs->flexBasis.unit == TRUnitPoint || TRIsPct(cs->flexBasis.unit)))
         basis = TRBoxSize(cs, cs->flexBasis, refMain, it->pbMain);
       if (isnan(basis) && !isnan(it->styleMain))
         basis = it->styleMain;

@@ -174,7 +174,7 @@ static void TRClearDirty(TRNode *n)
 static TRFloat TRRootInset(TRValue v, TRFloat ref)
 {
   if (v.unit == TRUnitPoint) return v.value;
-  if (v.unit == TRUnitPercent && !isnan(ref)) return v.value * ref / 100;
+  if (TRIsPct(v.unit) && !isnan(ref)) return TRValueAt(v, ref);
   return 0;
 }
 
@@ -191,16 +191,16 @@ static TRFloat TRRootInset(TRValue v, TRFloat ref)
 
   /* The root's own definite size wins over the available size. Margins
      of the root are honoured by offsetting it. */
-  if (s->width.unit == TRUnitPoint || (s->width.unit == TRUnitPercent && !isnan(aw)))
+  if (s->width.unit == TRUnitPoint || (TRIsPct(s->width.unit) && !isnan(aw)))
     {
       TRFloat pb = 0;
       for (int k = 0; k < 4; k += 2)
         {
           if (s->padding[k].unit == TRUnitPoint) pb += s->padding[k].value;
-          else if (s->padding[k].unit == TRUnitPercent && !isnan(aw)) pb += s->padding[k].value * aw / 100;
+          else if (TRIsPct(s->padding[k].unit) && !isnan(aw)) pb += TRValueAt(s->padding[k], aw);
           if (s->border[k].unit == TRUnitPoint) pb += s->border[k].value;
         }
-      TRFloat w = s->width.unit == TRUnitPoint ? s->width.value : s->width.value * aw / 100;
+      TRFloat w = s->width.unit == TRUnitPoint ? s->width.value : TRValueAt(s->width, aw);
       aw = s->boxSizing == TRBoxSizingContentBox ? w + pb : MAX(w, pb);
       wm = TRMeasureModeExactly;
     }
@@ -217,16 +217,16 @@ static TRFloat TRRootInset(TRValue v, TRFloat ref)
       else if (s->position == TRPositionAbsolute)
         aw = MAX(0, aw - TRRootInset(s->inset[TREdgeLeft], available.width) - TRRootInset(s->inset[TREdgeRight], available.width));
     }
-  if (s->height.unit == TRUnitPoint || (s->height.unit == TRUnitPercent && !isnan(ah)))
+  if (s->height.unit == TRUnitPoint || (TRIsPct(s->height.unit) && !isnan(ah)))
     {
       TRFloat pb = 0;
       for (int k = 1; k < 4; k += 2)
         {
           if (s->padding[k].unit == TRUnitPoint) pb += s->padding[k].value;
-          else if (s->padding[k].unit == TRUnitPercent && !isnan(available.width)) pb += s->padding[k].value * available.width / 100;
+          else if (TRIsPct(s->padding[k].unit) && !isnan(available.width)) pb += TRValueAt(s->padding[k], available.width);
           if (s->border[k].unit == TRUnitPoint) pb += s->border[k].value;
         }
-      TRFloat h = s->height.unit == TRUnitPoint ? s->height.value : s->height.value * ah / 100;
+      TRFloat h = s->height.unit == TRUnitPoint ? s->height.value : TRValueAt(s->height, ah);
       ah = s->boxSizing == TRBoxSizingContentBox ? h + pb : MAX(h, pb);
       hm = TRMeasureModeExactly;
     }
@@ -250,7 +250,7 @@ static TRFloat TRRootInset(TRValue v, TRFloat ref)
       {
         TRFloat v = 0;
         if (s->padding[k].unit == TRUnitPoint) v += s->padding[k].value;
-        else if (s->padding[k].unit == TRUnitPercent && !isnan(available.width)) v += s->padding[k].value * available.width / 100;
+        else if (TRIsPct(s->padding[k].unit) && !isnan(available.width)) v += TRValueAt(s->padding[k], available.width);
         if (s->border[k].unit == TRUnitPoint) v += s->border[k].value;
         pbs[k % 2] += v;
       }
@@ -296,15 +296,15 @@ static TRFloat TRRootInset(TRValue v, TRFloat ref)
         {
           TRFloat v = 0;
           if (s->padding[k].unit == TRUnitPoint) v += s->padding[k].value;
-          else if (s->padding[k].unit == TRUnitPercent && !isnan(available.width)) v += s->padding[k].value * available.width / 100;
+          else if (TRIsPct(s->padding[k].unit) && !isnan(available.width)) v += TRValueAt(s->padding[k], available.width);
           if (s->border[k].unit == TRUnitPoint) v += s->border[k].value;
           pb[k % 2] += v;   /* [0] = vertical (top+bottom), [1] = horizontal */
         }
       TRFloat pbW = pb[1], pbH = pb[0];
       BOOL cb = s->boxSizing == TRBoxSizingContentBox;
       TRFloat cbx[2] = { cb ? pbW : 0, cb ? pbH : 0 };   /* min/max are content sizes in content-box */
-      BOOL wDef = s->width.unit == TRUnitPoint || (s->width.unit == TRUnitPercent && !isnan(available.width));
-      BOOL hDef = s->height.unit == TRUnitPoint || (s->height.unit == TRUnitPercent && !isnan(available.height));
+      BOOL wDef = s->width.unit == TRUnitPoint || (TRIsPct(s->width.unit) && !isnan(available.width));
+      BOOL hDef = s->height.unit == TRUnitPoint || (TRIsPct(s->height.unit) && !isnan(available.height));
       #define TR_CLAMP_W(x) ({ TRFloat _v = (x); \
         if (s->maxWidth.unit == TRUnitPoint) _v = MIN(_v, s->maxWidth.value + cbx[0]); \
         if (s->minWidth.unit == TRUnitPoint) _v = MAX(_v, s->minWidth.value + cbx[0]); MAX(_v, pbW); })
@@ -371,11 +371,11 @@ static TRFloat TRRootInset(TRValue v, TRFloat ref)
   if (s->position != TRPositionStatic)
     {
       if (s->inset[TREdgeLeft].unit == TRUnitPoint) x += s->inset[TREdgeLeft].value;
-      else if (s->inset[TREdgeLeft].unit == TRUnitPercent && !isnan(available.width))
-        x += s->inset[TREdgeLeft].value * available.width / 100;
+      else if (TRIsPct(s->inset[TREdgeLeft].unit) && !isnan(available.width))
+        x += TRValueAt(s->inset[TREdgeLeft], available.width);
       if (s->inset[TREdgeTop].unit == TRUnitPoint) y += s->inset[TREdgeTop].value;
-      else if (s->inset[TREdgeTop].unit == TRUnitPercent && !isnan(available.height))
-        y += s->inset[TREdgeTop].value * available.height / 100;
+      else if (TRIsPct(s->inset[TREdgeTop].unit) && !isnan(available.height))
+        y += TRValueAt(s->inset[TREdgeTop], available.height);
     }
   _rawFrame.x = x;
   _rawFrame.y = y;

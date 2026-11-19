@@ -381,6 +381,7 @@ static inline double TRGResolve(TRValue v, double ref)
     {
       case TRUnitPoint: return v.value;
       case TRUnitPercent: return isnan(ref) ? NAN : v.value * ref / 100.0;
+      case TRUnitCalc: return isnan(ref) ? NAN : v.value + v.pct * ref / 100.0;
       default: return NAN;
     }
 }
@@ -763,7 +764,7 @@ static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
             double mg = columns ? it->margin[TREdgeLeft] + it->margin[TREdgeRight]
                                 : it->margin[TREdgeTop] + it->margin[TREdgeBottom];
             TRValue autoSize = columns ? it->s->width : it->s->height;
-            BOOL sizeAuto = autoSize.unit != TRUnitPoint && autoSize.unit != TRUnitPercent;
+            BOOL sizeAuto = autoSize.unit != TRUnitPoint && !TRIsPct(autoSize.unit);
             if (mk == TRBreadthAuto && (columns ? it->autoMinW : it->autoMinH))
               {
                 /* The content-box part is clamped to the stretch fit (the max
@@ -779,7 +780,7 @@ static void TRSizeTracks(TRTrack *tr, NSInteger n, double avail, double gap,
                 TRValue mv = columns ? it->s->minWidth : it->s->minHeight;
                 double mn = TRGBox(it->s, mv, NAN, columns, NAN);
                 /* A percentage can't resolve while the tracks are sized: 0. */
-                if (isnan(mn) && mv.unit == TRUnitPercent) mn = TRGBox(it->s, TRZeroValue(), NAN, columns, NAN);
+                if (isnan(mn) && TRIsPct(mv.unit)) mn = TRGBox(it->s, TRZeroValue(), NAN, columns, NAN);
                 if (!isnan(mn)) minA = mn + mg;
               }
             if (mk == TRBreadthAuto) t->base = MAX(t->base, minA);
@@ -1375,8 +1376,8 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           it->margin[e] = isnan(m) ? 0 : m;
         }
       double mh = it->margin[TREdgeLeft] + it->margin[TREdgeRight];
-      it->autoMinW = cs->width.unit != TRUnitPoint && cs->width.unit != TRUnitPercent && cs->minWidth.unit == TRUnitAuto;
-      it->autoMinH = cs->height.unit != TRUnitPoint && cs->height.unit != TRUnitPercent && cs->minHeight.unit == TRUnitAuto;
+      it->autoMinW = cs->width.unit != TRUnitPoint && !TRIsPct(cs->width.unit) && cs->minWidth.unit == TRUnitAuto;
+      it->autoMinH = cs->height.unit != TRUnitPoint && !TRIsPct(cs->height.unit) && cs->minHeight.unit == TRUnitAuto;
       double sw = TRGBox(cs, cs->width, NAN, YES, NAN);
       if (!isnan(sw))
         it->minW = it->maxW = sw + mh;
@@ -1436,7 +1437,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       TRGridItem *it = &items[k];
       double areaW = TRSpanSize(colsT, it->c0, it->c1);
       for (int e = 0; e < 4; e++)
-        if (it->s->margin[e].unit == TRUnitPercent)
+        if (TRIsPct(it->s->margin[e].unit))
           it->margin[e] = TRGResolve(it->s->margin[e], areaW);
     }
 
@@ -1518,9 +1519,9 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
   /* A percentage row-gap in an indefinite height counts as 0 while the
      height is found, then resolves against it (the grid keeps that height,
      so the rows may overflow). */
-  if (isnan(innerH) && s->rowGap.unit == TRUnitPercent)
+  if (isnan(innerH) && TRIsPct(s->rowGap.unit))
     {
-      double g = MAX(0, s->rowGap.value * contentH / 100.0);
+      double g = MAX(0, TRValueAt(s->rowGap, contentH));
       rowsTotal = TRPlaceTracks(rowsT, nRows, g, contentH, s->alignContent, s->alignContentSafe);
     }
 

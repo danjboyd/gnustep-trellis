@@ -521,8 +521,10 @@ def norm_value(v, font_size, requires):
     v = fixed_units_to_px(re.sub(r"\s+", " ", v.strip()))
     # CSS math functions; the lookbehind keeps minmax() (a grid track
     # function, supported) from matching max(.
-    if re.search(r"(?<![\w-])(calc|min|max|clamp)\(", v):
+    if re.search(r"(?<![\w-])calc\(", v):
         requires.add("css-calc")
+    if re.search(r"(?<![\w-])(min|max|clamp)\(", v):
+        requires.add("css-min-max")
     if re.search(r"\d(vw|vh|vmin|vmax|ch|ex|lh|rlh|cqw|cqh|cqi|cqb|cqmin|cqmax)\b", v, re.IGNORECASE):
         raise Skip("unit in " + v)
     p = to_px(v, font_size)
@@ -1009,6 +1011,9 @@ class Converter:
             if re.search(r"(inline|block)", k) and k not in ("display",):
                 self.requires.add("logical-properties")
             val = norm_value(v, fs, self.requires)
+            # Trellis takes calc() in lengths, not in grid track lists.
+            if k.startswith(("grid-template", "grid-auto")) and "calc(" in str(val):
+                self.requires.add("css-calc-tracks")
             if isinstance(val, str):
                 if re.search(r"\b(min-content|max-content|fit-content)\b", val) \
                         and not k.startswith("grid"):

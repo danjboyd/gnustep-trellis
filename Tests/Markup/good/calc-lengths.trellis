@@ -1,0 +1,9 @@
+<row class="bar">
+  <label class="name">Name</label>
+  <field class="input" placeholder="Type here"/>
+  <style>
+    .bar { padding: calc(2% + 4px) 8px; gap: 8px; }
+    .name { width: calc(30% - 8px); }
+    .input { flex: 1; min-width: calc(40px + 10%); }
+  </style>
+</row>

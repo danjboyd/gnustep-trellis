@@ -62,7 +62,7 @@ class MathFunctions(unittest.TestCase):
         W.norm_value("repeat(2, minmax(10px, 1fr))", 16, r)
         self.assertEqual(r, set())
         W.norm_value("max(10px, 5%)", 16, r)
-        self.assertEqual(r, {"css-calc"})
+        self.assertEqual(r, {"css-min-max"})
 
 
 class GridShorthand(unittest.TestCase):

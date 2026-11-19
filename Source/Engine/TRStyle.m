@@ -80,12 +80,26 @@ static NSString *TRKebab(NSString *name)
   return out;
 }
 
+/* Whitespace-separated tokens, keeping (...) groups such as calc() whole. */
 static NSArray<NSString *> *TRTokens(NSString *value)
 {
   NSMutableArray *out = [NSMutableArray array];
-  for (NSString *t in [value componentsSeparatedByCharactersInSet:
-                         [NSCharacterSet whitespaceAndNewlineCharacterSet]])
-    if ([t length]) [out addObject: t];
+  NSMutableString *cur = [NSMutableString string];
+  int depth = 0;
+  NSCharacterSet *ws = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+  for (NSUInteger i = 0; i < [value length]; i++)
+    {
+      unichar c = [value characterAtIndex: i];
+      if (c == '(') depth++;
+      else if (c == ')' && depth > 0) depth--;
+      if (depth == 0 && [ws characterIsMember: c])
+        {
+          if ([cur length]) { [out addObject: [cur copy]]; [cur setString: @""]; }
+          continue;
+        }
+      [cur appendFormat: @"%C", c];
+    }
+  if ([cur length]) [out addObject: [cur copy]];
   return out;
 }
 
@@ -95,6 +109,101 @@ static BOOL TRParseNumber(NSString *s, TRFloat *out)
   double d;
   if (![sc scanDouble: &d] || ![sc isAtEnd]) return NO;
   *out = d;
+  return YES;
+}
+
+/* calc() (CSS Values 4, 10) of px and percentages with + - * / and
+   parentheses, reduced to px + %. A term is (px, pct, isNumber). Returns
+   NO for anything else (other units, min()/max(), a length times a
+   length, division by a length or by 0). */
+typedef struct { double px, pct; BOOL num; } TRCalcTerm;
+
+static void TRCalcSkip(const char *s, size_t *i) { while (s[*i] == ' ' || s[*i] == '\t' || s[*i] == '\n') (*i)++; }
+static BOOL TRCalcSum(const char *s, size_t *i, TRCalcTerm *out);
+
+static BOOL TRCalcFactor(const char *s, size_t *i, TRCalcTerm *out)
+{
+  TRCalcSkip(s, i);
+  if (strncmp(s + *i, "calc(", 5) == 0) { *i += 4; }
+  if (s[*i] == '(')
+    {
+      (*i)++;
+      if (!TRCalcSum(s, i, out)) return NO;
+      TRCalcSkip(s, i);
+      if (s[*i] != ')') return NO;
+      (*i)++;
+      return YES;
+    }
+  char *end = NULL;
+  double v = strtod(s + *i, &end);
+  if (end == s + *i) return NO;
+  *i = (size_t)(end - s);
+  out->px = out->pct = 0; out->num = NO;
+  if (s[*i] == '%') { out->pct = v; (*i)++; }
+  else if (strncmp(s + *i, "px", 2) == 0) { out->px = v; *i += 2; }
+  else if (isalpha((unsigned char)s[*i])) return NO;   /* another unit */
+  else { out->px = v; out->num = YES; }
+  return YES;
+}
+
+static BOOL TRCalcProduct(const char *s, size_t *i, TRCalcTerm *out)
+{
+  if (!TRCalcFactor(s, i, out)) return NO;
+  for (;;)
+    {
+      TRCalcSkip(s, i);
+      char op = s[*i];
+      if (op != '*' && op != '/') return YES;
+      (*i)++;
+      TRCalcTerm r;
+      if (!TRCalcFactor(s, i, &r)) return NO;
+      if (op == '*')
+        {
+          if (!out->num && !r.num) return NO;                 /* length * length */
+          double k = out->num ? out->px : r.px;
+          TRCalcTerm l = out->num ? r : *out;
+          out->px = l.num ? l.px * k : l.px * k;
+          out->pct = l.pct * k;
+          out->num = out->num && r.num;
+        }
+      else
+        {
+          if (!r.num || r.px == 0) return NO;
+          out->px /= r.px; out->pct /= r.px;
+        }
+    }
+}
+
+static BOOL TRCalcSum(const char *s, size_t *i, TRCalcTerm *out)
+{
+  if (!TRCalcProduct(s, i, out)) return NO;
+  for (;;)
+    {
+      TRCalcSkip(s, i);
+      char op = s[*i];
+      if (op != '+' && op != '-') return YES;
+      (*i)++;
+      TRCalcTerm r;
+      if (!TRCalcProduct(s, i, &r)) return NO;
+      if (r.num != out->num && !(r.px == 0 && r.pct == 0) && !(out->px == 0 && out->pct == 0)) return NO;
+      double k = op == '+' ? 1 : -1;
+      out->px += k * r.px; out->pct += k * r.pct;
+      out->num = out->num && r.num;
+    }
+}
+
+static BOOL TRParseCalc(NSString *t, TRValue *out)
+{
+  if (![t hasPrefix: @"calc("] || ![t hasSuffix: @")"]) return NO;
+  const char *s = [t UTF8String];
+  size_t i = 0;
+  TRCalcTerm r;
+  if (!TRCalcFactor(s, &i, &r)) return NO;
+  TRCalcSkip(s, &i);
+  if (s[i] != 0) return NO;
+  if (r.pct == 0) *out = TRPx(r.px);
+  else if (r.px == 0) *out = TRPercent(r.pct);
+  else { TRValue v = { r.px, TRUnitCalc, r.pct }; *out = v; }
   return YES;
 }
 
@@ -114,6 +223,7 @@ static BOOL TRParseLength(NSString *tok, TRValue *out, BOOL allowAuto, BOOL allo
       *out = TRNone;
       return YES;
     }
+  if ([t hasPrefix: @"calc("]) return TRParseCalc(t, out);
   TRFloat v;
   if ([t hasSuffix: @"%"])
     {
@@ -997,6 +1107,8 @@ static NSString *TRValueString(TRValue v)
       case TRUnitUndefined: return @"none";
       case TRUnitPercent: return [NSString stringWithFormat: @"%g%%", v.value];
       case TRUnitPoint: return [NSString stringWithFormat: @"%gpx", v.value];
+      case TRUnitCalc: return [NSString stringWithFormat: @"calc(%g%% %@ %gpx)", v.pct,
+                                v.value < 0 ? @"-" : @"+", fabs(v.value)];
       case TRUnitMinContent: return @"min-content";
       case TRUnitMaxContent: return @"max-content";
       case TRUnitFitContent: return @"fit-content";

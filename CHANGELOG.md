@@ -66,6 +66,13 @@ version may change the API listed in docs/api.md, and says so here.
 - **Changed (lint):** an element the loader doesn't know (`<bogus>`) is
   an error. Before, trellis-lint passed it and only the loader rejected
   it, so a file that linted clean can fail lint now.
+- **Added (layout):** `calc()` in lengths: px and percentages with
+  `+ - * /` and parentheses, wherever a length or percentage goes
+  (sizes, min/max, flex-basis, margin, padding, insets, gaps). It
+  resolves like a percentage: against the same reference, and as auto
+  where that reference is indefinite. Not yet in grid track lists, and
+  no `min()`/`max()`/`clamp()`. Before, such a declaration was invalid
+  and ignored.
 - **Added (layout):** `display: contents`. The element generates no box:
   its children are laid out as its parent's (flex items or grid items of
   the parent), and it keeps a zero frame at the parent's origin. Before,

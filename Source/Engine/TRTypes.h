@@ -46,13 +46,20 @@ typedef NS_ENUM(unsigned char, TRUnit) {
   TRUnitMinContent,
   TRUnitMaxContent,
   TRUnitFitContent,
-  TRUnitStretch
+  TRUnitStretch,
+  /* calc() of lengths and percentages, reduced to value px + pct % */
+  TRUnitCalc
 };
 
-static inline BOOL TRUnitIsIntrinsic(TRUnit u) { return u >= TRUnitMinContent; }
+static inline BOOL TRUnitIsIntrinsic(TRUnit u) { return u >= TRUnitMinContent && u <= TRUnitStretch; }
 
-/* A CSS length-percentage-or-auto. */
-typedef struct { TRFloat value; TRUnit unit; } TRValue;
+/* A CSS length-percentage-or-auto. pct is the percentage part of a calc()
+   (unit TRUnitCalc); value is its px part. */
+typedef struct { TRFloat value; TRUnit unit; TRFloat pct; } TRValue;
+
+/* A percentage, or a calc() that may have one: resolves against a
+   reference, and is indefinite when the reference is. */
+static inline BOOL TRIsPct(TRUnit u) { return u == TRUnitPercent || u == TRUnitCalc; }
 
 static inline TRValue TRPx(TRFloat v) { TRValue r = { v, TRUnitPoint }; return r; }
 static inline TRValue TRPercent(TRFloat v) { TRValue r = { v, TRUnitPercent }; return r; }
@@ -65,7 +72,21 @@ static inline BOOL TRValueEqual(TRValue a, TRValue b)
 {
   if (a.unit != b.unit) return NO;
   if (a.unit == TRUnitPoint || a.unit == TRUnitPercent) return a.value == b.value;
+  if (a.unit == TRUnitCalc) return a.value == b.value && a.pct == b.pct;
   return YES;
+}
+
+/* A px, percentage or calc() length at a reference length: NAN for a
+   percentage part of an indefinite reference, and for any other unit. */
+static inline TRFloat TRValueAt(TRValue v, TRFloat ref)
+{
+  switch (v.unit)
+    {
+      case TRUnitPoint: return v.value;
+      case TRUnitPercent: return isnan(ref) ? (TRFloat)NAN : v.value * ref / 100;
+      case TRUnitCalc: return isnan(ref) ? (TRFloat)NAN : v.value + v.pct * ref / 100;
+      default: return (TRFloat)NAN;
+    }
 }
 
 typedef NS_ENUM(unsigned char, TREdge) {

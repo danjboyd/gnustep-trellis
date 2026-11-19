@@ -1,0 +1,2 @@
+<!-- expect: [items] <segmented items="Now|Today|All"> is one item: separate items with commas -->
+<row><segmented a11y-label="Range" items="Now|Today|All"/></row>

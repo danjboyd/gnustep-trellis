@@ -1,0 +1,2 @@
+<!-- expect: [element] unknown element <badge> -->
+<row><badge>Urgent</badge></row>

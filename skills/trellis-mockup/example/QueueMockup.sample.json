@@ -1,0 +1,8 @@
+{
+ "waitingCount": "3",
+ "activeCount": "5",
+ "doneCount": "12",
+ "item1": "DEMO-101 Example Agent A: review the sample layout",
+ "item2": "DEMO-102 Example Agent B: answer a placeholder question",
+ "item3": "DEMO-103 Example Agent C: approve a made-up change, with a longer line to show wrapping"
+}

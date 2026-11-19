@@ -55,6 +55,11 @@ static void TRLintNode(NSDictionary *n, NSString *path, double absX, double absY
         TRAdd(out, @"undersized", @"error", n, path,
               [NSString stringWithFormat: @"%@ (%@) is %gx%g, smaller than its intrinsic %gx%g",
                         name, n[@"class"], w, h, iw, ih]);
+      /* ...so an editable field with no width or flex shrinks to a sliver. */
+      else if ([n[@"editable"] boolValue] && w >= 1 && w < 40)
+        TRAdd(out, @"narrow-field", @"warning", n, path,
+              [NSString stringWithFormat: @"%@ (%@) is only %g wide: an editable field has no useful "
+                        @"intrinsic width; give it a width, min-width or flex", name, n[@"class"], w]);
     }
 
   /* Fixed-height controls (push buttons, pop-ups, single-line fields)

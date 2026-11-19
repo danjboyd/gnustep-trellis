@@ -1,0 +1,3 @@
+<!-- expect: [leaf-box-style] <label> doesn't draw background-color, border-radius -->
+<row><label class="badge">Urgent</label></row>
+<style> .badge { background-color: Highlight; color: HighlightText; padding: 2px 8px; border-radius: 8px; } </style>

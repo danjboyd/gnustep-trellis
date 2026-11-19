@@ -1,6 +1,4 @@
 {
  "about": "Cases of a supported feature that still fail. trellis-case skips them by default (counted as known-gap); --all runs them. Remove an entry when the engine passes it.",
- "cases": {
-  "wpt-sizing/css/css-sizing/stretch/block-height-004/7": "uses display: flow-root, which Trellis doesn't support"
- }
+ "cases": {}
 }

@@ -31,6 +31,9 @@ version may change the API listed in docs/api.md, and says so here.
   open, resize, reload, render, path, isolation and dependency cases on
   Linux and Windows, compared by structure across platforms and pixel
   for pixel within one (`make check-parity` on Linux).
+- **Added (layout):** `display: flow-root`, laid out as `block` (a block
+  never collapses margins in Trellis, so it already establishes its own
+  formatting context). Before, the declaration was invalid and ignored.
 - **Added (tooling):** the WPT importer translates `rem` (from the root's
   font size) and the absolute units (`in`, `cm`, `mm`, `Q`, `pt`, `pc`) to
   px, and matches `:nth-child`, `:nth-last-child`, `:nth-of-type` and

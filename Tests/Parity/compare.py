@@ -69,7 +69,7 @@ def compare_json(name, a, b, tol):
     if sa != sb:
         first = next((k for k in range(min(len(sa), len(sb))) if sa[k] != sb[k]), min(len(sa), len(sb)))
         fails.append("view tree differs (%d vs %d views; first difference at %s: %s vs %s)"
-                     % (len(sa), len(sb), (sa + sb)[first][0] if first < len(sa) else "end",
+                     % (len(sa), len(sb), (sa[first] if first < len(sa) else sb[first])[0],
                         sa[first] if first < len(sa) else "-", sb[first] if first < len(sb) else "-"))
     else:
         worst = []

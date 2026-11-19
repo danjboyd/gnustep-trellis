@@ -94,8 +94,10 @@ $P Screen.trellis --snapshot out.png --export-json out.json \
   two widths, both appearances, three runs each).
 - `--untrusted` (since 0.10.2), placed before the file, loads it hardened,
   for files someone else sent: images only from the document's own
-  folder, standard view classes only, and controls and links that do
-  nothing when clicked. A path rule broken is a load failure (exit 1).
+  folder (no links, PNG/JPEG/GIF only), its sample JSON under the same
+  rules, standard view classes only, and controls and links that do
+  nothing when clicked. A broken rule is a load failure (exit 1). Open
+  each sent file in a folder of its own: that folder is the boundary.
   See `TRMarkupDocument.untrusted` in TRMarkup.h.
 - **Exit status:** 0 on success; 1 when the spec or its sample fails to
   load (the snapshot then shows the error message, and no JSON is

@@ -73,12 +73,14 @@ extern NSString *const TRMarkupErrorDomain;
 @property (nonatomic, readonly) NSString *ownerClassName;
 /* Content from outside the app (a file someone sent): set before loading
    it, and TRLoader builds every view from this document, templates
-   included, in a hardened mode. <image src> must name a regular file inside
-   the document's own folder (no absolute, "..", "~", UNC, drive, device or
-   backslash paths, no symlink out), and <image name> a plain name;
+   included, in a hardened mode. <image src> must name a regular PNG, JPEG
+   or GIF file inside the document's own folder, reached without symbolic
+   links (no absolute, "..", "~", UNC, drive, device or backslash paths),
+   and <image name> a plain name;
    <view type> takes only standard AppKit/Trellis classes (others become
    placeholders); controls and <a> links get no action, links open no URL,
-   and no outlets are set. A file that breaks a path rule fails to load.
+   no outlets are set, and <split autosave> is ignored. A file that
+   breaks a rule fails to load.
    Default NO. */
 @property (nonatomic) BOOL untrusted;
 

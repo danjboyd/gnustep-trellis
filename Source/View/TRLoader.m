@@ -10,6 +10,14 @@
 #import "TRViewMeasure.h"
 #import "TRAppKitCompat.h"
 #import <objc/runtime.h>
+#ifdef _WIN32
+#import <windows.h>
+#else
+#import <fcntl.h>
+#import <sys/stat.h>
+#import <unistd.h>
+#import <errno.h>
+#endif
 
 static NSError *TRLoadError(TRMarkupDocument *doc, TRMarkupElement *e, NSString *fmt, ...) NS_FORMAT_FUNCTION(3,4);
 static NSError *TRLoadError(TRMarkupDocument *doc, TRMarkupElement *e, NSString *fmt, ...)
@@ -231,6 +239,15 @@ static NSView *TRFindView(NSString *identifier, NSView *root);
 
 static char kTRVirtualSampleKey;
 
+/* A sample number (NSNumber or numeric string), or dflt for anything else. */
+static NSInteger TRSampleInt(id x, NSInteger dflt)
+{
+  return ([x isKindOfClass: [NSNumber class]] || [x isKindOfClass: [NSString class]]) ? [x integerValue] : dflt;
+}
+
+/* The most rows a sample's <virtual> data may make. */
+#define TR_SAMPLE_MAX_ITEMS 1000000
+
 @implementation TRVirtualSample
 - (void)buildRuns
 {
@@ -241,8 +258,13 @@ static char kTRVirtualSampleKey;
       NSDictionary *d = [it isKindOfClass: [NSDictionary class]] ? it : @{};
       NSArray *sub = [d[@"items"] isKindOfClass: [NSArray class]] && d[@"_repeat"] ? d[@"items"] : nil;
       NSArray *entries = sub ?: @[d];
-      NSInteger count = sub ? (NSInteger)[sub count] * MAX([d[@"_repeat"] integerValue], 0) : 1;
+      /* Capped (with the total below) so a sample can't ask for more rows
+         than memory holds, or overflow the count. */
+      NSInteger count = sub ? (NSInteger)MIN((long long)[sub count] * MIN(MAX(TRSampleInt(d[@"_repeat"], 0), 0), TR_SAMPLE_MAX_ITEMS),
+                                             (long long)TR_SAMPLE_MAX_ITEMS) : 1;
       if (count == 0 || [entries count] == 0) continue;
+      if (start + count > TR_SAMPLE_MAX_ITEMS) count = TR_SAMPLE_MAX_ITEMS - start;
+      if (count <= 0) break;
       [runs addObject: @[entries, @(start), @(count)]];
       start += count;
     }
@@ -251,7 +273,7 @@ static char kTRVirtualSampleKey;
 - (NSInteger)numberOfItemsInVirtualBox:(TRVirtualBox *)box
 {
   if (runs == nil) [self buildRuns];
-  return perRound * repeat;
+  return (NSInteger)MIN((long long)perRound * MIN(repeat, TR_SAMPLE_MAX_ITEMS), (long long)TR_SAMPLE_MAX_ITEMS);
 }
 - (NSDictionary *)itemAt:(NSInteger)i run:(NSInteger *)inRun
 {
@@ -265,14 +287,16 @@ static char kTRVirtualSampleKey;
         {
           NSArray *entries = r[0];
           if (inRun) *inRun = k - st;
-          return entries[(NSUInteger)(k - st) % [entries count]];
+          id e = entries[(NSUInteger)(k - st) % [entries count]];
+          return [e isKindOfClass: [NSDictionary class]] ? e : @{};   /* a sample may hold anything */
         }
     }
   return @{};
 }
 - (NSString *)virtualBox:(TRVirtualBox *)box templateForItemAtIndex:(NSInteger)i
 {
-  return [self itemAt: i run: NULL][@"_template"];
+  id t = [self itemAt: i run: NULL][@"_template"];
+  return [t isKindOfClass: [NSString class]] ? t : nil;
 }
 static NSString *TRSampleString(NSString *s, NSInteger i, NSInteger n)
 {
@@ -492,7 +516,7 @@ static NSString *const TRRunAttributeName = @"TRRunIndex";
         {
           attrs[NSForegroundColorAttributeName] = TRColorFromCSS(@"LinkText") ?: [NSColor blueColor];
           attrs[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
-          if (r[@"href"]) attrs[NSLinkAttributeName] = r[@"href"];
+          if (r[@"href"] && !self.untrusted) attrs[NSLinkAttributeName] = r[@"href"];
         }
       [out appendAttributedString: [[NSAttributedString alloc] initWithString: r[@"text"] attributes: attrs]];
       idx++;
@@ -630,6 +654,11 @@ static NSString *TRUntrustedSrcProblem(NSString *src)
           [d addObject: [NSString stringWithFormat: @"com%d", n]];
           [d addObject: [NSString stringWithFormat: @"lpt%d", n]];
         }
+      for (NSString *sup in @[@"\u00b9", @"\u00b2", @"\u00b3"])
+        {
+          [d addObject: [@"com" stringByAppendingString: sup]];
+          [d addObject: [@"lpt" stringByAppendingString: sup]];
+        }
       devices = d;
     }
   for (NSString *c in [src componentsSeparatedByString: @"/"])
@@ -646,22 +675,164 @@ static NSString *TRUntrustedSrcProblem(NSString *src)
   return nil;
 }
 
-/* An absolute, symlink-resolved, standardized path. */
-static NSString *TRRealPath(NSString *p)
+/* Reads `rel` (already checked by TRUntrustedSrcProblem) below `folder`
+   without following any symbolic link (or, on Windows, reparse point) at
+   or below the folder, and returns the bytes of a regular file of at most
+   `max` bytes. The check and the read use the same descriptors, so the
+   file can't be swapped in between. Returns nil and sets *missing when
+   it doesn't exist, or nil and sets *problem when a rule is broken; any
+   other failure is a problem too (fail closed). */
+static NSData *TRUntrustedRead(NSString *folder, NSString *rel, unsigned long long max,
+                               NSString **problem, BOOL *missing)
 {
-  if (![p isAbsolutePath])
-    p = [[[NSFileManager defaultManager] currentDirectoryPath] stringByAppendingPathComponent: p];
-  return [[p stringByResolvingSymlinksInPath] stringByStandardizingPath];
+  NSArray *comps = [rel componentsSeparatedByString: @"/"];
+#ifndef _WIN32
+  int dfd = open([folder fileSystemRepresentation], O_RDONLY | O_DIRECTORY | O_CLOEXEC);
+  if (dfd < 0) { *problem = @"has no readable document folder"; return nil; }
+  for (NSUInteger i = 0; i + 1 < [comps count]; i++)
+    {
+      int nfd = openat(dfd, [comps[i] fileSystemRepresentation], O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
+      int err = errno;
+      close(dfd);
+      if (nfd < 0)
+        {
+          if (err == ENOENT) *missing = YES;
+          else if (err == ELOOP || err == ENOTDIR || err == EMLINK)
+            *problem = @"goes through a symbolic link or something that isn't a folder";
+          else *problem = @"cannot be opened";
+          return nil;
+        }
+      dfd = nfd;
+    }
+  /* O_NONBLOCK: opening a FIFO doesn't wait for a writer. */
+  int fd = openat(dfd, [[comps lastObject] fileSystemRepresentation],
+                  O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC);
+  int err = errno;
+  close(dfd);
+  if (fd < 0)
+    {
+      if (err == ENOENT) *missing = YES;
+      else if (err == ELOOP || err == EMLINK) *problem = @"is a symbolic link";
+      else *problem = @"cannot be opened";
+      return nil;
+    }
+  struct stat st;
+  if (fstat(fd, &st) != 0 || !S_ISREG(st.st_mode))
+    {
+      close(fd);
+      *problem = @"is not a regular file";
+      return nil;
+    }
+  if ((unsigned long long)st.st_size > max)
+    {
+      close(fd);
+      *problem = [NSString stringWithFormat: @"is larger than %llu MB", max / (1024 * 1024)];
+      return nil;
+    }
+  NSMutableData *data = [NSMutableData dataWithLength: (NSUInteger)st.st_size];
+  size_t got = 0;
+  while (got < (size_t)st.st_size)
+    {
+      ssize_t r = read(fd, (char *)[data mutableBytes] + got, (size_t)st.st_size - got);
+      if (r < 0 && errno == EINTR) continue;
+      if (r <= 0) break;
+      got += (size_t)r;
+    }
+  close(fd);
+  [data setLength: got];
+  return data;
+#else
+  /* Windows: no openat. Refuse any reparse point (symlink, junction,
+     mount point) on the way, then read. Not proof against a swap between
+     the check and the read; a sender who can change the folder at that
+     moment is out of scope. */
+  NSString *p = folder;
+  for (NSUInteger i = 0; i < [comps count]; i++)
+    {
+      p = [p stringByAppendingPathComponent: comps[i]];
+      DWORD at = GetFileAttributesW((const wchar_t *)[p fileSystemRepresentation]);
+      if (at == INVALID_FILE_ATTRIBUTES)
+        {
+          DWORD e = GetLastError();
+          if (e == ERROR_FILE_NOT_FOUND || e == ERROR_PATH_NOT_FOUND) *missing = YES;
+          else *problem = @"cannot be opened";
+          return nil;
+        }
+      if (at & FILE_ATTRIBUTE_REPARSE_POINT) { *problem = @"goes through a link or junction"; return nil; }
+      BOOL last = i + 1 == [comps count];
+      if (!last && !(at & FILE_ATTRIBUTE_DIRECTORY)) { *problem = @"goes through something that isn't a folder"; return nil; }
+      if (last && (at & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_DEVICE))) { *problem = @"is not a regular file"; return nil; }
+    }
+  NSDictionary *attrs = [[NSFileManager defaultManager] attributesOfItemAtPath: p error: NULL];
+  if (![[attrs fileType] isEqualToString: NSFileTypeRegular]) { *problem = @"is not a regular file"; return nil; }
+  if ([attrs fileSize] > max)
+    {
+      *problem = [NSString stringWithFormat: @"is larger than %llu MB", max / (1024 * 1024)];
+      return nil;
+    }
+  NSData *data = [NSData dataWithContentsOfFile: p];
+  if (data == nil) { *problem = @"cannot be read"; return nil; }
+  if ([data length] > max) { *problem = @"grew while being read"; return nil; }
+  return data;
+#endif
 }
 
-/* YES if path is dir or inside it (component-wise). */
-static BOOL TRPathInside(NSString *path, NSString *dir)
+/* An image file's format and pixel size from its header: only PNG, JPEG
+   and GIF, at most 16384 px a side and 40 megapixels, so a small file
+   can't make the decoder allocate gigabytes. nil if fine. */
+static NSString *TRUntrustedImageHeaderProblem(NSData *d)
 {
-  NSArray *a = [path pathComponents], *b = [dir pathComponents];
-  if ([a count] < [b count]) return NO;
-  for (NSUInteger i = 0; i < [b count]; i++)
-    if (![a[i] isEqualToString: b[i]]) return NO;
-  return YES;
+  const unsigned char *b = [d bytes];
+  NSUInteger n = [d length];
+  unsigned long w = 0, h = 0;
+  static const unsigned char png[8] = { 0x89, 'P', 'N', 'G', 0x0d, 0x0a, 0x1a, 0x0a };
+  if (n >= 24 && memcmp(b, png, 8) == 0 && memcmp(b + 12, "IHDR", 4) == 0)
+    {
+      w = ((unsigned long)b[16] << 24) | ((unsigned long)b[17] << 16) | ((unsigned long)b[18] << 8) | b[19];
+      h = ((unsigned long)b[20] << 24) | ((unsigned long)b[21] << 16) | ((unsigned long)b[22] << 8) | b[23];
+    }
+  else if (n >= 10 && (memcmp(b, "GIF87a", 6) == 0 || memcmp(b, "GIF89a", 6) == 0))
+    {
+      w = b[6] | ((unsigned long)b[7] << 8);
+      h = b[8] | ((unsigned long)b[9] << 8);
+    }
+  else if (n >= 4 && b[0] == 0xff && b[1] == 0xd8)
+    {
+      NSUInteger i = 2;
+      while (i + 4 <= n)
+        {
+          if (b[i] != 0xff) return @"is not a valid JPEG";
+          unsigned char m = b[i + 1];
+          if (m == 0xff) { i++; continue; }                     /* fill byte */
+          if (m == 0x01 || (m >= 0xd0 && m <= 0xd7)) { i += 2; continue; }
+          if (m == 0xd9 || m == 0xda) break;                     /* end, or scan before any frame */
+          NSUInteger len = ((NSUInteger)b[i + 2] << 8) | b[i + 3];
+          if (len < 2) return @"is not a valid JPEG";
+          if (m >= 0xc0 && m <= 0xcf && m != 0xc4 && m != 0xc8 && m != 0xcc)
+            {
+              if (i + 9 > n) break;
+              h = ((unsigned long)b[i + 5] << 8) | b[i + 6];
+              w = ((unsigned long)b[i + 7] << 8) | b[i + 8];
+              break;
+            }
+          i += 2 + len;
+        }
+      if (w == 0 || h == 0) return @"is a JPEG with no readable size";
+    }
+  else
+    return @"is not a PNG, JPEG or GIF image";
+  if (w == 0 || h == 0 || w > 16384 || h > 16384 || (unsigned long long)w * h > 40000000ULL)
+    return [NSString stringWithFormat: @"is too large (%lu x %lu pixels; at most 16384 a side and 40 megapixels)", w, h];
+  return nil;
+}
+
+/* The document's folder, or nil when it has none (a document from a string). */
+static NSString *TRDocumentFolder(TRMarkupDocument *doc)
+{
+  NSString *docPath = doc.name;
+  if ([docPath length] == 0 || [docPath hasPrefix: @"<"]) return nil;
+  NSString *folder = [docPath stringByDeletingLastPathComponent];
+  return [folder length] ? folder : @".";
 }
 
 /* The image an untrusted document's <image src> names, nil when the file
@@ -671,35 +842,13 @@ static NSImage *TRUntrustedImage(NSString *src, TRMarkupDocument *doc, NSString 
 {
   NSString *why = TRUntrustedSrcProblem(src);
   if (why) { *problem = why; return nil; }
-  NSString *docPath = doc.name;
-  if ([docPath length] == 0 || [docPath hasPrefix: @"<"])
-    {
-      *problem = @"has no document folder to resolve against";
-      return nil;
-    }
-  NSString *folder = TRRealPath([docPath stringByDeletingLastPathComponent]);
-  NSString *joined = [[docPath stringByDeletingLastPathComponent] stringByAppendingPathComponent: src];
-  NSFileManager *fm = [NSFileManager defaultManager];
-  if (![fm fileExistsAtPath: joined]) return nil;
-  NSString *real = TRRealPath(joined);
-  if (!TRPathInside(real, folder) || [real isEqualToString: folder])
-    {
-      *problem = @"resolves outside the document's folder";
-      return nil;
-    }
-  NSDictionary *attrs = [fm attributesOfItemAtPath: real error: NULL];
-  if (![[attrs fileType] isEqualToString: NSFileTypeRegular])
-    {
-      *problem = @"is not a regular file";
-      return nil;
-    }
-  if ([attrs fileSize] > TR_UNTRUSTED_IMAGE_MAX)
-    {
-      *problem = @"is larger than 32 MB";
-      return nil;
-    }
-  NSData *data = [NSData dataWithContentsOfFile: real];
-  return data ? [[NSImage alloc] initWithData: data] : nil;
+  NSString *folder = TRDocumentFolder(doc);
+  if (folder == nil) { *problem = @"has no document folder to resolve against"; return nil; }
+  BOOL missing = NO;
+  NSData *data = TRUntrustedRead(folder, src, TR_UNTRUSTED_IMAGE_MAX, problem, &missing);
+  if (data == nil) return nil;
+  if ((why = TRUntrustedImageHeaderProblem(data))) { *problem = why; return nil; }
+  return [[NSImage alloc] initWithData: data];
 }
 
 /* The view classes an untrusted <view type> may name: standard AppKit and
@@ -868,7 +1017,7 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
             TRApplyLeafStyle(pv, joined);
           if (hidePane) [sv setHidden: YES forPane: pv];
         }
-      if (a[@"autosave"]) sv.autosave = a[@"autosave"];
+      if (a[@"autosave"] && !doc.untrusted) sv.autosave = a[@"autosave"];   /* no defaults writes */
       v = sv;
     }
   else if ([n isEqualToString: @"label"])
@@ -1450,6 +1599,20 @@ static NSView *TRFindView(NSString *identifier, NSView *root)
   return nil;
 }
 
++ (NSData *)untrustedContentsOfFile:(NSString *)name inFolder:(NSString *)folder
+                         maxLength:(unsigned long long)max error:(NSError **)error
+{
+  if (error) *error = nil;
+  NSString *problem = TRUntrustedSrcProblem(name);
+  BOOL missing = NO;
+  NSData *data = problem ? nil : TRUntrustedRead(folder, name, max, &problem, &missing);
+  if (problem && error)
+    *error = [NSError errorWithDomain: TRMarkupErrorDomain code: 13 userInfo: @{
+      NSLocalizedDescriptionKey: [NSString stringWithFormat: @"untrusted: %@ %@ (it must be a regular file inside %@)",
+                                  name, problem, folder]}];
+  return data;
+}
+
 + (BOOL)applySample:(NSDictionary *)sample toView:(NSView *)root error:(NSError **)error
 {
   return [self applySample: sample toView: root depth: 0 error: error];
@@ -1480,49 +1643,80 @@ static NSView *TRFindView(NSString *identifier, NSView *root)
             }
           TRVirtualSample *src = [TRVirtualSample new];
           src->items = d[@"items"];
-          src->repeat = MAX([d[@"repeat"] integerValue], 1);
+          src->repeat = MAX(TRSampleInt(d[@"repeat"], 1), 1);
           /* The box holds its data source weakly; the sample lives with it. */
           objc_setAssociatedObject(v, &kTRVirtualSampleKey, src, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
           [(TRVirtualBox *)v setDataSource: src];
-          if (d[@"scroll-to"]) [(TRVirtualBox *)v scrollToItemAtIndex: [d[@"scroll-to"] integerValue]
+          if (d[@"scroll-to"]) [(TRVirtualBox *)v scrollToItemAtIndex: TRSampleInt(d[@"scroll-to"], 0)
                                                              position: TRVirtualScrollTop];
           continue;
         }
-      NSString *str = [val isKindOfClass: [NSString class]] ? val : d[@"string"];
+      /* Values are type-checked here: a number where a title goes would
+         otherwise be stored and raise later, during layout. */
+      NSString *bad = nil;
+      id strv = [val isKindOfClass: [NSString class]] ? val : d[@"string"];
+      if (strv && ![strv isKindOfClass: [NSString class]]) bad = @"string";
+      NSString *str = bad ? nil : strv;
+#define TR_SAMPLE_STR(KEY) ({ id _x = d[KEY]; if (_x && ![_x isKindOfClass: [NSString class]]) bad = KEY; \
+                              [_x isKindOfClass: [NSString class]] ? (NSString *)_x : nil; })
+#define TR_SAMPLE_NUM(KEY) ({ id _x = d[KEY]; if (_x && ![_x isKindOfClass: [NSNumber class]] \
+                              && ![_x isKindOfClass: [NSString class]]) bad = KEY; \
+                              ([_x isKindOfClass: [NSNumber class]] || [_x isKindOfClass: [NSString class]]) ? _x : nil; })
+      id vNum = TR_SAMPLE_NUM(@"value"), stNum = TR_SAMPLE_NUM(@"state");
+      id disNum = TR_SAMPLE_NUM(@"disabled"), hidNum = TR_SAMPLE_NUM(@"hidden");
+      NSString *title = TR_SAMPLE_STR(@"title");
       if ([v isKindOfClass: [NSPopUpButton class]])
         {
           NSArray *items = [val isKindOfClass: [NSArray class]] ? val : d[@"items"];
-          if (items) { [(NSPopUpButton *)v removeAllItems]; [(NSPopUpButton *)v addItemsWithTitles: items]; }
-          if (d[@"selected"]) [(NSPopUpButton *)v selectItemWithTitle: d[@"selected"]];
+          if (items && ![items isKindOfClass: [NSArray class]]) { bad = @"items"; items = nil; }
+          for (id it in items) if (![it isKindOfClass: [NSString class]]) { bad = @"items"; items = nil; break; }
+          NSString *chosen = TR_SAMPLE_STR(@"selected");
+          if (!bad)
+            {
+              if (items) { [(NSPopUpButton *)v removeAllItems]; [(NSPopUpButton *)v addItemsWithTitles: items]; }
+              if (chosen) [(NSPopUpButton *)v selectItemWithTitle: chosen];
+            }
         }
       else if ([v isKindOfClass: [TRSegmentedControl class]])
         {
           id sel = d[@"selected"] ?: str;
           if ([sel isKindOfClass: [NSString class]]) sel = @[sel];
-          if ([sel isKindOfClass: [NSArray class]]) [(TRSegmentedControl *)v setSelectedTitles: sel];
+          if (sel && ![sel isKindOfClass: [NSArray class]]) bad = @"selected";
+          for (id it in ([sel isKindOfClass: [NSArray class]] ? sel : @[]))
+            if (![it isKindOfClass: [NSString class]]) bad = @"selected";
+          if (!bad && sel) [(TRSegmentedControl *)v setSelectedTitles: sel];
         }
       else if ([v isKindOfClass: [NSButton class]])
         {
-          NSString *title = d[@"title"] ?: str;
-          if (title) [(NSButton *)v setTitle: title];
-          if (d[@"state"]) [(NSButton *)v setState: [d[@"state"] boolValue] ? NSControlStateValueOn : NSControlStateValueOff];
+          NSString *t = title ?: str;
+          if (!bad && t) [(NSButton *)v setTitle: t];
+          if (!bad && stNum) [(NSButton *)v setState: [stNum boolValue] ? NSControlStateValueOn : NSControlStateValueOff];
         }
       else if ([v isKindOfClass: [NSControl class]])
         {
-          if (str) [(NSControl *)v setStringValue: str];
-          if (d[@"value"]) [(NSControl *)v setDoubleValue: [d[@"value"] doubleValue]];
+          if (!bad && str) [(NSControl *)v setStringValue: str];
+          if (!bad && vNum) [(NSControl *)v setDoubleValue: [vNum doubleValue]];
         }
-      else if ([v isKindOfClass: [NSProgressIndicator class]] && d[@"value"])
-        [(NSProgressIndicator *)v setDoubleValue: [d[@"value"] doubleValue]];
-      if (d[@"disabled"]) TRSetEnabled(v, ![d[@"disabled"] boolValue]);
-      if (d[@"hidden"])
+      else if ([v isKindOfClass: [NSProgressIndicator class]] && vNum && !bad)
+        [(NSProgressIndicator *)v setDoubleValue: [vNum doubleValue]];
+#undef TR_SAMPLE_STR
+#undef TR_SAMPLE_NUM
+      if (bad)
+        {
+          if (error) *error = [NSError errorWithDomain: TRMarkupErrorDomain code: 12 userInfo: @{
+            NSLocalizedDescriptionKey: [NSString stringWithFormat:
+              @"sample: '%@': \"%@\" has the wrong type", ident, bad]}];
+          return NO;
+        }
+      if (disNum) TRSetEnabled(v, ![disNum boolValue]);
+      if (hidNum)
         {
           if ([[v superview] isKindOfClass: [TRBoxView class]])
-            [(TRBoxView *)[v superview] setHidden: [d[@"hidden"] boolValue] forSubview: v];
+            [(TRBoxView *)[v superview] setHidden: [hidNum boolValue] forSubview: v];
           else if ([[v superview] isKindOfClass: [TRSplitView class]])
-            [(TRSplitView *)[v superview] setHidden: [d[@"hidden"] boolValue] forPane: v];
+            [(TRSplitView *)[v superview] setHidden: [hidNum boolValue] forPane: v];
           else
-            [v setHidden: [d[@"hidden"] boolValue]];
+            [v setHidden: [hidNum boolValue]];
         }
     }
   return YES;

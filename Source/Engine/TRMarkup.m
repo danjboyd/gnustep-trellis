@@ -230,6 +230,9 @@ static NSString *TRSubstituteVars(NSString *value, NSDictionary *vars, int depth
       rep = TRSubstituteVars(rep, vars, depth + 1, missing);
       if (rep == nil) return nil;
       [out appendString: rep];
+      /* var() inside var() can grow exponentially (ten uses a level, 16
+         levels deep); no real value comes near this. */
+      if ([out length] > 65536) { if (missing) *missing = @"(a value over 64 KB after var() substitution)"; return nil; }
       i = j + 1;
     }
   return out;

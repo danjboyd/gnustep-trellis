@@ -1,9 +1,9 @@
 {
- "commit": "be0510f",
+ "commit": "7bdbb79",
  "conformance": {
-  "pass": 4046,
+  "pass": 4047,
   "skipped": 370,
-  "total": 4046
+  "total": 4047
  },
  "date": "2026-11-19",
  "platform": "linux",
@@ -13,9 +13,9 @@
    "total": 202
   },
   "wpt": {
-   "cases": 1045,
-   "pass": 964,
-   "total": 964
+   "cases": 1046,
+   "pass": 965,
+   "total": 965
   },
   "wpt-grid": {
    "cases": 2160,

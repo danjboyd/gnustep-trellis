@@ -1,0 +1,65 @@
+{
+ "id": "wpt/css/css-flexbox/intrinsic-size/col-wrap-004",
+ "source": {
+  "suite": "wpt",
+  "file": "css/css-flexbox/intrinsic-size/col-wrap-004.html",
+  "commit": "34bdce16413b56bcc6c90c42ad1ed051769bbe2b",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": 784,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "flex",
+   "boxSizing": "content-box",
+   "flexDirection": "column",
+   "flexWrap": "wrap",
+   "width": "max-content",
+   "height": 100,
+   "position": "relative"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "minHeight": 0,
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": 100,
+     "width": 100
+    }
+   },
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "minHeight": 0,
+     "flexGrow": 0,
+     "flexShrink": 0,
+     "flexBasis": 100,
+     "width": "100%"
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {},
+   {
+    "width": 100,
+    "x": 100
+   }
+  ],
+  "width": 100
+ },
+ "requires": [
+  "intrinsic-size-keyword"
+ ]
+}

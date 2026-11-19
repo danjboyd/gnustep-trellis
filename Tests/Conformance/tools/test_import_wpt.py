@@ -472,5 +472,36 @@ class StyleChange(unittest.TestCase):
                        '  done();\n}', self.BODY)
 
 
+class StylesheetSyntax(unittest.TestCase):
+    def test_nested_rules(self):
+        # align-self-baseline-with-flex-wrap: ".row { ...; .big {...} }" was
+        # read as a selector "}" and skipped the file.
+        rules = W.parse_stylesheet(".row { width: 20px; .big { height: 30px } &.x, > i { order: 1 } }"
+                                   " .c { top: 0 }")
+        self.assertEqual([r[0] for r in rules], [".row", ".row .big", ".row.x, .row > i", ".c"])
+        self.assertEqual(rules[0][1], [("width", "20px", False)])
+        self.assertEqual(rules[1][1], [("height", "30px", False)])
+
+    def test_dynamic_pseudo_never_matches(self):
+        d = tempfile.mkdtemp()
+        with open(os.path.join(d, "t.html"), "w") as f:
+            f.write("<!DOCTYPE html><style>.a:hover::before { content: 'x' } .a:focus, .a { width: 5px }"
+                    "</style><body><div class=a></div></body>")
+        p = W.Page(os.path.join(d, "t.html"))
+        self.assertEqual(p.declared(p.dom.body.element_children()[0])["width"], "5px")
+
+    def test_implied_body(self):
+        # col-wrap-004 has no <body> tag but checks 'body > div'.
+        d = tempfile.mkdtemp()
+        with open(os.path.join(d, "t.html"), "w") as f:
+            f.write('<!DOCTYPE html><meta charset=utf-8><script src="/resources/check-layout-th.js"></script>'
+                    '<div style="display:flex;width:100px" data-expected-width="100"></div>'
+                    "<script>checkLayout('body > div')</script>")
+        p = W.Page(os.path.join(d, "t.html"))
+        self.assertIsNotNone(p.dom.body)
+        self.assertEqual(len(W.select_all(p, "body > div")), 1)
+        self.assertEqual(len(W.convert_file(os.path.join(d, "t.html"), "t.html", "0" * 40)), 1)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=1)

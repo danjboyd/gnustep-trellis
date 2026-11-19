@@ -87,6 +87,11 @@ version may change the API listed in docs/api.md, and says so here.
   `/before` and `/after`: 32 files, 64 cases. 56 pass. The 8 that fail are
   in `known-gaps.json`: grid baseline alignment of an item without text,
   whose baseline should be synthesized from its bottom border edge.
+- **Changed (tooling):** the WPT importer reads CSS nesting (`.a { .b {} }`
+  and `&`), ignores rules with `:hover`, `:focus` or `:active` (they never
+  match a static page) instead of skipping the file, and implies `<body>`
+  when a page omits it. One more case (col-wrap-004); the other files
+  these unblocked still skip for other reasons (floats, scripts).
 - **Changed (tools):** trellis-render's isolation guard is stricter: the
   home, the user Library and the user defaults directory must all resolve,
   symlinks followed, inside the private `GNUSTEP_HOME`, and a dangling or

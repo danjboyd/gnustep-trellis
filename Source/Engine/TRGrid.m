@@ -7,7 +7,7 @@
    auto-placement (sparse); gaps; justify/align-items/self; justify- and
    align-content distribution of tracks; rtl.
 
-   Not (yet): named lines, subgrid, dense packing, baseline alignment,
+   Not (yet): subgrid, last-baseline alignment,
    masonry.
 
    Copyright (C) 2026 Dan Boyd
@@ -395,6 +395,11 @@ typedef struct {
      never laid out by this grid. noW/noH: a virtual item that doesn't
      contribute in that axis (the subgrid isn't subgridded there). */
   BOOL subC, subR, virt, noW, noH;
+  /* Row-axis baseline alignment (css-align-3 9): an item in one row with
+     align-self: baseline; baseAsc is its baseline from its top margin
+     edge (synthesized from the border box's bottom when it has none). */
+  BOOL inBase;
+  double baseAsc;
 } TRGridItem;
 
 static inline double TRGZero(double v) { return isnan(v) ? 0 : v; }
@@ -1644,6 +1649,36 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
                                TRMeasureModeUndefined, areaW, NAN, NO, dir);
       it->h = sz.height + mv;
     }
+  /* Baseline sharing groups: items starting in the same row that align
+     to the baseline. Each one's contribution grows by the shim that lines
+     its baseline up with the group's lowest one (CSS Grid 12.5). */
+  double *rowAsc = calloc(nRows ? nRows : 1, sizeof(double));
+  for (NSInteger k = 0; k < n; k++)
+    {
+      TRGridItem *it = &items[k];
+      const TRStyleStorage *cs = it->s;
+      TRAlign as = cs->alignSelf == TRAlignAuto ? s->alignItems : cs->alignSelf;
+      if (as != TRAlignBaseline || it->r1 - it->r0 != 1 || it->marginAuto[TREdgeTop] || it->marginAuto[TREdgeBottom])
+        continue;
+      double areaW = TRSpanSize(colsT, it->c0, it->c1);
+      double mh = it->margin[TREdgeLeft] + it->margin[TREdgeRight];
+      double mv = it->margin[TREdgeTop] + it->margin[TREdgeBottom];
+      double sw = TRGBox(cs, cs->width, areaW, YES, areaW), w;
+      TRAlign js = TRGJustifySelf(cs, s, dir);
+      if (!isnan(sw)) w = sw;
+      else if ((js == TRAlignNormal || js == TRAlignStretch) && !it->marginAuto[TREdgeLeft] && !it->marginAuto[TREdgeRight])
+        w = MAX(0, areaW - mh);
+      else
+        w = TRLayoutNode(it->node, MAX(0, areaW - mh), NAN, TRMeasureModeAtMost, TRMeasureModeUndefined, areaW, NAN, NO, dir).width;
+      double h = MAX(0, it->h - mv);
+      TRLayoutNode(it->node, w, h, TRMeasureModeExactly, TRMeasureModeExactly, areaW, NAN, YES, dir);
+      it->inBase = YES;
+      it->baseAsc = TRComputeBaseline(it->node) + it->margin[TREdgeTop];
+      rowAsc[it->r0] = MAX(rowAsc[it->r0], it->baseAsc);
+    }
+  for (NSInteger k = 0; k < n; k++)
+    if (items[k].inBase) items[k].h += rowAsc[items[k].r0] - items[k].baseAsc;
+
   /* Percentage rows in a grid of indefinite height (CSS Grid 7.2.1): size
      them as auto to find the grid's height, then resolve them against that
      height and size the rows again. The grid keeps the first height. */
@@ -1778,7 +1813,8 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
               else if (js == TRAlignEnd || js == TRAlignFlexEnd
                        || js == (rtl ? TRAlignLeft : TRAlignRight)) offX += freeW;
             }
-          if (autoT && autoB) offY += MAX(0, freeH) / 2;
+          if (it->inBase) offY += rowAsc[it->r0] - it->baseAsc;
+          else if (autoT && autoB) offY += MAX(0, freeH) / 2;
           else if (autoT) offY += MAX(0, freeH);
           else if (!autoB && !(asSafe && freeH < 0))
             {
@@ -1985,5 +2021,6 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
   free(items);
   free(colsT);
   free(rowsT);
+  free(rowAsc);
   return TRSizeMake(W, H);
 }

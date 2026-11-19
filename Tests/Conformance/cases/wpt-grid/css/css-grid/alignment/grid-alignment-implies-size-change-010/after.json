@@ -1,0 +1,52 @@
+{
+ "id": "wpt-grid/css/css-grid/alignment/grid-alignment-implies-size-change-010/after",
+ "source": {
+  "suite": "wpt-grid",
+  "file": "css/css-grid/alignment/grid-alignment-implies-size-change-010.html",
+  "commit": "34bdce16413b56bcc6c90c42ad1ed051769bbe2b",
+  "license": "BSD-3-Clause",
+  "copyright": "web-platform-tests contributors"
+ },
+ "direction": "ltr",
+ "tolerance": 0.999,
+ "pixelScale": 0,
+ "available": {
+  "width": null,
+  "height": null
+ },
+ "root": {
+  "style": {
+   "display": "inline-grid",
+   "boxSizing": "content-box",
+   "position": "relative",
+   "gridTemplateColumns": 100,
+   "gridTemplateRows": 80,
+   "alignItems": "start"
+  },
+  "children": [
+   {
+    "style": {
+     "display": "block",
+     "boxSizing": "content-box",
+     "alignSelf": "auto"
+    },
+    "measure": {
+     "text": "XX X\nX XXX\nX\nXX XXX",
+     "charWidth": 20,
+     "lineHeight": 20
+    }
+   }
+  ]
+ },
+ "expected": {
+  "children": [
+   {
+    "width": 100,
+    "height": 100
+   }
+  ]
+ },
+ "requires": [
+  "measure"
+ ]
+}

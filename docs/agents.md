@@ -196,7 +196,9 @@ collapses as in HTML, and the runs follow the label's `color`,
   `justify-items`, `justify-self`, `align-items`, `align-self` (each
   with an optional `safe`/`unsafe` prefix: `safe` puts an item that
   overflows its area at the area's start; unsafe is the default),
-  `justify-content` and `align-content`.
+  `justify-content` and `align-content`. `align-items`/`align-self:
+  baseline` lines up the items that start in the same row (an item
+  without text uses its bottom edge as its baseline).
   `fit-content(N)` (px or %) caps a track at N.
   `grid-auto-flow` takes `dense`.
   **Not supported:** `subgrid`.

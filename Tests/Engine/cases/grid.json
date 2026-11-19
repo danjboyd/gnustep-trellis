@@ -1295,6 +1295,63 @@
   }
  },
  {
+  "id": "engine/grid_align_items_baseline_synthesized",
+  "root": {
+   "style": {
+    "display": "grid",
+    "gridTemplateColumns": "50px 50px 50px",
+    "gridTemplateRows": "100px",
+    "alignItems": "baseline",
+    "width": 150,
+    "height": 100
+   },
+   "children": [
+    {
+     "style": {
+      "height": 20
+     }
+    },
+    {
+     "style": {
+      "height": 50
+     }
+    },
+    {
+     "style": {
+      "height": 30,
+      "alignSelf": "start"
+     }
+    }
+   ]
+  },
+  "expected": {
+   "x": 0,
+   "y": 0,
+   "width": 150,
+   "height": 100,
+   "children": [
+    {
+     "x": 0,
+     "y": 30,
+     "width": 50,
+     "height": 20
+    },
+    {
+     "x": 50,
+     "y": 0,
+     "width": 50,
+     "height": 50
+    },
+    {
+     "x": 100,
+     "y": 0,
+     "width": 50,
+     "height": 30
+    }
+   ]
+  }
+ },
+ {
   "id": "engine/subgrid_rows_align_cards",
   "root": {
    "style": {

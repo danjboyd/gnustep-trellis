@@ -66,6 +66,12 @@ version may change the API listed in docs/api.md, and says so here.
 - **Changed (lint):** an element the loader doesn't know (`<bogus>`) is
   an error. Before, trellis-lint passed it and only the loader rejected
   it, so a file that linted clean can fail lint now.
+- **Added (layout):** baseline alignment in a grid. `align-items` /
+  `align-self: baseline` lines up the first baselines of the items that
+  start in the same row (an item without one uses its border box's
+  bottom edge), and the row grows to fit. Before, `baseline` in a grid
+  was `start`. trellis-case gives Ahem text stand-ins their baseline
+  (0.8 em below half the leading) unless the case sets one.
 - **Fixed (layout):** `self-start` and `self-end` (on `justify-items`,
   `justify-self`, and on `align-items`/`align-self` in a column flex
   container) follow the item's own `direction`: an `rtl` item in an `ltr`
@@ -74,6 +80,13 @@ version may change the API listed in docs/api.md, and says so here.
 - **Added (tooling):** the WPT importer carries `direction` set on a node
   below the case root into the case (Trellis takes it per node), instead
   of skipping the test: 95 more cases.
+- **Added (tooling):** the WPT importer translates css-grid's
+  style-change tests (`evaluateStyleChange` and
+  `evaluateStyleChangeMultiple` before and after an inline
+  `el.style.prop = "value"` change) into one case per phase, ids ending
+  `/before` and `/after`: 32 files, 64 cases. 56 pass. The 8 that fail are
+  in `known-gaps.json`: grid baseline alignment of an item without text,
+  whose baseline should be synthesized from its bottom border edge.
 - **Changed (tools):** trellis-render's isolation guard is stricter: the
   home, the user Library and the user defaults directory must all resolve,
   symlinks followed, inside the private `GNUSTEP_HOME`, and a dangling or

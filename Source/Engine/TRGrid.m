@@ -38,15 +38,15 @@ typedef struct {
 
 static NSArray *TRTokenizeTracks(NSString *v)
 {
-  /* Split on whitespace at parenthesis depth 0. */
+  /* Split on whitespace outside (...) and [...] (line names). */
   NSMutableArray *out = [NSMutableArray array];
   NSMutableString *cur = [NSMutableString string];
   int depth = 0;
   for (NSUInteger i = 0; i < [v length]; i++)
     {
       unichar c = [v characterAtIndex: i];
-      if (c == '(') depth++;
-      if (c == ')') depth--;
+      if (c == '(' || c == '[') depth++;
+      if (c == ')' || c == ']') depth--;
       if (depth == 0 && (c == ' ' || c == '\t' || c == '\n'))
         {
           if ([cur length]) { [out addObject: [cur copy]]; [cur setString: @""]; }
@@ -109,6 +109,24 @@ static BOOL TRParseTrackSize(NSString *t, TRTrackSize *ts)
   return YES;
 }
 
+BOOL TRGridIsName(NSString *v);
+
+/* "[a b]": the names on one grid line, or nil if the token isn't a valid
+   line-names list. */
+static NSArray<NSString *> *TRLineNamesToken(NSString *tok)
+{
+  if (![tok hasPrefix: @"["] || ![tok hasSuffix: @"]"]) return nil;
+  NSString *inner = [tok substringWithRange: NSMakeRange(1, [tok length] - 2)];
+  NSMutableArray *names = [NSMutableArray array];
+  for (NSString *x in [inner componentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]])
+    {
+      if ([x length] == 0) continue;
+      if (!TRGridIsName(x) || [[x lowercaseString] isEqualToString: @"span"]) return nil;
+      [names addObject: x];
+    }
+  return names;
+}
+
 /* Parses a track list into entries; repeat() groups are flattened with
    their repeat marker on each entry and a group id. */
 typedef struct { TRTrackEntry *entries; int count; int groupStart, groupLen; int groupRepeat; } TRTrackList;
@@ -122,7 +140,11 @@ static BOOL TRParseTrackList(NSString *v, TRTrackList *out, BOOL singleOnly)
   int n = 0;
   for (NSString *tok in toks)
     {
-      if ([tok hasPrefix: @"["]) return NO;   /* named lines: not supported */
+      if ([tok hasPrefix: @"["])
+        {
+          if (singleOnly || TRLineNamesToken(tok) == nil) return NO;
+          continue;
+        }
       NSString *lt = [tok lowercaseString];
       if ([lt hasPrefix: @"repeat("] && [lt hasSuffix: @")"])
         {
@@ -140,8 +162,14 @@ static BOOL TRParseTrackList(NSString *v, TRTrackList *out, BOOL singleOnly)
           NSArray *innerToks = TRTokenizeTracks([inner substringFromIndex: NSMaxRange(comma)]);
           if ([innerToks count] == 0) return NO;
           int start = n;
+          int before = n;
           for (NSString *it in innerToks)
             {
+              if ([it hasPrefix: @"["])
+                {
+                  if (TRLineNamesToken(it) == nil) return NO;
+                  continue;
+                }
               TRTrackEntry e;
               if (!TRParseTrackSize(it, &e.size)) return NO;
               if (rep < 0 && (e.size.min.kind != TRBreadthFixed && e.size.min.kind != TRBreadthPercent)
@@ -151,6 +179,7 @@ static BOOL TRParseTrackList(NSString *v, TRTrackList *out, BOOL singleOnly)
               [buf appendBytes: &e length: sizeof e];
               n++;
             }
+          if (n == before) return NO;   /* names only, no track */
           if (rep < 0) { out->groupStart = start; out->groupLen = n - start; out->groupRepeat = rep; }
           else
             {
@@ -193,10 +222,22 @@ BOOL TRGridIsName(NSString *v)
 {
   if ([v length] == 0) return NO;
   unichar c = [v characterAtIndex: 0];
+  NSString *lv = [v lowercaseString];
+  /* A CSS identifier may start with '-' when a letter, '_' or '-'
+     follows ("-start"); "-1" stays a number. */
+  if (c == '-' && [v length] > 1)
+    c = [v characterAtIndex: 1] == '-' ? 'a' : [v characterAtIndex: 1];
+  /* One identifier: "span row" or "col 2" is a line, not a name (the
+     grid-row/column shorthands copy only a lone name to the end). */
   return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_')
-    && ![[v lowercaseString] isEqualToString: @"auto"] && ![[v lowercaseString] hasPrefix: @"span"];
+    && ![lv isEqualToString: @"auto"] && ![lv isEqualToString: @"span"]
+    && [v rangeOfCharacterFromSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]].location == NSNotFound;
 }
 
+/* A grid-*-start/end value: auto; <integer>; <name>; <integer> <name> (in
+   either order); span [<integer>] [<name>] (in any order). A name with no
+   integer is TRLineName; with one (or after span) the name goes to
+   nameOut and the kind stays TRLineNumber or TRLineSpan. */
 static BOOL TRParseLine(NSString *v, TRLine *l, NSString *__strong *nameOut)
 {
   v = [v stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
@@ -204,27 +245,50 @@ static BOOL TRParseLine(NSString *v, TRLine *l, NSString *__strong *nameOut)
   if (nameOut) *nameOut = nil;
   if ([v length] == 0 || [[v lowercaseString] isEqualToString: @"auto"]) return YES;
   NSArray *t = [v componentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
-  NSMutableArray *toks = [NSMutableArray array];
-  for (NSString *x in t) if ([x length]) [toks addObject: x];
-  if ([[toks[0] lowercaseString] isEqualToString: @"span"])
+  BOOL span = NO, haveN = NO;
+  NSInteger n = 0;
+  NSString *name = nil;
+  for (NSString *x in t)
     {
-      if ([toks count] != 2) return NO;
-      NSInteger n = [toks[1] integerValue];
-      if (n < 1) return NO;
-      l->kind = TRLineSpan; l->n = n;
-      return YES;
+      if ([x length] == 0) continue;
+      NSScanner *sc = [NSScanner scannerWithString: x];
+      NSInteger k;
+      if ([[x lowercaseString] isEqualToString: @"span"])
+        {
+          if (span) return NO;
+          span = YES;
+        }
+      else if ([sc scanInteger: &k] && [sc isAtEnd])
+        {
+          if (haveN || k == 0) return NO;
+          haveN = YES; n = k;
+        }
+      else if (TRGridIsName(x))
+        {
+          if (name) return NO;
+          name = x;
+        }
+      else
+        return NO;
     }
-  if ([toks count] != 1) return NO;
-  NSScanner *sc = [NSScanner scannerWithString: toks[0]];
-  NSInteger n;
-  if ([sc scanInteger: &n] && [sc isAtEnd])
+  if (span)
     {
-      if (n == 0) return NO;
+      if (!haveN && !name) return NO;
+      if (haveN && n < 1) return NO;
+      l->kind = TRLineSpan; l->n = haveN ? n : 1;
+    }
+  else if (haveN)
+    {
       l->kind = TRLineNumber; l->n = n;
-      return YES;
     }
-  if (TRGridIsName(toks[0])) { l->kind = TRLineName; if (nameOut) *nameOut = [toks[0] copy]; return YES; }
-  return NO;
+  else if (name)
+    {
+      l->kind = TRLineName; l->n = 1;
+    }
+  else
+    return NO;
+  if (nameOut) *nameOut = [name copy];
+  return YES;
 }
 
 BOOL TRGridValidateLine(NSString *value)
@@ -359,9 +423,9 @@ static double TRBreadthFixedValue(TRBreadth b, double avail)
 /* Expands a template + auto-repeat into concrete tracks. */
 static TRTrack *TRBuildTracks(NSString *tmpl, double avail, double gap, NSInteger *count,
                               NSInteger *autoFitStart, NSInteger *autoFitLen,
-                              double minAvail, double maxAvail)
+                              double minAvail, double maxAvail, int *autoReps)
 {
-  *autoFitStart = -1; *autoFitLen = 0;
+  *autoFitStart = -1; *autoFitLen = 0; *autoReps = 0;
   TRTrackList l = {0};
   if (tmpl == nil || !TRParseTrackList(tmpl, &l, NO)) { *count = 0; return NULL; }
   int reps = 1;
@@ -404,6 +468,7 @@ static TRTrack *TRBuildTracks(NSString *tmpl, double avail, double gap, NSIntege
           if (reps < 1) reps = 1;
         }
     }
+  if (l.groupStart >= 0) *autoReps = reps;
   NSInteger n = l.count + (l.groupStart >= 0 ? (reps - 1) * l.groupLen : 0);
   TRTrack *t = calloc(n ? n : 1, sizeof(TRTrack));
   NSInteger k = 0;
@@ -458,36 +523,118 @@ static inline TRTrackSize TRAutoBefore(const TRAutoTracks *at, NSInteger k)   /*
   return at->sizes[at->count - 1 - (k % at->count)];
 }
 
-/* Line -> track index for one axis. Returns NO for auto. */
-static BOOL TRResolveLine(TRLine l, NSString *name, NSInteger explicitCount, NSDictionary *areaLines,
+/* The explicit grid's named lines for one axis: name -> ascending line
+   indices (line i is the start edge of track i). From the template's
+   [names] (repeat() expanded, auto repeats autoReps times) and from the
+   areas' implicit name-start/name-end lines (CSS Grid 7.3.2). */
+static NSDictionary<NSString *, NSArray<NSNumber *> *> *TRLineNameMap(NSString *tmpl, int autoReps,
+                                                                      NSDictionary *areaEdges)
+{
+  NSMutableDictionary<NSString *, NSMutableOrderedSet *> *m = [NSMutableDictionary dictionary];
+  void (^add)(NSString *, NSInteger) = ^(NSString *nm, NSInteger line) {
+    NSMutableOrderedSet *set = m[nm];
+    if (set == nil) m[nm] = set = [NSMutableOrderedSet orderedSet];
+    [set addObject: @(line)];
+  };
+  NSInteger line = 0;
+  for (NSString *tok in (tmpl ? TRTokenizeTracks(tmpl) : nil))
+    {
+      if ([tok hasPrefix: @"["])
+        {
+          for (NSString *nm in TRLineNamesToken(tok)) add(nm, line);
+          continue;
+        }
+      NSString *lt = [tok lowercaseString];
+      if ([lt hasPrefix: @"repeat("] && [lt hasSuffix: @")"])
+        {
+          NSString *inner = [tok substringWithRange: NSMakeRange(7, [tok length] - 8)];
+          NSRange comma = [inner rangeOfString: @","];
+          if (comma.location == NSNotFound) continue;
+          NSString *countS = [[[inner substringToIndex: comma.location]
+            stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]] lowercaseString];
+          int reps = ([countS isEqualToString: @"auto-fill"] || [countS isEqualToString: @"auto-fit"])
+            ? autoReps : [countS intValue];
+          NSArray *innerToks = TRTokenizeTracks([inner substringFromIndex: NSMaxRange(comma)]);
+          for (int r = 0; r < reps; r++)
+            for (NSString *it in innerToks)
+              {
+                if ([it hasPrefix: @"["])
+                  for (NSString *nm in TRLineNamesToken(it)) add(nm, line);
+                else
+                  line++;
+              }
+          continue;
+        }
+      line++;
+    }
+  for (NSString *nm in areaEdges)
+    {
+      NSArray *edge = areaEdges[nm];
+      add([nm stringByAppendingString: @"-start"], [edge[0] integerValue]);
+      add([nm stringByAppendingString: @"-end"], [edge[1] integerValue]);
+    }
+  NSMutableDictionary *out = [NSMutableDictionary dictionary];
+  for (NSString *nm in m)
+    out[nm] = [[m[nm] array] sortedArrayUsingSelector: @selector(compare:)];
+  return out;
+}
+
+/* The n-th line named `name` (n < 0 counts from the end). With fewer such
+   lines, every implicit line past the explicit grid on that side counts
+   as having the name (CSS Grid 8.3.1). */
+static NSInteger TRNthNamedLine(NSArray<NSNumber *> *lines, NSInteger n, NSInteger explicitCount)
+{
+  NSInteger count = (NSInteger)[lines count];
+  if (n > 0) return n <= count ? [lines[n - 1] integerValue] : explicitCount + (n - count);
+  NSInteger m = -n;
+  return m <= count ? [lines[count - m] integerValue] : -(m - count);
+}
+
+/* Line -> line index for one axis (negative: before the explicit grid;
+   the caller adds implicit tracks there). Returns NO for auto and span. */
+static BOOL TRResolveLine(TRLine l, NSString *name, NSInteger explicitCount, NSDictionary *lineNames,
                           BOOL isStart, NSInteger *out)
 {
+  if (l.kind == TRLineNumber && name == nil)
+    {
+      *out = l.n > 0 ? l.n - 1 : explicitCount + 1 + l.n;
+      return YES;
+    }
   if (l.kind == TRLineNumber)
     {
-      /* Negative results are lines before the explicit grid; the caller
-         adds implicit tracks there. */
-      NSInteger idx = l.n > 0 ? l.n - 1 : explicitCount + 1 + l.n;
-      *out = idx;
+      *out = TRNthNamedLine(lineNames[name], l.n, explicitCount);
       return YES;
     }
   if (l.kind == TRLineName)
     {
-      NSString *key = name;
-      NSString *suffix = isStart ? @"-start" : @"-end";
-      /* An area named exactly so comes first (its implicit name-start and
-         name-end lines, CSS Grid 8.3.1); only then is a -start/-end
-         suffix read as naming another area's edge. */
-      if (areaLines[key] == nil && ([key hasSuffix: @"-start"] || [key hasSuffix: @"-end"]))
-        {
-          suffix = [key hasSuffix: @"-start"] ? @"-start" : @"-end";
-          key = [key substringToIndex: [key length] - [suffix length]];
-        }
-      NSArray *b = areaLines[key];
-      if (b == nil) return NO;
-      *out = [b[[suffix isEqualToString: @"-start"] ? 0 : 1] integerValue];
+      /* name-start / name-end first (an area's edge, or lines so named),
+         else the first line called name. */
+      NSArray *edge = lineNames[[name stringByAppendingString: isStart ? @"-start" : @"-end"]];
+      if (edge) { *out = [edge[0] integerValue]; return YES; }
+      *out = TRNthNamedLine(lineNames[name], 1, explicitCount);
       return YES;
     }
   return NO;
+}
+
+/* A span against a definite line: n lines (or the n-th line named `name`)
+   forward from `from` (end side) or backward (start side). Implicit lines
+   count as having the name, as in TRNthNamedLine. */
+static NSInteger TRSpanLine(TRLine span, NSString *name, NSInteger from, BOOL forward,
+                            NSInteger explicitCount, NSDictionary *lineNames)
+{
+  if (name == nil) return forward ? from + span.n : from - span.n;
+  NSArray<NSNumber *> *lines = lineNames[name];
+  NSInteger found = 0;
+  if (forward)
+    {
+      for (NSNumber *x in lines)
+        if ([x integerValue] > from && ++found == span.n) return [x integerValue];
+      return MAX(from, explicitCount) + (span.n - found);
+    }
+  for (NSNumber *x in [lines reverseObjectEnumerator])
+    if ([x integerValue] < from && ++found == span.n) return [x integerValue];
+  return MIN(from, 0) - (span.n - found);
 }
 
 /* "Distribute extra space" (CSS Grid 2, 12.5.1) into the base sizes of
@@ -927,21 +1074,24 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
      definite max-width (or else min-width), auto-repeat counts against
      that (7.2.3.2). */
   const double repInnerW = (wm == TRMeasureModeAtMost && (!isnan(maxInnerW) || !isnan(minInnerW))) ? NAN : innerW;
-  TRTrack *colsT = TRBuildTracks(st->_gridTemplateColumns, repInnerW, colGap, &nCols, &fitStartC, &fitLenC, minInnerW, maxInnerW);
-  TRTrack *rowsT = TRBuildTracks(st->_gridTemplateRows, innerH, rowGap, &nRows, &fitStartR, &fitLenR, minInnerH, maxInnerH);
+  int autoRepsC = 0, autoRepsR = 0;
+  TRTrack *colsT = TRBuildTracks(st->_gridTemplateColumns, repInnerW, colGap, &nCols, &fitStartC, &fitLenC, minInnerW, maxInnerW, &autoRepsC);
+  TRTrack *rowsT = TRBuildTracks(st->_gridTemplateRows, innerH, rowGap, &nRows, &fitStartR, &fitLenR, minInnerH, maxInnerH, &autoRepsR);
   NSArray *areas = st->_gridTemplateAreas;
   NSInteger areaRows = [areas count], areaCols = areaRows ? [areas[0] count] : 0;
   NSInteger explicitCols = MAX(nCols, areaCols), explicitRows = MAX(nRows, areaRows);
-  NSMutableDictionary *colLines = [NSMutableDictionary dictionary], *rowLines = [NSMutableDictionary dictionary];
+  NSMutableDictionary *colAreas = [NSMutableDictionary dictionary], *rowAreas = [NSMutableDictionary dictionary];
   for (NSInteger r = 0; r < areaRows; r++)
     for (NSInteger c = 0; c < areaCols; c++)
       {
         NSString *nm = areas[r][c];
         if ([nm isEqualToString: @"."]) continue;
-        NSArray *cl = colLines[nm], *rl = rowLines[nm];
-        colLines[nm] = @[@(cl ? MIN([cl[0] integerValue], c) : c), @(cl ? MAX([cl[1] integerValue], c + 1) : c + 1)];
-        rowLines[nm] = @[@(rl ? MIN([rl[0] integerValue], r) : r), @(rl ? MAX([rl[1] integerValue], r + 1) : r + 1)];
+        NSArray *cl = colAreas[nm], *rl = rowAreas[nm];
+        colAreas[nm] = @[@(cl ? MIN([cl[0] integerValue], c) : c), @(cl ? MAX([cl[1] integerValue], c + 1) : c + 1)];
+        rowAreas[nm] = @[@(rl ? MIN([rl[0] integerValue], r) : r), @(rl ? MAX([rl[1] integerValue], r + 1) : r + 1)];
       }
+  NSDictionary *colLines = TRLineNameMap(st->_gridTemplateColumns, autoRepsC, colAreas);
+  NSDictionary *rowLines = TRLineNameMap(st->_gridTemplateRows, autoRepsR, rowAreas);
 
   /* ---- Items and placement ---- */
   NSArray *children = node->_children;
@@ -1018,10 +1168,14 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           NSInteger span = 1;
           BOOL def = NO;
           NSInteger start = 0;
+          if (sDef && !eDef && b.kind == TRLineSpan) { ei = TRSpanLine(b, bName, si, YES, expl, names); eDef = YES; }
+          else if (eDef && !sDef && a.kind == TRLineSpan) { si = TRSpanLine(a, aName, ei, NO, expl, names); sDef = YES; }
           if (sDef && eDef) { if (ei < si) { NSInteger t = si; si = ei; ei = t; } if (ei == si) ei = si + 1; start = si; span = ei - si; def = YES; }
-          else if (sDef) { start = si; span = b.kind == TRLineSpan ? b.n : 1; def = YES; }
-          else if (eDef) { span = a.kind == TRLineSpan ? a.n : 1; start = ei - span; def = YES; }
-          else span = a.kind == TRLineSpan ? a.n : (b.kind == TRLineSpan ? b.n : 1);
+          else if (sDef) { start = si; span = 1; def = YES; }
+          else if (eDef) { start = ei - 1; span = 1; def = YES; }
+          /* Auto-placed: a span to a named line counts as span 1 (8.3.1). */
+          else if (a.kind == TRLineSpan) span = aName ? 1 : a.n;
+          else if (b.kind == TRLineSpan) span = bName ? 1 : b.n;
           if (axis == 0) { pl[k].rDef = def; pl[k].rs = start; pl[k].rspan = span; }
           else { pl[k].cDef = def; pl[k].cs = start; pl[k].cspan = span; }
         }
@@ -1488,10 +1642,10 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
           NSInteger si = 0, ei = 0;
           BOOL sDef = TRResolveLine(a, aName, expl, names, YES, &si);
           BOOL eDef = TRResolveLine(b, bName, expl, names, NO, &ei);
+          if (sDef && !eDef && b.kind == TRLineSpan) { ei = TRSpanLine(b, bName, si, YES, expl, names); eDef = YES; }
+          else if (eDef && !sDef && a.kind == TRLineSpan) { si = TRSpanLine(a, aName, ei, NO, expl, names); sDef = YES; }
           NSInteger off = axis == 0 ? offR : offC;
           si += off; ei += off;
-          if (sDef && !eDef && b.kind == TRLineSpan) { ei = si + b.n; eDef = YES; }
-          if (eDef && !sDef && a.kind == TRLineSpan) { si = ei - a.n; sDef = si >= 0; }
           if (sDef && eDef && ei < si) { NSInteger t = si; si = ei; ei = t; }
           if (sDef && (si < 0 || si > nt)) sDef = NO;
           if (eDef && (ei < 0 || ei > nt)) eDef = NO;

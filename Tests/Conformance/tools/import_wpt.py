@@ -507,6 +507,43 @@ def parse_border(v):
     return width, style
 
 
+GRID_PLACEMENT = ("grid-row", "grid-column", "grid-row-start", "grid-row-end",
+                  "grid-column-start", "grid-column-end", "grid-area")
+
+
+def valid_grid_line(v):
+    """CSS Grid <grid-line>: auto | <custom-ident> |
+    [<integer> && <custom-ident>?] | [span && [<integer> || <custom-ident>]]."""
+    toks = v.split()
+    if toks == ["auto"]:
+        return True
+    span = ints = idents = 0
+    for t in toks:
+        if t == "span":
+            span += 1
+        elif re.match(r"^[-+]?\d+$", t):
+            if int(t) == 0 or (span and int(t) < 0):
+                return False
+            ints += 1
+        elif re.match(r"^-?[A-Za-z_][\w-]*$", t) and t not in ("auto", "span"):
+            idents += 1
+        else:
+            return False
+    if span > 1 or ints > 1 or idents > 1 or not toks:
+        return False
+    if span and not (ints or idents):
+        return False
+    if span and ints and int(next(t for t in toks if re.match(r"^[-+]?\d+$", t))) < 0:
+        return False
+    return True
+
+
+def valid_grid_placement(k, v):
+    parts = [x.strip() for x in v.split("/")]
+    most = {"grid-area": 4, "grid-row": 2, "grid-column": 2}.get(k, 1)
+    return len(parts) <= most and all(valid_grid_line(x) for x in parts)
+
+
 def expand(decls):
     """Fold an ordered list of (prop, value) into a longhand dict."""
     out = collections.OrderedDict()
@@ -519,6 +556,8 @@ def expand(decls):
                 out[pre + s] = x
         elif k in ("grid", "grid-template"):
             out.update(expand_grid_shorthand(k, v))
+        elif k in GRID_PLACEMENT and not valid_grid_placement(k, v):
+            continue    # an invalid declaration is ignored
         elif k in ("grid-row-gap", "grid-column-gap"):
             out[k[len("grid-"):]] = v
         elif k in ("gap", "grid-gap"):
@@ -603,8 +642,9 @@ def expand_flex(v):
 
 
 def expand_grid_shorthand(k, v):
-    """grid / grid-template -> longhands. Forms with area strings or line
-    names are passed through for the engine (and tagged by grid_requires)."""
+    """grid / grid-template -> longhands. Forms with area strings are passed
+    through for the engine (and tagged by grid_requires); line names stay
+    in the track lists."""
     v = v.strip()
     reset = {"grid-template-rows": "none", "grid-template-columns": "none",
              "grid-template-areas": "none"}
@@ -613,7 +653,7 @@ def expand_grid_shorthand(k, v):
                       "grid-auto-flow": "row"})
     if v == "none":
         return reset
-    if '"' in v or "[" in v or "/" not in v:
+    if '"' in v or "/" not in v:
         return {k: v}           # complex form: leave to the engine
     rows, cols = [x.strip() for x in v.split("/", 1)]
     out = dict(reset)
@@ -923,8 +963,7 @@ class Converter:
                     return True
         return False
 
-    PLACEMENT = ("grid-row", "grid-column", "grid-row-start", "grid-row-end",
-                 "grid-column-start", "grid-column-end", "grid-area")
+    PLACEMENT = GRID_PLACEMENT
 
     def grid_requires(self, k, v, el=None):
         if "subgrid" in v:

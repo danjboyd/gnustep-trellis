@@ -102,9 +102,8 @@ int main(void)
 {
   @autoreleasepool
     {
-#ifdef GNUSTEP
+      /* AppKit too: without NSApp, -sendAction:to: reaches nothing. */
       [NSApplication sharedApplication];
-#endif
       NSFileManager *fm = [NSFileManager defaultManager];
       NSString *root = [NSTemporaryDirectory() stringByAppendingPathComponent:
                          [NSString stringWithFormat: @"trellis-untrusted-%d", getpid()]];

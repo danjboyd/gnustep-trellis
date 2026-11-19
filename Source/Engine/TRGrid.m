@@ -389,6 +389,12 @@ typedef struct {
   double x, y;
   NSInteger docOrder;
   BOOL autoMinW, autoMinH;    /* content-based (automatic) minimum size in that axis */
+  /* Subgrids (CSS Grid 2, 9). A subgrid item doesn't contribute its
+     content in a subgridded axis (subC/subR), only its margin, border and
+     padding; its items do, as virtual items that size tracks and are
+     never laid out by this grid. noW/noH: a virtual item that doesn't
+     contribute in that axis (the subgrid isn't subgridded there). */
+  BOOL subC, subR, virt, noW, noH;
 } TRGridItem;
 
 static inline double TRGZero(double v) { return isnan(v) ? 0 : v; }
@@ -1403,6 +1409,14 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       if (subC) { gridCols = nCols; offC = 0; }
       if (subR) { gridRows = nRows; offR = 0; }
     }
+  /* Asked by a parent only for where the items go. */
+  if (node->_subgridReport)
+    {
+      for (NSInteger k = 0; k < n; k++)
+        [node->_subgridReport addObject: @[items[k].node, @(items[k].r0), @(items[k].r1), @(items[k].c0), @(items[k].c1)]];
+      free(pl); free(items); free(colsT); free(rowsT);
+      return TRSizeMake(0, 0);
+    }
   free(pl);
   #undef OCC
 
@@ -1438,6 +1452,50 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
         { memset(&rowsT[i], 0, sizeof(TRTrack)); rowsT[i].size = TRAutoAfter(&autoRows, i - nRows); }
       nRows = gridRows;
     }
+  /* ---- Subgrid items as virtual items (CSS Grid 2, 9) ---- */
+  NSInteger nAll = n;
+  /* nAll grows as subgrids are expanded, so nested subgrids expand too:
+     only in an axis that is subgridded all the way up. */
+  for (NSInteger k = 0; k < nAll; k++)
+    {
+      TRGridItem *sg = &items[k];
+      if (sg->s->display != TRDisplayGrid) continue;
+      TRStyle *sst = sg->node->_style;
+      sg->subC = TRIsSubgrid(sst->_gridTemplateColumns) && !sg->noW;
+      sg->subR = TRIsSubgrid(sst->_gridTemplateRows) && !sg->noH;
+      if (!sg->subC && !sg->subR) continue;
+      TRNode *sgn = sg->node;
+      sgn->_subgridReport = [NSMutableArray array];
+      /* The spans it has here (only their counts matter for placing). */
+      if (sg->subC) sgn->_subgridCols = [NSMutableData dataWithLength: (sg->c1 - sg->c0) * 2 * sizeof(double)];
+      if (sg->subR) sgn->_subgridRows = [NSMutableData dataWithLength: (sg->r1 - sg->r0) * 2 * sizeof(double)];
+      TRFloat zero[4] = {0, 0, 0, 0};
+      TRLayoutGrid(sgn, sg->s, zero, zero, NAN, NAN, TRMeasureModeUndefined, TRMeasureModeUndefined, NAN, NAN, NO, dir);
+      NSArray *rep = sgn->_subgridReport;
+      sgn->_subgridReport = nil;
+      sgn->_subgridCols = nil;
+      sgn->_subgridRows = nil;
+      if ([rep count] == 0) continue;
+      items = realloc(items, sizeof(TRGridItem) * (size_t)(nAll + [rep count]));
+      sg = &items[k];
+      TRDirection sdir = sg->s->direction == TRDirectionInherit ? dir : sg->s->direction;
+      for (NSArray *e in rep)
+        {
+          TRGridItem *v = &items[nAll++];
+          memset(v, 0, sizeof *v);
+          v->node = e[0];
+          v->s = TRChildStyle(v->node, sdir);
+          const TRStyleStorage *r = TRResolveSizeKeywords(v->node, v->s, &v->kw, NAN, NAN, NAN, NAN, YES, sdir);
+          if (r != v->s) { v->os = v->s; v->s = r; }
+          v->virt = YES;
+          NSInteger r0 = [e[1] integerValue], r1 = [e[2] integerValue], c0 = [e[3] integerValue], c1 = [e[4] integerValue];
+          if (sg->subR) { v->r0 = MIN(sg->r0 + r0, sg->r1 - 1); v->r1 = MIN(sg->r0 + r1, sg->r1); }
+          else { v->r0 = sg->r0; v->r1 = sg->r1; v->noH = YES; }
+          if (sg->subC) { v->c0 = MIN(sg->c0 + c0, sg->c1 - 1); v->c1 = MIN(sg->c0 + c1, sg->c1); }
+          else { v->c0 = sg->c0; v->c1 = sg->c1; v->noW = YES; }
+        }
+    }
+
   /* auto-fit: empty repeated tracks collapse. */
   for (int axis = 0; axis < 2; axis++)
     {
@@ -1453,7 +1511,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
     }
 
   /* ---- Item resolved margins and content widths ---- */
-  for (NSInteger k = 0; k < n; k++)
+  for (NSInteger k = 0; k < nAll; k++)
     {
       TRGridItem *it = &items[k];
       const TRStyleStorage *cs = it->s;
@@ -1469,7 +1527,18 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       it->autoMinW = cs->width.unit != TRUnitPoint && cs->width.unit != TRUnitPercent && cs->minWidth.unit == TRUnitAuto;
       it->autoMinH = cs->height.unit != TRUnitPoint && cs->height.unit != TRUnitPercent && cs->minHeight.unit == TRUnitAuto;
       double sw = TRGBox(cs, cs->width, NAN, YES, NAN);
-      if (!isnan(sw))
+      if (it->noW)
+        it->minW = it->maxW = 0;
+      else if (it->subC)
+        {
+          /* Only its margin, border and padding (its items count instead). */
+          double pb = 0;
+          for (int e2 = 0; e2 < 4; e2 += 2)
+            pb += TRGZero(TRGResolve(cs->padding[e2 == 0 ? TREdgeLeft : TREdgeRight], NAN))
+                + TRGZero(TRGResolve(cs->border[e2 == 0 ? TREdgeLeft : TREdgeRight], NAN));
+          it->minW = it->maxW = pb + mh;
+        }
+      else if (!isnan(sw))
         it->minW = it->maxW = sw + mh;
       else
         {
@@ -1497,7 +1566,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
      grid whose width is only bounded (shrink-to-fit) sizes to its tracks,
      and stretches once it is laid out at that width. */
   TRAlign colStretch = wm == TRMeasureModeAtMost ? TRAlignStart : s->justifyContent;
-  TRSizeTracks(colsT, nCols, innerW, colGap, items, n, YES, colStretch, minInnerW, maxInnerW);
+  TRSizeTracks(colsT, nCols, innerW, colGap, items, nAll, YES, colStretch, minInnerW, maxInnerW);
   double contentW = NAN;
   if (percentCols)
     {
@@ -1511,7 +1580,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
       if (!isnan(minInnerW)) contentW = MAX(contentW, minInnerW);
       if (!isnan(maxInnerW)) contentW = MIN(contentW, maxInnerW);
       for (NSInteger i = 0; i < nCols; i++) colsT[i].size = savedCols[i];
-      TRSizeTracks(colsT, nCols, contentW, colGap, items, n, YES, colStretch, minInnerW, maxInnerW);
+      TRSizeTracks(colsT, nCols, contentW, colGap, items, nAll, YES, colStretch, minInnerW, maxInnerW);
     }
   /* left/right are physical: columns are placed from the inline start and
      mirrored for rtl, where left is the end and right the start. */
@@ -1534,7 +1603,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
     }
 
   /* Percentage margins, against each item's grid-area width (CSS Grid 6.5). */
-  for (NSInteger k = 0; k < n; k++)
+  for (NSInteger k = 0; k < nAll; k++)
     {
       TRGridItem *it = &items[k];
       double areaW = TRSpanSize(colsT, it->c0, it->c1);
@@ -1544,9 +1613,17 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
     }
 
   /* ---- Row contributions: content height at the resolved column width ---- */
-  for (NSInteger k = 0; k < n; k++)
+  for (NSInteger k = 0; k < nAll; k++)
     {
       TRGridItem *it = &items[k];
+      if (it->noH) { it->h = 0; continue; }
+      if (it->subR)
+        {
+          double pb = TRGZero(TRGResolve(it->s->padding[TREdgeTop], NAN)) + TRGZero(TRGResolve(it->s->padding[TREdgeBottom], NAN))
+                    + TRGZero(TRGResolve(it->s->border[TREdgeTop], NAN)) + TRGZero(TRGResolve(it->s->border[TREdgeBottom], NAN));
+          it->h = pb + it->margin[TREdgeTop] + it->margin[TREdgeBottom];
+          continue;
+        }
       double areaW = TRSpanSize(colsT, it->c0, it->c1);
       TRStyleStorage kwArea;
       const TRStyleStorage *cs = it->os ? TRResolveSizeKeywords(it->node, it->os, &kwArea, areaW, NAN, areaW, NAN, YES, dir) : it->s;
@@ -1579,13 +1656,13 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
         if (rowsT[i].size.min.kind == TRBreadthPercent) { rowsT[i].size.min.kind = TRBreadthAuto; percentRows = YES; }
         if (rowsT[i].size.max.kind == TRBreadthPercent) { rowsT[i].size.max.kind = TRBreadthAuto; percentRows = YES; }
       }
-  TRSizeTracks(rowsT, nRows, innerH, rowGap, items, n, NO, s->alignContent, minInnerH, maxInnerH);
+  TRSizeTracks(rowsT, nRows, innerH, rowGap, items, nAll, NO, s->alignContent, minInnerH, maxInnerH);
   double rowsTotal = TRPlaceTracks(rowsT, nRows, rowGap, innerH, s->alignContent, s->alignContentSafe);
   double contentH = rowsTotal;
   if (percentRows)
     {
       for (NSInteger i = 0; i < nRows; i++) rowsT[i].size = savedRows[i];
-      TRSizeTracks(rowsT, nRows, contentH, rowGap, items, n, NO, s->alignContent, minInnerH, maxInnerH);
+      TRSizeTracks(rowsT, nRows, contentH, rowGap, items, nAll, NO, s->alignContent, minInnerH, maxInnerH);
       rowsTotal = TRPlaceTracks(rowsT, nRows, rowGap, contentH, s->alignContent, s->alignContentSafe);
     }
   /* A percentage row-gap in an indefinite height counts as 0 while the

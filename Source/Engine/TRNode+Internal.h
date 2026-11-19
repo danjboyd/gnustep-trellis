@@ -39,6 +39,9 @@ typedef struct {
      the subgrid spans, as (start, size) double pairs, starts relative to
      the subgrid's border box along that axis (logical). nil otherwise. */
   NSData *_subgridRows, *_subgridCols;
+  /* Set by a grid parent while it sizes its tracks: the subgrid only
+     places its items and appends @[node, r0, r1, c0, c1] for each. */
+  NSMutableArray *_subgridReport;
 
   /* Results. _rawFrame is unrounded; _frame is what clients see. */
   TRRect _rawFrame;

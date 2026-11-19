@@ -1,16 +1,16 @@
 {
- "commit": "b6d1131",
+ "commit": "be0510f",
  "conformance": {
-  "pass": 4028,
-  "skipped": 388,
-  "total": 4028
+  "pass": 4046,
+  "skipped": 370,
+  "total": 4046
  },
  "date": "2026-11-19",
  "platform": "linux",
  "suites": {
   "engine": {
-   "pass": 201,
-   "total": 201
+   "pass": 202,
+   "total": 202
   },
   "wpt": {
    "cases": 1045,
@@ -29,8 +29,8 @@
   },
   "yoga": {
    "cases": 1086,
-   "pass": 1044,
-   "total": 1044
+   "pass": 1062,
+   "total": 1062
   }
  }
 }

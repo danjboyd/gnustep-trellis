@@ -32,6 +32,10 @@
 #            themselves are tested on stand-in trees in make check
 #            (Tests/View/isolation-verdict.m), never on the real home
 #   settings the real ~/GNUstep is unchanged by the whole run
+#   defaults nothing was written to the private home's GNUstep/Defaults
+#            either (apart from gnustep-base's .lck lock folder): the
+#            tools keep theme and appearance in the argument domain, so a
+#            write here would be a write to a real user's defaults
 #   deps     (Windows) every DLL TrellisPreview.exe loads, recursively, is
 #            found (Tests/Parity/pe-deps.py, in the app folder, obj/, then
 #            PATH); deps.json lists the ones an installer must ship
@@ -85,7 +89,10 @@ registry_state() {  # Windows only: reported, not failed (ask #8624)
     echo "== $k"; MSYS2_ARG_CONV_EXCL='*' reg query "$k" /s 2>/dev/null
   done | tee -a "$OUT/registry.txt" | sha256sum | cut -d' ' -f1
 }
-before=$(settings_state); reg_before=$(registry_state)
+defaults_state() {  # the private home's defaults: name size mtime, .lck excluded
+  find "$PRIV/GNUstep/Defaults" -path '*/.lck' -prune -o -type f -printf '%P %s %T@\n' 2>/dev/null | sort
+}
+before=$(settings_state); reg_before=$(registry_state); defaults_before=$(defaults_state)
 
 for entry in $THEMES; do
   theme=${entry%%:*}
@@ -167,7 +174,13 @@ if [ $PLATFORM = windows ]; then
   else add "deps" FAIL "$(tail -1 "$OUT/deps.txt" | sed 's/^== //') (deps.txt)"; fi
 else add "deps" INFO "not Windows"; fi
 
-after=$(settings_state); reg_after=$(registry_state)
+after=$(settings_state); reg_after=$(registry_state); defaults_after=$(defaults_state)
+if [ "$defaults_before" = "$defaults_after" ]; then
+  add "defaults" PASS "nothing written to the private $PRIV/GNUstep/Defaults"
+else
+  changed=$(diff <(echo "$defaults_before") <(echo "$defaults_after") | sed -n 's/^> \([^ ]*\) .*/\1/p' | sort -u | tr '\n' ' ')
+  add "defaults" FAIL "written to the private defaults: ${changed:-a file was removed}"
+fi
 [ "$before" = "$after" ] && add "settings" PASS "the real $REALGS is unchanged" \
   || add "settings" FAIL "the real $REALGS changed during the run"
 if [ "$reg_before" = n/a ]; then add "registry" INFO "not Windows"

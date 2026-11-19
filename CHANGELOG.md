@@ -5,6 +5,34 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Added (platform):** TrellisPreview, the libraries and the tools build
+  on Windows with MSYS2 CLANG64 and gnustep-cli's patched toolchain (draft;
+  see docs/windows.md). On Windows the GUI checks run only as a dedicated
+  test user (`TRELLIS_TEST_USER`), because gnustep-base writes to the
+  user's registry on every launch.
+- **Added (Preview):** `--resize W1xH1,W2xH2,...` resizes the window live
+  and writes a snapshot and frames JSON at each size; `--watch N` (with
+  `--watch-timeout S`) waits for N reloads of the file or its sample and
+  writes each one. Both are for scripted checks.
+- **Added (tooling):** `Tests/Parity/run.sh` and `compare.py`: the same
+  open, resize, reload, render, path, isolation and dependency cases on
+  Linux and Windows, compared by structure across platforms and pixel
+  for pixel within one (`make check-parity` on Linux).
+- **Changed (tools):** trellis-render's isolation guard is stricter: the
+  home, the user Library and the user defaults directory must all resolve,
+  symlinks followed, inside the private `GNUSTEP_HOME`, and a dangling or
+  unreadable path component is refused. A `GNUSTEP_CONFIG_FILE` that moves
+  them into the private home is accepted. Runs through
+  `scripts/run-headless.sh` are unaffected; see docs/migration-0.11.md.
+- **Changed (tools):** `--appearance` also sets WinUITheme's colour scheme
+  (argument domain only), alongside Adwaita's.
+- **Fixed (tools):** on Windows, non-ASCII file names on the command line
+  arrived garbled or as nil; TrellisPreview, trellis-render and
+  trellis-lint now read their arguments through NSProcessInfo. The
+  `.trellis` extension is matched without case.
+- **Fixed (tooling):** `scripts/env.sh` found the toolchain under `$HOME`,
+  so sourcing it with a private `HOME` (as the mockup skill does) missed
+  it; it now uses the account's home and exports `TRELLIS_TOOLCHAIN`.
 - **Fixed (tooling):** `scripts/run-headless.sh` hung when the caller's
   `TMPDIR` was long (over about 60 bytes): GNUstep's message-port socket
   paths went past the 108-byte limit and the app waited forever. It now

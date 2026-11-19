@@ -176,8 +176,11 @@ static BOOL TRLookup(NSString *tok, const TRKeyword *table, int *out)
 
 static const TRKeyword kDisplay[] = {
   {"flex", TRDisplayFlex}, {"none", TRDisplayNone},
-  /* No CSS block/inline flow: block is a column flex container. */
-  {"block", TRDisplayBlock}, {"inline-flex", TRDisplayFlex},
+  /* No CSS block/inline flow: block is a column flex container. Margins
+     never collapse, so every block already establishes its own formatting
+     context, which is all flow-root adds. */
+  {"block", TRDisplayBlock}, {"flow-root", TRDisplayBlock},
+  {"inline-flex", TRDisplayFlex},
   {"grid", TRDisplayGrid}, {"inline-grid", TRDisplayGrid}, {NULL, 0}};
 static const TRKeyword kPosition[] = {
   {"relative", TRPositionRelative}, {"static", TRPositionStatic},

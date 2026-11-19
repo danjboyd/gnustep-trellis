@@ -349,8 +349,8 @@ imported	css/css-grid/grid-definition/flex-factor-sum-less-than-1-001.html	4 cas
 imported	css/css-grid/grid-definition/grid-auto-explicit-rows-001.html	1 case(s)
 imported	css/css-grid/grid-definition/grid-auto-fill-columns-001.html	33 case(s)
 imported	css/css-grid/grid-definition/grid-auto-fill-rows-001.html	35 case(s)
-skipped	css/css-grid/grid-definition/grid-auto-fit-columns-001.html	pseudo :nth-child(2n)
-skipped	css/css-grid/grid-definition/grid-auto-fit-rows-001.html	pseudo :nth-child(2n)
+imported	css/css-grid/grid-definition/grid-auto-fit-columns-001.html	35 case(s)
+imported	css/css-grid/grid-definition/grid-auto-fit-rows-001.html	33 case(s)
 imported	css/css-grid/grid-definition/grid-auto-repeat-intrinsic-001.html	8 case(s)
 imported	css/css-grid/grid-definition/grid-auto-repeat-max-size-001.tentative.html	12 case(s)
 imported	css/css-grid/grid-definition/grid-auto-repeat-max-size-002.html	4 case(s)
@@ -562,11 +562,11 @@ skipped	css/css-grid/subgrid/subgrid-baseline-008.html	writing-mode
 skipped	css/css-grid/subgrid/subgrid-baseline-009.html	direction set below case root
 imported	css/css-grid/subgrid/subgrid-baseline-010.html	1 case(s)
 imported	css/css-grid/subgrid/subgrid-baseline-011.html	1 case(s)
-skipped	css/css-grid/subgrid/subgrid-baseline-013.html	unit in minmax(2rem, auto) auto
-skipped	css/css-grid/subgrid/subgrid-baseline-014.html	unit in minmax(2rem, auto) auto
-skipped	css/css-grid/subgrid/subgrid-baseline-015.html	unit in minmax(2rem, auto) auto
-skipped	css/css-grid/subgrid/subgrid-baseline-016.html	unit in minmax(2rem, auto) auto
-skipped	css/css-grid/subgrid/subgrid-baseline-017.html	unit in minmax(2rem, auto) auto
-skipped	css/css-grid/subgrid/subgrid-baseline-018.html	unit in minmax(2rem, auto) auto
+imported	css/css-grid/subgrid/subgrid-baseline-013.html	1 case(s)
+imported	css/css-grid/subgrid/subgrid-baseline-014.html	1 case(s)
+imported	css/css-grid/subgrid/subgrid-baseline-015.html	1 case(s)
+imported	css/css-grid/subgrid/subgrid-baseline-016.html	1 case(s)
+imported	css/css-grid/subgrid/subgrid-baseline-017.html	1 case(s)
+imported	css/css-grid/subgrid/subgrid-baseline-018.html	1 case(s)
 imported	css/css-grid/subgrid/subgrid-item-aspect-ratio-001.html	3 case(s)
 imported	css/css-grid/subgrid/subgridded-axis-content-distribution-001.html	8 case(s)

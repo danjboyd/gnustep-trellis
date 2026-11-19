@@ -1,16 +1,16 @@
 {
- "commit": "2388671",
+ "commit": "fabc8cc",
  "conformance": {
-  "pass": 3659,
-  "skipped": 524,
-  "total": 3659
+  "pass": 3681,
+  "skipped": 576,
+  "total": 3681
  },
- "date": "2026-11-17",
+ "date": "2026-11-19",
  "platform": "linux",
  "suites": {
   "engine": {
-   "pass": 192,
-   "total": 192
+   "pass": 196,
+   "total": 196
   },
   "wpt": {
    "cases": 995,
@@ -18,14 +18,14 @@
    "total": 914
   },
   "wpt-grid": {
-   "cases": 1977,
-   "pass": 1611,
-   "total": 1611
+   "cases": 2051,
+   "pass": 1626,
+   "total": 1626
   },
   "wpt-sizing": {
    "cases": 125,
-   "pass": 90,
-   "total": 90
+   "pass": 97,
+   "total": 97
   },
   "yoga": {
    "cases": 1086,

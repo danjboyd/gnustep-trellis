@@ -120,6 +120,13 @@ def main():
         check("every common file", [lin2, win("two", files=both)], 0, "== 2 file(s) compared, no failures")
         check("only common files", [lin2, win("one")], 0, "== 1 file(s) compared")
         check("usage", [lin], 2, "compare.py LINUX_OUT WINDOWS_OUT")
+        winui = win("winui", files=("open-WinUITheme-light.json",))
+        check("theme-map pairs", [lin, winui, "--theme-map", "Adwaita=WinUITheme"], 0,
+              "ok   open-Adwaita-light.json ~ open-WinUITheme-light.json")
+        check("theme-map needed", [lin, winui], 1, "FAIL no frames JSON in common")
+        check("theme-map compares", [lin, win("winuifar", nudge(30), files=("open-WinUITheme-light.json",)),
+                                     "--theme-map", "Adwaita=WinUITheme"], 1, "frame(s) differ by more than 24 px")
+        check("theme-map usage", [lin, winui, "--theme-map", "Adwaita"], 2, "--theme-map A=B")
 
         a, b, c, s = (os.path.join(t, n) for n in ("a.png", "b.png", "c.png", "s.png"))
         png(a, 8, 6, lambda x, y: (x * 30, y * 40, 200))

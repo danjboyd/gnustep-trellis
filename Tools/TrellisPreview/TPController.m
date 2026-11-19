@@ -588,8 +588,8 @@ static NSDictionary *TPDump(NSView *v, TRNode *node)
   [self reload: nil];   /* controls re-measure under the new theme */
 }
 
-/* Light or dark. GNUstep has no appearance API: the Adwaita theme reads
-   its colour scheme from a default when it loads, and activating a theme
+/* Light or dark. GNUstep has no appearance API: the Adwaita and WinUITheme
+   themes read their colour scheme from a default when they load, and activating a theme
    twice in one process isn't safe (Adwaita's method swizzling recurses).
    So the scheme is set in the volatile argument domain before the theme
    loads (main, for --appearance; nothing is written to the user's
@@ -601,7 +601,9 @@ static void TPSetSchemeDefault(NSString *appearance)
   NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
   NSMutableDictionary *args = [[defs volatileDomainForName: NSArgumentDomain] mutableCopy]
     ?: [NSMutableDictionary dictionary];
-  args[@"GnomeThemeColorScheme"] = [appearance isEqualToString: @"dark"] ? @"force-dark" : @"force-light";
+  BOOL dark = [appearance isEqualToString: @"dark"];
+  args[@"GnomeThemeColorScheme"] = dark ? @"force-dark" : @"force-light";   /* Adwaita */
+  args[@"WinUIThemeColorScheme"] = dark ? @"2" : @"1";                      /* WinUITheme */
   [defs removeVolatileDomainForName: NSArgumentDomain];
   [defs setVolatileDomain: args forName: NSArgumentDomain];
 #else

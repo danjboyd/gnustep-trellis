@@ -109,13 +109,14 @@ for entry in $THEMES; do
         add "render $tag" PASS "$(cat "$OUT/pixels-$tag.txt")"
       else add "render $tag" FAIL "$(tail -1 "$OUT/pixels-$tag.txt")"; fi
     else add "render $tag" FAIL "see render-$tag.log"; fi
-  done | awk '!seen[$0]++'
+  done
 done
 
 # reload: edit the fixture, then its sample, while Preview polls them
+RELOAD_THEME=${THEMES%% *}; RELOAD_THEME=${RELOAD_THEME%%:*}   # the first theme: Adwaita may not exist (Windows)
 W="$OUT/work"; cp "$FIX" Tests/Parity/Parity.sample.json "$W/"
 ( timeout 90 $RUN "$PREVIEW" "$W/Parity.trellis" --snapshot "$OUT/reload.png" --export-json "$OUT/reload.json" \
-    --width 900 --height 640 --watch 2 --watch-timeout 60 -GSTheme Adwaita > "$OUT/reload.log" 2>&1
+    --width 900 --height 640 --watch 2 --watch-timeout 60 -GSTheme "$RELOAD_THEME" > "$OUT/reload.log" 2>&1
   echo $? > "$W/reload.rc" ) &
 sleep 5; sed -i 's/Parity sample</Parity sample (edited)</' "$W/Parity.trellis"
 sleep 3; sed -i 's/"countA": "7"/"countA": "8"/' "$W/Parity.sample.json"

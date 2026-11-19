@@ -82,6 +82,17 @@ wrote: the same view tree (classes, ids, nesting), the same Tab order, and
 every frame within 24 px (`--tolerance`); lint findings that differ are
 listed as warnings. Within one platform the pixel check is exact.
 
+Themes that exist on one platform only are paired with `--theme-map`:
+
+```sh
+# Linux: THEMES="Adwaita GNUstep"; Windows: THEMES="WinUITheme GNUstep"
+python3 -I Tests/Parity/compare.py LINUX_OUT WINDOWS_OUT --theme-map Adwaita=WinUITheme
+```
+
+GNUstep's default theme builds everywhere, so `GNUstep` gives a
+same-theme comparison on both platforms. The reload case uses the first
+theme in `THEMES`.
+
 On Linux: `make check-parity` (needs Xvfb and Adwaita).
 
 ## Runtime contract (for packaging)
@@ -96,8 +107,11 @@ On Linux: `make check-parity` (needs Xvfb and Adwaita).
 - Settings: TrellisPreview writes nothing to the user's defaults (the
   appearance switch uses the argument domain and relaunches itself).
 - Build with `make hot_reload=no`.
-- Themes: Adwaita only for now; the appearance switch needs it.
-  WinUITheme ships once the matrix has passed with it on Windows
-  (`THEMES="Adwaita WinUITheme:light"`).
+- Themes: Adwaita (danjboyd/plugins-themes-Adwaita at 9c25a68) doesn't
+  build on Windows: its GNOME adapters (X11 window manager, portal file
+  chooser and print dialog) are Linux-only. On Windows the candidate is
+  WinUITheme (danjboyd/plugins-themes-winuitheme), which the appearance
+  switch also drives (`WinUIThemeColorScheme` 1 or 2, argument domain
+  only). It ships once the matrix has passed with it on Windows.
 - File association (`.trellis` opens TrellisPreview): Dan's decision, in
   the release proposal.

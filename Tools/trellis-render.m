@@ -424,9 +424,14 @@ int main(int argc, const char **argv)
             ?: [NSMutableDictionary dictionary];
           if (theme) args[@"GSTheme"] = theme;
 #ifdef GNUSTEP
-          /* GNUstep has no appearance API; Adwaita reads its colour scheme. */
+          /* GNUstep has no appearance API; Adwaita and WinUITheme read their
+             colour scheme from a default. */
           if (appearance)
-            args[@"GnomeThemeColorScheme"] = [appearance isEqualToString: @"dark"] ? @"force-dark" : @"force-light";
+            {
+              BOOL dark = [appearance isEqualToString: @"dark"];
+              args[@"GnomeThemeColorScheme"] = dark ? @"force-dark" : @"force-light";
+              args[@"WinUIThemeColorScheme"] = dark ? @"2" : @"1";
+            }
 #endif
           [defs removeVolatileDomainForName: NSArgumentDomain];
           [defs setVolatileDomain: args forName: NSArgumentDomain];

@@ -102,58 +102,58 @@ skipped	css/css-grid/alignment/grid-align-justify-stretch-with-orthogonal-flows.
 imported	css/css-grid/alignment/grid-align-justify-stretch.html	12 case(s)
 skipped	css/css-grid/alignment/grid-align-stretching-replaced-items.html	non-Ahem text
 imported	css/css-grid/alignment/grid-align.html	8 case(s)
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-001.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-002.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-003.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-004.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-005.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-006.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-007.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-008.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-009.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-010.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-011.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-012.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-013.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-014.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-015.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-016.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-017.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-018.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-019.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-020.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-021.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-022.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-023.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-024.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-025.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-026.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-027.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-028.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-029.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-030.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-031.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-032.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-033.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-034.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-035.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-036.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-037.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-038.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-039.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-040.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-041.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-042.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-043.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-implies-size-change-044.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-style-changes-001.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-style-changes-002.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-style-changes-003.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-style-changes-004.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-style-changes-005.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-style-changes-006.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-style-changes-007.html	no static checkLayout call
-skipped	css/css-grid/alignment/grid-alignment-style-changes-008.html	no static checkLayout call
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-001.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-002.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-003.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-004.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-005.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-006.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-007.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-008.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-009.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-010.html	2 case(s)
+skipped	css/css-grid/alignment/grid-alignment-implies-size-change-011.html	replaced element <img>
+skipped	css/css-grid/alignment/grid-alignment-implies-size-change-012.html	replaced element <img>
+skipped	css/css-grid/alignment/grid-alignment-implies-size-change-013.html	replaced element <img>
+skipped	css/css-grid/alignment/grid-alignment-implies-size-change-014.html	replaced element <img>
+skipped	css/css-grid/alignment/grid-alignment-implies-size-change-015.html	replaced element <img>
+skipped	css/css-grid/alignment/grid-alignment-implies-size-change-016.html	replaced element <img>
+skipped	css/css-grid/alignment/grid-alignment-implies-size-change-017.html	replaced element <img>
+skipped	css/css-grid/alignment/grid-alignment-implies-size-change-018.html	replaced element <img>
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-019.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-020.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-021.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-022.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-023.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-024.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-025.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-026.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-027.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-028.html	2 case(s)
+skipped	css/css-grid/alignment/grid-alignment-implies-size-change-029.html	replaced element <img>
+skipped	css/css-grid/alignment/grid-alignment-implies-size-change-030.html	replaced element <img>
+skipped	css/css-grid/alignment/grid-alignment-implies-size-change-031.html	replaced element <img>
+skipped	css/css-grid/alignment/grid-alignment-implies-size-change-032.html	replaced element <img>
+skipped	css/css-grid/alignment/grid-alignment-implies-size-change-033.html	replaced element <img>
+skipped	css/css-grid/alignment/grid-alignment-implies-size-change-034.html	replaced element <img>
+skipped	css/css-grid/alignment/grid-alignment-implies-size-change-035.html	replaced element <img>
+skipped	css/css-grid/alignment/grid-alignment-implies-size-change-036.html	replaced element <img>
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-037.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-038.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-039.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-040.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-041.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-042.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-043.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-implies-size-change-044.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-style-changes-001.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-style-changes-002.html	2 case(s)
+skipped	css/css-grid/alignment/grid-alignment-style-changes-003.html	writing-mode
+skipped	css/css-grid/alignment/grid-alignment-style-changes-004.html	writing-mode
+imported	css/css-grid/alignment/grid-alignment-style-changes-005.html	2 case(s)
+imported	css/css-grid/alignment/grid-alignment-style-changes-006.html	2 case(s)
+skipped	css/css-grid/alignment/grid-alignment-style-changes-007.html	writing-mode
+skipped	css/css-grid/alignment/grid-alignment-style-changes-008.html	writing-mode
 imported	css/css-grid/alignment/grid-baseline-004.html	6 case(s)
 skipped	css/css-grid/alignment/grid-block-axis-alignment-auto-margins-001.html	script mutates page
 skipped	css/css-grid/alignment/grid-block-axis-alignment-auto-margins-002.html	script mutates page

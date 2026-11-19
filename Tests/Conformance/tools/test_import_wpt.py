@@ -404,5 +404,73 @@ class NthChild(unittest.TestCase):
         with self.assertRaises(W.Skip):
             W.parse_selector("div:nth-child(2n of .x)")
 
+
+class StyleChange(unittest.TestCase):
+    """css-grid/alignment's support/style-change.js tests: each phase
+    (before/after an inline style change) imports as its own case."""
+    HEAD = ('<!DOCTYPE html><script src="/resources/check-layout-th.js"></script>'
+            '<script src="support/style-change.js"></script>'
+            '<style>#grid{display:grid;grid-template-columns:100px;grid-template-rows:200px;'
+            'align-items:stretch}.after{margin-left:5px}</style>')
+
+    def cases(self, script, body, onload="document.fonts.ready.then(() => { runTest(); })"):
+        d = tempfile.mkdtemp()
+        with open(os.path.join(d, "t.html"), "w") as f:
+            f.write(self.HEAD + "<script>" + script + "</script>"
+                    + '<body onload="%s">%s</body>' % (onload, body))
+        return W.convert_file(os.path.join(d, "t.html"), "t.html", "0" * 40)
+
+    BODY = '<div id="grid"><div id="item" data-expected-width="100"></div></div>'
+
+    def test_single_property_change(self):
+        cs = self.cases('setup({ explicit_done: true });\nfunction runTest() {\n'
+                        '  evaluateStyleChange(item, "before", "data-expected-height", 200);\n'
+                        '  grid.style.alignItems = "start";\n'
+                        '  evaluateStyleChange(item, "after", "data-expected-height", 0);\n'
+                        '  done();\n}', self.BODY)
+        self.assertEqual([c["id"].rsplit("/", 1)[1] for c in cs], ["before", "after"])
+        before, after = cs
+        self.assertEqual(before["root"]["style"]["alignItems"], "stretch")
+        self.assertEqual(after["root"]["style"]["alignItems"], "start")
+        self.assertEqual(before["expected"]["children"][0]["height"], 200)
+        self.assertEqual(after["expected"]["children"][0]["height"], 0)
+        # The phase class is on the element from its phase on: .after rules
+        # apply only to the after case.
+        self.assertNotIn("marginLeft", before["root"]["children"][0]["style"])
+        self.assertEqual(after["root"]["children"][0]["style"].get("marginLeft"), 5)
+
+    def test_multiple_with_variables_and_reset(self):
+        body = ('<div id="grid"><div id="item" style="align-self: start" data-expected-width="100">'
+                '</div></div>')
+        cs = self.cases("function runTest() {\n"
+                        "    let before = {\n        item: {'data-expected-height': 0},\n    };\n"
+                        "    let after = { item: {\"data-expected-height\": 200 } };\n"
+                        "    evaluateStyleChangeMultiple('before', before);\n"
+                        "    item.style.alignSelf = '';\n"
+                        "    evaluateStyleChangeMultiple('after', after);\n"
+                        "    done();\n}", body, onload="runTest()")
+        before, after = cs
+        self.assertEqual(before["root"]["children"][0]["style"].get("alignSelf"), "start")
+        self.assertNotEqual(after["root"]["children"][0]["style"].get("alignSelf"), "start")
+        self.assertEqual(after["expected"]["children"][0]["height"], 200)
+
+    def test_other_script_still_skips(self):
+        with self.assertRaises(W.Skip):
+            self.cases('function runTest() {\n'
+                       '  evaluateStyleChange(item, "before", "data-expected-height", 200);\n'
+                       '  item.offsetWidth;\n'
+                       '  grid.style.alignItems = "start";\n'
+                       '  evaluateStyleChange(item, "after", "data-expected-height", 0);\n'
+                       '  done();\n}', self.BODY)
+
+    def test_phase_split_by_a_change_skips(self):
+        with self.assertRaises(W.Skip):
+            self.cases('function runTest() {\n'
+                       '  evaluateStyleChange(item, "before", "data-expected-height", 200);\n'
+                       '  grid.style.alignItems = "start";\n'
+                       '  evaluateStyleChange(item, "before", "data-expected-width", 100);\n'
+                       '  done();\n}', self.BODY)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=1)

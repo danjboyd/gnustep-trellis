@@ -26,6 +26,10 @@ Mapping:
     box: 800px wide minus body's default 8px margins = 784px.
   * Ahem text becomes a measure stand-in (charWidth = font size).
   * check-layout-th's tolerance is |actual - expected| < 1.
+  * css-grid/alignment's support/style-change.js tests (evaluateStyleChange
+    and evaluateStyleChangeMultiple around inline el.style.prop = "value"
+    changes) import one case per phase, ids ending /before and /after, each
+    in the state its checkLayout sees.
 """
 import collections
 import html.parser
@@ -1425,9 +1429,168 @@ def is_ancestor(a, b):
     return False
 
 
+# css/css-grid/alignment/support/style-change.js: evaluateStyleChange(el,
+# phase, attr, value) adds class `phase` and attribute attr=value to el, then
+# runs checkLayout("." + phase); evaluateStyleChangeMultiple(phase, {id:
+# {attr: value}}) does the same for several elements. Between phases the
+# test changes an inline style (el.style.prop = "value"). Each phase is a
+# static layout, so it imports as its own case.
+STYLE_CHANGE_ONE = re.compile(
+    r"""evaluateStyleChange\(\s*([A-Za-z_]\w*)\s*,\s*(['"])(\w+)\2\s*,\s*(['"])([\w-]+)\4\s*,"""
+    r"""\s*(?:(['"])([^'"]*)\6|(-?\d+(?:\.\d+)?))\s*\)\s*;?""")
+STYLE_CHANGE_MULTI = re.compile(r"""evaluateStyleChangeMultiple\(\s*(['"])(\w+)\1\s*,\s*""")
+STYLE_CHANGE_SET = re.compile(r"""([A-Za-z_]\w*)\.style\.([A-Za-z]+)\s*=\s*(['"])([^'"]*)\3\s*;?""")
+STYLE_CHANGE_VAR = re.compile(r"""(?:let|var|const)\s+([A-Za-z_]\w*)\s*=\s*(?=\{)""")
+STYLE_CHANGE_NOISE = re.compile(
+    r"setup\(\s*\{\s*explicit_done\s*:\s*true\s*\}\s*\)\s*;?|function\s+runTest\s*\(\s*\)\s*\{|"
+    r"done\(\s*\)\s*;?|\}|\s+|//[^\n]*")
+STYLE_CHANGE_ONLOAD = re.compile(
+    r"^\s*(?:document\.fonts\.ready\.then\(\s*\(\s*\)\s*=>\s*\{\s*runTest\(\s*\)\s*;?\s*\}\s*\)|runTest\(\s*\))\s*;?\s*$")
+
+
+def js_object(code, pos):
+    """A {id: {attr: value}} literal at code[pos] as a dict, and the index
+    after it; None if it isn't plain data."""
+    depth = 0
+    for j in range(pos, len(code)):
+        if code[j] == "{":
+            depth += 1
+        elif code[j] == "}":
+            depth -= 1
+            if depth == 0:
+                break
+    else:
+        return None, pos
+    text = code[pos:j + 1]
+    text = re.sub(r"'([^'\\]*)'", r'"\1"', text)
+    text = re.sub(r"([{,]\s*)([A-Za-z_][\w-]*)\s*:", r'\1"\2":', text)
+    text = re.sub(r",(\s*\})", r"\1", text)
+    try:
+        obj = json.loads(text)
+    except ValueError:
+        return None, pos
+    if not isinstance(obj, dict) or not all(isinstance(v, dict) for v in obj.values()):
+        return None, pos
+    return obj, j + 1
+
+
+def style_change_steps(page):
+    """The ordered steps of a style-change.js test, or None if the page
+    isn't one: ("check", element id, phase, attr, value) and
+    ("style", element id, css property, value)."""
+    if not any((a.get("src") or "").endswith("support/style-change.js") for a, _ in page.dom.scripts):
+        return None
+    body = page.dom.body
+    onload = body.attrs.get("onload") if body is not None else None
+    if onload is None or not STYLE_CHANGE_ONLOAD.match(onload):
+        return None
+    code = "\n".join(t for a, t in page.dom.scripts if not a.get("src"))
+    steps, names, pos = [], {}, 0
+    while pos < len(code):
+        m = STYLE_CHANGE_NOISE.match(code, pos)
+        if m and m.end() > pos:
+            pos = m.end()
+            continue
+        m = STYLE_CHANGE_ONE.match(code, pos)
+        if m:
+            steps.append(("check", m.group(1), m.group(3), m.group(5),
+                          m.group(7) if m.group(6) else m.group(8)))
+            pos = m.end()
+            continue
+        m = STYLE_CHANGE_SET.match(code, pos)
+        if m:
+            prop = re.sub(r"[A-Z]", lambda c: "-" + c.group(0).lower(), m.group(2))
+            steps.append(("style", m.group(1), prop, m.group(4)))
+            pos = m.end()
+            continue
+        m = STYLE_CHANGE_VAR.match(code, pos)
+        if m:
+            obj, end = js_object(code, m.end())
+            if obj is None:
+                return None
+            names[m.group(1)] = obj
+            pos = re.match(r"\s*;?", code[end:]).end() + end
+            continue
+        m = STYLE_CHANGE_MULTI.match(code, pos)
+        if m:
+            rest = m.end()
+            if code.startswith("{", rest):
+                obj, rest = js_object(code, rest)
+            else:
+                v = re.match(r"([A-Za-z_]\w*)", code[rest:])
+                obj = names.get(v.group(1)) if v else None
+                rest += v.end() if v else 0
+            e = re.match(r"\s*\)\s*;?", code[rest:])
+            if obj is None or e is None:
+                return None
+            for el, attrs in obj.items():
+                for k, v in attrs.items():
+                    steps.append(("check", el, m.group(2), k, str(v)))
+            pos = rest + e.end()
+            continue
+        return None
+    if not any(st[0] == "check" for st in steps):
+        return None
+    return steps
+
+
+def set_inline_style(el, prop, value):
+    """el.style.prop = value: replace the inline declaration ("" removes it)."""
+    decls = [(k, v) for k, v, imp in parse_decls(el.attrs.get("style", ""))
+             if k != prop]
+    if value != "":
+        decls.append((prop, value))
+    el.attrs["style"] = "; ".join("%s: %s" % kv for kv in decls)
+
+
+def style_change_pages(path, steps):
+    """One page per phase, in the state checkLayout sees: the steps up to
+    and including that phase's last check replayed on a fresh parse."""
+    phases, last = [], {}
+    for i, st in enumerate(steps):
+        if st[0] != "check":
+            continue
+        if st[2] in last and any(s[0] == "style" for s in steps[last[st[2]] + 1:i]):
+            raise Skip("style-change phase checked across a style change")
+        if st[2] not in last:
+            phases.append(st[2])
+        last[st[2]] = i
+    out = []
+    for phase in phases:
+        page = Page(path)
+        byid = {e.id: e for e in Page.walk(page.dom.doc) if e.id}
+        for st in steps[:last[phase] + 1]:
+            el = byid.get(st[1])
+            if el is None:
+                raise Skip("style-change element not found")
+            if st[0] == "check":
+                el.classes.add(st[2])
+                el.attrs["class"] = " ".join(sorted(el.classes))
+                el.attrs[st[3]] = st[4]
+            else:
+                set_inline_style(el, st[2], st[3])
+        page.cache = {}
+        out.append((phase, page))
+    return out
+
+
 def convert_file(path, rel, commit):
     page = Page(path)
-    sels = find_check_calls(page)
+    steps = style_change_steps(page)
+    if steps is None:
+        return convert_page(page, find_check_calls(page), rel, commit)
+    cases, skips = [], []
+    for phase, ppage in style_change_pages(path, steps):
+        try:
+            cases.extend(convert_page(ppage, ["." + phase], rel, commit, phase))
+        except Skip as e:
+            skips.append(str(e))
+    if not cases:
+        raise Skip(skips[0] if skips else "no checks")
+    return cases
+
+
+def convert_page(page, sels, rel, commit, phase=None):
     selected = []
     for s in sels:
         selected.extend(select_all(page, s))
@@ -1504,7 +1667,8 @@ def convert_file(path, rel, commit):
         if conv.checks == 0:
             continue
         case = {
-            "id": "%s/%s%s" % (SUITE, rel[:-5], "" if len(roots) == 1 else "/%d" % i),
+            "id": "%s/%s%s%s" % (SUITE, rel[:-5], "" if phase is None else "/" + phase,
+                                 "" if len(roots) == 1 else "/%d" % i),
             "source": {
                 "suite": SUITE,
                 "file": rel,

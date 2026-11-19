@@ -47,6 +47,15 @@ int main(void)
       TRStyle *u = [TRStyle styleWithDeclarations: @"width: 20px; margin-inline: 6px 2px"];
       Expect("margin-inline written as start/end",
              [[u declarationString] rangeOfString: @"margin-inline-end: 2px"].location != NSNotFound);
+      /* Overflow alignment on self-alignment survives declarationString. */
+      TRStyle *sa = [TRStyle styleWithDeclarations:
+        @"justify-items: safe center; align-self: safe end; justify-self: unsafe end; align-items: center"];
+      NSString *sas = [sa declarationString];
+      Expect("justify-items keeps safe", [sas rangeOfString: @"justify-items: safe center"].location != NSNotFound);
+      Expect("align-self keeps safe", [sas rangeOfString: @"align-self: safe end"].location != NSNotFound);
+      Expect("unsafe is the default, written plain", [sas rangeOfString: @"justify-self: end"].location != NSNotFound
+             && [sas rangeOfString: @"unsafe"].location == NSNotFound);
+      Expect("safe read back", [[[TRStyle styleWithDeclarations: sas] declarationString] isEqualToString: sas]);
       printf("%s\n", gFail ? "LOGICALSTYLE FAIL" : "LOGICALSTYLE OK");
     }
   return gFail ? 1 : 0;

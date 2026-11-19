@@ -5,6 +5,19 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+- **Added (layout):** `justify-items`, `justify-self`, `align-items` and
+  `align-self` take a `safe` or `unsafe` prefix, as `justify-content` and
+  `align-content` already did. In a grid, `safe` puts an item that
+  overflows its area at the area's start instead of centring or
+  end-aligning it out of the area; `unsafe` is the default. A flex
+  container accepts the prefix and ignores it. Before, the prefixed value
+  was invalid and the declaration was ignored, so a stylesheet that
+  already used it can lay out differently now.
+- **Added (layout):** the length properties (`width`, `height`, their
+  `min-`/`max-` forms, `flex-basis` and the gaps) accept `initial`, meaning
+  their initial value: `auto`, `none` for `max-width`/`max-height`, `0`
+  for the gaps. Before, the declaration was ignored, so an `initial` that
+  reset an earlier rule now takes effect.
 - **Fixed (tooling):** `scripts/run-headless.sh` hung when the caller's
   `TMPDIR` was long (over about 60 bytes): GNUstep's message-port socket
   paths went past the 108-byte limit and the app waited forever. It now

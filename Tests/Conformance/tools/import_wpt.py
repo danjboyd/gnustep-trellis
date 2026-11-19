@@ -148,7 +148,16 @@ class DomBuilder(html.parser.HTMLParser):
         if decl.lower().startswith("doctype"):
             self.doctype = True
 
+    HEAD_ONLY = {"html", "head", "meta", "link", "title", "base", "style", "script", "noscript"}
+
     def handle_starttag(self, tag, attrs):
+        if self.body is None and tag not in self.HEAD_ONLY and tag != "body" \
+                and self.cur.tag in ("#document", "html", "head"):
+            # HTML implies <body> before the first element that can't be
+            # in <head>, so "body > div" matches pages that omit the tag.
+            if self.cur.tag == "head":
+                self.cur = self.cur.parent
+            self.handle_starttag("body", [])
         if tag == "body":
             el = El(tag, attrs, self.cur)
             self.cur.children.append(el)
@@ -221,12 +230,76 @@ def parse_decls(text):
 AHEM_IMPORT_RE = re.compile(r"""@import\s+(?:url\()?\s*["']?/fonts/ahem\.css["']?\s*\)?\s*;""", re.I)
 
 
+def nest_selector(parent, child):
+    """A nested rule's selector (CSS Nesting): & is the parent; without &,
+    the child is a descendant (or a relative > + ~ selector) of it."""
+    out = []
+    for p in split_selector_list(parent):
+        for c in split_selector_list(child):
+            out.append(c.replace("&", p) if "&" in c else p + " " + c)
+    return ", ".join(out)
+
+
+def split_selector_list(sel):
+    """Split a selector list at top-level commas (not inside :not(...))."""
+    parts, depth, cur = [], 0, ""
+    for ch in sel:
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+        if ch == "," and depth == 0:
+            parts.append(cur.strip())
+            cur = ""
+        else:
+            cur += ch
+    if cur.strip():
+        parts.append(cur.strip())
+    return parts
+
+
 def parse_stylesheet(css):
     css = strip_comments(css)
     # Cases assume Ahem already, so importing its stylesheet changes nothing.
     # Any other @import still skips the file.
     css = AHEM_IMPORT_RE.sub("", css)
     rules = []
+
+    def block(i, sel):
+        """Parse a rule body from css[i] (after its '{') to its '}'. Nested
+        rules (CSS Nesting) follow their parent rule. Returns the index
+        after the '}'."""
+        decls, buf, nested = [], "", []
+        while i < len(css):
+            ch = css[i]
+            if ch == "{":
+                head, _, inner = buf.rpartition(";")
+                decls.append(head)
+                inner = inner.strip()
+                if inner.startswith("@"):
+                    raise Skip("at-rule " + inner.split()[0])
+                sub = []
+                i = block_into(i + 1, nest_selector(sel, inner), sub)
+                nested.extend(sub)
+                buf = ""
+                continue
+            if ch == "}":
+                decls.append(buf)
+                rules.append((sel, parse_decls(";".join(decls))))
+                rules.extend(nested)
+                return i + 1
+            buf += ch
+            i += 1
+        raise Skip("unbalanced stylesheet")
+
+    def block_into(i, sel, out):
+        nonlocal rules
+        saved, rules = rules, out
+        try:
+            return block(i, sel)
+        finally:
+            rules = saved
+
     pos = 0
     while True:
         i = css.find("{", pos)
@@ -239,9 +312,7 @@ def parse_stylesheet(css):
                 pos = j + 1
                 continue
             raise Skip("at-rule " + sel.split()[0])
-        j = css.find("}", i)
-        rules.append((sel, parse_decls(css[i + 1:j])))
-        pos = j + 1
+        pos = block(i + 1, sel)
     return rules
 
 
@@ -289,6 +360,7 @@ def parse_selector(sel):
     return parts
 
 
+DYNAMIC_PSEUDO_RE = re.compile(r":(hover|active|focus|focus-within|focus-visible|visited)(?![\w-])")
 NTH_RE = re.compile(r"^(nth-child|nth-last-child|nth-of-type|nth-last-of-type)\((.*)\)$")
 
 
@@ -726,8 +798,10 @@ class Page:
                     sheets.append(f.read())
         for css in sheets + b.styles:
             for sel, decls in parse_stylesheet(css):
-                for s in sel.split(","):
-                    s = s.strip()
+                for s in split_selector_list(sel):
+                    if DYNAMIC_PSEUDO_RE.search(s):
+                        # :hover, :focus... never match in a static page.
+                        continue
                     try:
                         parts = parse_selector(s)
                     except Skip:

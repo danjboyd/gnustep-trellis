@@ -68,7 +68,7 @@ skipped	css/css-flexbox/align-items-baseline-vert-rl-column-horz-grid-item.html	
 skipped	css/css-flexbox/align-items-baseline-vert-rl-column-horz-items.html	writing-mode
 skipped	css/css-flexbox/align-items-baseline-vert-rl-column-horz-table-item.html	writing-mode
 skipped	css/css-flexbox/align-self-014.html	non-Ahem text
-skipped	css/css-flexbox/align-self-baseline-with-flex-wrap.html	selector }
+skipped	css/css-flexbox/align-self-baseline-with-flex-wrap.html	root inside non-block ancestor
 skipped	css/css-flexbox/alignment/flex-align-baseline-001.html	writing-mode
 skipped	css/css-flexbox/alignment/flex-align-baseline-002.html	writing-mode
 skipped	css/css-flexbox/alignment/flex-align-baseline-003.html	writing-mode
@@ -177,11 +177,11 @@ skipped	css/css-flexbox/image-as-flexitem-size-007.html	replaced element <img>
 skipped	css/css-flexbox/image-as-flexitem-size-007v.html	replaced element <img>
 imported	css/css-flexbox/inline-flex.html	1 case(s)
 imported	css/css-flexbox/inline-flexbox-wrap-vertically-width-calculation.html	8 case(s)
-skipped	css/css-flexbox/intrinsic-size/col-wrap-004.html	selector matched nothing
-skipped	css/css-flexbox/intrinsic-size/col-wrap-005.html	selector matched nothing
-skipped	css/css-flexbox/intrinsic-size/col-wrap-010.html	selector matched nothing
-skipped	css/css-flexbox/intrinsic-size/col-wrap-018.html	selector matched nothing
-skipped	css/css-flexbox/intrinsic-size/col-wrap-019.html	selector matched nothing
+imported	css/css-flexbox/intrinsic-size/col-wrap-004.html	1 case(s)
+skipped	css/css-flexbox/intrinsic-size/col-wrap-005.html	float
+skipped	css/css-flexbox/intrinsic-size/col-wrap-010.html	float
+skipped	css/css-flexbox/intrinsic-size/col-wrap-018.html	float
+skipped	css/css-flexbox/intrinsic-size/col-wrap-019.html	float
 imported	css/css-flexbox/intrinsic-size/col-wrap-baseline-001.html	4 case(s)
 skipped	css/css-flexbox/intrinsic-size/col-wrap-calc-size-001.html	float
 skipped	css/css-flexbox/intrinsic-size/col-wrap-dynamic-002.html	script mutates page
@@ -199,8 +199,8 @@ skipped	css/css-flexbox/justify-content_space-between-002.html	non-Ahem text
 skipped	css/css-flexbox/max-width-violation.html	non-Ahem text
 imported	css/css-flexbox/multiline-min-max.html	14 case(s)
 imported	css/css-flexbox/multiline-min-preferred-width.html	1 case(s)
-skipped	css/css-flexbox/negative-overflow-002.html	selector .container:hover::before
-skipped	css/css-flexbox/negative-overflow-003.html	selector .container:hover::before
+skipped	css/css-flexbox/negative-overflow-002.html	script mutates page
+skipped	css/css-flexbox/negative-overflow-003.html	script mutates page
 skipped	css/css-flexbox/negative-overflow-004-no-padding.html	script mutates page
 skipped	css/css-flexbox/negative-overflow.html	script mutates page
 skipped	css/css-flexbox/orthogonal-writing-modes-and-intrinsic-sizing.html	writing-mode

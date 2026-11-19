@@ -18,8 +18,20 @@ int main(void)
           { got = names[i]; break; }
       if (got == NULL) { printf("CALCLOCALE SKIP (no decimal-comma locale installed)\n"); return 0; }
       TRNode *root = [TRNode nodeWithStyle: @"width: 100px; height: 20px" children: nil];
-      TRNode *c = [TRNode nodeWithStyle: @"width: calc(50% - 10.5px); margin-left: calc(2.5px)" children: nil];
+      TRNode *c = nil;
+      @try
+        {
+          c = [TRNode nodeWithStyle: @"width: calc(50% - 10.5px); margin-left: calc(2.5px)" children: nil];
+        }
+      @catch (NSException *e)
+        {
+          /* A locale-dependent parser rejects the value as invalid. */
+          printf("FAIL calc under %s: %s\nCALCLOCALE FAIL\n", got, [[e reason] UTF8String]);
+          return 1;
+        }
       [root addChild: c];
+      /* No pixel rounding: 2.5 and 39.5 would round to whole points. */
+      root.pixelScale = 0;
       [root layoutWithAvailableSize: TRSizeMake(100, 20) direction: TRDirectionLTR];
       TRRect f = c.layoutFrame;
       BOOL ok = fabs(f.width - 39.5) < 0.01 && fabs(f.x - 2.5) < 0.01;

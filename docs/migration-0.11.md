@@ -1,18 +1,23 @@
 # Moving from 0.10 to 0.11 (draft)
 
-0.11 has two layout changes and one change for anyone who runs
-trellis-render outside `scripts/run-headless.sh`. For earlier changes, see
+0.11 has two layout changes, a stricter trellis-lint, and one change for
+anyone who runs trellis-render outside `scripts/run-headless.sh`. For earlier changes, see
 [migration-0.10.md](migration-0.10.md).
 
 | What changed | 0.10 | 0.11 |
 |---|---|---|
 | **`safe` / `unsafe`** on `justify-items`, `justify-self`, `align-items`, `align-self` | the declaration was invalid and ignored | applied; in a grid, `safe` keeps an overflowing item at its area's start |
 | **`initial`** on `width`, `height`, their `min-`/`max-` forms, `flex-basis` and the gaps | the declaration was ignored | the initial value (`auto`, `none` for max sizes, `0` for gaps) |
+| **trellis-lint** | an unknown element passed lint (the loader rejected it) | an error; new warnings `narrow-field`, `leaf-box-style`, `items` |
 | **trellis-render's isolation guard** | `GNUSTEP_HOME` set and the home and Library under it | also the defaults directory; every path resolved (symlinks followed) and compared by component; dangling or unreadable components refused |
 
 **What to check:**
 - Stylesheets that already use `safe`, `unsafe` or `initial` on those
   properties: they were silently ignored before and now take effect.
+- Lint gates (CI, an agent's loop): run trellis-lint over your `.trellis`
+  files once. An unknown element now fails, and the new warnings point at
+  things that already drew wrong (a field squeezed to a sliver, a label
+  "badge" with no background, a one-item segmented control).
 - Scripts or harnesses that call trellis-render directly. If one now exits
   3 ("refusing to run"), make sure its private `GNUSTEP_HOME` holds the
   home, `GNUstep/Library` and `GNUstep/Defaults`. Either run it through

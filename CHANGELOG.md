@@ -31,6 +31,23 @@ version may change the API listed in docs/api.md, and says so here.
   open, resize, reload, render, path, isolation and dependency cases on
   Linux and Windows, compared by structure across platforms and pixel
   for pixel within one (`make check-parity` on Linux).
+- **Added (lint):** three trellis-lint rules: `narrow-field` (an
+  editable field under 40px wide, from a frames dump), `leaf-box-style`
+  (a background or border on a label or control, which only boxes draw)
+  and `items` (segmented/popup `items=` with no comma is one item).
+  `unlabeled` no longer warns on a button, checkbox or radio titled with
+  `title=`. See docs/agents.md.
+- **Added (tooling, draft):** `skills/trellis-mockup`, a Claude Code skill
+  that renders a mockup headless (lint, trellis-render at three widths in
+  light and dark, TrellisPreview snapshots, png-check) with a synthetic
+  example; and `scripts/trellis-update.sh`, which installs the newest
+  release tag into a prefix after `make check`, with `--rollback`,
+  `--status` and `--dry-run`. Linux only.
+- **Added (packaging):** an original TrellisPreview icon (SVG, 256 and
+  1024 px PNG) in `packaging/` for the AppImage and MSI recipes.
+- **Changed (lint):** an element the loader doesn't know (`<bogus>`) is
+  an error. Before, trellis-lint passed it and only the loader rejected
+  it, so a file that linted clean can fail lint now.
 - **Changed (tools):** trellis-render's isolation guard is stricter: the
   home, the user Library and the user defaults directory must all resolve,
   symlinks followed, inside the private `GNUSTEP_HOME`, and a dangling or
@@ -46,6 +63,8 @@ version may change the API listed in docs/api.md, and says so here.
 - **Fixed (tooling):** `scripts/env.sh` found the toolchain under `$HOME`,
   so sourcing it with a private `HOME` (as the mockup skill does) missed
   it; it now uses the account's home and exports `TRELLIS_TOOLCHAIN`.
+- **Fixed (tooling):** sourcing `scripts/env.sh` overwrote the caller's
+  shell variable `P`; it now uses a private name and unsets it.
 - **Fixed (tooling):** `scripts/run-headless.sh` hung when the caller's
   `TMPDIR` was long (over about 60 bytes): GNUstep's message-port socket
   paths went past the 108-byte limit and the app waited forever. It now

@@ -130,6 +130,10 @@ check:: all
 	@$$(command -v python3 || command -v python) -I Tests/Scripts/parity-compare-regress.py
 	@echo "== pe-deps.py (synthetic PE files)"
 	@$$(command -v python3 || command -v python) -I Tests/Scripts/pe-deps-regress.py
+	@echo "== calc() under a decimal-comma locale"
+	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ISource/Engine Tests/Engine/calc-locale.m \
+	  -o obj/calc-locale -L./obj -lTrellisEngine $(shell gnustep-config --base-libs)
+	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH ./obj/calc-locale
 	@echo "== logical sides in styles"
 	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ISource/Engine Tests/Engine/logical-style.m \
 	  -o obj/logical-style -L./obj -lTrellisEngine $(shell gnustep-config --base-libs)

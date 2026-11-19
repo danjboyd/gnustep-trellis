@@ -5,6 +5,11 @@ version may change the API listed in docs/api.md, and says so here.
 
 ## Unreleased
 
+## 0.10.2 (2026-11-19)
+
+A hardened mode for files someone else sent, plus two robustness fixes.
+No layout changes.
+
 - **Added (security):** `TrellisPreview --untrusted` opens a file someone
   else sent (for example through AIManager's laptop.open) in a hardened
   mode. Put the flag before the file: `TrellisPreview --untrusted

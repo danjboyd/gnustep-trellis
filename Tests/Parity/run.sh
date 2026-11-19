@@ -6,9 +6,16 @@
 #
 #   Tests/Parity/run.sh OUT        (from a built checkout; OUT must be new)
 #
-# Cases, for each theme in THEMES (default "Adwaita") and appearance
-# (light, dark; dark only where the theme has one, i.e. Adwaita):
-#   open     TrellisPreview --snapshot + --export-json at 900x640
+# Cases, for each theme in THEMES (default "Adwaita") and appearance.
+# A THEMES entry is NAME or NAME:APPEARANCES, e.g. "Adwaita WinUITheme:light";
+# without a list, Adwaita runs light and dark and any other theme light only.
+#   theme    preflight: NAME.theme is installed where GNUstep looks (the
+#            private home's Library, then the toolchain's Local, Network and
+#            System libraries); otherwise FAIL and that theme's cases are
+#            skipped, rather than silently drawing the default theme
+#   open     TrellisPreview --snapshot + --export-json at 900x640; the JSON's
+#            theme must be NAME (GNUstep falls back to its default theme
+#            without a word when a theme fails to load)
 #   resize   the same window resized live to 520x640 and 340x640 (--resize)
 #   reload   --watch 2: the fixture edited, then its sample, while it polls
 #   render   trellis-render at 900, with the same theme and appearance;
@@ -44,6 +51,21 @@ THEMES=${THEMES:-Adwaita}
 FIX=Tests/Parity/Parity.trellis
 if [ $PLATFORM = windows ]; then REALGS="$(cygpath -u "$USERPROFILE")/GNUstep"
 else REALGS="$(getent passwd "$(id -un)" 2>/dev/null | cut -d: -f6)"; REALGS="${REALGS:-$HOME}/GNUstep"; fi
+PRIV=${TRELLIS_GNUSTEP_HOME:-$HOME/.cache/trellis-gnustep-home}   # as run-headless.sh
+theme_dirs() {  # where GNUstep looks for NAME.theme, private home first
+  echo "$PRIV/GNUstep/Library/Themes"
+  for v in GNUSTEP_LOCAL_LIBRARY GNUSTEP_NETWORK_LIBRARY GNUSTEP_SYSTEM_LIBRARY; do
+    d=$(gnustep-config --variable=$v 2>/dev/null) || continue
+    [ -n "$d" ] || continue
+    [ $PLATFORM = windows ] && d=$(cygpath -u "$d")
+    echo "$d/Themes"
+  done | awk '!seen[$0]++'
+}
+theme_installed() {
+  while read -r d; do [ -d "$d/$1.theme" ] && { echo "$d/$1.theme"; return 0; }; done < <(theme_dirs)
+  return 1
+}
+json_theme() { "$PY" -I -c 'import json,sys; print(json.load(open(sys.argv[1])).get("theme",""))' "$1" 2>/dev/null; }
 cases=()                      # name|status|detail
 add() { cases+=("$1|$2|$3"); printf '%-6s %s  %s\n' "$2" "$1" "$3"; }
 
@@ -58,15 +80,23 @@ registry_state() {  # Windows only: reported, not failed (ask #8624)
 }
 before=$(settings_state); reg_before=$(registry_state)
 
-for theme in $THEMES; do
-  aps="light"; [ "$theme" = Adwaita ] && aps="light dark"
+for entry in $THEMES; do
+  theme=${entry%%:*}
+  if [ "$entry" != "$theme" ]; then aps=${entry#*:}; aps=${aps//,/ }
+  elif [ "$theme" = Adwaita ]; then aps="light dark"; else aps="light"; fi
+  if [ "$theme" != GNUstep ]; then
+    if where=$(theme_installed "$theme"); then add "theme $theme" PASS "$where"
+    else add "theme $theme" FAIL "$theme.theme isn't installed in: $(theme_dirs | tr '\n' ' ')"; continue; fi
+  fi
   for ap in $aps; do
     tag="$theme-$ap"
     # open + resize
     if timeout 120 $RUN "$PREVIEW" "$FIX" --snapshot "$OUT/open-$tag.png" --export-json "$OUT/open-$tag.json" \
          --width 900 --height 640 --resize 520x640,340x640 --appearance "$ap" -GSTheme "$theme" \
          > "$OUT/open-$tag.log" 2>&1 && [ -s "$OUT/open-$tag.png" ] && [ -s "$OUT/open-$tag.json" ]; then
-      add "open $tag" PASS "open-$tag.png/.json"
+      got=$(json_theme "$OUT/open-$tag.json")
+      if [ "$got" = "$theme" ]; then add "open $tag" PASS "open-$tag.png/.json"
+      else add "open $tag" FAIL "drew theme '${got:-?}', not $theme (see open-$tag.log)"; fi
     else add "open $tag" FAIL "see open-$tag.log"; fi
     if [ -s "$OUT/open-$tag-520x640.json" ] && [ -s "$OUT/open-$tag-340x640.json" ]; then
       add "resize $tag" PASS "open-$tag-520x640, open-$tag-340x640"
@@ -79,7 +109,7 @@ for theme in $THEMES; do
         add "render $tag" PASS "$(cat "$OUT/pixels-$tag.txt")"
       else add "render $tag" FAIL "$(tail -1 "$OUT/pixels-$tag.txt")"; fi
     else add "render $tag" FAIL "see render-$tag.log"; fi
-  done
+  done | awk '!seen[$0]++'
 done
 
 # reload: edit the fixture, then its sample, while Preview polls them
@@ -115,7 +145,8 @@ else add "registry" INFO "HKCU GNUstep keys changed (registry.txt has before and
 import json, sys
 out, platform, commit, themes, *cases = sys.argv[1:]
 rows = [dict(zip(("case", "status", "detail"), c.split("|", 2))) for c in cases]
-json.dump({"platform": platform, "commit": commit, "themes": themes.split(), "cases": rows},
+json.dump({"platform": platform, "commit": commit, "themes": [t.split(":")[0] for t in themes.split()],
+           "cases": rows},
           open(out, "w"), indent=1)
 PY
 fails=$(printf '%s\n' "${cases[@]}" | grep -c '|FAIL|'); passes=$(printf '%s\n' "${cases[@]}" | grep -c '|PASS|')

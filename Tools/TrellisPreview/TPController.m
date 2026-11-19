@@ -26,6 +26,12 @@
        of N reloads; exits 1 if fewer than N happen within S seconds
        (default 30). The window is never shown in either.
 
+   --untrusted opens files from outside (sent by someone else) hardened:
+   images only from the document's own folder, only standard view
+   classes, and controls and links that do nothing when clicked (see
+   TRMarkupDocument.untrusted). It stays on for files opened later from
+   File > Open and across the appearance relaunch; the title says so.
+
    Copyright (C) 2026 Dan Boyd
    Licensed under the GNU LGPL, version 2.1 or later; see COPYING.LIB.
 */
@@ -198,12 +204,14 @@ static NSView *TPViewAtPath(NSView *root, NSString *path)
   NSString *_exportJSON;   /* headless: write the frames JSON here */
   BOOL _loadFailed;        /* the spec (or its sample) didn't load */
   NSUInteger _reloads;     /* reload: calls, the first load included */
+  BOOL _untrusted;         /* --untrusted: hardened loading */
 }
 @end
 
 @implementation TPController
 
 - (void)setExportJSON:(NSString *)path { _exportJSON = [path copy]; }
+- (void)setUntrusted:(BOOL)yn { _untrusted = yn; }
 - (BOOL)loadFailed { return _loadFailed; }
 - (NSUInteger)reloadCount { return _reloads; }
 - (NSString *)exportJSONPath { return _exportJSON; }
@@ -392,7 +400,8 @@ static NSDate *TPModDate(NSString *path)
   [_errorLabel setStringValue: msg];
   [_errorLabel setFrame: NSInsetRect([_content bounds], 16, 16)];
   [_content addSubview: _errorLabel];
-  [_window setTitle: [NSString stringWithFormat: @"%@ — error", [_path lastPathComponent]]];
+  [_window setTitle: [NSString stringWithFormat: @"%@ — error%@", [_path lastPathComponent],
+                       _untrusted ? @" — untrusted" : @""]];
 }
 
 - (void)reload:(id)sender
@@ -402,6 +411,7 @@ static NSDate *TPModDate(NSString *path)
   _sampleMtime = TPModDate([self samplePath]);
   NSError *err = nil;
   TRMarkupDocument *doc = [TRMarkupDocument documentWithContentsOfFile: _path error: &err];
+  doc.untrusted = _untrusted;
   TRBoxView *screen = doc ? [TRLoader loadDocument: doc owner: nil error: &err] : nil;
   if (screen && [[NSFileManager defaultManager] fileExistsAtPath: [self samplePath]])
     {
@@ -435,9 +445,10 @@ static NSDate *TPModDate(NSString *path)
   _findings = [self lintScreen];
   NSUInteger errors = 0;
   for (NSDictionary *f in _findings) if ([f[@"severity"] isEqualToString: @"error"]) errors++;
-  [_window setTitle: [NSString stringWithFormat: @"%@ — %g × %g — %lu lint (%lu errors)",
+  [_window setTitle: [NSString stringWithFormat: @"%@ — %g × %g — %lu lint (%lu errors)%@",
                        [_path lastPathComponent], s.width, s.height,
-                       (unsigned long)[_findings count], (unsigned long)errors]];
+                       (unsigned long)[_findings count], (unsigned long)errors,
+                       _untrusted ? @" — untrusted" : @""]];
   _overlay.target = _screen;
   _overlay.findings = _findings;
   [_overlay setFrame: [_content bounds]];
@@ -651,6 +662,7 @@ static void TPSetSchemeDefault(NSString *appearance)
                                @"--height", [NSString stringWithFormat: @"%.0f", s.height]]];
   if (_inspector) [args addObject: @"--inspector"];
   if (_focusOrder) [args addObject: @"--focus-order"];
+  if (_untrusted) [args addObject: @"--untrusted"];
   NSString *theme = [[GSTheme theme] name];
   if ([theme length]) [args addObjectsFromArray: @[@"-GSTheme", theme]];
   NSTask *t = [NSTask new];
@@ -791,7 +803,7 @@ int main(int argc, const char **argv)
       NSArray<NSString *> *args = TRArguments(argc, argv);
       NSString *path = nil, *snapshot = nil;
       NSSize size = NSMakeSize(640, 480);
-      BOOL inspector = NO, focusOrder = NO;
+      BOOL inspector = NO, focusOrder = NO, untrusted = NO;
       NSString *exportJSON = nil, *appearance = nil, *resize = nil;
       NSInteger watch = 0;
       double watchTimeout = 30;
@@ -804,6 +816,7 @@ int main(int argc, const char **argv)
           else if ([a isEqualToString: @"--height"] && next) { size.height = [next doubleValue]; i++; }
           else if ([a isEqualToString: @"--inspector"]) inspector = YES;
           else if ([a isEqualToString: @"--focus-order"]) focusOrder = YES;
+          else if ([a isEqualToString: @"--untrusted"]) untrusted = YES;
           else if ([a isEqualToString: @"--export-json"] && next) { exportJSON = next; i++; }
           else if ([a isEqualToString: @"--appearance"] && next) { appearance = next; i++; }
           else if ([a isEqualToString: @"--resize"] && next) { resize = next; i++; }
@@ -821,6 +834,7 @@ int main(int argc, const char **argv)
       [NSApplication sharedApplication];
       TPController *c = [[TPController alloc] initWithPath: path snapshot: snapshot size: size inspector: inspector];
       [c setExportJSON: exportJSON];
+      [c setUntrusted: untrusted];
       [c setShowsFocusOrder: focusOrder];
       if (appearance) [c setInitialAppearance: appearance];
       if (snapshot)

@@ -208,6 +208,7 @@ check-gui:: all
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/disabled.m -o obj/gui-tests/disabled $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/direction.m -o obj/gui-tests/direction $(GUI_TEST_LIBS)
 	@$(CC) $(GUI_TEST_FLAGS) Tests/View/scroll-overlay.m -o obj/gui-tests/scroll-overlay $(GUI_TEST_LIBS)
+	@$(CC) $(GUI_TEST_FLAGS) Tests/View/untrusted.m -o obj/gui-tests/untrusted $(GUI_TEST_LIBS)
 	@echo "== view checks (headless)"
 	@export LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH; status=0; \
 	  timeout 60 scripts/run-headless.sh obj/gui-tests/size-for-width > obj/gui-tests/hook.log 2>&1 || status=1; \
@@ -251,6 +252,9 @@ check-gui:: all
 	  NSZombieEnabled=YES timeout 60 scripts/run-headless.sh obj/gui-tests/direction > obj/gui-tests/direction.log 2>&1 || status=1; \
 	  if grep -q "deallocated instance" obj/gui-tests/direction.log; then echo "DIRECTION FAIL: message sent to a freed object"; status=1; fi; \
 	  grep -v _NET_WORKAREA obj/gui-tests/direction.log | tail -1; \
+	  NSZombieEnabled=YES timeout 60 scripts/run-headless.sh obj/gui-tests/untrusted > obj/gui-tests/untrusted.log 2>&1 || status=1; \
+	  if grep -q "deallocated instance" obj/gui-tests/untrusted.log; then echo "UNTRUSTED FAIL: message sent to a freed object"; status=1; fi; \
+	  grep -v _NET_WORKAREA obj/gui-tests/untrusted.log | grep -E "^(FAIL|UNTRUSTED)" ; \
 	  timeout 300 scripts/run-headless.sh obj/gui-tests/virtual-bench > obj/gui-tests/vbench.log 2>&1 || status=1; \
 	  grep -v _NET_WORKAREA obj/gui-tests/vbench.log | tail -3; \
 	  Tests/View/appearance.sh || status=1; \

@@ -41,5 +41,25 @@ if [ -s "$out/plain.png" ] && [ -s "$out/focus.png" ] && ! cmp -s "$out/plain.pn
 else
   echo "FAIL focus-order overlay: snapshot missing or unchanged"; fail=1
 fi
+# --untrusted: an image from outside the document's folder fails the load
+# (exit 1), one inside renders, and without the flag the same file loads.
+mkdir -p "$out/u/doc"
+python3 -I - "$out/u" <<'PY'
+import base64, sys
+png = base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==")
+d = sys.argv[1]
+open(d + "/secret.png", "wb").write(png)
+open(d + "/doc/ok.png", "wb").write(png)
+open(d + "/doc/out.trellis", "w").write('<column><image src="../secret.png"/><button action="terminate:">Quit</button></column>\n')
+open(d + "/doc/in.trellis", "w").write('<column><image src="ok.png"/><button action="terminate:">Quit</button></column>\n')
+PY
+$APP --untrusted "$out/u/doc/out.trellis" --snapshot "$out/u/out.png" --width 200 --height 100 >"$out/u/out.log" 2>&1; rc_out=$?
+$APP --untrusted "$out/u/doc/in.trellis" --snapshot "$out/u/in.png" --width 200 --height 100 >"$out/u/in.log" 2>&1; rc_in=$?
+$APP "$out/u/doc/out.trellis" --snapshot "$out/u/trusted.png" --width 200 --height 100 >"$out/u/t.log" 2>&1; rc_t=$?
+if [ $rc_out -eq 1 ] && [ $rc_in -eq 0 ] && [ -s "$out/u/in.png" ] && [ $rc_t -eq 0 ]; then
+  echo "ok   --untrusted: outside image refused (exit 1), inside image renders, trusted unchanged"
+else
+  echo "FAIL --untrusted: exits out=$rc_out in=$rc_in trusted=$rc_t ($(grep -v _NET_WORKAREA "$out/u/out.log" | tail -1))"; fail=1
+fi
 rm -rf "${out:?}"
 [ $fail -eq 0 ] && echo "PREVIEWEXPORT OK" || { echo "PREVIEWEXPORT FAIL"; exit 1; }

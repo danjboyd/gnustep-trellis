@@ -138,6 +138,31 @@ version may change the API listed in docs/api.md, and says so here.
   unchanged. `-hasVerticalScroller` on that scroll view now reports
   whether the content overflows. Themes with legacy scrollers (the
   default, Gumdrop) are unchanged.
+- **Added (security):** `TrellisPreview --untrusted` opens a file someone
+  else sent (for example through AIManager's laptop.open) in a hardened
+  mode. Put the flag before the file: `TrellisPreview --untrusted
+  Screen.trellis`. In this mode:
+  - `<image src>` must name a regular file inside the document's own
+    folder. Absolute, `..`, `~`, UNC or backslash, drive or colon, device
+    name (`NUL`, `COM1`, ...) and empty-component paths, symlinks that
+    lead out, FIFOs and devices, and files over 32 MB fail the load with
+    a message. A missing file still just shows no image.
+  - `<image name>` takes a plain name only.
+  - `<view type>` builds only standard AppKit and Trellis view classes
+    from a fixed list. Any other name, including the app's own classes,
+    becomes a placeholder and is never instantiated.
+  - Controls get no target or action, `<a action>` links send nothing,
+    links open no URL, and no outlets are set. Before, Preview wired
+    `action=` to the responder chain, so a click on a crafted button
+    could send `terminate:` or Preview's own menu actions.
+  The mode stays on for files opened from File > Open and across the
+  appearance relaunch, and the window title says "untrusted". The same
+  mode is available to apps as `TRMarkupDocument.untrusted` (set it before
+  `+[TRLoader loadDocument:owner:error:]`; templates built later from
+  that document are hardened too), with `TRRichLabel.untrusted` for
+  links. Trusted loading is unchanged. A Preview older than this one
+  reads `--untrusted <file>` as an unknown option with a value and opens
+  no file, so the flag before the path fails safe.
 
 ## 0.10.1 (2026-11-18)
 

@@ -105,6 +105,9 @@ void TRUpdateThemeTokens(void);
 @interface TRRichLabel : NSTextField
 @property (nonatomic, weak) id linkTarget;
 @property (nonatomic, readonly, copy) NSString *clickedLink;
+/* From an untrusted document: clicking a link records clickedLink but
+   sends no action and opens no URL. */
+@property (nonatomic) BOOL untrusted;
 - (void)setTrellisRuns:(NSArray<NSDictionary *> *)runs;
 - (NSArray<NSDictionary *> *)trellisRuns;
 - (NSString *)plainText;

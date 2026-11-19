@@ -567,6 +567,7 @@ static NSString *const TRRunAttributeName = @"TRRunIndex";
   NSDictionary *r = _runs[[run unsignedIntegerValue]];
   if (r[@"link"] == nil) return NO;
   _clickedLink = r[@"href"];
+  if (self.untrusted) return NO;   /* no action, no URL */
   if (r[@"action"])
     {
       SEL sel = NSSelectorFromString(r[@"action"]);
@@ -599,6 +600,126 @@ static NSString *const TRRunAttributeName = @"TRRunIndex";
 }
 
 @end
+
+/* ------------------------------------------------------------------ */
+#pragma mark Untrusted documents
+
+/* The largest image an untrusted document may load. */
+#define TR_UNTRUSTED_IMAGE_MAX (32 * 1024 * 1024)
+
+/* A path rule broken by an untrusted <image src>, or nil. Only a plain
+   relative path of forward-slash components passes: no absolute, "~",
+   "..", empty or "." components, backslashes (UNC, Windows separators),
+   colons (drives, URLs, NTFS streams), control characters or Windows
+   device names (CON, NUL, COM1, ...). */
+static NSString *TRUntrustedSrcProblem(NSString *src)
+{
+  if ([src length] == 0) return @"is empty";
+  if ([src isAbsolutePath] || [src hasPrefix: @"/"]) return @"is an absolute path";
+  if ([src hasPrefix: @"~"]) return @"starts with ~";
+  if ([src rangeOfString: @"\\"].location != NSNotFound) return @"contains a backslash";
+  if ([src rangeOfString: @":"].location != NSNotFound) return @"contains a colon";
+  for (NSUInteger i = 0; i < [src length]; i++)
+    if ([src characterAtIndex: i] < 0x20 || [src characterAtIndex: i] == 0x7f) return @"contains a control character";
+  static NSSet *devices;
+  if (devices == nil)
+    {
+      NSMutableSet *d = [NSMutableSet setWithObjects: @"con", @"prn", @"aux", @"nul", @"conin$", @"conout$", nil];
+      for (int n = 0; n <= 9; n++)
+        {
+          [d addObject: [NSString stringWithFormat: @"com%d", n]];
+          [d addObject: [NSString stringWithFormat: @"lpt%d", n]];
+        }
+      devices = d;
+    }
+  for (NSString *c in [src componentsSeparatedByString: @"/"])
+    {
+      if ([c length] == 0 || [c isEqualToString: @"."]) return @"has an empty or '.' component";
+      if ([c isEqualToString: @".."]) return @"goes up with '..'";
+      NSString *base = [[[c componentsSeparatedByString: @"."] firstObject] lowercaseString];
+      base = [base stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
+      if ([devices containsObject: base]) return @"names a device";
+    }
+  return nil;
+}
+
+/* An absolute, symlink-resolved, standardized path. */
+static NSString *TRRealPath(NSString *p)
+{
+  if (![p isAbsolutePath])
+    p = [[[NSFileManager defaultManager] currentDirectoryPath] stringByAppendingPathComponent: p];
+  return [[p stringByResolvingSymlinksInPath] stringByStandardizingPath];
+}
+
+/* YES if path is dir or inside it (component-wise). */
+static BOOL TRPathInside(NSString *path, NSString *dir)
+{
+  NSArray *a = [path pathComponents], *b = [dir pathComponents];
+  if ([a count] < [b count]) return NO;
+  for (NSUInteger i = 0; i < [b count]; i++)
+    if (![a[i] isEqualToString: b[i]]) return NO;
+  return YES;
+}
+
+/* The image an untrusted document's <image src> names, nil when the file
+   doesn't exist (as for a trusted one). Sets *problem when a rule is
+   broken. */
+static NSImage *TRUntrustedImage(NSString *src, TRMarkupDocument *doc, NSString **problem)
+{
+  NSString *why = TRUntrustedSrcProblem(src);
+  if (why) { *problem = why; return nil; }
+  NSString *docPath = doc.name;
+  if ([docPath length] == 0 || [docPath hasPrefix: @"<"])
+    {
+      *problem = @"has no document folder to resolve against";
+      return nil;
+    }
+  NSString *folder = TRRealPath([docPath stringByDeletingLastPathComponent]);
+  NSString *joined = [[docPath stringByDeletingLastPathComponent] stringByAppendingPathComponent: src];
+  NSFileManager *fm = [NSFileManager defaultManager];
+  if (![fm fileExistsAtPath: joined]) return nil;
+  NSString *real = TRRealPath(joined);
+  if (!TRPathInside(real, folder) || [real isEqualToString: folder])
+    {
+      *problem = @"resolves outside the document's folder";
+      return nil;
+    }
+  NSDictionary *attrs = [fm attributesOfItemAtPath: real error: NULL];
+  if (![[attrs fileType] isEqualToString: NSFileTypeRegular])
+    {
+      *problem = @"is not a regular file";
+      return nil;
+    }
+  if ([attrs fileSize] > TR_UNTRUSTED_IMAGE_MAX)
+    {
+      *problem = @"is larger than 32 MB";
+      return nil;
+    }
+  NSData *data = [NSData dataWithContentsOfFile: real];
+  return data ? [[NSImage alloc] initWithData: data] : nil;
+}
+
+/* The view classes an untrusted <view type> may name: standard AppKit and
+   Trellis views, looked up in a fixed table (no NSClassFromString). */
+static Class TRUntrustedViewClass(NSString *type)
+{
+  static NSDictionary *table;
+  if (table == nil)
+    table = @{
+      @"NSView": [NSView class], @"NSBox": [NSBox class],
+      @"NSImageView": [NSImageView class], @"NSTextField": [NSTextField class],
+      @"NSSecureTextField": [NSSecureTextField class], @"NSSearchField": [NSSearchField class],
+      @"NSButton": [NSButton class], @"NSPopUpButton": [NSPopUpButton class],
+      @"NSSlider": [NSSlider class], @"NSStepper": [NSStepper class],
+      @"NSProgressIndicator": [NSProgressIndicator class], @"NSLevelIndicator": [NSLevelIndicator class],
+      @"NSColorWell": [NSColorWell class], @"NSComboBox": [NSComboBox class],
+      @"NSScrollView": [NSScrollView class], @"NSTableView": [NSTableView class],
+      @"NSOutlineView": [NSOutlineView class], @"NSTextView": [NSTextView class],
+      @"NSSegmentedControl": [NSSegmentedControl class], @"NSSplitView": [NSSplitView class],
+      @"TRBoxView": [TRBoxView class],
+    };
+  return type ? table[type] : Nil;
+}
 
 @implementation TRLoader
 
@@ -866,7 +987,30 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
     {
       NSImageView *iv = [[NSImageView alloc] initWithFrame: NSMakeRect(0, 0, 10, 10)];
       NSImage *img = nil;
-      if (a[@"src"])
+      if (doc.untrusted && a[@"src"])
+        {
+          NSString *problem = nil;
+          img = TRUntrustedImage(a[@"src"], doc, &problem);
+          if (problem)
+            {
+              if (error) *error = TRLoadError(doc, e, @"untrusted document: <image src=\"%@\"> %@ "
+                                              @"(it must name a file inside the document's folder)", a[@"src"], problem);
+              return nil;
+            }
+        }
+      else if (doc.untrusted && a[@"name"])
+        {
+          NSString *nm = a[@"name"];
+          if ([nm length] == 0 || [nm rangeOfCharacterFromSet:
+                [NSCharacterSet characterSetWithCharactersInString: @"/\\:~"]].location != NSNotFound
+              || [nm hasPrefix: @"."])
+            {
+              if (error) *error = TRLoadError(doc, e, @"untrusted document: <image name=\"%@\"> must be a plain image name", nm);
+              return nil;
+            }
+          img = [NSImage imageNamed: nm];
+        }
+      else if (a[@"src"])
         {
           NSString *path = a[@"src"];
           if (![path isAbsolutePath])
@@ -907,7 +1051,7 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
   else if ([n isEqualToString: @"view"])
     {
       NSString *type = a[@"type"];
-      Class cls = type ? NSClassFromString(type) : Nil;
+      Class cls = doc.untrusted ? TRUntrustedViewClass(type) : (type ? NSClassFromString(type) : Nil);
       if (cls && [cls isSubclassOfClass: [NSView class]])
         v = [[cls alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)];
       else
@@ -939,9 +1083,10 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
       [rl setDrawsBackground: NO];
       [[rl cell] setWraps: wraps];
       [[rl cell] setLineBreakMode: wraps ? NSLineBreakByWordWrapping : NSLineBreakByTruncatingTail];
-      rl.linkTarget = owner;
+      rl.linkTarget = doc.untrusted ? nil : owner;
+      rl.untrusted = doc.untrusted;
       for (NSDictionary *r in runs)
-        if (r[@"action"] && owner != nil && ![owner respondsToSelector: NSSelectorFromString(r[@"action"])])
+        if (r[@"action"] && owner != nil && !doc.untrusted && ![owner respondsToSelector: NSSelectorFromString(r[@"action"])])
           {
             if (error) *error = TRLoadError(doc, e, @"<a action=\"%@\">: %@ does not implement -%@",
                                             r[@"action"], NSStringFromClass([owner class]), r[@"action"]);
@@ -993,18 +1138,19 @@ static NSTextField *TRMakeLabel(NSString *text, BOOL wraps)
           return nil;
         }
       SEL sel = NSSelectorFromString(action);
-      if (owner != nil && ![owner respondsToSelector: sel])
+      if (doc.untrusted) sel = NULL;   /* inert: no target, no action */
+      else if (owner != nil && ![owner respondsToSelector: sel])
         {
           if (error) *error = TRLoadError(doc, e, @"action '%@': %@ does not implement -%@",
                                           action, NSStringFromClass([owner class]), action);
           return nil;
         }
-      [(NSControl *)v setTarget: owner];
+      [(NSControl *)v setTarget: doc.untrusted ? nil : owner];
       [(NSControl *)v setAction: sel];
     }
 
   /* Outlet. */
-  if (ident && owner != nil)
+  if (ident && owner != nil && !doc.untrusted)
     {
       NSString *setter = [NSString stringWithFormat: @"set%@%@:", [[ident substringToIndex: 1] uppercaseString],
                                                      [ident substringFromIndex: 1]];

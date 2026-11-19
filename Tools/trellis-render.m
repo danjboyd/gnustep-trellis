@@ -11,6 +11,7 @@
 */
 
 #import <AppKit/AppKit.h>
+#import "TRArguments.h"
 #import "TRBoxView.h"
 #import "TRViewMeasure.h"
 #import "TRLint.h"
@@ -358,6 +359,7 @@ int main(int argc, const char **argv)
 {
   @autoreleasepool
     {
+      NSArray<NSString *> *args = TRArguments(argc, argv);
       NSString *screen = nil, *png = nil, *json = nil, *file = nil, *samplePath = nil;
       NSMutableArray *widths = [NSMutableArray array];
       double height = NAN;
@@ -365,8 +367,8 @@ int main(int argc, const char **argv)
       NSString *theme = nil, *appearance = nil;
       for (int i = 1; i < argc; i++)
         {
-          NSString *a = [NSString stringWithUTF8String: argv[i]];
-          NSString *next = (i + 1 < argc) ? [NSString stringWithUTF8String: argv[i + 1]] : nil;
+          NSString *a = args[i];
+          NSString *next = (i + 1 < argc) ? args[i + 1] : nil;
           if ([a isEqualToString: @"--screen"] && next) { screen = next; i++; }
           else if ([a isEqualToString: @"--width"] && next) { [widths addObject: @([next doubleValue])]; i++; }
           else if ([a isEqualToString: @"--widths"] && next)
@@ -386,7 +388,7 @@ int main(int argc, const char **argv)
           /* -Key value: an NSUserDefaults argument (GNUstep already put it
              in the argument domain), e.g. -GnomeThemeColorScheme force-dark. */
           else if ([a hasPrefix: @"-"] && ![a hasPrefix: @"--"] && next) i++;
-          else if ([[a pathExtension] isEqualToString: @"trellis"] && file == nil) file = a;
+          else if ([[a pathExtension] caseInsensitiveCompare: @"trellis"] == NSOrderedSame && file == nil) file = a;
           else TRUsage();
         }
       if (screen == nil && file == nil) TRUsage();

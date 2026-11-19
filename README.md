@@ -101,8 +101,8 @@ Recorded: Linux dad58aa (2026-11-19), macOS 62dc14f (2026-11-17). Skipped by `re
 Skipped cases need features Trellis
 leaves out or does differently on purpose (`position: static`,
 `inline-block`, `inline-grid`, `display: contents`, intrinsic-size
-keywords, per-axis overflow, `flex-wrap: balance`, `-webkit-box`, named
-grid lines, subgrid, masonry, `position: sticky`, `calc()`, ancestor
+keywords, per-axis overflow, `flex-wrap: balance`, `-webkit-box`,
+subgrid, masonry, `position: sticky`, `calc()`, ancestor
 containing blocks for abspos); `trellis-case --all`
 runs them anyway. Every case that runs passes.
 `make conformance-record` (or `make -f Makefile.macos conformance-record`)

@@ -31,6 +31,15 @@ version may change the API listed in docs/api.md, and says so here.
   open, resize, reload, render, path, isolation and dependency cases on
   Linux and Windows, compared by structure across platforms and pixel
   for pixel within one (`make check-parity` on Linux).
+- **Added (layout):** named grid lines. Track lists take line names in
+  brackets (`[side-start] 200px [side-end main] 1fr`, also inside
+  `repeat()`), and `grid-row`/`grid-column` place by name: `main`
+  (`main-start`/`main-end` first, from an area or from lines so named),
+  `2 col`, `-1 col`, `span col`, `span 2 col`. A name with too few lines
+  counts the implicit lines past the grid, as in CSS. Before, a track list
+  with brackets was invalid and ignored, and a placement name that wasn't
+  an area was auto-placed; see docs/migration-0.11.md. 191 more
+  conformance cases run (3872 in all).
 - **Added (layout):** `display: flow-root`, laid out as `block` (a block
   never collapses margins in Trellis, so it already establishes its own
   formatting context). Before, the declaration was invalid and ignored.

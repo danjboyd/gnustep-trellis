@@ -185,17 +185,21 @@ collapses as in HTML, and the runs follow the label's `color`,
   `min-`/`max-`. Prefer them for start/end spacing so rtl works.
 - **Grid** (`display: grid`): `grid-template-columns` and
   `grid-template-rows` take `px`, `%`, `fr`, `auto`, `min-content`,
-  `max-content`, `minmax()` and `repeat(N | auto-fill | auto-fit, …)`.
+  `max-content`, `minmax()` and `repeat(N | auto-fill | auto-fit, …)`,
+  with line names in brackets (`[side-start] 200px [side-end main] 1fr`,
+  also inside `repeat()`).
   Also `grid-template-areas`, `grid-auto-rows` and `grid-auto-columns` (one or more sizes),
   `grid-auto-flow: row | column`, `grid-row`, `grid-column` (`2 / 4`,
-  `span 2`, `1 / -1`), `grid-area` (an area name or four lines),
+  `span 2`, `1 / -1`, a line name: `main`, `2 col`, `span col`,
+  `-1 col`), `grid-area` (an area name or four lines). A name that
+  isn't found falls on the implicit lines after the grid, as in CSS.
   `justify-items`, `justify-self`, `align-items`, `align-self` (each
   with an optional `safe`/`unsafe` prefix: `safe` puts an item that
   overflows its area at the area's start; unsafe is the default),
   `justify-content` and `align-content`.
   `fit-content(N)` (px or %) caps a track at N.
   `grid-auto-flow` takes `dense`.
-  **Not supported:** named lines (`[name]`) and `subgrid`.
+  **Not supported:** `subgrid`.
 - **Drawing:** `background-color` and `border-color`/`border-radius` on
   boxes; `border-style` (or the style in `border:`) `solid`, `dashed`,
   `dotted` or `double` (since 0.5; `groove`, `ridge`, `inset` and `outset`

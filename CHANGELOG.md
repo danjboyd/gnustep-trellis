@@ -145,7 +145,8 @@ version may change the API listed in docs/api.md, and says so here.
   - `<image src>` must name a regular file inside the document's own
     folder. Absolute, `..`, `~`, UNC or backslash, drive or colon, device
     name (`NUL`, `COM1`, ...) and empty-component paths, symlinks that
-    lead out, FIFOs and devices, and files over 32 MB fail the load with
+    lead out, components ending in a dot or space, FIFOs and devices, and
+    files over 32 MB fail the load with
     a message. A missing file still just shows no image.
   - `<image name>` takes a plain name only.
   - `<view type>` builds only standard AppKit and Trellis view classes

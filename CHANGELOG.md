@@ -66,6 +66,12 @@ version may change the API listed in docs/api.md, and says so here.
 - **Changed (lint):** an element the loader doesn't know (`<bogus>`) is
   an error. Before, trellis-lint passed it and only the loader rejected
   it, so a file that linted clean can fail lint now.
+- **Added (layout):** baseline alignment in a grid. `align-items` /
+  `align-self: baseline` lines up the first baselines of the items that
+  start in the same row (an item without one uses its border box's
+  bottom edge), and the row grows to fit. Before, `baseline` in a grid
+  was `start`. trellis-case gives Ahem text stand-ins their baseline
+  (0.8 em below half the leading) unless the case sets one.
 - **Fixed (layout):** `self-start` and `self-end` (on `justify-items`,
   `justify-self`, and on `align-items`/`align-self` in a column flex
   container) follow the item's own `direction`: an `rtl` item in an `ltr`

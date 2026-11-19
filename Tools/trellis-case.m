@@ -87,6 +87,15 @@ static TRNode *TRBuildNode(NSDictionary *d, NSString **err)
           TRFloat b = [m[@"baseline"] doubleValue];
           n.baselineBlock = ^TRFloat(TRSize size) { return b; };
         }
+      else if (m[@"text"])
+        {
+          /* Ahem: the font size is the glyph width and the ascent 0.8 em,
+             below half the leading of the first line. */
+          TRFloat cw = [m[@"charWidth"] doubleValue] ?: 10;
+          TRFloat lh = [m[@"lineHeight"] doubleValue] ?: 10;
+          TRFloat b = (lh - cw) / 2 + 0.8 * cw;
+          n.baselineBlock = ^TRFloat(TRSize size) { return b; };
+        }
     }
   for (NSDictionary *cq in d[@"conditions"])
     {

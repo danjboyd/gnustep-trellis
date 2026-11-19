@@ -1,13 +1,4 @@
 {
  "about": "Cases of a supported feature that still fail. trellis-case skips them by default (counted as known-gap); --all runs them. Remove an entry when the engine passes it.",
- "cases": {
-  "wpt-grid/css/css-grid/alignment/grid-alignment-style-changes-001/before": "grid baseline alignment of an item with no text: CSS Align 9.1 synthesizes its baseline from the border box's bottom edge; Trellis leaves the item at the start (y 0)",
-  "wpt-grid/css/css-grid/alignment/grid-alignment-style-changes-001/after": "grid baseline alignment of an item with no text: CSS Align 9.1 synthesizes its baseline from the border box's bottom edge; Trellis leaves the item at the start (y 0)",
-  "wpt-grid/css/css-grid/alignment/grid-alignment-style-changes-002/before": "grid baseline alignment of an item with no text: CSS Align 9.1 synthesizes its baseline from the border box's bottom edge; Trellis leaves the item at the start (y 0)",
-  "wpt-grid/css/css-grid/alignment/grid-alignment-style-changes-002/after": "grid baseline alignment of an item with no text: CSS Align 9.1 synthesizes its baseline from the border box's bottom edge; Trellis leaves the item at the start (y 0)",
-  "wpt-grid/css/css-grid/alignment/grid-alignment-style-changes-005/before": "grid baseline alignment of an item with no text: CSS Align 9.1 synthesizes its baseline from the border box's bottom edge; Trellis leaves the item at the start (y 0)",
-  "wpt-grid/css/css-grid/alignment/grid-alignment-style-changes-005/after": "grid baseline alignment of an item with no text: CSS Align 9.1 synthesizes its baseline from the border box's bottom edge; Trellis leaves the item at the start (y 0)",
-  "wpt-grid/css/css-grid/alignment/grid-alignment-style-changes-006/before": "grid baseline alignment of an item with no text: CSS Align 9.1 synthesizes its baseline from the border box's bottom edge; Trellis leaves the item at the start (y 0)",
-  "wpt-grid/css/css-grid/alignment/grid-alignment-style-changes-006/after": "grid baseline alignment of an item with no text: CSS Align 9.1 synthesizes its baseline from the border box's bottom edge; Trellis leaves the item at the start (y 0)"
- }
+ "cases": {}
 }

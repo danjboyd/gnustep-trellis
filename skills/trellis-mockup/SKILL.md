@@ -29,7 +29,10 @@ version, plus the rules for showing a mockup to people.
   overflow, but not a card that sits centred when it should stretch.
 - **When you show a mockup to Dan,** send the PNGs, not just a
   description. Through AIManager, attach them with `laptop.open` (images
-  only) and name the files in your ask.
+  only) and name the files in your ask. To let him open it live in
+  TrellisPreview as well, add the commands from `handoff.py` to the ask
+  (see "Letting Dan open it in TrellisPreview"). Never send a `.trellis`
+  or `.json` file through `laptop.open`.
 
 ## Setup (once per checkout)
 
@@ -130,6 +133,28 @@ match the trellis-render PNG at the same width and appearance pixel for
 pixel. If they differ, report it to the Trellis maintainers, because
 that's a bug. If TrellisPreview can't load the file, render.sh fails and
 keeps its error snapshot aside as `*.load-error.png`.
+
+## Letting Dan open it in TrellisPreview
+
+Dan has TrellisPreview installed in `~/opt/trellis-stable` on his laptop
+and chose to receive mockups as commands he runs himself. After the PNGs:
+
+1. Run `python3 -I skills/trellis-mockup/handoff.py Screen.trellis --json
+   commands.json`. It reads `Screen.trellis` and `Screen.sample.json` and
+   writes the commands: one line each, every file line single-quoted, and
+   a last command that opens the mockup. It checks that they recreate both
+   files before it prints them. Don't write or edit these commands by hand.
+2. Put the commands, in order, in the ask's `command` field (no host:
+   they run on his laptop). In the body, say what they do: they write the
+   mockup into `~/agent-shared/trellis-mockups/Screen/` and open it in
+   TrellisPreview, and he runs them in one terminal, in order.
+3. Exit 3 means the mockup can't go this way: a single quote (use fake
+   text without apostrophes), a tab, no final newline, or more than 8
+   commands (about 12 KB). Fix the first three, or send the PNGs only.
+
+The same fake-data rule applies: the commands carry the whole mockup.
+A newer set of commands for the same screen replaces the files, and an
+open TrellisPreview reloads them.
 
 ## What a mockup can't show
 

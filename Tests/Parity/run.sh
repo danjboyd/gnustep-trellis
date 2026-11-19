@@ -136,8 +136,8 @@ else add "reload" FAIL "see reload.log (rc $(cat "$W/reload.rc" 2>/dev/null))"; 
 # paths: spaces and non-ASCII letters in the fixture's and the outputs' paths
 PT=${THEMES%% *}; PT=${PT%%:*}
 PD="$OUT/work/dir with spaces ü"; PO="$OUT/out é"; mkdir -p "$PD" "$PO"
-cp "$FIX" "$PD/Façade ñ.trellis"; cp Tests/Parity/Parity.sample.json "$PD/Façade ñ.sample.json"
-if timeout 120 $RUN "$PREVIEW" "$PD/Façade ñ.trellis" --snapshot "$PO/snap ü.png" --export-json "$PO/frames ü.json" \
+cp "$FIX" "$PD/Façade ñ.TRELLIS"; cp Tests/Parity/Parity.sample.json "$PD/Façade ñ.sample.json"
+if timeout 120 $RUN "$PREVIEW" "$PD/Façade ñ.TRELLIS" --snapshot "$PO/snap ü.png" --export-json "$PO/frames ü.json" \
      --width 900 --height 640 -GSTheme "$PT" > "$OUT/paths.log" 2>&1 && [ -s "$PO/snap ü.png" ] && [ -s "$PO/frames ü.json" ]; then
   if "$PY" -I - "$PO/frames ü.json" "$OUT/open-$PT-light.json" <<'PY'
 import json, sys

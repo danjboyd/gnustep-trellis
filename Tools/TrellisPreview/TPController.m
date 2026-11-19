@@ -31,6 +31,7 @@
 */
 
 #import <AppKit/AppKit.h>
+#import "../TRArguments.h"
 #import "TRBoxView.h"
 #import "TRLoader.h"
 #import "TRVirtualBox.h"
@@ -339,7 +340,7 @@ static NSDate *TPModDate(NSString *path)
    -applicationDidFinishLaunching:. */
 - (BOOL)application:(NSApplication *)app openFile:(NSString *)file
 {
-  if (![[file pathExtension] isEqualToString: @"trellis"]) return NO;
+  if ([[file pathExtension] caseInsensitiveCompare: @"trellis"] != NSOrderedSame) return NO;
   _path = [file stringByStandardizingPath];
   _mtime = nil;
   if (_window != nil)
@@ -787,6 +788,7 @@ int main(int argc, const char **argv)
 {
   @autoreleasepool
     {
+      NSArray<NSString *> *args = TRArguments(argc, argv);
       NSString *path = nil, *snapshot = nil;
       NSSize size = NSMakeSize(640, 480);
       BOOL inspector = NO, focusOrder = NO;
@@ -795,8 +797,8 @@ int main(int argc, const char **argv)
       double watchTimeout = 30;
       for (int i = 1; i < argc; i++)
         {
-          NSString *a = [NSString stringWithUTF8String: argv[i]];
-          NSString *next = i + 1 < argc ? [NSString stringWithUTF8String: argv[i + 1]] : nil;
+          NSString *a = args[i];
+          NSString *next = i + 1 < argc ? args[i + 1] : nil;
           if ([a isEqualToString: @"--snapshot"] && next) { snapshot = next; i++; }
           else if ([a isEqualToString: @"--width"] && next) { size.width = [next doubleValue]; i++; }
           else if ([a isEqualToString: @"--height"] && next) { size.height = [next doubleValue]; i++; }
@@ -807,7 +809,7 @@ int main(int argc, const char **argv)
           else if ([a isEqualToString: @"--resize"] && next) { resize = next; i++; }
           else if ([a isEqualToString: @"--watch"] && next) { watch = [next integerValue]; i++; }
           else if ([a isEqualToString: @"--watch-timeout"] && next) { watchTimeout = [next doubleValue]; i++; }
-          else if ([[a pathExtension] isEqualToString: @"trellis"]) path = [a stringByStandardizingPath];
+          else if ([[a pathExtension] caseInsensitiveCompare: @"trellis"] == NSOrderedSame) path = [a stringByStandardizingPath];
           else if ([a hasPrefix: @"-"] && next && ![next hasPrefix: @"-"]) i++;   /* NSUserDefaults args, e.g. -GSTheme X */
         }
       if (appearance && ![appearance isEqualToString: @"light"] && ![appearance isEqualToString: @"dark"])

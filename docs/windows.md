@@ -65,7 +65,7 @@ synthetic fixture (`Tests/Parity/Parity.trellis` and its sample), and
 | resize | the same window resized live (`--resize 520x640,340x640`) | a snapshot and JSON at each size |
 | reload | `--watch 2` while the fixture, then its sample, are edited | each reload's JSON shows the edit |
 | render | trellis-render at 900x640, same theme and appearance | its PNG equals the Preview snapshot, 0 differing pixels |
-| paths | the fixture (and its sample) under `dir with spaces ü/Façade ñ.trellis`, exported to `out é/` | a snapshot and JSON written there, frames equal to the plain open case's |
+| paths | the fixture (and its sample) under `dir with spaces ü/Façade ñ.TRELLIS` (upper-case extension too), exported to `out é/` | a snapshot and JSON written there, frames equal to the plain open case's |
 | refuse | trellis-render without a private `GNUSTEP_HOME` (stand-in `HOME`) | exit 3, nothing written |
 | settings | the real `~/GNUstep` (`%USERPROFILE%\GNUstep` on Windows) | unchanged by the whole run |
 | deps | Windows: every DLL `TrellisPreview.exe` loads, recursively (`Tests/Parity/pe-deps.py`, import and delay-import tables) | each one is found in the app folder, `obj/` or `PATH`; `deps.json` lists the ones to ship and the system ones |

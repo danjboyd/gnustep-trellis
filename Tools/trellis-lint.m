@@ -11,6 +11,7 @@
 */
 
 #import <Foundation/Foundation.h>
+#import "TRArguments.h"
 #import "TRLint.h"
 #import "TRMarkup.h"
 
@@ -467,13 +468,14 @@ int main(int argc, const char **argv)
 {
   @autoreleasepool
     {
+      NSArray<NSString *> *args = TRArguments(argc, argv);
       NSString *owner = nil;
       NSMutableArray *inputs = [NSMutableArray array];
       for (int i = 1; i < argc; i++)
         {
-          NSString *a = [NSString stringWithUTF8String: argv[i]];
+          NSString *a = args[i];
           if ([a isEqualToString: @"--owner"] && i + 1 < argc)
-            owner = [NSString stringWithUTF8String: argv[++i]];
+            owner = args[++i];
           else
             [inputs addObject: a];
         }
@@ -484,7 +486,7 @@ int main(int argc, const char **argv)
         }
       for (NSString *path in inputs)
         {
-          if ([[path pathExtension] isEqualToString: @"trellis"])
+          if ([[path pathExtension] caseInsensitiveCompare: @"trellis"] == NSOrderedSame)
             {
               TRLintTrellis(path, owner);
               continue;

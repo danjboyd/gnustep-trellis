@@ -74,6 +74,13 @@ version may change the API listed in docs/api.md, and says so here.
 - **Added (tooling):** the WPT importer carries `direction` set on a node
   below the case root into the case (Trellis takes it per node), instead
   of skipping the test: 95 more cases.
+- **Added (tooling):** the WPT importer translates css-grid's
+  style-change tests (`evaluateStyleChange` and
+  `evaluateStyleChangeMultiple` before and after an inline
+  `el.style.prop = "value"` change) into one case per phase, ids ending
+  `/before` and `/after`: 32 files, 64 cases. 56 pass. The 8 that fail are
+  in `known-gaps.json`: grid baseline alignment of an item without text,
+  whose baseline should be synthesized from its bottom border edge.
 - **Changed (tools):** trellis-render's isolation guard is stricter: the
   home, the user Library and the user defaults directory must all resolve,
   symlinks followed, inside the private `GNUSTEP_HOME`, and a dangling or

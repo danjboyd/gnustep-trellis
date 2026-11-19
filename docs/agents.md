@@ -169,7 +169,8 @@ collapses as in HTML, and the runs follow the label's `color`,
 
 ## 3. CSS that works
 
-- **Properties:** `display` (`flex`, `none`, `block`, `flow-root`, the same as `block` here), `flex-direction`,
+- **Properties:** `display` (`flex`, `none`, `block`, `flow-root`, the same as `block` here, and
+  `contents`: the element draws no box and its children are laid out as its parent's), `flex-direction`,
   `flex-wrap`, `flex-flow`, `flex`, `flex-grow`, `flex-shrink`,
   `flex-basis`, `justify-content`, `align-items`, `align-self`,
   `align-content` (`justify-*` also take physical `left`/`right`; `justify-content` and `align-content` take a `safe`/`unsafe` prefix; on `align-items`/`align-self` a flex container accepts it and ignores it), `place-*`, `gap`, `row-gap`, `column-gap`, `order`,

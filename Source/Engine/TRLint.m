@@ -90,6 +90,13 @@ static void TRLintNode(NSDictionary *n, NSString *path, double absX, double absY
 
   NSArray *kids = n[@"children"];
   NSString *ov = n[@"overflow"];
+  /* display: contents draws no box: its children join this node's flow
+     (their frames are relative to it at this node's origin), and it isn't
+     checked as a box itself. */
+  BOOL (^isContents)(NSDictionary *) = ^BOOL(NSDictionary *d) {
+    return [d[@"style"] isKindOfClass: [NSString class]]
+        && [d[@"style"] rangeOfString: @"display: contents"].location != NSNotFound;
+  };
   BOOL clips = [ov isEqualToString: @"hidden"] || [ov isEqualToString: @"scroll"]
             || [ov isEqualToString: @"auto"];
   NSMutableArray *flow = [NSMutableArray array];
@@ -104,6 +111,19 @@ static void TRLintNode(NSDictionary *n, NSString *path, double absX, double absY
          as Yoga does, so it may stick out of its parent by up to one
          pixel; that isn't a layout problem. */
       double farTol = c[@"intrinsic"] != nil ? 1.0 + kTol : kTol;   /* not "far": a Windows macro */
+      if (isContents(c))
+        {
+          NSArray *gk = c[@"children"];
+          for (NSUInteger g = 0; g < [gk count]; g++)
+            {
+              NSDictionary *gc = gk[g];
+              if (![gc[@"hidden"] boolValue] && ![gc[@"position"] isEqualToString: @"absolute"]
+                  && [gc[@"width"] doubleValue] > 0 && [gc[@"height"] doubleValue] > 0)
+                [flow addObject: @[gc, [NSString stringWithFormat: @"%@/%lu", cp, (unsigned long)g]]];
+            }
+          TRLintNode(c, cp, ax, ay, vw, vh, insideScroller || clips, out);
+          continue;
+        }
       if (!clips && (cx < -kTol || cy < -kTol || cx + cw > w + farTol || cy + ch > h + farTol))
         TRAdd(out, @"overflow", @"warning", c, cp,
               [NSString stringWithFormat: @"%@ (%g,%g %gx%g) overflows %@ (%gx%g)",
@@ -113,6 +133,7 @@ static void TRLintNode(NSDictionary *n, NSString *path, double absX, double absY
       /* Content of a scrolling/clipping box may extend past the viewport. */
       TRLintNode(c, cp, ax, ay, vw, vh, insideScroller || clips, out);
     }
+  if (isContents(n)) return;   /* its parent checked its children's overlaps */
   for (NSUInteger i = 0; i < [flow count]; i++)
     for (NSUInteger j = i + 1; j < [flow count]; j++)
       {

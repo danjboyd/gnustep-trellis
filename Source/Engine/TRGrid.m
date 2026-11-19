@@ -1101,7 +1101,7 @@ TRSize TRLayoutGrid(TRNode *node, const TRStyleStorage *s, TRFloat pad[4], TRFlo
   NSDictionary *rowLines = TRLineNameMap(st->_gridTemplateRows, autoRepsR, rowAreas);
 
   /* ---- Items and placement ---- */
-  NSArray *children = node->_children;
+  NSArray *children = TRLayoutChildren(node);
   NSUInteger nc = [children count];
   TRGridItem *items = calloc(nc ? nc : 1, sizeof(TRGridItem));
   NSInteger n = 0;

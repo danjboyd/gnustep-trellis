@@ -66,6 +66,10 @@ version may change the API listed in docs/api.md, and says so here.
 - **Changed (lint):** an element the loader doesn't know (`<bogus>`) is
   an error. Before, trellis-lint passed it and only the loader rejected
   it, so a file that linted clean can fail lint now.
+- **Added (layout):** `display: contents`. The element generates no box:
+  its children are laid out as its parent's (flex items or grid items of
+  the parent), and it keeps a zero frame at the parent's origin. Before,
+  the value was invalid and ignored. 18 more conformance cases run.
 - **Added (layout):** baseline alignment in a grid. `align-items` /
   `align-self: baseline` lines up the first baselines of the items that
   start in the same row (an item without one uses its border box's

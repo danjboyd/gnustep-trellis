@@ -198,7 +198,7 @@ static BOOL gRunAll;
 static NSSet *TRDefaultUnsupported(void)
 {
   return [NSSet setWithObjects:
-    @"display-inline", @"display-inline-block", @"display-contents",
+    @"display-inline", @"display-inline-block",
     @"display--webkit-box",
     @"display-table",            /* display: table and its parts */
     @"overflow-axis",            /* overflow-x differs from overflow-y */

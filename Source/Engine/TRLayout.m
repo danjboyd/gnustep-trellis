@@ -150,6 +150,39 @@ static void TRCacheStore(TRNode *n, TRFloat aw, TRFloat ah,
 /* ------------------------------------------------------------------ */
 #pragma mark Zeroing hidden subtrees
 
+static void TRCollectLayoutChildren(TRNode *node, NSMutableArray *out)
+{
+  for (TRNode *c in node->_children)
+    {
+      if (TRIsContents(c)) TRCollectLayoutChildren(c, out);
+      else [out addObject: c];
+    }
+}
+
+NSArray<TRNode *> *TRLayoutChildren(TRNode *node)
+{
+  BOOL any = NO;
+  for (TRNode *c in node->_children) if (TRIsContents(c)) { any = YES; break; }
+  if (!any) return node->_children;
+  NSMutableArray *out = [NSMutableArray array];
+  TRCollectLayoutChildren(node, out);
+  return out;
+}
+
+/* A contents node's own frame: zero, at its parent's origin (not its
+   children, which its parent laid out). */
+static void TRPlaceContentsNodes(TRNode *node)
+{
+  for (TRNode *c in node->_children)
+    if (TRIsContents(c))
+      {
+        c->_rawFrame = TRRectMake(0, 0, 0, 0);
+        c->_contentSize = TRSizeMake(0, 0);
+        c->_hasPerformEntry = NO;
+        TRPlaceContentsNodes(c);
+      }
+}
+
 static void TRZeroLayout(TRNode *n)
 {
   n->_rawFrame = TRRectMake(0, 0, 0, 0);
@@ -322,7 +355,7 @@ static inline TRValue TRSizeValue(const TRStyleStorage *s, TRFloat borderBox, TR
 static TRFloat TRMinContentWidth(TRNode *node, const TRStyleStorage *s, TRFloat refW, TRFloat refH, TRDirection dir)
 {
   BOOL any = NO;
-  for (TRNode *c in node->_children)
+  for (TRNode *c in TRLayoutChildren(node))
     if (!TRNodeIsNone(c) && c->_style->_s.position != TRPositionAbsolute) { any = YES; break; }
   if (!any || s->display == TRDisplayGrid || node->_measure != nil)
     return TRLayoutNode(node, 0, TRUndefined, TRMeasureModeAtMost, TRMeasureModeUndefined, refW, refH, NO, dir).width;
@@ -342,12 +375,12 @@ static TRFloat TRMinContentWidth(TRNode *node, const TRStyleStorage *s, TRFloat 
      item that can shrink contributes its contribution when that fraction
      and its own are <= 0; otherwise its base size flexed by the fraction. */
   NSInteger nItems = 0;
-  for (TRNode *c in node->_children)
+  for (TRNode *c in TRLayoutChildren(node))
     if (!TRNodeIsNone(c) && c->_style->_s.position != TRPositionAbsolute) nItems++;
   TRFloat *cb = sum ? calloc(nItems ? nItems : 1, 4 * sizeof(TRFloat)) : NULL;   /* c, b, d, m per item */
   NSInteger k = 0;
   TRFloat chosen = -INFINITY;
-  for (TRNode *c in node->_children)
+  for (TRNode *c in TRLayoutChildren(node))
     {
       if (TRNodeIsNone(c) || c->_style->_s.position == TRPositionAbsolute) continue;
       const TRStyleStorage *cs = TRChildStyle(c, dir);
@@ -400,7 +433,7 @@ static TRFloat TRMinContentWidth(TRNode *node, const TRStyleStorage *s, TRFloat 
     {
       if (k == 0) chosen = 0;
       k = 0;
-      for (TRNode *c in node->_children)
+      for (TRNode *c in TRLayoutChildren(node))
         {
           if (TRNodeIsNone(c) || c->_style->_s.position == TRPositionAbsolute) continue;
           const TRStyleStorage *cs = TRChildStyle(c, dir);
@@ -521,7 +554,7 @@ const TRStyleStorage *TRResolveSizeKeywords(TRNode *c, const TRStyleStorage *cs,
     TRFloat gap = TRMax(0, TRDefault(TRResolve(cs->rowGap, limit), 0));
     TRFloat line = 0, longest = 0;
     BOOL lineEmpty = YES;
-    for (TRNode *k in c->_children)
+    for (TRNode *k in TRLayoutChildren(c))
       {
         if (TRNodeIsNone(k) || k->_style->_s.position == TRPositionAbsolute) continue;
         const TRStyleStorage *ks = TRChildStyle(k, cdir);
@@ -750,7 +783,7 @@ static void TRLayoutAbsDescendants(TRNode *node, const TRStyleStorage *s, TRDire
   TRFloat cbX = border[TREdgeLeft], cbY = border[TREdgeTop];
   TRFloat cbW = W - border[TREdgeLeft] - border[TREdgeRight];
   TRFloat cbH = H - border[TREdgeTop] - border[TREdgeBottom];
-  for (TRNode *c in node->_children)
+  for (TRNode *c in TRLayoutChildren(node))
     if (!TRNodeIsNone(c) && c->_style->_s.position == TRPositionAbsolute)
       TRLayoutAbsChild(c, dir, cbX, cbY, cbW, cbH, s, dir, W, H, pad, border);
   TRLayoutStaticDescendants(node, dir, 0, 0, cbX, cbY, cbW, cbH, nil);
@@ -831,7 +864,7 @@ static TRSize TRLayoutFlex(TRNode *node, const TRStyleStorage *s, const TREdges 
   const TREdge crossLeadE = TRLeadingEdge(!isRow, crossRev), crossTrailE = TRTrailingEdge(!isRow, crossRev);
 
   /* ---- Collect in-flow items ---- */
-  NSArray<TRNode *> *children = node->_children;
+  NSArray<TRNode *> *children = TRLayoutChildren(node);
   NSUInteger nChildren = [children count];
   TRItem *items = calloc(nChildren ? nChildren : 1, sizeof(TRItem));
   TRStyleStorage *kwBufs = NULL;   /* items' styles with size keywords resolved */
@@ -1526,7 +1559,7 @@ TRSize TRLayoutNode(TRNode *node, TRFloat aw, TRFloat ah,
   TRFloat pbW = TRPBHorizontal(&e), pbH = TRPBVertical(&e);
 
   BOOL hasInFlowOrAbs = NO;
-  for (TRNode *c in node->_children)
+  for (TRNode *c in TRLayoutChildren(node))
     if (!TRNodeIsNone(c)) { hasInFlowOrAbs = YES; break; }
 
   TRSize size;
@@ -1563,6 +1596,7 @@ TRSize TRLayoutNode(TRNode *node, TRFloat aw, TRFloat ah,
           node->_lborder[k] = e.border[k];
         }
       if (!hasInFlowOrAbs) node->_contentSize = size;
+      TRPlaceContentsNodes(node);
       node->_hasPerformEntry = YES;
       TRCacheEntry *pe = &node->_performEntry;
       pe->aw = aw; pe->ah = ah; pe->wm = wm; pe->hm = hm;
@@ -1585,7 +1619,7 @@ TRFloat TRComputeBaseline(TRNode *node)
     && (s->flexDirection == TRFlexDirectionRow || s->flexDirection == TRFlexDirectionRowReverse);
   TRNode *best = nil;
   NSInteger bestOrder = NSIntegerMax;
-  for (TRNode *c in node->_children)
+  for (TRNode *c in TRLayoutChildren(node))
     {
       if (!TRIsInFlow(c) || c->_lineIndex != 0) continue;
       const TRStyleStorage *cs = &c->_style->_s;

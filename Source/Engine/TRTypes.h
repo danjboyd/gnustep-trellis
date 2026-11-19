@@ -75,7 +75,8 @@ typedef NS_ENUM(unsigned char, TREdge) {
 /* display: block is a Trellis convenience, not CSS block flow: it lays out
    like flex with flex-direction: column (and the default align-items:
    stretch), whatever flex-direction says. */
-typedef NS_ENUM(unsigned char, TRDisplay) { TRDisplayFlex = 0, TRDisplayNone, TRDisplayBlock, TRDisplayGrid };
+typedef NS_ENUM(unsigned char, TRDisplay) { TRDisplayFlex = 0, TRDisplayNone, TRDisplayBlock, TRDisplayGrid,
+  TRDisplayContents /* no box: its children are laid out as its parent's */ };
 typedef NS_ENUM(unsigned char, TRPosition) {
   TRPositionRelative = 0, TRPositionStatic, TRPositionAbsolute
 };

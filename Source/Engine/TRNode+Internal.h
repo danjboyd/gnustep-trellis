@@ -63,6 +63,18 @@ static inline BOOL TRNodeIsNone(TRNode *n)
   return n->_hidden || n->_style->_s.display == TRDisplayNone;
 }
 
+/* display: contents (CSS Display 2.5): the node generates no box; its
+   children take part in its parent's layout as if they were the parent's
+   own. TRLayoutChildren is a node's children with every such child
+   replaced, recursively, by its children (node->_children itself when
+   there is none). The contents node keeps a zero frame at the parent's
+   origin, so its children's frames read the same relative to it. */
+static inline BOOL TRIsContents(TRNode *n)
+{
+  return !n->_hidden && n->_style->_s.display == TRDisplayContents;
+}
+NSArray<TRNode *> *TRLayoutChildren(TRNode *node);
+
 /* A style's storage with its logical sides (margin-inline-start and so
    on) mapped for the box's direction (TRStyle.m). */
 const TRStyleStorage *TRStyleStorageForDirection(TRStyle *st, TRDirection dir);

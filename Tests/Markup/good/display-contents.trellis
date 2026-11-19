@@ -1,0 +1,8 @@
+<row class="toolbar">
+  <label>Status</label>
+  <column class="group"><button title="Approve"/><button title="Reject"/></column>
+  <style>
+    .toolbar { gap: 8px; padding: 8px; align-items: center; }
+    .group { display: contents; }
+  </style>
+</row>

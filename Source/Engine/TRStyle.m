@@ -181,7 +181,8 @@ static const TRKeyword kDisplay[] = {
      context, which is all flow-root adds. */
   {"block", TRDisplayBlock}, {"flow-root", TRDisplayBlock},
   {"inline-flex", TRDisplayFlex},
-  {"grid", TRDisplayGrid}, {"inline-grid", TRDisplayGrid}, {NULL, 0}};
+  {"grid", TRDisplayGrid}, {"inline-grid", TRDisplayGrid},
+  {"contents", TRDisplayContents}, {NULL, 0}};
 static const TRKeyword kPosition[] = {
   {"relative", TRPositionRelative}, {"static", TRPositionStatic},
   {"absolute", TRPositionAbsolute}, {NULL, 0}};

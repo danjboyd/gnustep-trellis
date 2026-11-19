@@ -1203,6 +1203,11 @@ static void TRCollectKeyViews(NSView *v, NSMutableArray *out)
       BOOL wasShown = ![v isHidden] && [_placed containsObject: v];
       [v setHidden: hidden];
       NSRect nf = NSMakeRect(f.x, f.y, f.width, f.height);
+      /* display: contents: no box, but its children's frames are relative
+         to it at this box's origin; the view spans this box's bounds so
+         they aren't clipped away. */
+      if (st.display == TRDisplayContents)
+        nf = NSMakeRect(0, 0, NSWidth([self bounds]), NSHeight([self bounds]));
       if (!hidden)
         {
           NSRect old = [v frame];
@@ -1364,6 +1369,7 @@ static void TRStrokeBorder(NSRect r, CGFloat bw, CGFloat radius, NSString *style
 
 - (void)drawRect:(NSRect)dirty
 {
+  if (_node.style.display == TRDisplayContents) return;   /* no box to draw */
   NSDictionary *d = _node.style.otherDeclarations;
   NSString *bg = d[@"background-color"] ?: d[@"background"];
   NSString *bc = d[@"border-color"];

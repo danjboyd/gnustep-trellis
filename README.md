@@ -100,7 +100,7 @@ Recorded: Linux b6d1131 (2026-11-19), macOS 62dc14f (2026-11-17). Skipped by `re
 
 Skipped cases need features Trellis
 leaves out or does differently on purpose (`position: static`,
-`inline-block`, `inline-grid`, `display: contents`, intrinsic-size
+`inline-block`, `inline-grid`, intrinsic-size
 keywords, per-axis overflow, `flex-wrap: balance`, `-webkit-box`,
 subgrid, masonry, `position: sticky`, `calc()`, ancestor
 containing blocks for abspos); `trellis-case --all`

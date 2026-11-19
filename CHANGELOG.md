@@ -70,9 +70,13 @@ version may change the API listed in docs/api.md, and says so here.
   `+ - * /` and parentheses, wherever a length or percentage goes
   (sizes, min/max, flex-basis, margin, padding, insets, gaps). It
   resolves like a percentage: against the same reference, and as auto
-  where that reference is indefinite. Not yet in grid track lists, and
-  no `min()`/`max()`/`clamp()`. Before, such a declaration was invalid
-  and ignored.
+  where that reference is indefinite. Not yet in grid track lists.
+  Before, such a declaration was invalid and ignored.
+- **Added (layout):** `min()`, `max()` and `clamp()` in lengths, alone
+  or inside `calc()` and each other (`width: clamp(200px, 40%, 480px)`,
+  `padding: max(8px, 2%)`). Like `calc()`, they resolve against the
+  percentage's reference, and as auto where it is indefinite. Not in
+  grid track lists.
 - **Added (layout):** `display: contents`. The element generates no box:
   its children are laid out as its parent's (flex items or grid items of
   the parent), and it keeps a zero frame at the parent's origin. Before,

@@ -31,6 +31,7 @@ static inline TRFloat TRResolve(TRValue v, TRFloat ref)
       case TRUnitPoint: return v.value;
       case TRUnitPercent: return isnan(ref) ? TRUndefined : v.value * ref / 100.0;
       case TRUnitCalc: return isnan(ref) ? TRUndefined : v.value + v.pct * ref / 100.0;
+      case TRUnitMath: return TRMathEval((int)v.value, ref);
       default: return TRUndefined;
     }
 }

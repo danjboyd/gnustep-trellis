@@ -112,25 +112,217 @@ static BOOL TRParseNumber(NSString *s, TRFloat *out)
   return YES;
 }
 
-/* calc() (CSS Values 4, 10) of px and percentages with + - * / and
-   parentheses, reduced to px + %. A term is (px, pct, isNumber). Returns
-   NO for anything else (other units, min()/max(), a length times a
-   length, division by a length or by 0). */
-typedef struct { double px, pct; BOOL num; } TRCalcTerm;
+/* calc(), min(), max() and clamp() (CSS Values 4, 10) of px and
+   percentages with + - * / and parentheses. A term is linear, px + pct %,
+   or (once a min/max mixes px with %) a small expression tree evaluated at
+   layout time against the percentage basis. Parsing returns NO for
+   anything else (other units, a length times a length, division by a
+   length or by 0, mixing numbers with lengths). */
+typedef struct TRMathNode {
+  char kind;                    /* 'l' linear, 'm' min, 'M' max, '+' sum, '*' scale */
+  double px, pct, k;            /* linear part; scale factor for '*' */
+  int n;
+  struct TRMathNode **kids;
+} TRMathNode;
+
+typedef struct { double px, pct; BOOL num; TRMathNode *node; } TRCalcTerm;
+
+static TRMathNode *TRMathNew(char kind, int n)
+{
+  TRMathNode *m = calloc(1, sizeof(TRMathNode));
+  m->kind = kind;
+  m->n = n;
+  if (n > 0) m->kids = calloc(n, sizeof(TRMathNode *));
+  return m;
+}
+
+static void TRMathFree(TRMathNode *m)
+{
+  if (!m) return;
+  for (int i = 0; i < m->n; i++) TRMathFree(m->kids[i]);
+  free(m->kids);
+  free(m);
+}
+
+/* The term as a tree node (a fresh linear leaf for a linear term). */
+static TRMathNode *TRCalcNode(TRCalcTerm t)
+{
+  if (t.node) return t.node;
+  TRMathNode *m = TRMathNew('l', 0);
+  m->px = t.px; m->pct = t.pct;
+  return m;
+}
+
+static void TRCalcDrop(TRCalcTerm *t) { TRMathFree(t->node); t->node = NULL; }
+
+static double TRMathEvalNode(const TRMathNode *m, double ref)
+{
+  switch (m->kind)
+    {
+      case 'l': return m->px + (m->pct == 0 ? 0 : m->pct * ref / 100);
+      case '*': return m->k * TRMathEvalNode(m->kids[0], ref);
+      case '+': return TRMathEvalNode(m->kids[0], ref) + TRMathEvalNode(m->kids[1], ref);
+      default:
+        {
+          double r = TRMathEvalNode(m->kids[0], ref);
+          for (int i = 1; i < m->n; i++)
+            {
+              double v = TRMathEvalNode(m->kids[i], ref);
+              r = m->kind == 'm' ? MIN(r, v) : MAX(r, v);
+            }
+          return r;
+        }
+    }
+}
+
+/* Interned expressions: a TRValue of unit TRUnitMath holds an index into
+   this table. Entries are never freed or moved (chunks of 256), so a
+   lookup needs no lock; the source text is kept for serialisation. */
+#define TR_MATH_CHUNK 256
+#define TR_MATH_CHUNKS 1024
+typedef struct { TRMathNode *node; char *src; } TRMathEntry;
+static TRMathEntry *TRMathTable[TR_MATH_CHUNKS];
+static int TRMathCount = 0;
+
+static int TRMathIntern(TRMathNode *node, NSString *src, BOOL *owned)
+{
+  const char *s = [src UTF8String];
+  int idx = -1;
+  *owned = NO;
+  @synchronized ([TRStyle class])
+    {
+      for (int i = 0; i < TRMathCount; i++)
+        if (strcmp(TRMathTable[i / TR_MATH_CHUNK][i % TR_MATH_CHUNK].src, s) == 0) { idx = i; break; }
+      if (idx < 0 && TRMathCount < TR_MATH_CHUNK * TR_MATH_CHUNKS)
+        {
+          idx = TRMathCount;
+          if (!TRMathTable[idx / TR_MATH_CHUNK])
+            TRMathTable[idx / TR_MATH_CHUNK] = calloc(TR_MATH_CHUNK, sizeof(TRMathEntry));
+          TRMathEntry *e = &TRMathTable[idx / TR_MATH_CHUNK][idx % TR_MATH_CHUNK];
+          e->node = node;
+          e->src = strdup(s);
+          *owned = YES;
+          TRMathCount++;
+        }
+    }
+  return idx;
+}
+
+TRFloat TRMathEval(int index, TRFloat ref)
+{
+  if (index < 0 || index >= TRMathCount || isnan(ref)) return (TRFloat)NAN;
+  return (TRFloat)TRMathEvalNode(TRMathTable[index / TR_MATH_CHUNK][index % TR_MATH_CHUNK].node, ref);
+}
+
+static NSString *TRMathSource(int index)
+{
+  if (index < 0 || index >= TRMathCount) return @"";
+  return [NSString stringWithUTF8String: TRMathTable[index / TR_MATH_CHUNK][index % TR_MATH_CHUNK].src];
+}
 
 static void TRCalcSkip(const char *s, size_t *i) { while (s[*i] == ' ' || s[*i] == '\t' || s[*i] == '\n') (*i)++; }
 static BOOL TRCalcSum(const char *s, size_t *i, TRCalcTerm *out);
 
+/* Multiplies a term by a number. */
+static void TRCalcScale(TRCalcTerm *t, double k)
+{
+  if (!t->node) { t->px *= k; t->pct *= k; return; }
+  TRMathNode *m = TRMathNew('*', 1);
+  m->k = k;
+  m->kids[0] = t->node;
+  t->node = m;
+}
+
+/* min/max over terms (consumed): folds to a linear term when every
+   argument is px only, or % only (percentage bases are never negative). */
+static BOOL TRCalcCombine(char kind, TRCalcTerm *args, int n, TRCalcTerm *out)
+{
+  BOOL ok = n > 0;
+  for (int a = 1; ok && a < n; a++)
+    if (args[a].num != args[0].num) ok = NO;
+  if (!ok)
+    {
+      for (int a = 0; a < n; a++) TRCalcDrop(&args[a]);
+      return NO;
+    }
+  BOOL allPx = YES, allPct = YES;
+  for (int a = 0; a < n; a++)
+    {
+      if (args[a].node || args[a].pct != 0) allPx = NO;
+      if (args[a].node || args[a].px != 0) allPct = NO;
+    }
+  out->num = args[0].num;
+  out->node = NULL;
+  if (allPx || allPct)
+    {
+      double r = allPx ? args[0].px : args[0].pct;
+      for (int a = 1; a < n; a++)
+        {
+          double v = allPx ? args[a].px : args[a].pct;
+          r = kind == 'm' ? MIN(r, v) : MAX(r, v);
+        }
+      out->px = allPx ? r : 0;
+      out->pct = allPx ? 0 : r;
+      return YES;
+    }
+  TRMathNode *m = TRMathNew(kind, n);
+  for (int a = 0; a < n; a++) m->kids[a] = TRCalcNode(args[a]);
+  out->px = out->pct = 0;
+  out->node = m;
+  return YES;
+}
+
+/* A comma-separated argument list up to and including ')'. */
+static int TRCalcArgs(const char *s, size_t *i, TRCalcTerm *args, int max)
+{
+  int n = 0;
+  for (;;)
+    {
+      if (n == max || !TRCalcSum(s, i, &args[n])) break;
+      n++;
+      TRCalcSkip(s, i);
+      if (s[*i] == ',') { (*i)++; continue; }
+      if (s[*i] == ')') { (*i)++; return n; }
+      break;
+    }
+  for (int a = 0; a < n; a++) TRCalcDrop(&args[a]);
+  return -1;
+}
+
 static BOOL TRCalcFactor(const char *s, size_t *i, TRCalcTerm *out)
 {
   TRCalcSkip(s, i);
+  out->node = NULL;
   if (strncmp(s + *i, "calc(", 5) == 0) { *i += 4; }
+  TRCalcTerm args[32];
+  int n;
+  if (strncmp(s + *i, "min(", 4) == 0 || strncmp(s + *i, "max(", 4) == 0)
+    {
+      char kind = s[*i + 1] == 'i' ? 'm' : 'M';
+      *i += 4;
+      return (n = TRCalcArgs(s, i, args, 32)) > 0 && TRCalcCombine(kind, args, n, out);
+    }
+  if (strncmp(s + *i, "clamp(", 6) == 0)
+    {
+      /* clamp(MIN, VAL, MAX) = max(MIN, min(VAL, MAX)) */
+      *i += 6;
+      n = TRCalcArgs(s, i, args, 3);
+      if (n != 3)
+        {
+          for (int a = 0; a < n; a++) TRCalcDrop(&args[a]);
+          return NO;
+        }
+      TRCalcTerm inner;
+      if (!TRCalcCombine('m', args + 1, 2, &inner)) { TRCalcDrop(&args[0]); return NO; }
+      args[1] = inner;
+      return TRCalcCombine('M', args, 2, out);
+    }
   if (s[*i] == '(')
     {
       (*i)++;
       if (!TRCalcSum(s, i, out)) return NO;
       TRCalcSkip(s, i);
-      if (s[*i] != ')') return NO;
+      if (s[*i] != ')') { TRCalcDrop(out); return NO; }
       (*i)++;
       return YES;
     }
@@ -177,20 +369,23 @@ static BOOL TRCalcProduct(const char *s, size_t *i, TRCalcTerm *out)
       if (op != '*' && op != '/') return YES;
       (*i)++;
       TRCalcTerm r;
-      if (!TRCalcFactor(s, i, &r)) return NO;
+      if (!TRCalcFactor(s, i, &r)) { TRCalcDrop(out); return NO; }
       if (op == '*')
         {
-          if (!out->num && !r.num) return NO;                 /* length * length */
-          double k = out->num ? out->px : r.px;
+          if (!out->num && !r.num) { TRCalcDrop(out); TRCalcDrop(&r); return NO; }   /* length * length */
+          /* A number term is always linear px (numbers never mix with %). */
           TRCalcTerm l = out->num ? r : *out;
-          out->px = l.num ? l.px * k : l.px * k;
-          out->pct = l.pct * k;
-          out->num = out->num && r.num;
+          double k = out->num ? out->px : r.px;
+          BOOL num = out->num && r.num;
+          if (out->num) TRCalcDrop(out); else TRCalcDrop(&r);
+          TRCalcScale(&l, k);
+          *out = l;
+          out->num = num;
         }
       else
         {
-          if (!r.num || r.px == 0) return NO;
-          out->px /= r.px; out->pct /= r.px;
+          if (!r.num || r.node || r.px == 0) { TRCalcDrop(out); TRCalcDrop(&r); return NO; }
+          TRCalcScale(out, 1 / r.px);
         }
     }
 }
@@ -205,23 +400,59 @@ static BOOL TRCalcSum(const char *s, size_t *i, TRCalcTerm *out)
       if (op != '+' && op != '-') return YES;
       (*i)++;
       TRCalcTerm r;
-      if (!TRCalcProduct(s, i, &r)) return NO;
-      if (r.num != out->num && !(r.px == 0 && r.pct == 0) && !(out->px == 0 && out->pct == 0)) return NO;
+      if (!TRCalcProduct(s, i, &r)) { TRCalcDrop(out); return NO; }
+      BOOL rZero = !r.node && r.px == 0 && r.pct == 0;
+      BOOL lZero = !out->node && out->px == 0 && out->pct == 0;
+      if (r.num != out->num && !rZero && !lZero) { TRCalcDrop(out); TRCalcDrop(&r); return NO; }
       double k = op == '+' ? 1 : -1;
-      out->px += k * r.px; out->pct += k * r.pct;
-      out->num = out->num && r.num;
+      BOOL num = out->num && r.num;
+      if (!out->node && !r.node)
+        {
+          out->px += k * r.px; out->pct += k * r.pct;
+        }
+      else
+        {
+          TRCalcScale(&r, k);
+          TRMathNode *m = TRMathNew('+', 2);
+          m->kids[0] = TRCalcNode(*out);
+          m->kids[1] = TRCalcNode(r);
+          out->px = out->pct = 0;
+          out->node = m;
+        }
+      out->num = num;
     }
+}
+
+static BOOL TRIsMathFunction(NSString *t)
+{
+  return [t hasPrefix: @"calc("] || [t hasPrefix: @"min("]
+    || [t hasPrefix: @"max("] || [t hasPrefix: @"clamp("];
 }
 
 static BOOL TRParseCalc(NSString *t, TRValue *out)
 {
-  if (![t hasPrefix: @"calc("] || ![t hasSuffix: @")"]) return NO;
+  if (!TRIsMathFunction(t) || ![t hasSuffix: @")"]) return NO;
   const char *s = [t UTF8String];
   size_t i = 0;
   TRCalcTerm r;
   if (!TRCalcFactor(s, &i, &r)) return NO;
   TRCalcSkip(s, &i);
-  if (s[i] != 0) return NO;
+  if (s[i] != 0) { TRCalcDrop(&r); return NO; }
+  if (r.node)
+    {
+      NSString *src = [[t componentsSeparatedByCharactersInSet:
+                         [NSCharacterSet whitespaceAndNewlineCharacterSet]]
+                        componentsJoinedByString: @" "];
+      while ([src rangeOfString: @"  "].location != NSNotFound)
+        src = [src stringByReplacingOccurrencesOfString: @"  " withString: @" "];
+      BOOL owned;
+      int idx = TRMathIntern(r.node, src, &owned);
+      if (!owned) TRCalcDrop(&r);
+      if (idx < 0) return NO;
+      TRValue v = { idx, TRUnitMath, 0 };
+      *out = v;
+      return YES;
+    }
   if (r.pct == 0) *out = TRPx(r.px);
   else if (r.px == 0) *out = TRPercent(r.pct);
   else { TRValue v = { r.px, TRUnitCalc, r.pct }; *out = v; }
@@ -244,7 +475,7 @@ static BOOL TRParseLength(NSString *tok, TRValue *out, BOOL allowAuto, BOOL allo
       *out = TRNone;
       return YES;
     }
-  if ([t hasPrefix: @"calc("]) return TRParseCalc(t, out);
+  if (TRIsMathFunction(t)) return TRParseCalc(t, out);
   TRFloat v;
   if ([t hasSuffix: @"%"])
     {
@@ -1134,6 +1365,7 @@ static NSString *TRValueString(TRValue v)
       case TRUnitMaxContent: return @"max-content";
       case TRUnitFitContent: return @"fit-content";
       case TRUnitStretch: return @"stretch";
+      case TRUnitMath: return TRMathSource((int)v.value);
     }
   return @"";
 }

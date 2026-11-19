@@ -1,0 +1,9 @@
+<column class="page">
+  <label class="title">Settings</label>
+  <field class="input" placeholder="Search"/>
+  <style>
+    .page { --gap: 8px; padding: max(var(--gap), 2%); gap: var(--gap); }
+    .title { width: clamp(120px, 40%, 480px); }
+    .input { width: calc(100% - min(10%, 40px)); }
+  </style>
+</column>

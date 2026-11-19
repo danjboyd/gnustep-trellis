@@ -49,6 +49,10 @@ $(B)/calc-locale: Tests/Engine/calc-locale.m $(B)/libTrellisEngine.dylib
 	$(CC) $(CFLAGS) -ISource/Engine -framework Foundation -L$(B) -lTrellisEngine \
 	  -Wl,-rpath,@executable_path Tests/Engine/calc-locale.m -o $@
 
+$(B)/math-functions: Tests/Engine/math-functions.m $(B)/libTrellisEngine.dylib
+	$(CC) $(CFLAGS) -ISource/Engine -framework Foundation -L$(B) -lTrellisEngine \
+	  -Wl,-rpath,@executable_path Tests/Engine/math-functions.m -o $@
+
 $(B)/markup-scale: Tests/Engine/markup-scale.m $(B)/libTrellisEngine.dylib
 	$(CC) $(CFLAGS) -ISource/Engine -framework Foundation -L$(B) -lTrellisEngine \
 	  -Wl,-rpath,@executable_path Tests/Engine/markup-scale.m -o $@
@@ -91,7 +95,7 @@ $(B)/TrellisPreview.app: Tools/TrellisPreview/TPController.m $(B)/libTrellis.dyl
 # rates and skip reasons.
 CONF_SUMMARY = sed -n -e 's/^FAIL \([^ :]*\).*/  fail: \1/p' -e '/^PASS /,$$p'
 
-check: all $(B)/virtual-layout $(B)/custom-properties $(B)/lint-targets $(B)/markup-scale $(B)/logical-style $(B)/calc-locale
+check: all $(B)/virtual-layout $(B)/custom-properties $(B)/lint-targets $(B)/markup-scale $(B)/logical-style $(B)/calc-locale $(B)/math-functions
 	$(B)/trellis-case Tests/Engine/cases
 	$(B)/virtual-layout
 	$(B)/custom-properties
@@ -99,6 +103,7 @@ check: all $(B)/virtual-layout $(B)/custom-properties $(B)/lint-targets $(B)/mar
 	$(B)/markup-scale
 	$(B)/logical-style
 	$(B)/calc-locale
+	$(B)/math-functions
 	@if [ -d Tests/Conformance/cases ]; then $(B)/trellis-case Tests/Conformance/cases | $(CONF_SUMMARY) || true; fi
 
 # Record this platform's results in docs/conformance/macos.json and

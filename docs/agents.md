@@ -246,8 +246,9 @@ collapses as in HTML, and the runs follow the label's `color`,
   don't. Give them `min-width`/`min-height: 24px` or a `gap`.
 - **Units:** `px`, `%` and `auto`, and `calc()` mixing them anywhere a
   length goes (`width: calc(100% - 24px)`, `margin: calc(5% + 4px) 8px`;
-  `+ - * /` and parentheses; not in grid track lists, and no `min()`,
-  `max()` or `clamp()`). `width`, `height`, their `min-`/`max-`
+  `+ - * /` and parentheses), and `min()`, `max()` and `clamp()`, alone
+  or nested (`width: clamp(200px, 40%, 480px)`); none of them in grid
+  track lists. `width`, `height`, their `min-`/`max-`
   forms and `flex-basis` also take `min-content`, `max-content`,
   `fit-content` and `stretch` (since 0.8; `flex-basis: stretch` acts as
   `content`, as in Yoga), and `initial` (their initial value: `auto`, or
@@ -285,7 +286,8 @@ collapses as in HTML, and the runs follow the label's `color`,
 
   An undefined `var()` without a fallback is an error at the element. A
   custom property set inside `@container` applies only inside that block
-  (write the `var()` uses there too, as above). No `calc()` yet.
+  (write the `var()` uses there too, as above). `var()` works inside
+  `calc()` and the other math functions: `calc(var(--gap) * 2)`.
 - **Unknown properties and bad values are errors,** with `file:line:col`.
 
 ## 4. Where Trellis is not the browser

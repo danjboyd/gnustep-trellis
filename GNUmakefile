@@ -134,6 +134,10 @@ check:: all
 	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ISource/Engine Tests/Engine/calc-locale.m \
 	  -o obj/calc-locale -L./obj -lTrellisEngine $(shell gnustep-config --base-libs)
 	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH ./obj/calc-locale
+	@echo "== min(), max() and clamp()"
+	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ISource/Engine Tests/Engine/math-functions.m \
+	  -o obj/math-functions -L./obj -lTrellisEngine $(shell gnustep-config --base-libs)
+	@LD_LIBRARY_PATH=./obj:$$LD_LIBRARY_PATH ./obj/math-functions
 	@echo "== logical sides in styles"
 	@$(CC) $(shell gnustep-config --objc-flags) -fobjc-arc -fblocks -ISource/Engine Tests/Engine/logical-style.m \
 	  -o obj/logical-style -L./obj -lTrellisEngine $(shell gnustep-config --base-libs)

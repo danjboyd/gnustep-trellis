@@ -48,7 +48,10 @@ typedef NS_ENUM(unsigned char, TRUnit) {
   TRUnitFitContent,
   TRUnitStretch,
   /* calc() of lengths and percentages, reduced to value px + pct % */
-  TRUnitCalc
+  TRUnitCalc,
+  /* min()/max()/clamp() mixing px with %: value is an index of an
+     interned expression, evaluated by TRMathEval at layout time. */
+  TRUnitMath
 };
 
 static inline BOOL TRUnitIsIntrinsic(TRUnit u) { return u >= TRUnitMinContent && u <= TRUnitStretch; }
@@ -59,7 +62,11 @@ typedef struct { TRFloat value; TRUnit unit; TRFloat pct; } TRValue;
 
 /* A percentage, or a calc() that may have one: resolves against a
    reference, and is indefinite when the reference is. */
-static inline BOOL TRIsPct(TRUnit u) { return u == TRUnitPercent || u == TRUnitCalc; }
+static inline BOOL TRIsPct(TRUnit u) { return u == TRUnitPercent || u == TRUnitCalc || u == TRUnitMath; }
+
+/* The interned min()/max()/clamp() expression at index, at a reference
+   length; NAN when the reference is indefinite. */
+TRFloat TRMathEval(int index, TRFloat ref);
 
 static inline TRValue TRPx(TRFloat v) { TRValue r = { v, TRUnitPoint }; return r; }
 static inline TRValue TRPercent(TRFloat v) { TRValue r = { v, TRUnitPercent }; return r; }
@@ -71,7 +78,7 @@ static inline TRValue TRNoneValue(void) { TRValue r = { 0, TRUnitUndefined }; re
 static inline BOOL TRValueEqual(TRValue a, TRValue b)
 {
   if (a.unit != b.unit) return NO;
-  if (a.unit == TRUnitPoint || a.unit == TRUnitPercent) return a.value == b.value;
+  if (a.unit == TRUnitPoint || a.unit == TRUnitPercent || a.unit == TRUnitMath) return a.value == b.value;
   if (a.unit == TRUnitCalc) return a.value == b.value && a.pct == b.pct;
   return YES;
 }
@@ -85,6 +92,7 @@ static inline TRFloat TRValueAt(TRValue v, TRFloat ref)
       case TRUnitPoint: return v.value;
       case TRUnitPercent: return isnan(ref) ? (TRFloat)NAN : v.value * ref / 100;
       case TRUnitCalc: return isnan(ref) ? (TRFloat)NAN : v.value + v.pct * ref / 100;
+      case TRUnitMath: return TRMathEval((int)v.value, ref);
       default: return (TRFloat)NAN;
     }
 }

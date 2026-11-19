@@ -210,7 +210,6 @@ static NSSet *TRDefaultUnsupported(void)
     @"grid-template-shorthand",  /* grid / grid-template with area strings */
     @"abspos-ancestor-cb",       /* abspos whose containing block the format can't express (fixed, or no positioned ancestor in the case) */
     @"containing-block-height",  /* % min/max-height on a root: no way to give a CB height without fixing it */
-    @"css-min-max",              /* min(), max(), clamp() values */
     @"css-calc-tracks",          /* calc() in grid track lists */
     @"margin-collapse",          /* CSS 2 collapsing margins (a block is a flex column here) */
     nil];

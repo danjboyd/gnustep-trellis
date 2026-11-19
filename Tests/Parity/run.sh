@@ -22,6 +22,10 @@
 #            its PNG must equal the TrellisPreview snapshot pixel for pixel
 #            (same platform and build)
 # And once:
+#   paths    open and export with a space and non-ASCII letters in every
+#            path (folder and file names, the fixture and its sample, the
+#            PNG and JSON written): the frames JSON must equal the plain
+#            open case's
 #   refuse   trellis-render refuses (exit 3) without a private GNUSTEP_HOME.
 #            HOME (and USERPROFILE on Windows) point at a stand-in folder, so
 #            even a broken guard could only touch that; the path rules
@@ -128,6 +132,21 @@ if [ "$(cat "$W/reload.rc" 2>/dev/null)" = 0 ] && grep -q 'Parity sample (edited
    && grep -q '"8"' "$OUT/reload-reload2.json" 2>/dev/null; then
   add "reload" PASS "reload-reload1 has the edited title, reload-reload2 the edited sample"
 else add "reload" FAIL "see reload.log (rc $(cat "$W/reload.rc" 2>/dev/null))"; fi
+
+# paths: spaces and non-ASCII letters in the fixture's and the outputs' paths
+PT=${THEMES%% *}; PT=${PT%%:*}
+PD="$OUT/work/dir with spaces ü"; PO="$OUT/out é"; mkdir -p "$PD" "$PO"
+cp "$FIX" "$PD/Façade ñ.trellis"; cp Tests/Parity/Parity.sample.json "$PD/Façade ñ.sample.json"
+if timeout 120 $RUN "$PREVIEW" "$PD/Façade ñ.trellis" --snapshot "$PO/snap ü.png" --export-json "$PO/frames ü.json" \
+     --width 900 --height 640 -GSTheme "$PT" > "$OUT/paths.log" 2>&1 && [ -s "$PO/snap ü.png" ] && [ -s "$PO/frames ü.json" ]; then
+  if "$PY" -I - "$PO/frames ü.json" "$OUT/open-$PT-light.json" <<'PY'
+import json, sys
+a, b = (json.load(open(f, encoding="utf-8")) for f in sys.argv[1:3])
+sys.exit(0 if (a["root"], a.get("focusOrder")) == (b["root"], b.get("focusOrder")) else 1)
+PY
+  then add "paths" PASS "open and export under 'dir with spaces ü' and 'out é': frames equal open-$PT-light"
+  else add "paths" FAIL "frames differ from open-$PT-light.json (see $PO)"; fi
+else add "paths" FAIL "no snapshot or JSON under '$PO' (see paths.log)"; fi
 
 # refuse: no private GNUSTEP_HOME, no render (a stand-in HOME either way)
 SI="$OUT/standin-home"; mkdir -p "$SI"
